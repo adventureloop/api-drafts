@@ -5,7 +5,7 @@
 TAPS Working Group                                      B. Trammell, Ed.
 Internet-Draft                                                ETH Zurich
 Intended status: Informational                             M. Welzl, Ed.
-Expires: August 3, 2018                               University of Oslo
+Expires: August 5, 2018                               University of Oslo
                                                             G. Fairhurst
                                                   University of Aberdeen
                                                            M. Kuehlewind
@@ -16,7 +16,7 @@ Expires: August 3, 2018                               University of Oslo
                                                                TU Berlin
                                                                  C. Wood
                                                               Apple Inc.
-                                                        January 30, 2018
+                                                       February 01, 2018
 
 
      An Abstract Application Layer Interface to Transport Services
@@ -48,14 +48,14 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on August 3, 2018.
+   This Internet-Draft will expire on August 5, 2018.
 
 
 
 
-Trammell, et al.         Expires August 3, 2018                 [Page 1]
+Trammell, et al.         Expires August 5, 2018                 [Page 1]
 
-Internet-Draft               TAPS Interface                 January 2018
+Internet-Draft               TAPS Interface                February 2018
 
 
 Copyright Notice
@@ -75,7 +75,7 @@ Copyright Notice
 
 Table of Contents
 
-   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
    2.  Terminology and Notation  . . . . . . . . . . . . . . . . . .   3
    3.  Design Principles . . . . . . . . . . . . . . . . . . . . . .   4
    4.  API Summary . . . . . . . . . . . . . . . . . . . . . . . . .   5
@@ -84,41 +84,36 @@ Table of Contents
      5.2.  Specifying Transport Parameters . . . . . . . . . . . . .   5
      5.3.  Specifying Cryptographic Parameters . . . . . . . . . . .   5
    6.  Establishing Connections  . . . . . . . . . . . . . . . . . .   5
-     6.1.  Active Open: Connect  . . . . . . . . . . . . . . . . . .   5
+     6.1.  Active Open: Initiate . . . . . . . . . . . . . . . . . .   5
      6.2.  Passive Open: Listen  . . . . . . . . . . . . . . . . . .   5
-     6.3.  Peer to Peer Establishment: Rendezvous  . . . . . . . . .   5
-     6.4.  Connection Groups . . . . . . . . . . . . . . . . . . . .   5
-   7.  Sending Data  . . . . . . . . . . . . . . . . . . . . . . . .   5
-     7.1.  Send Parameters . . . . . . . . . . . . . . . . . . . . .   5
+     6.3.  Peer to Peer Establishment: Rendezvous  . . . . . . . . .   6
+     6.4.  Connection Groups . . . . . . . . . . . . . . . . . . . .   6
+   7.  Sending Data  . . . . . . . . . . . . . . . . . . . . . . . .   6
+     7.1.  Send Parameters . . . . . . . . . . . . . . . . . . . . .   6
      7.2.  Sender-side Framing over Stream Protocols . . . . . . . .   6
    8.  Receiving Data  . . . . . . . . . . . . . . . . . . . . . . .   6
      8.1.  Receiver-side Deframing over Stream Protocols . . . . . .   6
-   9.  Responding to Events  . . . . . . . . . . . . . . . . . . . .   6
-   10. Error Handling  . . . . . . . . . . . . . . . . . . . . . . .   6
-   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
-   12. Security Considerations . . . . . . . . . . . . . . . . . . .   6
-   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .   6
-     13.1.  Normative References . . . . . . . . . . . . . . . . . .   6
-     13.2.  Informative References . . . . . . . . . . . . . . . . .   6
+   9.  Connection Termination  . . . . . . . . . . . . . . . . . . .   6
+   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
+   11. Security Considerations . . . . . . . . . . . . . . . . . . .   7
+   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .   7
+     12.1.  Normative References . . . . . . . . . . . . . . . . . .   7
+     12.2.  Informative References . . . . . . . . . . . . . . . . .   7
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   7
-
-
-
-
-
-
-
-
-Trammell, et al.         Expires August 3, 2018                 [Page 2]
-
-Internet-Draft               TAPS Interface                 January 2018
-
 
 1.  Introduction
 
    The BSD Unix Sockets API's SOCK_STREAM abstraction, by bringing
    network sockets into the UNIX programming model, allowing anyone who
    knew how to write programs that dealt with sequential-access files to
+
+
+
+Trammell, et al.         Expires August 5, 2018                 [Page 2]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    also write network applications, was a revolution in simplicity.  It
    would not be an overstatement to say that this simple API is the
    reason the Internet won the protocol wars of the 1980s.  SOCK_STREAM
@@ -163,20 +158,22 @@ Internet-Draft               TAPS Interface                 January 2018
 
          An Action is performed on an Object.
 
+   o  Object -> Event<>
 
 
-Trammell, et al.         Expires August 3, 2018                 [Page 3]
+
+
+
+
+Trammell, et al.         Expires August 5, 2018                 [Page 3]
 
-Internet-Draft               TAPS Interface                 January 2018
-
-
-   o  Object -> Event()
-
+Internet-Draft               TAPS Interface                February 2018
 
 
          An Object sends an Event.
 
-   o  Action(Parameters) / Event(Parameters)
+   o  Action(parameter, parameter, ...) / Event<parameter, parameter,
+      ...>
 
 
 
@@ -217,22 +214,22 @@ Internet-Draft               TAPS Interface                 January 2018
       and deframing where the underlying transport does not provide
       these.
 
-
-
-
-
-Trammell, et al.         Expires August 3, 2018                 [Page 4]
-
-Internet-Draft               TAPS Interface                 January 2018
-
-
    o  Asynchronous connection establishment, transmission, and
       reception, allowing most application interactions with the
       transport layer to be event-driven.
 
+
+
+
+Trammell, et al.         Expires August 5, 2018                 [Page 4]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
 4.  API Summary
 
-   summarize API here
+   [TASK: write three paragraph summary here, should state how all this
+   works for common cases from the application's PoV.]
 
    In the following sections, we describe the details of application
    interaction with Objects through Actions and Events in each phase of
@@ -242,76 +239,125 @@ Internet-Draft               TAPS Interface                 January 2018
 
    Establishment begins with the creation of a Connection...
 
+   Connection := NewConnection(remoteSpecifier, transportParameters,
+   cryptographicParameters)
+
 5.1.  Resolving Remote Endpoints
 
-   note here: resolution should be flexible, and should accept URLS and
-   URL-like things. binding to transport or pseudotransport happens via
-   pre-establishment properties.
+   [TASK: write me. note: resolution should be flexible, and should
+   accept URLS and URL-like things. binding to transport or
+   pseudotransport happens via pre-establishment properties. resolution
+   happens as part of connection creation.]
 
 5.2.  Specifying Transport Parameters
 
-   list parameters to bind to a connection before establishing it
+   [TASK: write me. list parameters to bind to a connection before
+   establishing it. look at minset for this. note that the API should
+   have sensible and well-defined defaults.]
 
 5.3.  Specifying Cryptographic Parameters
 
-   list cryptographic parameters supported during pre-establishment
+   [TASK: write me. separate out cryptographic parameters, since these
+   bind to a local and a remote. chris?]
 
 6.  Establishing Connections
 
-6.1.  Active Open: Connect
+6.1.  Active Open: Initiate
+
+   Connection.Initiate()
+
+   Connection -> Ready<>
 
 6.2.  Passive Open: Listen
 
+   Connection.Listen()
+
+   Connection -> ConnectionReceived<remoteSpecifier>
+
+
+
+
+Trammell, et al.         Expires August 5, 2018                 [Page 5]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
 6.3.  Peer to Peer Establishment: Rendezvous
+
+   Connection.Rendezvous()
+
+   Connection -> Ready<>
 
 6.4.  Connection Groups
 
 7.  Sending Data
 
+   Connection.Send(Content, ...)
+
+   Connection -> Sent<>
+
+   Connection -> SendError<>
+
 7.1.  Send Parameters
-
-
-
-
-
-
-
-
-Trammell, et al.         Expires August 3, 2018                 [Page 5]
-
-Internet-Draft               TAPS Interface                 January 2018
-
 
 7.2.  Sender-side Framing over Stream Protocols
 
+   Connection.FrameWith(Framer)
+
+   Octets := Framer.Frame(Content)
+
 8.  Receiving Data
+
+   Connection -> Received<Content>
+
+   Connection -> ReceiveError<>
 
 8.1.  Receiver-side Deframing over Stream Protocols
 
-9.  Responding to Events
+   Connection.DeframeWith(Deframer)
 
-10.  Error Handling
+   Content := Deframer.Deframe(OctetStream)
 
-11.  IANA Considerations
+9.  Connection Termination
+
+   Connection.Close()
+
+   Connection -> Finished<>
+
+   Connection.Abort()
+
+   Connection -> ConnectionError<>
+
+
+
+
+
+
+Trammell, et al.         Expires August 5, 2018                 [Page 6]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
+10.  IANA Considerations
 
    RFC-EDITOR: Please remove this section before publication.
 
    This document has no actions for IANA.
 
-12.  Security Considerations
+11.  Security Considerations
 
    be paranoid
 
-13.  References
+12.  References
 
-13.1.  Normative References
+12.1.  Normative References
 
    [TAPS-ARCH]
               Pauly, T., Ed., Trammell, B., Ed., Brunstrom, A.,
               Fairhurst, G., Perkins, C., Tiesel, P., and C. Wood, "An
               Architecture for Transport Services", n.d..
 
-13.2.  Informative References
+12.2.  Informative References
 
    [RFC0793]  Postel, J., "Transmission Control Protocol", STD 7,
               RFC 793, DOI 10.17487/RFC0793, September 1981,
@@ -328,16 +374,6 @@ Internet-Draft               TAPS Interface                 January 2018
               Services for TAPS Systems", draft-ietf-taps-minset-00
               (work in progress), October 2017.
 
-
-
-
-
-
-Trammell, et al.         Expires August 3, 2018                 [Page 6]
-
-Internet-Draft               TAPS Interface                 January 2018
-
-
 Authors' Addresses
 
    Brian Trammell (editor)
@@ -347,6 +383,15 @@ Authors' Addresses
    Switzerland
 
    Email: ietf@trammell.ch
+
+
+
+
+
+
+Trammell, et al.         Expires August 5, 2018                 [Page 7]
+
+Internet-Draft               TAPS Interface                February 2018
 
 
    Michael Welzl (editor)
@@ -383,17 +428,6 @@ Authors' Addresses
    Email: philipp@inet.tu-berlin.de
 
 
-
-
-
-
-
-
-Trammell, et al.         Expires August 3, 2018                 [Page 7]
-
-Internet-Draft               TAPS Interface                 January 2018
-
-
    Chris Wood
    Apple Inc.
    1 Infinite Loop
@@ -411,38 +445,4 @@ Internet-Draft               TAPS Interface                 January 2018
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Trammell, et al.         Expires August 3, 2018                 [Page 8]
+Trammell, et al.         Expires August 5, 2018                 [Page 8]
