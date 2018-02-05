@@ -296,10 +296,16 @@ address {
 <link href="#rfc.section.6.3" rel="Chapter" title="6.3 Peer to Peer Establishment: Rendezvous">
 <link href="#rfc.section.6.4" rel="Chapter" title="6.4 Connection Groups">
 <link href="#rfc.section.7" rel="Chapter" title="7 Sending Data">
-<link href="#rfc.section.7.1" rel="Chapter" title="7.1 Send Parameters">
+<link href="#rfc.section.7.1" rel="Chapter" title="7.1 Send Properties">
+<link href="#rfc.section.7.1.1" rel="Chapter" title="7.1.1 Lifetime">
+<link href="#rfc.section.7.1.2" rel="Chapter" title="7.1.2 Niceness">
+<link href="#rfc.section.7.1.3" rel="Chapter" title="7.1.3 Ordered">
+<link href="#rfc.section.7.1.4" rel="Chapter" title="7.1.4 Immediate">
+<link href="#rfc.section.7.1.5" rel="Chapter" title="7.1.5 Idempotent">
 <link href="#rfc.section.7.2" rel="Chapter" title="7.2 Sender-side Framing over Stream Protocols">
 <link href="#rfc.section.8" rel="Chapter" title="8 Receiving Data">
-<link href="#rfc.section.8.1" rel="Chapter" title="8.1 Receiver-side Deframing over Stream Protocols">
+<link href="#rfc.section.8.1" rel="Chapter" title="8.1 Application-Layer Backpressure at the Receiver">
+<link href="#rfc.section.8.2" rel="Chapter" title="8.2 Receiver-side Deframing over Stream Protocols">
 <link href="#rfc.section.9" rel="Chapter" title="9 Connection Termination">
 <link href="#rfc.section.10" rel="Chapter" title="10 Event and Error Handling">
 <link href="#rfc.section.11" rel="Chapter" title="11 IANA Considerations">
@@ -438,13 +444,25 @@ address {
 </li>
 </ul><li>7.   <a href="#rfc.section.7">Sending Data</a>
 </li>
-<ul><li>7.1.   <a href="#rfc.section.7.1">Send Parameters</a>
+<ul><li>7.1.   <a href="#rfc.section.7.1">Send Properties</a>
 </li>
-<li>7.2.   <a href="#rfc.section.7.2">Sender-side Framing over Stream Protocols</a>
+<ul><li>7.1.1.   <a href="#rfc.section.7.1.1">Lifetime</a>
+</li>
+<li>7.1.2.   <a href="#rfc.section.7.1.2">Niceness</a>
+</li>
+<li>7.1.3.   <a href="#rfc.section.7.1.3">Ordered</a>
+</li>
+<li>7.1.4.   <a href="#rfc.section.7.1.4">Immediate</a>
+</li>
+<li>7.1.5.   <a href="#rfc.section.7.1.5">Idempotent</a>
+</li>
+</ul><li>7.2.   <a href="#rfc.section.7.2">Sender-side Framing over Stream Protocols</a>
 </li>
 </ul><li>8.   <a href="#rfc.section.8">Receiving Data</a>
 </li>
-<ul><li>8.1.   <a href="#rfc.section.8.1">Receiver-side Deframing over Stream Protocols</a>
+<ul><li>8.1.   <a href="#rfc.section.8.1">Application-Layer Backpressure at the Receiver</a>
+</li>
+<li>8.2.   <a href="#rfc.section.8.2">Receiver-side Deframing over Stream Protocols</a>
 </li>
 </ul><li>9.   <a href="#rfc.section.9">Connection Termination</a>
 </li>
@@ -554,7 +572,7 @@ address {
 <p id="rfc.section.6.1.p.7">Connection -&gt; InitiateError&lt;&gt;</p>
 <p id="rfc.section.6.1.p.8">An InitiateError occurs either when the set of local and remote specifiers and transport and cryptographic parameters cannot be fulfilled on a connection for initiation (e.g. the set of available Paths and/or Protocol Stacks meeting the constraints is empty), when the remote specifier cannot be resolved, or when no transport-layer connection can be established to the remote endpoint (e.g.  because the remote endpoint is not accepting connections, or the application is prohibited from opening a connection by the operating system).</p>
 <h1 id="rfc.section.6.2">
-<a href="#rfc.section.6.2">6.2.</a> <a href="#passive-open-listen" id="passive-open-listen">Passive Open: Listen</a>
+<a href="#rfc.section.6.2">6.2.</a> <a href="#listen" id="listen">Passive Open: Listen</a>
 </h1>
 <p id="rfc.section.6.2.p.1">Passive open is the action of waiting for connections from remote endpoints, commonly used by servers in client-server interactions. Passive open is supported by this interface through the Listen action:</p>
 <p id="rfc.section.6.2.p.2">Connection.Listen()</p>
@@ -564,39 +582,72 @@ address {
 <p id="rfc.section.6.2.p.6">Connection -&gt; ListenError&lt;&gt;</p>
 <p id="rfc.section.6.2.p.7">A ListenError occurs either when the set of local specifier, transport and cryptographic parameters cannot be fulfilled for listening, when the local specifier cannot be resolved, or when the application is prohibited from listening by the operating system.</p>
 <h1 id="rfc.section.6.3">
-<a href="#rfc.section.6.3">6.3.</a> <a href="#peer-to-peer-establishment-rendezvous" id="peer-to-peer-establishment-rendezvous">Peer to Peer Establishment: Rendezvous</a>
+<a href="#rfc.section.6.3">6.3.</a> <a href="#rendezvous" id="rendezvous">Peer to Peer Establishment: Rendezvous</a>
 </h1>
 <p id="rfc.section.6.3.p.1">Connection.Rendezvous()</p>
 <p id="rfc.section.6.3.p.2">Connection -&gt; Ready&lt;&gt;</p>
 <p id="rfc.section.6.3.p.3">Connection -&gt; RendezvousError&lt;&gt;</p>
 <h1 id="rfc.section.6.4">
-<a href="#rfc.section.6.4">6.4.</a> <a href="#connection-groups" id="connection-groups">Connection Groups</a>
+<a href="#rfc.section.6.4">6.4.</a> <a href="#groups" id="groups">Connection Groups</a>
 </h1>
 <h1 id="rfc.section.7">
 <a href="#rfc.section.7">7.</a> <a href="#sending" id="sending">Sending Data</a>
 </h1>
-<p id="rfc.section.7.p.1">Connection.Send(Content, &#8230;)</p>
-<p id="rfc.section.7.p.2">Connection -&gt; Sent&lt;&gt;</p>
-<p id="rfc.section.7.p.3">Connection -&gt; SendError&lt;&gt;</p>
+<p id="rfc.section.7.p.1">Once a Connection has been established, it can be used for sending data. Data is sent by passing a Content object and additional properties <a href="#send-props" class="xref">Section 7.1</a> to the Send action on an established connection:</p>
+<p id="rfc.section.7.p.2">Connection.Send(Content, &#8230;)</p>
+<p id="rfc.section.7.p.3">The type of the Content to be passed is dependent on the implementation, and on the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. It may itself contain an array of octets to be transmitted in the transport protocol payload, or be transformable to an array of octets by a sender-side framer (see <a href="#send-framing" class="xref">Section 7.2</a>).</p>
+<p id="rfc.section.7.p.4">Like all Actions in this interface, the Send action is asynchronous. However, a Send call may block until there is sufficient buffer space in the implementation and/or the underlying Protocol Stack to handle the Content, in order to provide sender-side backpressure to the application when transmission is limited by transport channel capacity.</p>
+<p id="rfc.section.7.p.5">Connection -&gt; Sent&lt;contentRef&gt;</p>
+<p id="rfc.section.7.p.6">The Sent event occurs when a previous Send action has completed, i.e. when the data derived from the Content has been passed down or through the underlying Protocol Stack and is no longer the responsbility of the implementation of this interface. The exact disposition of Content when the Sent event occurs is specific to the implementation and the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. The Sent event contains an implementation-specific reference to the Content to which it applies.</p>
+<p id="rfc.section.7.p.7">Connection -&gt; Expired&lt;contentRef&gt;</p>
+<p id="rfc.section.7.p.8">The Expired event occurs when a previous Send action expired before completion; i.e. when the data derived from the Content was not sent before its Lifetime (see <a href="#send-lifetime" class="xref">Section 7.1.1</a>) expired. This is separate from SendError, as it is an expected behavior for partially reliable transports. The Expired event contains an implementation-specific reference to the Content to which it applies.</p>
+<p id="rfc.section.7.p.9">Connection -&gt; SendError&lt;contentRef&gt;</p>
+<p id="rfc.section.7.p.10">A SendError occurs when Content could not be sent due to an error condition: some failure of the underlying Protocol Stack, or a set of send parameters not consistent with the Connection&#8217;s transport parameters.</p>
 <h1 id="rfc.section.7.1">
-<a href="#rfc.section.7.1">7.1.</a> <a href="#send-parameters" id="send-parameters">Send Parameters</a>
+<a href="#rfc.section.7.1">7.1.</a> <a href="#send-props" id="send-props">Send Properties</a>
 </h1>
+<p id="rfc.section.7.1.p.1">The Send action takes five per-Content properties which control how it will be sent down to the underlying Protocol Stack and transmitted. Note that some of these properties are not compatible with transport parameters; attempting to Send with such an incompatibility yields a SendError.</p>
+<h1 id="rfc.section.7.1.1">
+<a href="#rfc.section.7.1.1">7.1.1.</a> <a href="#send-lifetime" id="send-lifetime">Lifetime</a>
+</h1>
+<p id="rfc.section.7.1.1.p.1">Lifetime specifies how long a particular Content can wait to be sent to the remote endpoint before it is irrelevant and no longer needs to be (re-)transmitted. When a Content&#8217;s Lifetime is infinite, it must be transmitted reliably. The type and units of Lifetime are implementation-specific.</p>
+<h1 id="rfc.section.7.1.2">
+<a href="#rfc.section.7.1.2">7.1.2.</a> <a href="#send-niceness" id="send-niceness">Niceness</a>
+</h1>
+<p id="rfc.section.7.1.2.p.1">Niceness represents an unbounded hierarchy of priorities of Content, relative to other Content sent over the same Connection and/or Connection Group (see <a href="#groups" class="xref">Section 6.4</a>). It is most naturally represented as a non-negative integer.  Content with Niceness 0 will yield to Content with Niceness 1, which will yield to Content with Niceness 2, and so on. Niceness may be used as a sender-side scheduling construct only, or be used to specify priorities on the wire for Protocol Stacks supporting prioritization.</p>
+<p id="rfc.section.7.1.2.p.2">Note that this inversion of normal schemes for expressing priority has a convenient property: priority increases as both Niceness and Lifetime decrease.</p>
+<h1 id="rfc.section.7.1.3">
+<a href="#rfc.section.7.1.3">7.1.3.</a> <a href="#send-ordered" id="send-ordered">Ordered</a>
+</h1>
+<p id="rfc.section.7.1.3.p.1">Ordered is a boolean property. If true, this Content should be delivered after the last Content passed to the same Connection via the Send action; if false, this Content may be delivered before the last Content passed to the same Connection.</p>
+<h1 id="rfc.section.7.1.4">
+<a href="#rfc.section.7.1.4">7.1.4.</a> <a href="#send-immediate" id="send-immediate">Immediate</a>
+</h1>
+<p id="rfc.section.7.1.4.p.1">Immediate is a boolean property. If true, the caller prefers immediacy to efficiency for this Content, and the Content should not be bundled with other Content into the same transmission by the underlying Protocol Stack.</p>
+<h1 id="rfc.section.7.1.5">
+<a href="#rfc.section.7.1.5">7.1.5.</a> <a href="#send-idempotent" id="send-idempotent">Idempotent</a>
+</h1>
+<p id="rfc.section.7.1.5.p.1">Idempotent is a boolean property. If true, the application-layer entity in the Content is safe to send to the remote endpoint more than once for a single Send action. It is used to mark data safe for certain 0-RTT establishment techniques, where retransmission of the 0-RTT data may cause the remote application to receive the Content multiple times.</p>
+<p id="rfc.section.7.1.5.p.2">[NOTE: we need some way to signal to the transport that we want to wait for 0RTT data on Initiate. Probably a transport parameter]</p>
 <h1 id="rfc.section.7.2">
-<a href="#rfc.section.7.2">7.2.</a> <a href="#sender-side-framing-over-stream-protocols" id="sender-side-framing-over-stream-protocols">Sender-side Framing over Stream Protocols</a>
+<a href="#rfc.section.7.2">7.2.</a> <a href="#send-framing" id="send-framing">Sender-side Framing over Stream Protocols</a>
 </h1>
 <p id="rfc.section.7.2.p.1">Connection.FrameWith(Framer)</p>
-<p id="rfc.section.7.2.p.2">Octets := Framer.Frame(Content)</p>
+<p id="rfc.section.7.2.p.2">OctetArray := Framer.Frame(Content)</p>
 <h1 id="rfc.section.8">
 <a href="#rfc.section.8">8.</a> <a href="#receiving" id="receiving">Receiving Data</a>
 </h1>
 <p id="rfc.section.8.p.1">Connection -&gt; Received&lt;Content&gt;</p>
 <p id="rfc.section.8.p.2">Connection -&gt; ReceiveError&lt;&gt;</p>
 <h1 id="rfc.section.8.1">
-<a href="#rfc.section.8.1">8.1.</a> <a href="#receiver-side-deframing-over-stream-protocols" id="receiver-side-deframing-over-stream-protocols">Receiver-side Deframing over Stream Protocols</a>
+<a href="#rfc.section.8.1">8.1.</a> <a href="#receive-backpressure" id="receive-backpressure">Application-Layer Backpressure at the Receiver</a>
 </h1>
-<p id="rfc.section.8.1.p.1">Connection.DeframeWith(Deframer)</p>
-<p id="rfc.section.8.1.p.2">Content := Deframer.Deframe(OctetStream)</p>
-<p id="rfc.section.8.1.p.3">[NOTE: somewhere we should capture the idea that a Content has metadata that comes from the stack. This set of actions doesn&#8217;t allow for that as is.]</p>
+<h1 id="rfc.section.8.2">
+<a href="#rfc.section.8.2">8.2.</a> <a href="#receive-framing" id="receive-framing">Receiver-side Deframing over Stream Protocols</a>
+</h1>
+<p id="rfc.section.8.2.p.1">Connection.DeframeWith(Deframer)</p>
+<p id="rfc.section.8.2.p.2">Content := Deframer.Deframe(OctetStream)</p>
+<p id="rfc.section.8.2.p.3">[NOTE: somewhere we should capture the idea that a Content has metadata that comes from the stack. This set of actions doesn&#8217;t allow for that as is.]</p>
 <h1 id="rfc.section.9">
 <a href="#rfc.section.9">9.</a> <a href="#connection-termination" id="connection-termination">Connection Termination</a>
 </h1>

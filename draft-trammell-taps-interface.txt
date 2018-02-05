@@ -89,23 +89,23 @@ Table of Contents
      6.3.  Peer to Peer Establishment: Rendezvous  . . . . . . . . .   7
      6.4.  Connection Groups . . . . . . . . . . . . . . . . . . . .   7
    7.  Sending Data  . . . . . . . . . . . . . . . . . . . . . . . .   7
-     7.1.  Send Parameters . . . . . . . . . . . . . . . . . . . . .   8
-     7.2.  Sender-side Framing over Stream Protocols . . . . . . . .   8
-   8.  Receiving Data  . . . . . . . . . . . . . . . . . . . . . . .   8
-     8.1.  Receiver-side Deframing over Stream Protocols . . . . . .   8
-   9.  Connection Termination  . . . . . . . . . . . . . . . . . . .   8
-   10. Event and Error Handling  . . . . . . . . . . . . . . . . . .   8
-   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
-   12. Security Considerations . . . . . . . . . . . . . . . . . . .   9
-   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .   9
-     13.1.  Normative References . . . . . . . . . . . . . . . . . .   9
-     13.2.  Informative References . . . . . . . . . . . . . . . . .   9
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   9
-
-
-
-
-
+     7.1.  Send Properties . . . . . . . . . . . . . . . . . . . . .   8
+       7.1.1.  Lifetime  . . . . . . . . . . . . . . . . . . . . . .   9
+       7.1.2.  Niceness  . . . . . . . . . . . . . . . . . . . . . .   9
+       7.1.3.  Ordered . . . . . . . . . . . . . . . . . . . . . . .   9
+       7.1.4.  Immediate . . . . . . . . . . . . . . . . . . . . . .   9
+       7.1.5.  Idempotent  . . . . . . . . . . . . . . . . . . . . .   9
+     7.2.  Sender-side Framing over Stream Protocols . . . . . . . .  10
+   8.  Receiving Data  . . . . . . . . . . . . . . . . . . . . . . .  10
+     8.1.  Application-Layer Backpressure at the Receiver  . . . . .  10
+     8.2.  Receiver-side Deframing over Stream Protocols . . . . . .  10
+   9.  Connection Termination  . . . . . . . . . . . . . . . . . . .  10
+   10. Event and Error Handling  . . . . . . . . . . . . . . . . . .  10
+   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
+   12. Security Considerations . . . . . . . . . . . . . . . . . . .  11
+   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  11
+     13.1.  Normative References . . . . . . . . . . . . . . . . . .  11
+     13.2.  Informative References . . . . . . . . . . . . . . . . .  11
 
 
 
@@ -113,6 +113,8 @@ Trammell, et al.         Expires August 9, 2018                 [Page 2]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  11
 
 1.  Introduction
 
@@ -161,14 +163,14 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-         An Action is performed on an Object.
-
 
 
 Trammell, et al.         Expires August 9, 2018                 [Page 3]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+         An Action is performed on an Object.
 
    o  Object -> Event<>
 
@@ -214,9 +216,7 @@ Internet-Draft               TAPS Interface                February 2018
       features, and for long-term caching of cryptographic identities
       and parameters for associations among endpoints.
 
-   o  Atomic transmission of content, using application-assisted framing
-      and deframing where the underlying transport does not provide
-      these.
+
 
 
 
@@ -225,6 +225,10 @@ Trammell, et al.         Expires August 9, 2018                 [Page 4]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   o  Atomic transmission of content, using application-assisted framing
+      and deframing where the underlying transport does not provide
+      these.
 
    o  Asynchronous connection establishment, transmission, and
       reception, allowing most application interactions with the
@@ -270,10 +274,6 @@ Internet-Draft               TAPS Interface                February 2018
    established.  Establishment ends the pre-establishment phase; all
    transport and cryptographic parameter specification must be complete
    before establishment, as these parameters will be used to select
-   candidate Paths and Protocol Stacks for the Connection.
-   Establishment may be active, using the Initiate() Action; passive,
-   using the Listen() Action; or simultaneous for peer-to-peer, using
-
 
 
 
@@ -282,6 +282,9 @@ Trammell, et al.         Expires August 9, 2018                 [Page 5]
 Internet-Draft               TAPS Interface                February 2018
 
 
+   candidate Paths and Protocol Stacks for the Connection.
+   Establishment may be active, using the Initiate() Action; passive,
+   using the Listen() Action; or simultaneous for peer-to-peer, using
    the Rendezvous() Action.  These Actions are described in the
    subsections below.
 
@@ -325,9 +328,6 @@ Internet-Draft               TAPS Interface                February 2018
    connection can be established to the remote endpoint (e.g.  because
    the remote endpoint is not accepting connections, or the application
    is prohibited from opening a connection by the operating system).
-
-
-
 
 
 
@@ -381,11 +381,11 @@ Internet-Draft               TAPS Interface                February 2018
 
 7.  Sending Data
 
-   Connection.Send(Content, ...)
+   Once a Connection has been established, it can be used for sending
+   data.  Data is sent by passing a Content object and additional
+   properties Section 7.1 to the Send action on an established
+   connection:
 
-   Connection -> Sent<>
-
-   Connection -> SendError<>
 
 
 
@@ -394,13 +394,126 @@ Trammell, et al.         Expires August 9, 2018                 [Page 7]
 Internet-Draft               TAPS Interface                February 2018
 
 
-7.1.  Send Parameters
+   Connection.Send(Content, ...)
+
+   The type of the Content to be passed is dependent on the
+   implementation, and on the constraints on the Protocol Stacks implied
+   by the Connection's transport parameters.  It may itself contain an
+   array of octets to be transmitted in the transport protocol payload,
+   or be transformable to an array of octets by a sender-side framer
+   (see Section 7.2).
+
+   Like all Actions in this interface, the Send action is asynchronous.
+   However, a Send call may block until there is sufficient buffer space
+   in the implementation and/or the underlying Protocol Stack to handle
+   the Content, in order to provide sender-side backpressure to the
+   application when transmission is limited by transport channel
+   capacity.
+
+   Connection -> Sent<contentRef>
+
+   The Sent event occurs when a previous Send action has completed, i.e.
+   when the data derived from the Content has been passed down or
+   through the underlying Protocol Stack and is no longer the
+   responsbility of the implementation of this interface.  The exact
+   disposition of Content when the Sent event occurs is specific to the
+   implementation and the constraints on the Protocol Stacks implied by
+   the Connection's transport parameters.  The Sent event contains an
+   implementation-specific reference to the Content to which it applies.
+
+   Connection -> Expired<contentRef>
+
+   The Expired event occurs when a previous Send action expired before
+   completion; i.e. when the data derived from the Content was not sent
+   before its Lifetime (see Section 7.1.1) expired.  This is separate
+   from SendError, as it is an expected behavior for partially reliable
+   transports.  The Expired event contains an implementation-specific
+   reference to the Content to which it applies.
+
+   Connection -> SendError<contentRef>
+
+   A SendError occurs when Content could not be sent due to an error
+   condition: some failure of the underlying Protocol Stack, or a set of
+   send parameters not consistent with the Connection's transport
+   parameters.
+
+7.1.  Send Properties
+
+   The Send action takes five per-Content properties which control how
+   it will be sent down to the underlying Protocol Stack and
+   transmitted.  Note that some of these properties are not compatible
+
+
+
+Trammell, et al.         Expires August 9, 2018                 [Page 8]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
+   with transport parameters; attempting to Send with such an
+   incompatibility yields a SendError.
+
+7.1.1.  Lifetime
+
+   Lifetime specifies how long a particular Content can wait to be sent
+   to the remote endpoint before it is irrelevant and no longer needs to
+   be (re-)transmitted.  When a Content's Lifetime is infinite, it must
+   be transmitted reliably.  The type and units of Lifetime are
+   implementation-specific.
+
+7.1.2.  Niceness
+
+   Niceness represents an unbounded hierarchy of priorities of Content,
+   relative to other Content sent over the same Connection and/or
+   Connection Group (see Section 6.4).  It is most naturally represented
+   as a non-negative integer.  Content with Niceness 0 will yield to
+   Content with Niceness 1, which will yield to Content with Niceness 2,
+   and so on.  Niceness may be used as a sender-side scheduling
+   construct only, or be used to specify priorities on the wire for
+   Protocol Stacks supporting prioritization.
+
+   Note that this inversion of normal schemes for expressing priority
+   has a convenient property: priority increases as both Niceness and
+   Lifetime decrease.
+
+7.1.3.  Ordered
+
+   Ordered is a boolean property.  If true, this Content should be
+   delivered after the last Content passed to the same Connection via
+   the Send action; if false, this Content may be delivered before the
+   last Content passed to the same Connection.
+
+7.1.4.  Immediate
+
+   Immediate is a boolean property.  If true, the caller prefers
+   immediacy to efficiency for this Content, and the Content should not
+   be bundled with other Content into the same transmission by the
+   underlying Protocol Stack.
+
+7.1.5.  Idempotent
+
+   Idempotent is a boolean property.  If true, the application-layer
+   entity in the Content is safe to send to the remote endpoint more
+   than once for a single Send action.  It is used to mark data safe for
+   certain 0-RTT establishment techniques, where retransmission of the
+   0-RTT data may cause the remote application to receive the Content
+   multiple times.
+
+
+
+Trammell, et al.         Expires August 9, 2018                 [Page 9]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
+   [NOTE: we need some way to signal to the transport that we want to
+   wait for 0RTT data on Initiate.  Probably a transport parameter]
 
 7.2.  Sender-side Framing over Stream Protocols
 
    Connection.FrameWith(Framer)
 
-   Octets := Framer.Frame(Content)
+   OctetArray := Framer.Frame(Content)
 
 8.  Receiving Data
 
@@ -408,7 +521,9 @@ Internet-Draft               TAPS Interface                February 2018
 
    Connection -> ReceiveError<>
 
-8.1.  Receiver-side Deframing over Stream Protocols
+8.1.  Application-Layer Backpressure at the Receiver
+
+8.2.  Receiver-side Deframing over Stream Protocols
 
    Connection.DeframeWith(Deframer)
 
@@ -442,10 +557,7 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-
-
-
-Trammell, et al.         Expires August 9, 2018                 [Page 8]
+Trammell, et al.         Expires August 9, 2018                [Page 10]
 
 Internet-Draft               TAPS Interface                February 2018
 
@@ -501,7 +613,7 @@ Authors' Addresses
 
 
 
-Trammell, et al.         Expires August 9, 2018                 [Page 9]
+Trammell, et al.         Expires August 9, 2018                [Page 11]
 
 Internet-Draft               TAPS Interface                February 2018
 
@@ -557,4 +669,4 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.         Expires August 9, 2018                [Page 10]
+Trammell, et al.         Expires August 9, 2018                [Page 12]
