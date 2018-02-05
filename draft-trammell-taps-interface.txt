@@ -85,21 +85,21 @@ Table of Contents
      5.3.  Specifying Cryptographic Parameters . . . . . . . . . . .   5
    6.  Establishing Connections  . . . . . . . . . . . . . . . . . .   5
      6.1.  Active Open: Initiate . . . . . . . . . . . . . . . . . .   6
-     6.2.  Passive Open: Listen  . . . . . . . . . . . . . . . . . .   6
+     6.2.  Passive Open: Listen  . . . . . . . . . . . . . . . . . .   7
      6.3.  Peer to Peer Establishment: Rendezvous  . . . . . . . . .   7
      6.4.  Connection Groups . . . . . . . . . . . . . . . . . . . .   7
    7.  Sending Data  . . . . . . . . . . . . . . . . . . . . . . . .   7
-     7.1.  Send Parameters . . . . . . . . . . . . . . . . . . . . .   7
-     7.2.  Sender-side Framing over Stream Protocols . . . . . . . .   7
-   8.  Receiving Data  . . . . . . . . . . . . . . . . . . . . . . .   7
-     8.1.  Receiver-side Deframing over Stream Protocols . . . . . .   7
+     7.1.  Send Parameters . . . . . . . . . . . . . . . . . . . . .   8
+     7.2.  Sender-side Framing over Stream Protocols . . . . . . . .   8
+   8.  Receiving Data  . . . . . . . . . . . . . . . . . . . . . . .   8
+     8.1.  Receiver-side Deframing over Stream Protocols . . . . . .   8
    9.  Connection Termination  . . . . . . . . . . . . . . . . . . .   8
    10. Event and Error Handling  . . . . . . . . . . . . . . . . . .   8
    11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
-   12. Security Considerations . . . . . . . . . . . . . . . . . . .   8
-   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .   8
-     13.1.  Normative References . . . . . . . . . . . . . . . . . .   8
-     13.2.  Informative References . . . . . . . . . . . . . . . . .   8
+   12. Security Considerations . . . . . . . . . . . . . . . . . . .   9
+   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .   9
+     13.1.  Normative References . . . . . . . . . . . . . . . . . .   9
+     13.2.  Informative References . . . . . . . . . . . . . . . . .   9
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   9
 
 
@@ -290,15 +290,16 @@ Internet-Draft               TAPS Interface                February 2018
    Active open is the action of establishing a connection to an endpoint
    presumed to be listening for incoming connection requests, commonly
    used by clients in client-server interactions.  Active open is
-   supported by this Interface through the Initiate action:
+   supported by this interface through the Initiate action:
 
    Connection.Initiate()
 
-   Before calling Initiate(), the caller must have initialized the
+   Before calling Initiate, the caller must have initialized the
    Connection during the pre-establishment phase with local and remote
    endpoint specifiers, as well as all parameters necessary for
    candidate selection.  After calling Initiate, no further parameters
-   may be bound to the Connection.
+   may be bound to the Connection, and no subsequent establishment call
+   may be made on the Connection.
 
    Once Initiate is called, the candidate Protocol Stack(s) may cause
    one or more transport-layer connections to be created to the
@@ -310,8 +311,9 @@ Internet-Draft               TAPS Interface                February 2018
 
    The Ready event occurs after Initiate has established a transport-
    layer connection on at least one usable candidate Protocol Stack over
-   at least one candidate Path.  No Receive events will occur until
-   after the Ready event for connections established using Initiate.
+   at least one candidate Path.  No Receive events (see Section 8) will
+   occur until after the Ready event for connections established using
+   Initiate.
 
    Connection -> InitiateError<>
 
@@ -321,14 +323,12 @@ Internet-Draft               TAPS Interface                February 2018
    Paths and/or Protocol Stacks meeting the constraints is empty), when
    the remote specifier cannot be resolved, or when no transport-layer
    connection can be established to the remote endpoint (e.g.  because
-   the remote endpoint is not accepting connections, or is not
-   routable).
+   the remote endpoint is not accepting connections, or the application
+   is prohibited from opening a connection by the operating system).
 
-6.2.  Passive Open: Listen
 
-   Connection.Listen()
 
-   Connection -> ConnectionReceived<Connection>
+
 
 
 
@@ -338,7 +338,36 @@ Trammell, et al.         Expires August 9, 2018                 [Page 6]
 Internet-Draft               TAPS Interface                February 2018
 
 
+6.2.  Passive Open: Listen
+
+   Passive open is the action of waiting for connections from remote
+   endpoints, commonly used by servers in client-server interactions.
+   Passive open is supported by this interface through the Listen
+   action:
+
+   Connection.Listen()
+
+   Before calling Listen, the caller must have initialized the
+   Connection during the pre-establishment phase with local endpoint
+   specifiers, as well as all parameters necessary for Protocol Stack
+   selection.  After calling Listen, no further parameters may be bound
+   to the Connection, and no subsequent establishment call may be made
+   on the Connection.
+
+   Connection -> ConnectionReceived<Connection>
+
+   The ConnectionReceived event occurs when a remote endpoint has
+   established a transport-layer connection to this Connection, causing
+   a new Connection to be created.  The resulting Connection is
+   contained within the ConnectionReceived event, and is ready to use as
+   soon as it is passed to the application via the event.
+
    Connection -> ListenError<>
+
+   A ListenError occurs either when the set of local specifier,
+   transport and cryptographic parameters cannot be fulfilled for
+   listening, when the local specifier cannot be resolved, or when the
+   application is prohibited from listening by the operating system.
 
 6.3.  Peer to Peer Establishment: Rendezvous
 
@@ -357,6 +386,13 @@ Internet-Draft               TAPS Interface                February 2018
    Connection -> Sent<>
 
    Connection -> SendError<>
+
+
+
+Trammell, et al.         Expires August 9, 2018                 [Page 7]
+
+Internet-Draft               TAPS Interface                February 2018
+
 
 7.1.  Send Parameters
 
@@ -382,18 +418,6 @@ Internet-Draft               TAPS Interface                February 2018
    metadata that comes from the stack.  This set of actions doesn't
    allow for that as is.]
 
-
-
-
-
-
-
-
-Trammell, et al.         Expires August 9, 2018                 [Page 7]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
 9.  Connection Termination
 
    Connection.Close()
@@ -414,6 +438,17 @@ Internet-Draft               TAPS Interface                February 2018
    RFC-EDITOR: Please remove this section before publication.
 
    This document has no actions for IANA.
+
+
+
+
+
+
+
+Trammell, et al.         Expires August 9, 2018                 [Page 8]
+
+Internet-Draft               TAPS Interface                February 2018
+
 
 12.  Security Considerations
 
@@ -440,16 +475,6 @@ Internet-Draft               TAPS Interface                February 2018
               DOI 10.17487/RFC8095, March 2017,
               <https://www.rfc-editor.org/info/rfc8095>.
 
-
-
-
-
-
-Trammell, et al.         Expires August 9, 2018                 [Page 8]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    [TAPS-MINSET]
               Welzl, M. and S. Gjessing, "A Minimal Set of Transport
               Services for TAPS Systems", draft-ietf-taps-minset-00
@@ -468,6 +493,17 @@ Authors' Addresses
 
    Michael Welzl (editor)
    University of Oslo
+
+
+
+
+
+
+
+
+Trammell, et al.         Expires August 9, 2018                 [Page 9]
+
+Internet-Draft               TAPS Interface                February 2018
 
 
    Gorry Fairhurst
@@ -500,12 +536,6 @@ Authors' Addresses
    Email: philipp@inet.tu-berlin.de
 
 
-
-Trammell, et al.         Expires August 9, 2018                 [Page 9]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    Chris Wood
    Apple Inc.
    1 Infinite Loop
@@ -513,36 +543,6 @@ Internet-Draft               TAPS Interface                February 2018
    United States of America
 
    Email: cawood@apple.com
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

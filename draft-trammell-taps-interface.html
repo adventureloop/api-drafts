@@ -545,20 +545,24 @@ address {
 <h1 id="rfc.section.6.1">
 <a href="#rfc.section.6.1">6.1.</a> <a href="#initiate" id="initiate">Active Open: Initiate</a>
 </h1>
-<p id="rfc.section.6.1.p.1">Active open is the action of establishing a connection to an endpoint presumed to be listening for incoming connection requests, commonly used by clients in client-server interactions. Active open is supported by this Interface through the Initiate action:</p>
+<p id="rfc.section.6.1.p.1">Active open is the action of establishing a connection to an endpoint presumed to be listening for incoming connection requests, commonly used by clients in client-server interactions. Active open is supported by this interface through the Initiate action:</p>
 <p id="rfc.section.6.1.p.2">Connection.Initiate()</p>
-<p id="rfc.section.6.1.p.3">Before calling Initiate(), the caller must have initialized the Connection during the pre-establishment phase with local and remote endpoint specifiers, as well as all parameters necessary for candidate selection. After calling Initiate, no further parameters may be bound to the Connection.</p>
+<p id="rfc.section.6.1.p.3">Before calling Initiate, the caller must have initialized the Connection during the pre-establishment phase with local and remote endpoint specifiers, as well as all parameters necessary for candidate selection. After calling Initiate, no further parameters may be bound to the Connection, and no subsequent establishment call may be made on the Connection.</p>
 <p id="rfc.section.6.1.p.4">Once Initiate is called, the candidate Protocol Stack(s) may cause one or more transport-layer connections to be created to the specified remote endpoint.  The caller may immediately begin sending Content on the Connection (see <a href="#sending" class="xref">Section 7</a>) after calling Initate, though it may wait for one of the following events before doing so.</p>
 <p id="rfc.section.6.1.p.5">Connection -&gt; Ready&lt;&gt;</p>
-<p id="rfc.section.6.1.p.6">The Ready event occurs after Initiate has established a transport-layer connection on at least one usable candidate Protocol Stack over at least one candidate Path. No Receive events will occur until after the Ready event for connections established using Initiate.</p>
+<p id="rfc.section.6.1.p.6">The Ready event occurs after Initiate has established a transport-layer connection on at least one usable candidate Protocol Stack over at least one candidate Path. No Receive events (see <a href="#receiving" class="xref">Section 8</a>) will occur until after the Ready event for connections established using Initiate.</p>
 <p id="rfc.section.6.1.p.7">Connection -&gt; InitiateError&lt;&gt;</p>
-<p id="rfc.section.6.1.p.8">An InitiateError occurs either when the set of local and remote specifiers and transport and cryptographic parameters cannot be fulfilled on a connection for initiation (e.g. the set of available Paths and/or Protocol Stacks meeting the constraints is empty), when the remote specifier cannot be resolved, or when no transport-layer connection can be established to the remote endpoint (e.g.  because the remote endpoint is not accepting connections, or is not routable).</p>
+<p id="rfc.section.6.1.p.8">An InitiateError occurs either when the set of local and remote specifiers and transport and cryptographic parameters cannot be fulfilled on a connection for initiation (e.g. the set of available Paths and/or Protocol Stacks meeting the constraints is empty), when the remote specifier cannot be resolved, or when no transport-layer connection can be established to the remote endpoint (e.g.  because the remote endpoint is not accepting connections, or the application is prohibited from opening a connection by the operating system).</p>
 <h1 id="rfc.section.6.2">
 <a href="#rfc.section.6.2">6.2.</a> <a href="#passive-open-listen" id="passive-open-listen">Passive Open: Listen</a>
 </h1>
-<p id="rfc.section.6.2.p.1">Connection.Listen()</p>
-<p id="rfc.section.6.2.p.2">Connection -&gt; ConnectionReceived&lt;Connection&gt;</p>
-<p id="rfc.section.6.2.p.3">Connection -&gt; ListenError&lt;&gt;</p>
+<p id="rfc.section.6.2.p.1">Passive open is the action of waiting for connections from remote endpoints, commonly used by servers in client-server interactions. Passive open is supported by this interface through the Listen action:</p>
+<p id="rfc.section.6.2.p.2">Connection.Listen()</p>
+<p id="rfc.section.6.2.p.3">Before calling Listen, the caller must have initialized the Connection during the pre-establishment phase with local endpoint specifiers, as well as all parameters necessary for Protocol Stack selection. After calling Listen, no further parameters may be bound to the Connection, and no subsequent establishment call may be made on the Connection.</p>
+<p id="rfc.section.6.2.p.4">Connection -&gt; ConnectionReceived&lt;Connection&gt;</p>
+<p id="rfc.section.6.2.p.5">The ConnectionReceived event occurs when a remote endpoint has established a transport-layer connection to this Connection, causing a new Connection to be created. The resulting Connection is contained within the ConnectionReceived event, and is ready to use as soon as it is passed to the application via the event.</p>
+<p id="rfc.section.6.2.p.6">Connection -&gt; ListenError&lt;&gt;</p>
+<p id="rfc.section.6.2.p.7">A ListenError occurs either when the set of local specifier, transport and cryptographic parameters cannot be fulfilled for listening, when the local specifier cannot be resolved, or when the application is prohibited from listening by the operating system.</p>
 <h1 id="rfc.section.6.3">
 <a href="#rfc.section.6.3">6.3.</a> <a href="#peer-to-peer-establishment-rendezvous" id="peer-to-peer-establishment-rendezvous">Peer to Peer Establishment: Rendezvous</a>
 </h1>
@@ -583,7 +587,7 @@ address {
 <p id="rfc.section.7.2.p.1">Connection.FrameWith(Framer)</p>
 <p id="rfc.section.7.2.p.2">Octets := Framer.Frame(Content)</p>
 <h1 id="rfc.section.8">
-<a href="#rfc.section.8">8.</a> <a href="#receiving-data" id="receiving-data">Receiving Data</a>
+<a href="#rfc.section.8">8.</a> <a href="#receiving" id="receiving">Receiving Data</a>
 </h1>
 <p id="rfc.section.8.p.1">Connection -&gt; Received&lt;Content&gt;</p>
 <p id="rfc.section.8.p.2">Connection -&gt; ReceiveError&lt;&gt;</p>
