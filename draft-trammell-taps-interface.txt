@@ -5,7 +5,7 @@
 TAPS Working Group                                      B. Trammell, Ed.
 Internet-Draft                                                ETH Zurich
 Intended status: Informational                             M. Welzl, Ed.
-Expires: August 9, 2018                               University of Oslo
+Expires: August 10, 2018                              University of Oslo
                                                             G. Fairhurst
                                                   University of Aberdeen
                                                            M. Kuehlewind
@@ -16,7 +16,7 @@ Expires: August 9, 2018                               University of Oslo
                                                                TU Berlin
                                                                  C. Wood
                                                               Apple Inc.
-                                                       February 05, 2018
+                                                       February 06, 2018
 
 
      An Abstract Application Layer Interface to Transport Services
@@ -48,12 +48,12 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on August 9, 2018.
+   This Internet-Draft will expire on August 10, 2018.
 
 
 
 
-Trammell, et al.         Expires August 9, 2018                 [Page 1]
+Trammell, et al.         Expires August 10, 2018                [Page 1]
 
 Internet-Draft               TAPS Interface                February 2018
 
@@ -89,19 +89,19 @@ Table of Contents
      6.3.  Peer to Peer Establishment: Rendezvous  . . . . . . . . .   7
      6.4.  Connection Groups . . . . . . . . . . . . . . . . . . . .   7
    7.  Sending Data  . . . . . . . . . . . . . . . . . . . . . . . .   7
-     7.1.  Send Properties . . . . . . . . . . . . . . . . . . . . .   8
+     7.1.  Send Properties . . . . . . . . . . . . . . . . . . . . .   9
        7.1.1.  Lifetime  . . . . . . . . . . . . . . . . . . . . . .   9
        7.1.2.  Niceness  . . . . . . . . . . . . . . . . . . . . . .   9
        7.1.3.  Ordered . . . . . . . . . . . . . . . . . . . . . . .   9
        7.1.4.  Immediate . . . . . . . . . . . . . . . . . . . . . .   9
-       7.1.5.  Idempotent  . . . . . . . . . . . . . . . . . . . . .   9
+       7.1.5.  Idempotent  . . . . . . . . . . . . . . . . . . . . .  10
      7.2.  Sender-side Framing over Stream Protocols . . . . . . . .  10
    8.  Receiving Data  . . . . . . . . . . . . . . . . . . . . . . .  10
      8.1.  Application-Layer Backpressure at the Receiver  . . . . .  10
      8.2.  Receiver-side Deframing over Stream Protocols . . . . . .  10
    9.  Connection Termination  . . . . . . . . . . . . . . . . . . .  10
-   10. Event and Error Handling  . . . . . . . . . . . . . . . . . .  10
-   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
+   10. Event and Error Handling  . . . . . . . . . . . . . . . . . .  11
+   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  11
    12. Security Considerations . . . . . . . . . . . . . . . . . . .  11
    13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  11
      13.1.  Normative References . . . . . . . . . . . . . . . . . .  11
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Trammell, et al.         Expires August 9, 2018                 [Page 2]
+Trammell, et al.         Expires August 10, 2018                [Page 2]
 
 Internet-Draft               TAPS Interface                February 2018
 
@@ -165,7 +165,7 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.         Expires August 9, 2018                 [Page 3]
+Trammell, et al.         Expires August 10, 2018                [Page 3]
 
 Internet-Draft               TAPS Interface                February 2018
 
@@ -221,7 +221,7 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.         Expires August 9, 2018                 [Page 4]
+Trammell, et al.         Expires August 10, 2018                [Page 4]
 
 Internet-Draft               TAPS Interface                February 2018
 
@@ -277,7 +277,7 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.         Expires August 9, 2018                 [Page 5]
+Trammell, et al.         Expires August 10, 2018                [Page 5]
 
 Internet-Draft               TAPS Interface                February 2018
 
@@ -333,7 +333,7 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.         Expires August 9, 2018                 [Page 6]
+Trammell, et al.         Expires August 10, 2018                [Page 6]
 
 Internet-Draft               TAPS Interface                February 2018
 
@@ -389,7 +389,7 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.         Expires August 9, 2018                 [Page 7]
+Trammell, et al.         Expires August 10, 2018                [Page 7]
 
 Internet-Draft               TAPS Interface                February 2018
 
@@ -402,6 +402,12 @@ Internet-Draft               TAPS Interface                February 2018
    array of octets to be transmitted in the transport protocol payload,
    or be transformable to an array of octets by a sender-side framer
    (see Section 7.2).
+
+   If Send is called on a Connection which has not yet been established,
+   an Initiate action will be implicitly performed simultaneously with
+   the Send.  Used together with the Idempotent property (see
+   Section 7.1.5), this can be used to send data during establishment
+   for 0-RTT session resumption on Protocol Stacks that support it.
 
    Like all Actions in this interface, the Send action is asynchronous.
    However, a Send call may block until there is sufficient buffer space
@@ -437,19 +443,18 @@ Internet-Draft               TAPS Interface                February 2018
    send parameters not consistent with the Connection's transport
    parameters.
 
+
+
+Trammell, et al.         Expires August 10, 2018                [Page 8]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
 7.1.  Send Properties
 
    The Send action takes five per-Content properties which control how
    it will be sent down to the underlying Protocol Stack and
    transmitted.  Note that some of these properties are not compatible
-
-
-
-Trammell, et al.         Expires August 9, 2018                 [Page 8]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    with transport parameters; attempting to Send with such an
    incompatibility yields a SendError.
 
@@ -490,6 +495,17 @@ Internet-Draft               TAPS Interface                February 2018
    be bundled with other Content into the same transmission by the
    underlying Protocol Stack.
 
+
+
+
+
+
+
+Trammell, et al.         Expires August 10, 2018                [Page 9]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
 7.1.5.  Idempotent
 
    Idempotent is a boolean property.  If true, the application-layer
@@ -498,13 +514,6 @@ Internet-Draft               TAPS Interface                February 2018
    certain 0-RTT establishment techniques, where retransmission of the
    0-RTT data may cause the remote application to receive the Content
    multiple times.
-
-
-
-Trammell, et al.         Expires August 9, 2018                 [Page 9]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
    [NOTE: we need some way to signal to the transport that we want to
    wait for 0RTT data on Initiate.  Probably a transport parameter]
@@ -543,6 +552,16 @@ Internet-Draft               TAPS Interface                February 2018
 
    Connection -> ConnectionError<>
 
+
+
+
+
+
+Trammell, et al.         Expires August 10, 2018               [Page 10]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
 10.  Event and Error Handling
 
    [NOTE: point out that events and errors may be handled differently,
@@ -553,14 +572,6 @@ Internet-Draft               TAPS Interface                February 2018
    RFC-EDITOR: Please remove this section before publication.
 
    This document has no actions for IANA.
-
-
-
-
-Trammell, et al.         Expires August 9, 2018                [Page 10]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
 12.  Security Considerations
 
@@ -594,6 +605,19 @@ Internet-Draft               TAPS Interface                February 2018
 
 Authors' Addresses
 
+
+
+
+
+
+
+
+
+Trammell, et al.         Expires August 10, 2018               [Page 11]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    Brian Trammell (editor)
    ETH Zurich
    Gloriastrasse 35
@@ -605,17 +629,6 @@ Authors' Addresses
 
    Michael Welzl (editor)
    University of Oslo
-
-
-
-
-
-
-
-
-Trammell, et al.         Expires August 9, 2018                [Page 11]
-
-Internet-Draft               TAPS Interface                February 2018
 
 
    Gorry Fairhurst
@@ -648,6 +661,19 @@ Internet-Draft               TAPS Interface                February 2018
    Email: philipp@inet.tu-berlin.de
 
 
+
+
+
+
+
+
+
+
+Trammell, et al.         Expires August 10, 2018               [Page 12]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    Chris Wood
    Apple Inc.
    1 Infinite Loop
@@ -669,4 +695,34 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.         Expires August 9, 2018                [Page 12]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Trammell, et al.         Expires August 10, 2018               [Page 13]
