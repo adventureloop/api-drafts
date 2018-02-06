@@ -544,6 +544,7 @@ address {
 </h1>
 <p id="rfc.section.5.p.1">Establishment begins with the creation of a Connection&#8230;</p>
 <p id="rfc.section.5.p.2">Connection := NewConnection(localSpecifier, remoteSpecifier, transportParameters, cryptographicParameters)</p>
+<p id="rfc.section.5.p.3">[NOTE: note also that framers and deframers should be bound to connections during pre-establishment, forward-reference <a href="#send-framing" class="xref">Section 7.2</a> and <a href="#receive-framing" class="xref">Section 8.2</a>]</p>
 <h1 id="rfc.section.5.1">
 <a href="#rfc.section.5.1">5.1.</a> <a href="#resolving" id="resolving">Resolving Remote Endpoints</a>
 </h1>
@@ -596,7 +597,7 @@ address {
 <p id="rfc.section.7.p.1">Once a Connection has been established, it can be used for sending data. Data is sent by passing a Content object and additional properties <a href="#send-props" class="xref">Section 7.1</a> to the Send action on an established connection:</p>
 <p id="rfc.section.7.p.2">Connection.Send(Content, &#8230;)</p>
 <p id="rfc.section.7.p.3">The type of the Content to be passed is dependent on the implementation, and on the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. It may itself contain an array of octets to be transmitted in the transport protocol payload, or be transformable to an array of octets by a sender-side framer (see <a href="#send-framing" class="xref">Section 7.2</a>).</p>
-<p id="rfc.section.7.p.4">If Send is called on a Connection which has not yet been established, an Initiate action will be implicitly performed simultaneously with the Send. Used together with the Idempotent property (see <a href="#send-idempotent" class="xref">Section 7.1.5</a>), this can be used to send data during establishment for 0-RTT session resumption on Protocol Stacks that support it.</p>
+<p id="rfc.section.7.p.4">If Send is called on a Connection which has not yet been established, an Initiate action will be implicitly performed simultaneously with the Send.  Used together with the Idempotent property (see <a href="#send-idempotent" class="xref">Section 7.1.5</a>), this can be used to send data during establishment for 0-RTT session resumption on Protocol Stacks that support it.</p>
 <p id="rfc.section.7.p.5">Like all Actions in this interface, the Send action is asynchronous. However, a Send call may block until there is sufficient buffer space in the implementation and/or the underlying Protocol Stack to handle the Content, in order to provide sender-side backpressure to the application when transmission is limited by transport channel capacity.</p>
 <p id="rfc.section.7.p.6">Connection -&gt; Sent&lt;contentRef&gt;</p>
 <p id="rfc.section.7.p.7">The Sent event occurs when a previous Send action has completed, i.e. when the data derived from the Content has been passed down or through the underlying Protocol Stack and is no longer the responsbility of the implementation of this interface. The exact disposition of Content when the Sent event occurs is specific to the implementation and the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. The Sent event contains an implementation-specific reference to the Content to which it applies.</p>
@@ -633,8 +634,10 @@ address {
 <h1 id="rfc.section.7.2">
 <a href="#rfc.section.7.2">7.2.</a> <a href="#send-framing" id="send-framing">Sender-side Framing over Stream Protocols</a>
 </h1>
-<p id="rfc.section.7.2.p.1">Connection.FrameWith(Framer)</p>
-<p id="rfc.section.7.2.p.2">OctetArray := Framer.Frame(Content)</p>
+<p id="rfc.section.7.2.p.1">Sender-side framing allows a caller to provide the interface with a function that takes Content of an appropriate type and returns an array of octets, the on-the-wire representation of the content to be handed down to the Protocol Stack. It consists of a Framer object with a single Action, Frame. Since the Framer depends on the protocol used at the application layer, it is bound to the Connection during the pre-establishment phase:</p>
+<p id="rfc.section.7.2.p.2">Connection.FrameWith(Framer)</p>
+<p id="rfc.section.7.2.p.3">OctetArray := Framer.Frame(Content)</p>
+<p id="rfc.section.7.2.p.4">Sender-side framing is a convenience feature of the interface, for parity with receiver-side framing (see <a href="#receive-framing" class="xref">Section 8.2</a>).</p>
 <h1 id="rfc.section.8">
 <a href="#rfc.section.8">8.</a> <a href="#receiving" id="receiving">Receiving Data</a>
 </h1>

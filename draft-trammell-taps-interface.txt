@@ -83,29 +83,29 @@ Table of Contents
      5.1.  Resolving Remote Endpoints  . . . . . . . . . . . . . . .   5
      5.2.  Specifying Transport Parameters . . . . . . . . . . . . .   5
      5.3.  Specifying Cryptographic Parameters . . . . . . . . . . .   5
-   6.  Establishing Connections  . . . . . . . . . . . . . . . . . .   5
+   6.  Establishing Connections  . . . . . . . . . . . . . . . . . .   6
      6.1.  Active Open: Initiate . . . . . . . . . . . . . . . . . .   6
      6.2.  Passive Open: Listen  . . . . . . . . . . . . . . . . . .   7
      6.3.  Peer to Peer Establishment: Rendezvous  . . . . . . . . .   7
-     6.4.  Connection Groups . . . . . . . . . . . . . . . . . . . .   7
-   7.  Sending Data  . . . . . . . . . . . . . . . . . . . . . . . .   7
+     6.4.  Connection Groups . . . . . . . . . . . . . . . . . . . .   8
+   7.  Sending Data  . . . . . . . . . . . . . . . . . . . . . . . .   8
      7.1.  Send Properties . . . . . . . . . . . . . . . . . . . . .   9
        7.1.1.  Lifetime  . . . . . . . . . . . . . . . . . . . . . .   9
        7.1.2.  Niceness  . . . . . . . . . . . . . . . . . . . . . .   9
        7.1.3.  Ordered . . . . . . . . . . . . . . . . . . . . . . .   9
-       7.1.4.  Immediate . . . . . . . . . . . . . . . . . . . . . .   9
+       7.1.4.  Immediate . . . . . . . . . . . . . . . . . . . . . .  10
        7.1.5.  Idempotent  . . . . . . . . . . . . . . . . . . . . .  10
      7.2.  Sender-side Framing over Stream Protocols . . . . . . . .  10
    8.  Receiving Data  . . . . . . . . . . . . . . . . . . . . . . .  10
      8.1.  Application-Layer Backpressure at the Receiver  . . . . .  10
-     8.2.  Receiver-side Deframing over Stream Protocols . . . . . .  10
-   9.  Connection Termination  . . . . . . . . . . . . . . . . . . .  10
+     8.2.  Receiver-side Deframing over Stream Protocols . . . . . .  11
+   9.  Connection Termination  . . . . . . . . . . . . . . . . . . .  11
    10. Event and Error Handling  . . . . . . . . . . . . . . . . . .  11
    11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  11
    12. Security Considerations . . . . . . . . . . . . . . . . . . .  11
    13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  11
      13.1.  Normative References . . . . . . . . . . . . . . . . . .  11
-     13.2.  Informative References . . . . . . . . . . . . . . . . .  11
+     13.2.  Informative References . . . . . . . . . . . . . . . . .  12
 
 
 
@@ -114,7 +114,7 @@ Trammell, et al.         Expires August 10, 2018                [Page 2]
 Internet-Draft               TAPS Interface                February 2018
 
 
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  11
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  12
 
 1.  Introduction
 
@@ -250,6 +250,10 @@ Internet-Draft               TAPS Interface                February 2018
    Connection := NewConnection(localSpecifier, remoteSpecifier,
    transportParameters, cryptographicParameters)
 
+   [NOTE: note also that framers and deframers should be bound to
+   connections during pre-establishment, forward-reference Section 7.2
+   and Section 8.2]
+
 5.1.  Resolving Remote Endpoints
 
    [TASK: write me. note: resolution should be flexible, and should
@@ -268,12 +272,8 @@ Internet-Draft               TAPS Interface                February 2018
    [TASK: write me. separate out cryptographic parameters, since these
    bind to a local and a remote. chris?]
 
-6.  Establishing Connections
 
-   Before a Connection can be used for data transfer, it must be
-   established.  Establishment ends the pre-establishment phase; all
-   transport and cryptographic parameter specification must be complete
-   before establishment, as these parameters will be used to select
+
 
 
 
@@ -282,6 +282,12 @@ Trammell, et al.         Expires August 10, 2018                [Page 5]
 Internet-Draft               TAPS Interface                February 2018
 
 
+6.  Establishing Connections
+
+   Before a Connection can be used for data transfer, it must be
+   established.  Establishment ends the pre-establishment phase; all
+   transport and cryptographic parameter specification must be complete
+   before establishment, as these parameters will be used to select
    candidate Paths and Protocol Stacks for the Connection.
    Establishment may be active, using the Initiate() Action; passive,
    using the Listen() Action; or simultaneous for peer-to-peer, using
@@ -324,12 +330,6 @@ Internet-Draft               TAPS Interface                February 2018
    specifiers and transport and cryptographic parameters cannot be
    fulfilled on a connection for initiation (e.g. the set of available
    Paths and/or Protocol Stacks meeting the constraints is empty), when
-   the remote specifier cannot be resolved, or when no transport-layer
-   connection can be established to the remote endpoint (e.g.  because
-   the remote endpoint is not accepting connections, or the application
-   is prohibited from opening a connection by the operating system).
-
-
 
 
 
@@ -337,6 +337,11 @@ Trammell, et al.         Expires August 10, 2018                [Page 6]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   the remote specifier cannot be resolved, or when no transport-layer
+   connection can be established to the remote endpoint (e.g.  because
+   the remote endpoint is not accepting connections, or the application
+   is prohibited from opening a connection by the operating system).
 
 6.2.  Passive Open: Listen
 
@@ -377,14 +382,9 @@ Internet-Draft               TAPS Interface                February 2018
 
    Connection -> RendezvousError<>
 
-6.4.  Connection Groups
 
-7.  Sending Data
 
-   Once a Connection has been established, it can be used for sending
-   data.  Data is sent by passing a Content object and additional
-   properties Section 7.1 to the Send action on an established
-   connection:
+
 
 
 
@@ -393,6 +393,15 @@ Trammell, et al.         Expires August 10, 2018                [Page 7]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+6.4.  Connection Groups
+
+7.  Sending Data
+
+   Once a Connection has been established, it can be used for sending
+   data.  Data is sent by passing a Content object and additional
+   properties Section 7.1 to the Send action on an established
+   connection:
 
    Connection.Send(Content, ...)
 
@@ -433,6 +442,14 @@ Internet-Draft               TAPS Interface                February 2018
    completion; i.e. when the data derived from the Content was not sent
    before its Lifetime (see Section 7.1.1) expired.  This is separate
    from SendError, as it is an expected behavior for partially reliable
+
+
+
+Trammell, et al.         Expires August 10, 2018                [Page 8]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    transports.  The Expired event contains an implementation-specific
    reference to the Content to which it applies.
 
@@ -442,13 +459,6 @@ Internet-Draft               TAPS Interface                February 2018
    condition: some failure of the underlying Protocol Stack, or a set of
    send parameters not consistent with the Connection's transport
    parameters.
-
-
-
-Trammell, et al.         Expires August 10, 2018                [Page 8]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
 7.1.  Send Properties
 
@@ -488,16 +498,6 @@ Internet-Draft               TAPS Interface                February 2018
    the Send action; if false, this Content may be delivered before the
    last Content passed to the same Connection.
 
-7.1.4.  Immediate
-
-   Immediate is a boolean property.  If true, the caller prefers
-   immediacy to efficiency for this Content, and the Content should not
-   be bundled with other Content into the same transmission by the
-   underlying Protocol Stack.
-
-
-
-
 
 
 
@@ -505,6 +505,13 @@ Trammell, et al.         Expires August 10, 2018                [Page 9]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+7.1.4.  Immediate
+
+   Immediate is a boolean property.  If true, the caller prefers
+   immediacy to efficiency for this Content, and the Content should not
+   be bundled with other Content into the same transmission by the
+   underlying Protocol Stack.
 
 7.1.5.  Idempotent
 
@@ -520,9 +527,20 @@ Internet-Draft               TAPS Interface                February 2018
 
 7.2.  Sender-side Framing over Stream Protocols
 
+   Sender-side framing allows a caller to provide the interface with a
+   function that takes Content of an appropriate type and returns an
+   array of octets, the on-the-wire representation of the content to be
+   handed down to the Protocol Stack.  It consists of a Framer object
+   with a single Action, Frame.  Since the Framer depends on the
+   protocol used at the application layer, it is bound to the Connection
+   during the pre-establishment phase:
+
    Connection.FrameWith(Framer)
 
    OctetArray := Framer.Frame(Content)
+
+   Sender-side framing is a convenience feature of the interface, for
+   parity with receiver-side framing (see Section 8.2).
 
 8.  Receiving Data
 
@@ -531,6 +549,18 @@ Internet-Draft               TAPS Interface                February 2018
    Connection -> ReceiveError<>
 
 8.1.  Application-Layer Backpressure at the Receiver
+
+
+
+
+
+
+
+
+Trammell, et al.         Expires August 10, 2018               [Page 10]
+
+Internet-Draft               TAPS Interface                February 2018
+
 
 8.2.  Receiver-side Deframing over Stream Protocols
 
@@ -551,16 +581,6 @@ Internet-Draft               TAPS Interface                February 2018
    Connection.Abort()
 
    Connection -> ConnectionError<>
-
-
-
-
-
-
-Trammell, et al.         Expires August 10, 2018               [Page 10]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
 10.  Event and Error Handling
 
@@ -586,6 +606,18 @@ Internet-Draft               TAPS Interface                February 2018
               Fairhurst, G., Perkins, C., Tiesel, P., and C. Wood, "An
               Architecture for Transport Services", n.d..
 
+
+
+
+
+
+
+
+Trammell, et al.         Expires August 10, 2018               [Page 11]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
 13.2.  Informative References
 
    [RFC0793]  Postel, J., "Transmission Control Protocol", STD 7,
@@ -604,19 +636,6 @@ Internet-Draft               TAPS Interface                February 2018
               (work in progress), October 2017.
 
 Authors' Addresses
-
-
-
-
-
-
-
-
-
-Trammell, et al.         Expires August 10, 2018               [Page 11]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
    Brian Trammell (editor)
    ETH Zurich
@@ -646,6 +665,15 @@ Internet-Draft               TAPS Interface                February 2018
    Email: mirja.kuehlewind@tik.ee.ethz.ch
 
 
+
+
+
+
+Trammell, et al.         Expires August 10, 2018               [Page 12]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    Colin Perkins
    University of Glasgow
    School of Computing Science
@@ -661,19 +689,6 @@ Internet-Draft               TAPS Interface                February 2018
    Email: philipp@inet.tu-berlin.de
 
 
-
-
-
-
-
-
-
-
-Trammell, et al.         Expires August 10, 2018               [Page 12]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    Chris Wood
    Apple Inc.
    1 Infinite Loop
@@ -681,21 +696,6 @@ Internet-Draft               TAPS Interface                February 2018
    United States of America
 
    Email: cawood@apple.com
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
