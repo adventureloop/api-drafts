@@ -81,30 +81,30 @@ Table of Contents
    4.  API Summary . . . . . . . . . . . . . . . . . . . . . . . . .   5
    5.  Pre-Establishment Phase . . . . . . . . . . . . . . . . . . .   5
      5.1.  Resolving Remote Endpoints  . . . . . . . . . . . . . . .   5
-     5.2.  Specifying Transport Parameters . . . . . . . . . . . . .   5
-     5.3.  Specifying Cryptographic Parameters . . . . . . . . . . .   5
+     5.2.  Specifying Transport Parameters . . . . . . . . . . . . .   6
+     5.3.  Specifying Cryptographic Parameters . . . . . . . . . . .   6
    6.  Establishing Connections  . . . . . . . . . . . . . . . . . .   6
-     6.1.  Active Open: Initiate . . . . . . . . . . . . . . . . . .   6
+     6.1.  Active Open: Initiate . . . . . . . . . . . . . . . . . .   7
      6.2.  Passive Open: Listen  . . . . . . . . . . . . . . . . . .   7
-     6.3.  Peer to Peer Establishment: Rendezvous  . . . . . . . . .   7
+     6.3.  Peer to Peer Establishment: Rendezvous  . . . . . . . . .   8
      6.4.  Connection Groups . . . . . . . . . . . . . . . . . . . .   8
    7.  Sending Data  . . . . . . . . . . . . . . . . . . . . . . . .   8
      7.1.  Send Properties . . . . . . . . . . . . . . . . . . . . .   9
-       7.1.1.  Lifetime  . . . . . . . . . . . . . . . . . . . . . .   9
-       7.1.2.  Niceness  . . . . . . . . . . . . . . . . . . . . . .   9
-       7.1.3.  Ordered . . . . . . . . . . . . . . . . . . . . . . .   9
+       7.1.1.  Lifetime  . . . . . . . . . . . . . . . . . . . . . .  10
+       7.1.2.  Niceness  . . . . . . . . . . . . . . . . . . . . . .  10
+       7.1.3.  Ordered . . . . . . . . . . . . . . . . . . . . . . .  10
        7.1.4.  Immediate . . . . . . . . . . . . . . . . . . . . . .  10
        7.1.5.  Idempotent  . . . . . . . . . . . . . . . . . . . . .  10
-     7.2.  Sender-side Framing . . . . . . . . . . . . . . . . . . .  10
-   8.  Receiving Data  . . . . . . . . . . . . . . . . . . . . . . .  10
-     8.1.  Application-Layer Backpressure at the Receiver  . . . . .  11
-     8.2.  Receiver-side Deframing over Stream Protocols . . . . . .  11
+     7.2.  Sender-side Framing . . . . . . . . . . . . . . . . . . .  11
+   8.  Receiving Data  . . . . . . . . . . . . . . . . . . . . . . .  11
+     8.1.  Application-Layer Backpressure at the Receiver  . . . . .  12
+     8.2.  Receiver-side Deframing over Stream Protocols . . . . . .  12
    9.  Connection Termination  . . . . . . . . . . . . . . . . . . .  12
-   10. Event and Error Handling  . . . . . . . . . . . . . . . . . .  12
-   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  12
-   12. Security Considerations . . . . . . . . . . . . . . . . . . .  12
-   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  12
-     13.1.  Normative References . . . . . . . . . . . . . . . . . .  12
+   10. Event and Error Handling  . . . . . . . . . . . . . . . . . .  13
+   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  13
+   12. Security Considerations . . . . . . . . . . . . . . . . . . .  13
+   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
+     13.1.  Normative References . . . . . . . . . . . . . . . . . .  13
      13.2.  Informative References . . . . . . . . . . . . . . . . .  13
 
 
@@ -256,10 +256,54 @@ Internet-Draft               TAPS Interface                February 2018
 
 5.1.  Resolving Remote Endpoints
 
-   [TASK: write me. note: resolution should be flexible, and should
-   accept URLS and URL-like things. binding to transport or
-   pseudotransport happens via pre-establishment properties. resolution
-   happens as part of connection creation.]
+   Name resolution is no explicit step of an transport service API.
+   Therefore, name resolution may be deferred until connection
+   establishment to incorporate transport parameters.  Instead, a
+   remoteSpecifier object representing the remote endpoint is created
+   providing an appropriate endpoint representation, which include ip-
+   addresses, hostnames and URLs:
+
+   remoteSpecifier := Endpoint()
+   remoteSpecifier.withUrl("https://example.com")
+
+   remoteSpecifier := Endpoint()
+   remoteSpecifier.withHostname("example.com"
+   remoteSpecifier.withService("https")
+
+   remoteSpecifier := Endpoint()
+   remoteSpecifier.withIPv6Address(2001:db8:4920:e29d:a420:7461:7073:0a)
+   remoteSpecifier.withPort(443)
+
+
+
+
+Trammell, et al.         Expires August 10, 2018                [Page 5]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
+   remoteSpecifier := Endpoint()
+   remoteSpecifier.withIPv4Address(192.0.2.21)
+   remoteSpecifier.withPort(443)
+
+   Implementations may also support add additional endpoint
+   representations and provide a single Endpoint() call that takes
+   different endpoint representations.
+
+   Endpoint representations may imply transport protocols,
+   pseudotransport protocols, or families of protocols, e.g.,
+   remoteSpecifier.withUrl("https://example.com") implies either using
+   HTTP over TLS over TCP or using HTTP over QUIC over UDP.  Whether the
+   protocols implied by the endpoint representation are provided by the
+   transport system is implementation specific, but MUST BE tunable
+   using pre-establishment properties.  Implementations SHOULD provide
+   all parts of the implied transport stack they implement unless
+   specified otherwise using pre-establishment properties.  For example,
+   the transport system may provide TLS over TCP in the above example
+   and let the application implement HTTP pseudo-transport itself.
+
+   [TASK: match with #initiate / #listen / #rendezvous and make sure the
+   transport stack used is communicated ]
 
 5.2.  Specifying Transport Parameters
 
@@ -272,16 +316,6 @@ Internet-Draft               TAPS Interface                February 2018
    [TASK: write me. separate out cryptographic parameters, since these
    bind to a local and a remote. chris?]
 
-
-
-
-
-
-Trammell, et al.         Expires August 10, 2018                [Page 5]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
 6.  Establishing Connections
 
    Before a Connection can be used for data transfer, it must be
@@ -293,6 +327,16 @@ Internet-Draft               TAPS Interface                February 2018
    using the Listen() Action; or simultaneous for peer-to-peer, using
    the Rendezvous() Action.  These Actions are described in the
    subsections below.
+
+
+
+
+
+
+Trammell, et al.         Expires August 10, 2018                [Page 6]
+
+Internet-Draft               TAPS Interface                February 2018
+
 
 6.1.  Active Open: Initiate
 
@@ -330,14 +374,6 @@ Internet-Draft               TAPS Interface                February 2018
    specifiers and transport and cryptographic parameters cannot be
    fulfilled on a connection for initiation (e.g. the set of available
    Paths and/or Protocol Stacks meeting the constraints is empty), when
-
-
-
-Trammell, et al.         Expires August 10, 2018                [Page 6]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    the remote specifier cannot be resolved, or when no transport-layer
    connection can be established to the remote endpoint (e.g.  because
    the remote endpoint is not accepting connections, or the application
@@ -349,6 +385,14 @@ Internet-Draft               TAPS Interface                February 2018
    endpoints, commonly used by servers in client-server interactions.
    Passive open is supported by this interface through the Listen
    action:
+
+
+
+
+Trammell, et al.         Expires August 10, 2018                [Page 7]
+
+Internet-Draft               TAPS Interface                February 2018
+
 
    Connection.Listen()
 
@@ -382,18 +426,6 @@ Internet-Draft               TAPS Interface                February 2018
 
    Connection -> RendezvousError<>
 
-
-
-
-
-
-
-
-Trammell, et al.         Expires August 10, 2018                [Page 7]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
 6.4.  Connection Groups
 
 7.  Sending Data
@@ -409,6 +441,15 @@ Internet-Draft               TAPS Interface                February 2018
    implementation, and on the constraints on the Protocol Stacks implied
    by the Connection's transport parameters.  It may itself contain an
    array of octets to be transmitted in the transport protocol payload,
+
+
+
+
+Trammell, et al.         Expires August 10, 2018                [Page 8]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    or be transformable to an array of octets by a sender-side framer
    (see Section 7.2).
 
@@ -442,14 +483,6 @@ Internet-Draft               TAPS Interface                February 2018
    completion; i.e. when the data derived from the Content was not sent
    before its Lifetime (see Section 7.1.1) expired.  This is separate
    from SendError, as it is an expected behavior for partially reliable
-
-
-
-Trammell, et al.         Expires August 10, 2018                [Page 8]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    transports.  The Expired event contains an implementation-specific
    reference to the Content to which it applies.
 
@@ -465,6 +498,14 @@ Internet-Draft               TAPS Interface                February 2018
    The Send action takes five per-Content properties which control how
    it will be sent down to the underlying Protocol Stack and
    transmitted.  Note that some of these properties are not compatible
+
+
+
+Trammell, et al.         Expires August 10, 2018                [Page 9]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    with transport parameters; attempting to Send with such an
    incompatibility yields a SendError.
 
@@ -498,14 +539,6 @@ Internet-Draft               TAPS Interface                February 2018
    the Send action; if false, this Content may be delivered before the
    last Content passed to the same Connection.
 
-
-
-
-Trammell, et al.         Expires August 10, 2018                [Page 9]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
 7.1.4.  Immediate
 
    Immediate is a boolean property.  If true, the caller prefers
@@ -521,6 +554,13 @@ Internet-Draft               TAPS Interface                February 2018
    certain 0-RTT establishment techniques, where retransmission of the
    0-RTT data may cause the remote application to receive the Content
    multiple times.
+
+
+
+Trammell, et al.         Expires August 10, 2018               [Page 10]
+
+Internet-Draft               TAPS Interface                February 2018
+
 
    [NOTE: we need some way to signal to the transport that we want to
    wait for 0RTT data on Initiate.  Probably a transport parameter]
@@ -553,15 +593,6 @@ Internet-Draft               TAPS Interface                February 2018
    As with sending, the type of the Content to be passed is dependent on
    the implementation, and on the constraints on the Protocol Stacks
    implied by the Connection's transport parameters.  The Content may
-
-
-
-
-Trammell, et al.         Expires August 10, 2018               [Page 10]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    also contain metadata from protocols in the Protocol Stack for
    logging and debugging purposes.
 
@@ -579,6 +610,13 @@ Internet-Draft               TAPS Interface                February 2018
    conditions that irrevocably lead the the termination of the
    Connection are signaled using ConnectionError instead (see
    Section 9).
+
+
+
+Trammell, et al.         Expires August 10, 2018               [Page 11]
+
+Internet-Draft               TAPS Interface                February 2018
+
 
 8.1.  Application-Layer Backpressure at the Receiver
 
@@ -610,14 +648,6 @@ Internet-Draft               TAPS Interface                February 2018
 
    Concretely, receiver-side deframing allows a caller to provide the
    interface with a function that takes an octet stream, as provided by
-
-
-
-Trammell, et al.         Expires August 10, 2018               [Page 11]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    the underlying Protocol Stack, reads and returns a sigle Content of
    an appropriate type for the application and platform, and leaves the
    octet stream at the start of the next Content.  It consists of a
@@ -636,6 +666,13 @@ Internet-Draft               TAPS Interface                February 2018
    Connection -> Finished<>
 
    Connection.Abort()
+
+
+
+Trammell, et al.         Expires August 10, 2018               [Page 12]
+
+Internet-Draft               TAPS Interface                February 2018
+
 
    Connection -> ConnectionError<>
 
@@ -663,17 +700,6 @@ Internet-Draft               TAPS Interface                February 2018
               Fairhurst, G., Perkins, C., Tiesel, P., and C. Wood, "An
               Architecture for Transport Services", n.d..
 
-
-
-
-
-
-
-Trammell, et al.         Expires August 10, 2018               [Page 12]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
 13.2.  Informative References
 
    [RFC0793]  Postel, J., "Transmission Control Protocol", STD 7,
@@ -688,10 +714,21 @@ Internet-Draft               TAPS Interface                February 2018
 
    [TAPS-MINSET]
               Welzl, M. and S. Gjessing, "A Minimal Set of Transport
-              Services for TAPS Systems", draft-ietf-taps-minset-00
-              (work in progress), October 2017.
+              Services for TAPS Systems", draft-ietf-taps-minset-01
+              (work in progress), February 2018.
 
 Authors' Addresses
+
+
+
+
+
+
+
+Trammell, et al.         Expires August 10, 2018               [Page 13]
+
+Internet-Draft               TAPS Interface                February 2018
+
 
    Brian Trammell (editor)
    ETH Zurich
@@ -721,15 +758,6 @@ Authors' Addresses
    Email: mirja.kuehlewind@tik.ee.ethz.ch
 
 
-
-
-
-
-Trammell, et al.         Expires August 10, 2018               [Page 13]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    Colin Perkins
    University of Glasgow
    School of Computing Science
@@ -743,6 +771,19 @@ Internet-Draft               TAPS Interface                February 2018
    TU Berlin
 
    Email: philipp@inet.tu-berlin.de
+
+
+
+
+
+
+
+
+
+
+Trammell, et al.         Expires August 10, 2018               [Page 14]
+
+Internet-Draft               TAPS Interface                February 2018
 
 
    Chris Wood
@@ -781,4 +822,19 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.         Expires August 10, 2018               [Page 14]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Trammell, et al.         Expires August 10, 2018               [Page 15]

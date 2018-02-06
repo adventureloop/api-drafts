@@ -548,7 +548,14 @@ address {
 <h1 id="rfc.section.5.1">
 <a href="#rfc.section.5.1">5.1.</a> <a href="#resolving" id="resolving">Resolving Remote Endpoints</a>
 </h1>
-<p id="rfc.section.5.1.p.1">[TASK: write me. note: resolution should be flexible, and should accept URLS and URL-like things. binding to transport or pseudotransport happens via pre-establishment properties. resolution happens as part of connection creation.]</p>
+<p id="rfc.section.5.1.p.1">Name resolution is no explicit step of an transport service API.  Therefore, name resolution may be deferred until connection establishment to incorporate transport parameters.  Instead, a remoteSpecifier object representing the remote endpoint is created providing an appropriate endpoint representation, which include ip-addresses, hostnames and URLs:</p>
+<p id="rfc.section.5.1.p.2">remoteSpecifier := Endpoint() remoteSpecifier.withUrl(&#8220;https://example.com&#8221;)</p>
+<p id="rfc.section.5.1.p.3">remoteSpecifier := Endpoint() remoteSpecifier.withHostname(&#8220;example.com&#8221; remoteSpecifier.withService(&#8220;https&#8221;)</p>
+<p id="rfc.section.5.1.p.4">remoteSpecifier := Endpoint() remoteSpecifier.withIPv6Address(2001:db8:4920:e29d:a420:7461:7073:0a) remoteSpecifier.withPort(443)</p>
+<p id="rfc.section.5.1.p.5">remoteSpecifier := Endpoint() remoteSpecifier.withIPv4Address(192.0.2.21) remoteSpecifier.withPort(443)</p>
+<p id="rfc.section.5.1.p.6">Implementations may also support add additional endpoint representations and provide a single Endpoint() call that takes different endpoint representations.</p>
+<p id="rfc.section.5.1.p.7">Endpoint representations may imply transport protocols, pseudotransport protocols, or families of protocols, e.g., remoteSpecifier.withUrl(&#8220;https://example.com&#8221;) implies either using HTTP over TLS over TCP or using HTTP over QUIC over UDP.  Whether the protocols implied by the endpoint representation are provided by the transport system is implementation specific, but MUST BE tunable using pre-establishment properties.  Implementations SHOULD provide all parts of the implied transport stack they implement unless specified otherwise using pre-establishment properties.  For example, the transport system may provide TLS over TCP in the above example and let the application implement HTTP pseudo-transport itself.</p>
+<p id="rfc.section.5.1.p.8">[TASK: match with #initiate / #listen / #rendezvous and make sure the transport stack used is communicated ]</p>
 <h1 id="rfc.section.5.2">
 <a href="#rfc.section.5.2">5.2.</a> <a href="#transport-params" id="transport-params">Specifying Transport Parameters</a>
 </h1>
@@ -704,7 +711,7 @@ address {
 <tr>
 <td class="reference"><b id="TAPS-MINSET">[TAPS-MINSET]</b></td>
 <td class="top">
-<a>Welzl, M.</a> and <a>S. Gjessing</a>, "<a href="https://tools.ietf.org/html/draft-ietf-taps-minset-00">A Minimal Set of Transport Services for TAPS Systems</a>", Internet-Draft draft-ietf-taps-minset-00, October 2017.</td>
+<a>Welzl, M.</a> and <a>S. Gjessing</a>, "<a href="https://tools.ietf.org/html/draft-ietf-taps-minset-01">A Minimal Set of Transport Services for TAPS Systems</a>", Internet-Draft draft-ietf-taps-minset-01, February 2018.</td>
 </tr>
 </tbody></table>
 <h1 id="rfc.authors"><a href="#rfc.authors">Authors' Addresses</a></h1>
