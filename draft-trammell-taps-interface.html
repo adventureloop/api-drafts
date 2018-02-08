@@ -815,9 +815,7 @@ address {
 <a href="#rfc.section.7.1.2">7.1.2.</a> <a href="#send-niceness" id="send-niceness">Niceness</a>
 </h1>
 <p id="rfc.section.7.1.2.p.1">Niceness represents an unbounded hierarchy of priorities of Content, relative to other Content sent over the same Connection and/or Connection Group (see <a href="#groups" class="xref">Section 6.4</a>). It is most naturally represented as a non-negative integer.  Content with Niceness 0 will yield to Content with Niceness 1, which will yield to Content with Niceness 2, and so on. Niceness may be used as a sender-side scheduling construct only, or be used to specify priorities on the wire for Protocol Stacks supporting prioritization.</p>
-<p id="rfc.section.7.1.2.p.2">[Task: decide whether / how to keep this (issue #32)]</p>
-<p id="rfc.section.7.1.2.p.3">Note that this inversion of normal schemes for expressing priority has a convenient property: priority increases as both Niceness and Lifetime decrease.</p>
-<p id="rfc.section.7.1.2.p.4">[MICHAEL: not convinced  :-)  still awkward, still a Unix artifact if you ask me]</p>
+<p id="rfc.section.7.1.2.p.2">Note that this inversion of normal schemes for expressing priority has a convenient property: priority increases as both Niceness and Lifetime decrease.</p>
 <h1 id="rfc.section.7.1.3">
 <a href="#rfc.section.7.1.3">7.1.3.</a> <a href="#send-ordered" id="send-ordered">Ordered</a>
 </h1>
@@ -825,12 +823,12 @@ address {
 <h1 id="rfc.section.7.1.4">
 <a href="#rfc.section.7.1.4">7.1.4.</a> <a href="#send-immediate" id="send-immediate">Immediate</a>
 </h1>
-<p id="rfc.section.7.1.4.p.1">Immediate is a boolean property. If true, the caller prefers immediacy to efficiency for this Content, and the Content should not be bundled with other Content into the same transmission by the underlying Protocol Stack.</p>
+<p id="rfc.section.7.1.4.p.1">Immediate is a boolean property. If true, the caller prefers immediacy to efficient capacity usage for this Content. For example, this means that the Content should not be bundled with other Content into the same transmission by the underlying Protocol Stack.</p>
 <h1 id="rfc.section.7.1.5">
 <a href="#rfc.section.7.1.5">7.1.5.</a> <a href="#send-idempotent" id="send-idempotent">Idempotent</a>
 </h1>
 <p id="rfc.section.7.1.5.p.1">Idempotent is a boolean property. If true, the application-layer entity in the Content is safe to send to the remote endpoint more than once for a single Send action. It is used to mark data safe for certain 0-RTT establishment techniques, where retransmission of the 0-RTT data may cause the remote application to receive the Content multiple times.</p>
-<p id="rfc.section.7.1.5.p.2">[NOTE: we need some way to signal to the transport that we want to wait for 0RTT data on Initiate. Probably a transport parameter]</p>
+<p id="rfc.section.7.1.5.p.2">[NOTE: we need some way to signal to the transport that we want to wait for 0RTT data on Initiate. Probably a transport parameter] [MICHAEL: why? As an app programmer, I can just use Send instead of Initiate.]</p>
 <h1 id="rfc.section.7.2">
 <a href="#rfc.section.7.2">7.2.</a> <a href="#send-framing" id="send-framing">Sender-side Framing</a>
 </h1>
@@ -846,16 +844,16 @@ address {
 <p id="rfc.section.8.p.3">As with sending, the type of the Content to be passed is dependent on the implementation, and on the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. The Content may also contain metadata from protocols in the Protocol Stack for logging and debugging purposes.</p>
 <p id="rfc.section.8.p.4">The Content object must provide some method to retrieve an octet array containing application data, corresponding to a single message within the underlying Protocol Stack&#8217;s framing.  See <a href="#receive-framing" class="xref">Section 8.2</a> for handling framing in situations where the Protocol Stack provides octet-stream transport only.</p>
 <p id="rfc.section.8.p.5">Connection -&gt; ReceiveError&lt;&gt;</p>
-<p id="rfc.section.8.p.6">A ReceiveError occurs when data is received by the underlying Protocol Stack that cannot be fully retrieved or deframed, or when some other indication is recieved that reception has failed. Such conditions that irrevocably lead the the termination of the Connection are signaled using ConnectionError instead (see <a href="#termination" class="xref">Section 9</a>).</p>
+<p id="rfc.section.8.p.6">A ReceiveError occurs when data is received by the underlying Protocol Stack that cannot be fully retrieved or deframed, or when some other indication is received that reception has failed. Such conditions that irrevocably lead the the termination of the Connection are signaled using ConnectionError instead (see <a href="#termination" class="xref">Section 9</a>).</p>
 <h1 id="rfc.section.8.1">
 <a href="#rfc.section.8.1">8.1.</a> <a href="#receive-backpressure" id="receive-backpressure">Application-Layer Backpressure at the Receiver</a>
 </h1>
-<p id="rfc.section.8.1.p.1">Implementations of this interface must provide some way for the application to indicate that it is temporarily not ready to receive new Content. Since the mechanisms of event handling are implementation-platform specific, this document does not specify the exact nature of this</p>
+<p id="rfc.section.8.1.p.1">Implementations of this interface must provide some way for the application to indicate that it is temporarily not ready to receive new Content. Since the mechanisms of event handling are implementation-platform specific, this document does not specify the exact nature of this interface.</p>
 <h1 id="rfc.section.8.2">
 <a href="#rfc.section.8.2">8.2.</a> <a href="#receive-framing" id="receive-framing">Receiver-side Deframing over Stream Protocols</a>
 </h1>
-<p id="rfc.section.8.2.p.1">The Receive event is intended to be fired once per application-layer Content sent by the remote endpoint; i.e., it is a desired property of this interface that a Send at one end of a Connection maps to exactly one Receive on the other end. This is possible with Protocol Stacks that provide a mechanism message boundary preservation, but is not the case over Protocol Stacks that provide a simple octet stream transport.</p>
-<p id="rfc.section.8.2.p.2">For preserving message boundaries over stream transports, this interface provides receiver-side deframing. This facility is based on the observation that, since many of our current application protocols evolved over TCP, which does not provide message boundary preservation, and since many these protocols require message boundaries to function, each application layer protocol has defined its own framing. A Deframer allows an application to push this deframing down into the interface, in order to transform an octet stream into a sequence of Content.</p>
+<p id="rfc.section.8.2.p.1">The Receive event is intended to be fired once per application-layer Content sent by the remote endpoint; i.e., it is a desired property of this interface that a Send at one end of a Connection maps to exactly one Receive on the other end. This is possible with Protocol Stacks that provide message boundary preservation, but is not the case over Protocol Stacks that provide a simple octet stream transport.</p>
+<p id="rfc.section.8.2.p.2">For preserving message boundaries over stream transports, this interface provides receiver-side deframing. This facility is based on the observation that, since many of our current application protocols evolved over TCP, which does not provide message boundary preservation, and since many of these protocols require message boundaries to function, each application layer protocol has defined its own framing. A Deframer allows an application to push this deframing down into the interface, in order to transform an octet stream into a sequence of Content.</p>
 <p id="rfc.section.8.2.p.3">Concretely, receiver-side deframing allows a caller to provide the interface with a function that takes an octet stream, as provided by the underlying Protocol Stack, reads and returns a sigle Content of an appropriate type for the application and platform, and leaves the octet stream at the start of the next Content. It consists of a Deframer object with a single Action, Deframe.  Since the Deframer depends on the protocol used at the application layer, it is bound to the Connection during the pre-establishment phase:</p>
 <p id="rfc.section.8.2.p.4">Connection.DeframeWith(Deframer)</p>
 <p id="rfc.section.8.2.p.5">Content := Deframer.Deframe(OctetStream, &#8230;)</p>
