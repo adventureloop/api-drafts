@@ -581,12 +581,11 @@ address {
 <p id="rfc.section.5.2.p.4">[Should it be possible for an application to specify which properties are most important to it, or to set properties as required?]</p>
 <p id="rfc.section.5.2.p.5">There need to be sensible defaults for the Protocol Selection Properties. The defaults given in the following section represent a configuration that can be implemented over TCP. An alternate set of default Protocol Selection Properties would represent a configuration that can be implemented over UDP.</p>
 <p id="rfc.section.5.2.p.6">Note that some parameters can also be set later in the lifetime of a connection. However, Protocol Selection Properties and Path Selection Properties must be specified before Initiate() to be useful. For other properties, it is beneficial for the application to set them as early as possible in order to help the TAPS system optimize.</p>
-<p id="rfc.section.5.2.p.7">Some properties may apply to connection groups.</p>
-<p id="rfc.section.5.2.p.8">[Task: Elaborate on connection groups, reference 6.4]</p>
-<p id="rfc.section.5.2.p.9">Connection := Create(ProtocolSelectionProperties, ProtocolProperties, PathSelectionProperties, SocketIntents)</p>
-<p id="rfc.section.5.2.p.10">Connection.Configure(ProtocolProperties, SocketIntents)</p>
-<p id="rfc.section.5.2.p.11">Connection.QueryProperties()</p>
-<p id="rfc.section.5.2.p.12">[Add call to clone a connection here?]</p>
+<p id="rfc.section.5.2.p.7">Connections can be cloned at any time, before or after establishment.  A cloned connection and its parent are entangled: they share the same properties, changing any parameter for one of them also changes the parameter for the other, connecting one of them also connects the other, etc. There is only one exception: priority assignment ((see also <a href="#groups" class="xref">Section 6.4</a> for more details).  Cloning connections during pre-establishment is encouraged, as it informs the transport system about the intent to use Connection Groups.</p>
+<p id="rfc.section.5.2.p.8">Connection := Create(ProtocolSelectionProperties, ProtocolProperties, PathSelectionProperties, SocketIntents)</p>
+<p id="rfc.section.5.2.p.9">Connection.Configure(ProtocolProperties, SocketIntents)</p>
+<p id="rfc.section.5.2.p.10">Connection.QueryProperties()</p>
+<p id="rfc.section.5.2.p.11">Connection := Connection.Clone()</p>
 <h1 id="rfc.section.5.2.1">
 <a href="#rfc.section.5.2.1">5.2.1.</a> <a href="#protocol-selection-props" id="protocol-selection-props">Protocol Selection Properties</a>
 </h1>

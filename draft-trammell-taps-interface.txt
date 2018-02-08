@@ -359,9 +359,14 @@ Internet-Draft               TAPS Interface                February 2018
    to set them as early as possible in order to help the TAPS system
    optimize.
 
-   Some properties may apply to connection groups.
-
-   [Task: Elaborate on connection groups, reference 6.4]
+   Connections can be cloned at any time, before or after establishment.
+   A cloned connection and its parent are entangled: they share the same
+   properties, changing any parameter for one of them also changes the
+   parameter for the other, connecting one of them also connects the
+   other, etc.  There is only one exception: priority assignment ((see
+   also Section 6.4 for more details).  Cloning connections during pre-
+   establishment is encouraged, as it informs the transport system about
+   the intent to use Connection Groups.
 
    Connection := Create(ProtocolSelectionProperties, ProtocolProperties,
    PathSelectionProperties, SocketIntents)
@@ -370,7 +375,7 @@ Internet-Draft               TAPS Interface                February 2018
 
    Connection.QueryProperties()
 
-   [Add call to clone a connection here?]
+   Connection := Connection.Clone()
 
 5.2.1.  Protocol Selection Properties
 
@@ -382,11 +387,6 @@ Internet-Draft               TAPS Interface                February 2018
    connections and connection groups.  This is a strict requirement.
    The default is to enable Reliable Data Transfer.
 
-   Notification of peer closing/aborting
-
-   This boolean property specifies whether the application needs the
-   transport protocol to inform it in case the connection terminates.
-
 
 
 Trammell, et al.         Expires August 12, 2018                [Page 7]
@@ -394,6 +394,10 @@ Trammell, et al.         Expires August 12, 2018                [Page 7]
 Internet-Draft               TAPS Interface                February 2018
 
 
+   Notification of peer closing/aborting
+
+   This boolean property specifies whether the application needs the
+   transport protocol to inform it in case the connection terminates.
    This property applies to connections and connection groups.  This is
    a strict requirement.  The default is to enable such notifications.
 
@@ -438,10 +442,6 @@ Internet-Draft               TAPS Interface                February 2018
    supply a message to the transport protocol before connection
    establishment, which will then be reliably transferred to the other
    side before or during connection establishment, potentially multiple
-   times.  See also Section 7.1.5.  This property applies to connections
-   and connection groups.  This is a strict requirement.  The default is
-   to not have this option.
-
 
 
 
@@ -449,6 +449,10 @@ Trammell, et al.         Expires August 12, 2018                [Page 8]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   times.  See also Section 7.1.5.  This property applies to connections
+   and connection groups.  This is a strict requirement.  The default is
+   to not have this option.
 
    Option to assign priority or weight per connection in a group
 
@@ -493,10 +497,6 @@ Internet-Draft               TAPS Interface                February 2018
 
    Specify checksum coverage used by sender
 
-   This boolean property specifies whether the application considers it
-   useful to have the option to specify what parts of the transmitted
-   data should be covered by the transport protocol checksum.  This
-   property applies to connections and connection groups.  This is not a
 
 
 
@@ -506,6 +506,10 @@ Trammell, et al.         Expires August 12, 2018                [Page 9]
 Internet-Draft               TAPS Interface                February 2018
 
 
+   This boolean property specifies whether the application considers it
+   useful to have the option to specify what parts of the transmitted
+   data should be covered by the transport protocol checksum.  This
+   property applies to connections and connection groups.  This is not a
    strict requirement, as it signifies a reduction in reliability.  The
    default is full checksum coverage without being able to change it.
 
@@ -550,10 +554,6 @@ Internet-Draft               TAPS Interface                February 2018
    properties can also be set on individual messages, similar to the
    properties in Section 7.1.
 
-   The default settings of these properties depends on the chosen
-   protocol and on the system configuration.
-
-   Set timeout for aborting connection
 
 
 
@@ -561,6 +561,11 @@ Trammell, et al.         Expires August 12, 2018               [Page 10]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   The default settings of these properties depends on the chosen
+   protocol and on the system configuration.
+
+   Set timeout for aborting connection
 
    This numeric property specifies how long to wait before aborting a
    connection.  It is given in seconds.  This property applies to
@@ -605,11 +610,6 @@ Internet-Draft               TAPS Interface                February 2018
 
    Set scheduler for connections in a group
 
-   This property specifies which scheduler should be used among
-   connections within a connection group.  It applies to connection
-   groups.  For now we suggest we suggest the schedulers defined in
-   [I-D.ietf-tsvwg-sctp-ndata].
-
 
 
 
@@ -617,6 +617,11 @@ Trammell, et al.         Expires August 12, 2018               [Page 11]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   This property specifies which scheduler should be used among
+   connections within a connection group.  It applies to connection
+   groups.  For now we suggest we suggest the schedulers defined in
+   [I-D.ietf-tsvwg-sctp-ndata].
 
    Configure the priority of a connection for the scheduler
 
@@ -661,11 +666,6 @@ Internet-Draft               TAPS Interface                February 2018
 
    This property specifies which kind of access network interface, e.g.,
    WiFi, Ethternet, or LTE, to not use for this connection.  This is a
-   strict requirement and connection establishment will fail if no other
-   interface is available.  The default is to not prohibit any
-   particular interface.
-
-
 
 
 
@@ -673,6 +673,10 @@ Trammell, et al.         Expires August 12, 2018               [Page 12]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   strict requirement and connection establishment will fail if no other
+   interface is available.  The default is to not prohibit any
+   particular interface.
 
 5.2.4.  Socket Intents
 
@@ -719,16 +723,14 @@ Internet-Draft               TAPS Interface                February 2018
 
    Stream:  Stream of bytes/messages with steady data rate
 
-   Bulk:  Bulk transfer of large messages, presumably bandwidth bound
-
-
-
 
 
 Trammell, et al.         Expires August 12, 2018               [Page 13]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   Bulk:  Bulk transfer of large messages, presumably bandwidth bound
 
    The default is to not assume any particular traffic pattern.  Most
    categories suggest the use of other intents to further describe the
@@ -777,14 +779,14 @@ Internet-Draft               TAPS Interface                February 2018
 
    The default is to not assume any particular burst characteristics.
 
-   Timeliness
-
 
 
 Trammell, et al.         Expires August 12, 2018               [Page 14]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   Timeliness
 
    This Intent specifies what delay characteristcs the applications
    prefers.  It provides hints for the TAPS system whether to optimize
@@ -833,14 +835,14 @@ Internet-Draft               TAPS Interface                February 2018
    tradeoffs between cost and performance or reliability.  This Intent
    applies to connections, connection groups, and messages.
 
-   No Expense:  Avoid transports associated with monetary cost
-
 
 
 Trammell, et al.         Expires August 12, 2018               [Page 15]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   No Expense:  Avoid transports associated with monetary cost
 
    Optimize Cost:  Prefer inexpensive transports and accept service
       degradation
@@ -888,8 +890,6 @@ Internet-Draft               TAPS Interface                February 2018
    Once Initiate is called, the candidate Protocol Stack(s) may cause
    one or more transport-layer connections to be created to the
    specified remote endpoint.  The caller may immediately begin sending
-   Content on the Connection (see Section 7) after calling Initate,
-   though it may wait for one of the following events before doing so.
 
 
 
@@ -897,6 +897,9 @@ Trammell, et al.         Expires August 12, 2018               [Page 16]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   Content on the Connection (see Section 7) after calling Initate,
+   though it may wait for one of the following events before doing so.
 
    Connection -> Ready<>
 
@@ -943,9 +946,6 @@ Internet-Draft               TAPS Interface                February 2018
 
    Connection -> ListenError<>
 
-   A ListenError occurs either when the set of local specifier,
-   transport and cryptographic parameters cannot be fulfilled for
-
 
 
 
@@ -954,6 +954,8 @@ Trammell, et al.         Expires August 12, 2018               [Page 17]
 Internet-Draft               TAPS Interface                February 2018
 
 
+   A ListenError occurs either when the set of local specifier,
+   transport and cryptographic parameters cannot be fulfilled for
    listening, when the local specifier cannot be resolved, or when the
    application is prohibited from listening by the operating system.
 
@@ -1000,8 +1002,6 @@ Internet-Draft               TAPS Interface                February 2018
 
    The Sent event occurs when a previous Send action has completed, i.e.
    when the data derived from the Content has been passed down or
-   through the underlying Protocol Stack and is no longer the
-   responsbility of the implementation of this interface.  The exact
 
 
 
@@ -1010,6 +1010,8 @@ Trammell, et al.         Expires August 12, 2018               [Page 18]
 Internet-Draft               TAPS Interface                February 2018
 
 
+   through the underlying Protocol Stack and is no longer the
+   responsbility of the implementation of this interface.  The exact
    disposition of Content when the Sent event occurs is specific to the
    implementation and the constraints on the Protocol Stacks implied by
    the Connection's transport parameters.  The Sent event contains an
@@ -1055,8 +1057,6 @@ Internet-Draft               TAPS Interface                February 2018
    as a non-negative integer.  Content with Niceness 0 will yield to
    Content with Niceness 1, which will yield to Content with Niceness 2,
    and so on.  Niceness may be used as a sender-side scheduling
-   construct only, or be used to specify priorities on the wire for
-   Protocol Stacks supporting prioritization.
 
 
 
@@ -1065,6 +1065,9 @@ Trammell, et al.         Expires August 12, 2018               [Page 19]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   construct only, or be used to specify priorities on the wire for
+   Protocol Stacks supporting prioritization.
 
    Note that this inversion of normal schemes for expressing priority
    has a convenient property: priority increases as both Niceness and
@@ -1110,9 +1113,6 @@ Internet-Draft               TAPS Interface                February 2018
 
    OctetArray := Framer.Frame(Content)
 
-   Sender-side framing is a convenience feature of the interface, for
-   parity with receiver-side framing (see Section 8.2).
-
 
 
 
@@ -1121,6 +1121,9 @@ Trammell, et al.         Expires August 12, 2018               [Page 20]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   Sender-side framing is a convenience feature of the interface, for
+   parity with receiver-side framing (see Section 8.2).
 
 8.  Receiving Data
 
@@ -1166,9 +1169,6 @@ Internet-Draft               TAPS Interface                February 2018
    of this interface that a Send at one end of a Connection maps to
    exactly one Receive on the other end.  This is possible with Protocol
    Stacks that provide a mechanism message boundary preservation, but is
-   not the case over Protocol Stacks that provide a simple octet stream
-   transport.
-
 
 
 
@@ -1177,6 +1177,9 @@ Trammell, et al.         Expires August 12, 2018               [Page 21]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   not the case over Protocol Stacks that provide a simple octet stream
+   transport.
 
    For preserving message boundaries over stream transports, this
    interface provides receiver-side deframing.  This facility is based
@@ -1221,9 +1224,6 @@ Internet-Draft               TAPS Interface                February 2018
    RFC-EDITOR: Please remove this section before publication.
 
    This document has no actions for IANA.
-
-
-
 
 
 
