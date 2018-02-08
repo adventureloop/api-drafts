@@ -103,7 +103,7 @@ Table of Contents
      7.2.  Sender-side Framing . . . . . . . . . . . . . . . . . . .  19
    8.  Receiving Data  . . . . . . . . . . . . . . . . . . . . . . .  20
      8.1.  Application-Layer Backpressure at the Receiver  . . . . .  20
-     8.2.  Receiver-side Deframing over Stream Protocols . . . . . .  20
+     8.2.  Receiver-side Deframing over Stream Protocols . . . . . .  21
    9.  Connection Termination  . . . . . . . . . . . . . . . . . . .  21
    10. Event and Error Handling  . . . . . . . . . . . . . . . . . .  22
 
@@ -118,7 +118,7 @@ Internet-Draft               TAPS Interface                February 2018
    12. Security Considerations . . . . . . . . . . . . . . . . . . .  22
    13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  22
      13.1.  Normative References . . . . . . . . . . . . . . . . . .  22
-     13.2.  Informative References . . . . . . . . . . . . . . . . .  22
+     13.2.  Informative References . . . . . . . . . . . . . . . . .  23
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  23
 
 1.  Introduction
@@ -1083,7 +1083,9 @@ Internet-Draft               TAPS Interface                February 2018
    the implementation, and on the constraints on the Protocol Stacks
    implied by the Connection's transport parameters.  The Content may
    also contain metadata from protocols in the Protocol Stack for
-   logging and debugging purposes.
+   logging and debugging purposes.  In particular, when this information
+   is available, the value of the Explicit Congestion Notification (ECN)
+   field is contained in such metadata.
 
    The Content object must provide some method to retrieve an octet
    array containing application data, corresponding to a single message
@@ -1108,12 +1110,10 @@ Internet-Draft               TAPS Interface                February 2018
    implementation-platform specific, this document does not specify the
    exact nature of this interface.
 
-8.2.  Receiver-side Deframing over Stream Protocols
 
-   The Receive event is intended to be fired once per application-layer
-   Content sent by the remote endpoint; i.e., it is a desired property
-   of this interface that a Send at one end of a Connection maps to
-   exactly one Receive on the other end.  This is possible with Protocol
+
+
+
 
 
 
@@ -1122,6 +1122,12 @@ Trammell, et al.         Expires August 12, 2018               [Page 20]
 Internet-Draft               TAPS Interface                February 2018
 
 
+8.2.  Receiver-side Deframing over Stream Protocols
+
+   The Receive event is intended to be fired once per application-layer
+   Content sent by the remote endpoint; i.e., it is a desired property
+   of this interface that a Send at one end of a Connection maps to
+   exactly one Receive on the other end.  This is possible with Protocol
    Stacks that provide message boundary preservation, but is not the
    case over Protocol Stacks that provide a simple octet stream
    transport.
@@ -1164,12 +1170,6 @@ Internet-Draft               TAPS Interface                February 2018
    This event can (i.e., this is not guaranteed to happen) inform the
    application that the peer has closed the Connection:
 
-   Connection -> Finished<>
-
-   Abort terminates a Connection without delivering remaining data:
-
-   Connection.Abort()
-
 
 
 
@@ -1177,6 +1177,12 @@ Trammell, et al.         Expires August 12, 2018               [Page 21]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   Connection -> Finished<>
+
+   Abort terminates a Connection without delivering remaining data:
+
+   Connection.Abort()
 
    This event can (i.e., this is not guaranteed to happen) inform the
    application that the other side has aborted the Connection:
@@ -1218,12 +1224,6 @@ Internet-Draft               TAPS Interface                February 2018
               Fairhurst, G., Perkins, C., Tiesel, P., and C. Wood, "An
               Architecture for Transport Services", n.d..
 
-13.2.  Informative References
-
-   [RFC0793]  Postel, J., "Transmission Control Protocol", STD 7,
-              RFC 793, DOI 10.17487/RFC0793, September 1981,
-              <https://www.rfc-editor.org/info/rfc793>.
-
 
 
 
@@ -1233,6 +1233,12 @@ Trammell, et al.         Expires August 12, 2018               [Page 22]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+13.2.  Informative References
+
+   [RFC0793]  Postel, J., "Transmission Control Protocol", STD 7,
+              RFC 793, DOI 10.17487/RFC0793, September 1981,
+              <https://www.rfc-editor.org/info/rfc793>.
 
    [RFC8095]  Fairhurst, G., Ed., Trammell, B., Ed., and M. Kuehlewind,
               Ed., "Services Provided by IETF Transport Protocols and
@@ -1275,6 +1281,15 @@ Authors' Addresses
    Email: mirja.kuehlewind@tik.ee.ethz.ch
 
 
+
+
+
+
+Trammell, et al.         Expires August 12, 2018               [Page 23]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    Colin Perkins
    University of Glasgow
    School of Computing Science
@@ -1282,12 +1297,6 @@ Authors' Addresses
    United Kingdom
 
    Email: csp@csperkins.org
-
-
-
-Trammell, et al.         Expires August 12, 2018               [Page 23]
-
-Internet-Draft               TAPS Interface                February 2018
 
 
    Philipp S. Tiesel
@@ -1309,15 +1318,6 @@ Internet-Draft               TAPS Interface                February 2018
    United States of America
 
    Email: cawood@apple.com
-
-
-
-
-
-
-
-
-
 
 
 
