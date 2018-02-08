@@ -92,20 +92,20 @@ Table of Contents
      6.2.  Passive Open: Listen  . . . . . . . . . . . . . . . . . .  17
      6.3.  Peer to Peer Establishment: Rendezvous  . . . . . . . . .  18
      6.4.  Connection Groups . . . . . . . . . . . . . . . . . . . .  18
-   7.  Sending Data  . . . . . . . . . . . . . . . . . . . . . . . .  18
-     7.1.  Send Properties . . . . . . . . . . . . . . . . . . . . .  19
-       7.1.1.  Lifetime  . . . . . . . . . . . . . . . . . . . . . .  19
+   7.  Sending Data  . . . . . . . . . . . . . . . . . . . . . . . .  19
+     7.1.  Send Properties . . . . . . . . . . . . . . . . . . . . .  20
+       7.1.1.  Lifetime  . . . . . . . . . . . . . . . . . . . . . .  20
        7.1.2.  Niceness  . . . . . . . . . . . . . . . . . . . . . .  20
-       7.1.3.  Ordered . . . . . . . . . . . . . . . . . . . . . . .  20
-       7.1.4.  Immediate . . . . . . . . . . . . . . . . . . . . . .  20
-       7.1.5.  Idempotent  . . . . . . . . . . . . . . . . . . . . .  20
+       7.1.3.  Ordered . . . . . . . . . . . . . . . . . . . . . . .  21
+       7.1.4.  Immediate . . . . . . . . . . . . . . . . . . . . . .  21
+       7.1.5.  Idempotent  . . . . . . . . . . . . . . . . . . . . .  21
      7.2.  Sender-side Framing . . . . . . . . . . . . . . . . . . .  21
    8.  Receiving Data  . . . . . . . . . . . . . . . . . . . . . . .  21
      8.1.  Application-Layer Backpressure at the Receiver  . . . . .  22
      8.2.  Receiver-side Deframing over Stream Protocols . . . . . .  22
-   9.  Connection Termination  . . . . . . . . . . . . . . . . . . .  22
+   9.  Connection Termination  . . . . . . . . . . . . . . . . . . .  23
    10. Event and Error Handling  . . . . . . . . . . . . . . . . . .  23
-   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  23
+   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  24
 
 
 
@@ -114,11 +114,11 @@ Trammell, et al.         Expires August 12, 2018                [Page 2]
 Internet-Draft               TAPS Interface                February 2018
 
 
-   12. Security Considerations . . . . . . . . . . . . . . . . . . .  23
-   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  23
-     13.1.  Normative References . . . . . . . . . . . . . . . . . .  23
-     13.2.  Informative References . . . . . . . . . . . . . . . . .  23
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  24
+   12. Security Considerations . . . . . . . . . . . . . . . . . . .  24
+   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  24
+     13.1.  Normative References . . . . . . . . . . . . . . . . . .  24
+     13.2.  Informative References . . . . . . . . . . . . . . . . .  24
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  25
 
 1.  Introduction
 
@@ -977,6 +977,42 @@ Internet-Draft               TAPS Interface                February 2018
 
 6.4.  Connection Groups
 
+   Groups of Connections can be created using Clone action:
+
+   Connection := Connection.Clone()
+
+   Calling this once yields a group of two Connections: the parent
+   Connection - whose Clone action was called - and the resulting clone.
+   Calling Clone on any of these two Connections adds a third Connection
+   to the group, and so on.  All Connections in a group are entangled.
+   This means that they automatically share all properties: changing a
+   parameter for one of them also changes the parameter for all others,
+   closing one of them also closes all others, etc.
+
+   There is only one Protocol Property that is not entangled, i.e. it is
+   a separate per-Connection Property for individual Connections in the
+   group: a priority.  This priority, which can be represented as a non-
+   negative integer or float, expresses a desired share of the
+   Connection Group's available network capacity, such that an ideal
+   transport system implementation would assign the Connection the
+   capacity share P x C/sum_P, where P = priority, C = total available
+   capacity and sum_P = sum of all priority values that are used for the
+   Connections in the same Connection Group.  The priority setting is
+   purely advisory; no guarantees are given.
+
+   Connection Groups should be created (i.e., the Clone action should be
+   used) as early as possible, ideally already during the Pre-
+
+
+
+Trammell, et al.         Expires August 12, 2018               [Page 18]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
+   Establishment phase, in order to aid the Transport System in choosing
+   and configuring the right protocols (see also Section 5.2).
+
 7.  Sending Data
 
    Once a Connection has been established, it can be used for sending
@@ -1002,14 +1038,6 @@ Internet-Draft               TAPS Interface                February 2018
    Like all Actions in this interface, the Send action is asynchronous.
    However, a Send call may block until there is sufficient buffer space
    in the implementation and/or the underlying Protocol Stack to handle
-
-
-
-Trammell, et al.         Expires August 12, 2018               [Page 18]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    the Content, in order to provide sender-side backpressure to the
    application when transmission is limited by transport channel
    capacity.
@@ -1030,6 +1058,14 @@ Internet-Draft               TAPS Interface                February 2018
    The Expired event occurs when a previous Send action expired before
    completion; i.e. when the data derived from the Content was not sent
    before its Lifetime (see Section 7.1.1) expired.  This is separate
+
+
+
+Trammell, et al.         Expires August 12, 2018               [Page 19]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    from SendError, as it is an expected behavior for partially reliable
    transports.  The Expired event contains an implementation-specific
    reference to the Content to which it applies.
@@ -1057,15 +1093,6 @@ Internet-Draft               TAPS Interface                February 2018
    be transmitted reliably.  The type and units of Lifetime are
    implementation-specific.
 
-
-
-
-
-Trammell, et al.         Expires August 12, 2018               [Page 19]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
 7.1.2.  Niceness
 
    Niceness represents an unbounded hierarchy of priorities of Content,
@@ -1085,6 +1112,15 @@ Internet-Draft               TAPS Interface                February 2018
 
    [MICHAEL: not convinced :-) still awkward, still a Unix artifact if
    you ask me]
+
+
+
+
+
+Trammell, et al.         Expires August 12, 2018               [Page 20]
+
+Internet-Draft               TAPS Interface                February 2018
+
 
 7.1.3.  Ordered
 
@@ -1112,16 +1148,6 @@ Internet-Draft               TAPS Interface                February 2018
    [NOTE: we need some way to signal to the transport that we want to
    wait for 0RTT data on Initiate.  Probably a transport parameter]
 
-
-
-
-
-
-Trammell, et al.         Expires August 12, 2018               [Page 20]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
 7.2.  Sender-side Framing
 
    Sender-side framing allows a caller to provide the interface with a
@@ -1145,6 +1171,13 @@ Internet-Draft               TAPS Interface                February 2018
    interface notifies the application that content has been received via
    the Received event:
 
+
+
+Trammell, et al.         Expires August 12, 2018               [Page 21]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    Connection -> Received<Content>
 
    As with sending, the type of the Content to be passed is dependent on
@@ -1167,16 +1200,6 @@ Internet-Draft               TAPS Interface                February 2018
    conditions that irrevocably lead the the termination of the
    Connection are signaled using ConnectionError instead (see
    Section 9).
-
-
-
-
-
-
-Trammell, et al.         Expires August 12, 2018               [Page 21]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
 8.1.  Application-Layer Backpressure at the Receiver
 
@@ -1203,6 +1226,14 @@ Internet-Draft               TAPS Interface                February 2018
    preservation, and since many these protocols require message
    boundaries to function, each application layer protocol has defined
    its own framing.  A Deframer allows an application to push this
+
+
+
+Trammell, et al.         Expires August 12, 2018               [Page 22]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    deframing down into the interface, in order to transform an octet
    stream into a sequence of Content.
 
@@ -1221,18 +1252,27 @@ Internet-Draft               TAPS Interface                February 2018
 
 9.  Connection Termination
 
+   Close terminates a Connection after satisfying all the requirements
+   that were specified regarding the delivery of Content that the
+   application has already given to the transport system.  For example,
+   if reliable delivery was requested for Content handed over before
+   calling Close, the transport system will ensure that such Content is
+   indeed delivered.  If the peer still has data to send, it cannot be
+   received after this call.
+
    Connection.Close()
+
+   This event can (i.e., this is not guaranteed to happen) inform the
+   application that the peer has closed the Connection:
 
    Connection -> Finished<>
 
+   Abort terminates a Connection without delivering remaining data:
+
    Connection.Abort()
 
-
-
-Trammell, et al.         Expires August 12, 2018               [Page 22]
-
-Internet-Draft               TAPS Interface                February 2018
-
+   This event can (i.e., this is not guaranteed to happen) inform the
+   application that the other side has aborted the Connection:
 
    Connection -> ConnectionError<>
 
@@ -1240,6 +1280,15 @@ Internet-Draft               TAPS Interface                February 2018
 
    [NOTE: point out that events and errors may be handled differently,
    although they are the modeled the same in this specification.]
+
+
+
+
+
+Trammell, et al.         Expires August 12, 2018               [Page 23]
+
+Internet-Draft               TAPS Interface                February 2018
+
 
 11.  IANA Considerations
 
@@ -1283,17 +1332,19 @@ Internet-Draft               TAPS Interface                February 2018
               DOI 10.17487/RFC8095, March 2017,
               <https://www.rfc-editor.org/info/rfc8095>.
 
-
-
-Trammell, et al.         Expires August 12, 2018               [Page 23]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    [TAPS-MINSET]
               Welzl, M. and S. Gjessing, "A Minimal Set of Transport
               Services for TAPS Systems", draft-ietf-taps-minset-01
               (work in progress), February 2018.
+
+
+
+
+
+Trammell, et al.         Expires August 12, 2018               [Page 24]
+
+Internet-Draft               TAPS Interface                February 2018
+
 
 Authors' Addresses
 
@@ -1341,7 +1392,12 @@ Authors' Addresses
 
 
 
-Trammell, et al.         Expires August 12, 2018               [Page 24]
+
+
+
+
+
+Trammell, et al.         Expires August 12, 2018               [Page 25]
 
 Internet-Draft               TAPS Interface                February 2018
 
@@ -1397,4 +1453,4 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.         Expires August 12, 2018               [Page 25]
+Trammell, et al.         Expires August 12, 2018               [Page 26]
