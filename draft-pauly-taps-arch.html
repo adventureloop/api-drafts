@@ -310,7 +310,7 @@ address {
 
   <meta name="dct.creator" content="Pauly, T., Ed., Trammell, B., Ed., Brunstrom, A., Fairhurst, G., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-pauly-taps-arch-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-2-07" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-2-08" />
   <meta name="dct.abstract" content="This document provides an overview of the architecture of Transport Services, a system for exposing the features of transport protocols to applications. This architecture serves as a basis for Application Programming Interfaces (APIs) and implementations that provide flexibile transport networking services. It defines the common set of terminology and concepts to be used in more detailed discussion of transport services." />
   <meta name="description" content="This document provides an overview of the architecture of Transport Services, a system for exposing the features of transport protocols to applications. This architecture serves as a basis for Application Programming Interfaces (APIs) and implementations that provide flexibile transport networking services. It defines the common set of terminology and concepts to be used in more detailed discussion of transport services." />
 
@@ -334,7 +334,7 @@ address {
 <td class="right">B. Trammell, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: August 11, 2018</td>
+<td class="left">Expires: August 12, 2018</td>
 <td class="right">ETH Zurich</td>
 </tr>
 <tr>
@@ -379,7 +379,7 @@ address {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">February 07, 2018</td>
+<td class="right">February 08, 2018</td>
 </tr>
 
     	
@@ -395,7 +395,7 @@ address {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on August 11, 2018.</p>
+<p>This Internet-Draft will expire on August 12, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -463,7 +463,7 @@ address {
 </h1>
 <p id="rfc.section.2.p.1">The architecture of Transport Services is based on the survey of Services Provided by IETF Tranport Protocols and Congestion Control Mechanisms <a href="#RFC8095" class="xref">[RFC8095]</a>, and the distilled minimal set of the features offered by trasport protocols <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>. This work identified the common features and patterns across all transport protocols developed thus far.</p>
 <p id="rfc.section.2.p.2">Since transport security is an increasingly relevant aspect of using transport protocols on the Internet, this architecture also considers the impact of transport security protocols on the feature set exposed by transport services <a href="#I-D.pauly-taps-transport-security" class="xref">[I-D.pauly-taps-transport-security]</a>.</p>
-<p id="rfc.section.2.p.3">One of the key insights from the defining the minimal set of transport features <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a> was to identify how features either required application interaction and guidance (referred to as Functional) or else could be handled automatically by a system implementing Transport Services (referred to as Automatable). Among the Functional features, some were common across all or nearly all transport protocols, while others could be seen as features that, if specified, would only be useful to a single transport protocol, but not harm the functionality of other protocols.</p>
+<p id="rfc.section.2.p.3">One of the key insights from the defining the minimal set of transport features <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a> was to identify how features either required application interaction and guidance (referred to as Functional) or else could be handled automatically by a system implementing Transport Services (referred to as Automatable). Among the Functional features, some were common across all or nearly all transport protocols, while others could be seen as features that, if specified, would only be useful to [MICHAEL: with?] a single transport protocol, but not harm the functionality of other protocols.  [MICHAEL: I think adding a simple example may be good here. I suggest: For example, some protocols can deliver messages faster for applications that do not require them to arrive in the order in which they were sent. However, this functionality can never be automatically provided without the application being involved.]</p>
 <h1 id="rfc.section.3">
 <a href="#rfc.section.3">3.</a> <a href="#design-principles" id="design-principles">Design Principles</a>
 </h1>
@@ -478,9 +478,9 @@ address {
 <h1 id="rfc.section.3.2">
 <a href="#rfc.section.3.2">3.2.</a> <a href="#access-to-specialized-features" id="access-to-specialized-features">Access to Specialized Features</a>
 </h1>
-<p id="rfc.section.3.2.p.1">Since applications will often need to control fine-grained details of transport protocols in order to optimize their behavior and ensure compatibility with remote peers, a Transport Services system also needs to allow more specialized protocol features to be used. The interface for these specialized options should be treated differently from the common options in order to ensure flexibility</p>
-<p id="rfc.section.3.2.p.2">A specialized feature may be required by an application only when using a specific protocol, and not when using other. For example, if an application is using UDP, it may require control over the checksum or fragmentation behavior for UDP; while if it used a protocol to frame its content over a bytestream like TCP, it would not need these options. In such cases, the API should expose the features in such a way that they take effect when a particular protocol is selected, but do not imply that only that protocol may be used if there are equivalent options.</p>
-<p id="rfc.section.3.2.p.3">Other specialized features, however, may be strictly required by an application and thus constrain the set of protocols that may be used. For example, if an application requires encryption of its transport content, it must be guaranteed that only combinations of protocols that include a transport security protocol. A Transport Services API must allow applications to define such requirements and constrain the system&#8217;s options. Since such options are not part of the core, common features, however, it should be simple for an application to modify its set of constraints and change the set of allowable protocol features without changing the core implementation.</p>
+<p id="rfc.section.3.2.p.1">Since applications will often need to control fine-grained details of transport protocols in order to optimize their behavior and ensure compatibility with remote peers, a Transport Services system also needs to allow more specialized protocol features to be used. The interface for these specialized options should be treated differently from the common options in order to ensure flexibility.</p>
+<p id="rfc.section.3.2.p.2">A specialized feature may be required by an application only when using a specific protocol, and not when using others. For example, if an application is using UDP, it may require control over the checksum or fragmentation behavior for UDP; if it used a protocol to frame its content over a bytestream like TCP, it would not need these options. In such cases, the API should expose the features in such a way that they take effect when a particular protocol is selected, but do not imply that only that protocol may be used if there are equivalent options.</p>
+<p id="rfc.section.3.2.p.3">Other specialized features, however, may be strictly required by an application and thus constrain the set of protocols that can be used. For example, if an application requires encryption of its transport content, it must be guaranteed that only combinations of protocols that include a transport security protocol.[MICHAEL: &#8220;&#8230;are used?&#8221; - but also the &#8220;combinations that include&#8221; seems strange here. Suggest: &#8220;it must be guaranteed that a chosen transport protocol that can encrypt data.&#8221;] A Transport Services API must allow applications to define such requirements and constrain the system&#8217;s options. Since such options are not part of the core, common features, however, it should be simple for an application to modify its set of constraints and change the set of allowable protocol features without changing the core implementation.</p>
 <h1 id="rfc.section.3.3">
 <a href="#rfc.section.3.3">3.3.</a> <a href="#scope-for-api-and-implementation-definitions" id="scope-for-api-and-implementation-definitions">Scope for API and Implementation Definitions</a>
 </h1>
