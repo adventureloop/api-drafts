@@ -795,13 +795,14 @@ address {
 <p id="rfc.section.7.p.2">Connection.Send(Content, &#8230;)</p>
 <p id="rfc.section.7.p.3">The type of the Content to be passed is dependent on the implementation, and on the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. It may itself contain an array of octets to be transmitted in the transport protocol payload, or be transformable to an array of octets by a sender-side framer (see <a href="#send-framing" class="xref">Section 7.2</a>).</p>
 <p id="rfc.section.7.p.4">If Send is called on a Connection which has not yet been established, an Initiate action will be implicitly performed simultaneously with the Send.  Used together with the Idempotent property (see <a href="#send-idempotent" class="xref">Section 7.1.5</a>), this can be used to send data during establishment for 0-RTT session resumption on Protocol Stacks that support it.</p>
-<p id="rfc.section.7.p.5">Like all Actions in this interface, the Send action is asynchronous. However, a Send call may block until there is sufficient buffer space in the implementation and/or the underlying Protocol Stack to handle the Content, in order to provide sender-side backpressure to the application when transmission is limited by transport channel capacity.</p>
+<p id="rfc.section.7.p.5">Like all Actions in this interface, the Send action is asynchronous.</p>
 <p id="rfc.section.7.p.6">Connection -&gt; Sent&lt;contentRef&gt;</p>
-<p id="rfc.section.7.p.7">The Sent event occurs when a previous Send action has completed, i.e. when the data derived from the Content has been passed down or through the underlying Protocol Stack and is no longer the responsbility of the implementation of this interface. The exact disposition of Content when the Sent event occurs is specific to the implementation and the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. The Sent event contains an implementation-specific reference to the Content to which it applies.</p>
-<p id="rfc.section.7.p.8">Connection -&gt; Expired&lt;contentRef&gt;</p>
-<p id="rfc.section.7.p.9">The Expired event occurs when a previous Send action expired before completion; i.e. when the data derived from the Content was not sent before its Lifetime (see <a href="#send-lifetime" class="xref">Section 7.1.1</a>) expired. This is separate from SendError, as it is an expected behavior for partially reliable transports. The Expired event contains an implementation-specific reference to the Content to which it applies.</p>
-<p id="rfc.section.7.p.10">Connection -&gt; SendError&lt;contentRef&gt;</p>
-<p id="rfc.section.7.p.11">A SendError occurs when Content could not be sent due to an error condition: some failure of the underlying Protocol Stack, or a set of send parameters not consistent with the Connection&#8217;s transport parameters.</p>
+<p id="rfc.section.7.p.7">The Sent event occurs when a previous Send action has completed, i.e. when the data derived from the Content has been passed down or through the underlying Protocol Stack and is no longer the responsibility of the implementation of this interface. The exact disposition of Content when the Sent event occurs is specific to the implementation and the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. The Sent event contains an implementation-specific reference to the Content to which it applies.</p>
+<p id="rfc.section.7.p.8">Sent events allow an application to obtain an understanding of the amount of buffering it creates. That is, if an application calls the Send action multiple times without waiting for a Sent event, it has created more buffer inside the transport system than an application that only issues a Send after this event fires.</p>
+<p id="rfc.section.7.p.9">Connection -&gt; Expired&lt;contentRef&gt;</p>
+<p id="rfc.section.7.p.10">The Expired event occurs when a previous Send action expired before completion; i.e. when the data derived from the Content was not sent before its Lifetime (see <a href="#send-lifetime" class="xref">Section 7.1.1</a>) expired. This is separate from SendError, as it is an expected behavior for partially reliable transports. The Expired event contains an implementation-specific reference to the Content to which it applies.</p>
+<p id="rfc.section.7.p.11">Connection -&gt; SendError&lt;contentRef&gt;</p>
+<p id="rfc.section.7.p.12">A SendError occurs when Content could not be sent due to an error condition: some failure of the underlying Protocol Stack, or a set of send parameters not consistent with the Connection&#8217;s transport parameters.</p>
 <h1 id="rfc.section.7.1">
 <a href="#rfc.section.7.1">7.1.</a> <a href="#send-props" id="send-props">Send Properties</a>
 </h1>
@@ -820,7 +821,7 @@ address {
 <h1 id="rfc.section.7.1.3">
 <a href="#rfc.section.7.1.3">7.1.3.</a> <a href="#send-ordered" id="send-ordered">Ordered</a>
 </h1>
-<p id="rfc.section.7.1.3.p.1">Ordered is a boolean property. If true, this Content should be delivered after the last Content passed to the same Connection via the Send action; if false, this Content may be delivered before the last Content passed to the same Connection.</p>
+<p id="rfc.section.7.1.3.p.1">Ordered is a boolean property. If true, this Content should be delivered after the last Content passed to the same Connection via the Send action; if false, this Content may be delivered out of order.</p>
 <h1 id="rfc.section.7.1.4">
 <a href="#rfc.section.7.1.4">7.1.4.</a> <a href="#send-immediate" id="send-immediate">Immediate</a>
 </h1>
