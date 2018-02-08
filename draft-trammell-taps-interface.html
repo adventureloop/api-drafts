@@ -306,6 +306,7 @@ address {
 <link href="#rfc.section.7.1.3" rel="Chapter" title="7.1.3 Ordered">
 <link href="#rfc.section.7.1.4" rel="Chapter" title="7.1.4 Immediate">
 <link href="#rfc.section.7.1.5" rel="Chapter" title="7.1.5 Idempotent">
+<link href="#rfc.section.7.1.6" rel="Chapter" title="7.1.6 Checksum">
 <link href="#rfc.section.7.2" rel="Chapter" title="7.2 Sender-side Framing">
 <link href="#rfc.section.8" rel="Chapter" title="8 Receiving Data">
 <link href="#rfc.section.8.1" rel="Chapter" title="8.1 Application-Layer Backpressure at the Receiver">
@@ -472,6 +473,8 @@ address {
 </li>
 <li>7.1.5.   <a href="#rfc.section.7.1.5">Idempotent</a>
 </li>
+<li>7.1.6.   <a href="#rfc.section.7.1.6">Checksum</a>
+</li>
 </ul><li>7.2.   <a href="#rfc.section.7.2">Sender-side Framing</a>
 </li>
 </ul><li>8.   <a href="#rfc.section.8">Receiving Data</a>
@@ -576,7 +579,7 @@ address {
 <a href="#rfc.section.5.2">5.2.</a> <a href="#transport-params" id="transport-params">Specifying Transport Parameters</a>
 </h1>
 <p id="rfc.section.5.2.p.1">When creating a connection, an application needs to specify transport parameters reflecting its requirements and preferences regarding its communication. These Transport parameters include Protocol Selection Properties, Protocol Properties (configuration of a transport protocol once it has been selected), Path Selection Properties, and Socket Intents (hints to the TAPS system what to optimize for).</p>
-<p id="rfc.section.5.2.p.2">Some Protocol Selection Properties are strict requirements that the application relies on, while others are hints of what transport features would be helpful for the application. For example, if an application asks for reliable data transfer, choosing a transport protocol such as UDP, which does not have this feature, will break the application&#8217;s functionality. On the other hand, the option to disable checksums when sending an individual message can help optimize for low latency, but if not present, it will most likely not break the fundamental assumptions of the application.</p>
+<p id="rfc.section.5.2.p.2">Some Protocol Selection Properties are strict requirements that the application relies on, while others are hints of what transport features would be helpful for the application. For example, if an application asks for reliable data transfer, choosing a transport protocol such as UDP, which does not have this feature, will break the application&#8217;s functionality. On the other hand, the option to not require checksums when receiving an individual Content can help optimize for low latency, but if not present, it will most likely not break the fundamental assumptions of the application.</p>
 <p id="rfc.section.5.2.p.3">Moreover, there can be conflicts between properties set by the application: If multiple features are requested which are offered by different protocols, it may not be possible to satisfy all requirements. Consequently, a TAPS system must prioritize transport parameters and consider the relevant trade-offs, see also <a href="#TAPS-MINSET" class="xref">[TAPS-MINSET]</a>.</p>
 <p id="rfc.section.5.2.p.4">[Should it be possible for an application to specify which properties are most important to it, or to set properties as required?]</p>
 <p id="rfc.section.5.2.p.5">There need to be sensible defaults for the Protocol Selection Properties. The defaults given in the following section represent a configuration that can be implemented over TCP. An alternate set of default Protocol Selection Properties would represent a configuration that can be implemented over UDP.</p>
@@ -589,65 +592,41 @@ address {
 <h1 id="rfc.section.5.2.1">
 <a href="#rfc.section.5.2.1">5.2.1.</a> <a href="#protocol-selection-props" id="protocol-selection-props">Protocol Selection Properties</a>
 </h1>
-<p id="rfc.section.5.2.1.p.1">Reliable Data Transfer</p>
-<p id="rfc.section.5.2.1.p.2">This boolean property specifies whether the application needs the transport protocol to ensure that data is received completely and without corruption on the other side. This property applies to connections and connection groups.  This is a strict requirement. The default is to enable Reliable Data Transfer.</p>
-<p id="rfc.section.5.2.1.p.3">Notification of peer closing/aborting</p>
-<p id="rfc.section.5.2.1.p.4">This boolean property specifies whether the application needs the transport protocol to inform it in case the connection terminates. This property applies to connections and connection groups. This is a strict requirement. The default is to enable such notifications.</p>
-<p id="rfc.section.5.2.1.p.5">Preservation of data ordering</p>
-<p id="rfc.section.5.2.1.p.6">This boolean property specifies whether the application needs the transport protocol to assure that data is received by the application on the other end in the same order as it was sent. This property applies to connections and connection groups. This is a strict requirement. The default is to preserve data ordering.</p>
-<p id="rfc.section.5.2.1.p.7">Option to configure reliability for individual messages</p>
-<p id="rfc.section.5.2.1.p.8">This boolean property specifies whether an application considers it useful to indicate its reliability requirements on a per-message basis. This property applies to connections and connection groups. This is not a strict requirement.  The default is to not have this option.</p>
-<p id="rfc.section.5.2.1.p.9">Option of unordered message delivery</p>
-<p id="rfc.section.5.2.1.p.10">This boolean property specifies whether an application allows messages to be delivered in a different order than they were sent, potentially at the benefit of lower latency for individual messages. This property applies to connections and connection groups. This is not a strict requirement. The default is to not have this option, so all data arrives strictly in-order.</p>
-<p id="rfc.section.5.2.1.p.11">Option to request not to delay acknowledgement (SACK) of a message</p>
-<p id="rfc.section.5.2.1.p.12">This boolean property specifies whether an application considers it useful to request for a message that its acknowledgement be sent out as early as possible (SACK) instead of potentially being bundled with other acknowledgements. This property applies to connections and connection groups. This is not a strict requirement. The default is to not have this option.</p>
-<p id="rfc.section.5.2.1.p.13">Option to hand over a message to reliably transfer (possibly multiple times) before connection establishment (0-RTT idempotent)</p>
-<p id="rfc.section.5.2.1.p.14">This boolean property specifies whether an application would like to supply a message to the transport protocol before connection establishment, which will then be reliably transferred to the other side before or during connection establishment, potentially multiple times. See also <a href="#send-idempotent" class="xref">Section 7.1.5</a>. This property applies to connections and connection groups. This is a strict requirement. The default is to not have this option.</p>
-<p id="rfc.section.5.2.1.p.15">Option to assign priority or weight per connection in a group</p>
-<p id="rfc.section.5.2.1.p.16">This boolean property specifies whether an application considers it useful to have the option to explicitly prioritize between multiple connections within a connection group. This property applies to connection groups. This is not a strict requirement. The default is to not have this option.</p>
-<p id="rfc.section.5.2.1.p.17">Option to choose a scheduler between connections in a group</p>
-<p id="rfc.section.5.2.1.p.18">This boolean property specifies whether an application considers it useful to have the option to explicitly set a scheduler between the connections within a connection group. This property applies to connection groups. This is not a strict requirement. The default is to not have this option.</p>
-<p id="rfc.section.5.2.1.p.19">Suggest a timeout to the peer</p>
-<p id="rfc.section.5.2.1.p.20">This boolean property specifies whether an application considers it useful to propose a timeout until the connection is assumed to be lost. This property applies to connections and connection groups. This is not a strict requirement. The default is to have this option.</p>
-<p id="rfc.section.5.2.1.p.21">Notification of excessive retransmissions (early warning before abortion threshold)</p>
-<p id="rfc.section.5.2.1.p.22">This boolean property specifies whether an application considers it useful to be informed in case sent data was retransmitted more often than a certain threshold. This property applies to connections and connection groups. This is not a strict requirement. The default is to have this option.</p>
-<p id="rfc.section.5.2.1.p.23">Notification of ICMP error message arrival</p>
-<p id="rfc.section.5.2.1.p.24">This boolean property specifies whether an application considers it useful to be informed in case an ICMP error message is received related to this connection. This property applies to connections and connection groups. This is not a strict requirement. The default is to have this option.</p>
-<p id="rfc.section.5.2.1.p.25">Specify checksum coverage used by sender</p>
-<p id="rfc.section.5.2.1.p.26">This boolean property specifies whether the application considers it useful to have the option to specify what parts of the transmitted data should be covered by the transport protocol checksum. This property applies to connections and connection groups. This is not a strict requirement, as it signifies a reduction in reliability. The default is full checksum coverage without being able to change it.</p>
-<p id="rfc.section.5.2.1.p.27">Option to disable checksum when sending an individual message</p>
-<p id="rfc.section.5.2.1.p.28">This boolean property specifies whether the application considers it useful to have the option to disable checksums for individual messages. This property applies to connections and connection groups. This is not a strict requirement, as it signifies a reduction in reliability. The default is full checksum coverage without the option to disable it.</p>
-<p id="rfc.section.5.2.1.p.29">Specify minimum checksum coverage required by receiver</p>
-<p id="rfc.section.5.2.1.p.30">This boolean property specifies whether the application considers it useful to have the option to specify what parts of the received data it needs to be covered by the checksum. This property applies to connections and connection groups. This is not a strict requirement, as it signifies a reduction in reliability. The default is full checksum coverage without being able to change it.</p>
-<p id="rfc.section.5.2.1.p.31">Option to disable checksum requirement when receiving an individual message</p>
-<p id="rfc.section.5.2.1.p.32">This boolean property specifies whether an application considers it useful to have the option to communicate to the remote endpoint that it does not require an individual message to be covered by a checksum. This property applies to connections and connection groups. This is not a strict requirement, as it signifies a reduction in reliability. The default is full checksum coverage without the option to disable it.</p>
+<p id="rfc.section.5.2.1.p.1">The following properties can be adjusted before establishing a Connection. They all apply to Connections and Connection Groups:</p>
+<p id="rfc.section.5.2.1.p.2">Reliable Data Transfer</p>
+<p id="rfc.section.5.2.1.p.3">This boolean property specifies whether the application needs the transport protocol to ensure that data is received completely and without corruption on the other side. This also entails being notified when a Connection is closed or aborted. This property applies to connections and connection groups.  This is a strict requirement. The default is to enable Reliable Data Transfer.</p>
+<p id="rfc.section.5.2.1.p.4">Preservation of data ordering</p>
+<p id="rfc.section.5.2.1.p.5">This boolean property specifies whether the application needs the transport protocol to assure that data is received by the application on the other end in the same order as it was sent. This property applies to connections and connection groups. This is a strict requirement. The default is to preserve data ordering.</p>
+<p id="rfc.section.5.2.1.p.6">Option to configure reliability for individual Content</p>
+<p id="rfc.section.5.2.1.p.7">This boolean property specifies whether an application considers it useful to indicate its reliability requirements on a per-Content basis. This property applies to connections and connection groups. This is not a strict requirement.  The default is to not have this option.</p>
+<p id="rfc.section.5.2.1.p.8">Option to request not to delay acknowledgement (SACK) of Content</p>
+<p id="rfc.section.5.2.1.p.9">This boolean property specifies whether an application considers it useful to request for Content that its acknowledgement be sent out as early as possible (SACK) instead of potentially being bundled with other acknowledgements. This property applies to connections and connection groups. This is not a strict requirement. The default is to not have this option.</p>
+<p id="rfc.section.5.2.1.p.10">Option to use 0-RTT session establishment with idempotent Content</p>
+<p id="rfc.section.5.2.1.p.11">This boolean property specifies whether an application would like to supply a Content to the transport protocol before Connection establishment, which will then be reliably transferred to the other side before or during connection establishment, potentially multiple times. See also <a href="#send-idempotent" class="xref">Section 7.1.5</a>.  This is a strict requirement. The default is to not have this option.</p>
+<p id="rfc.section.5.2.1.p.12">Option to use Connection Groups with priorities</p>
+<p id="rfc.section.5.2.1.p.13">This boolean property specifies whether an application considers it useful to create Connection Groups and explicitly prioritize between Connections within a Connection Group.</p>
+<p id="rfc.section.5.2.1.p.14">Suggest a timeout to the peer</p>
+<p id="rfc.section.5.2.1.p.15">This boolean property specifies whether an application considers it useful to propose a timeout until the connection is assumed to be lost. This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</p>
+<p id="rfc.section.5.2.1.p.16">Notification of special errors (excessive retransmissions, ICMP error message arrival)</p>
+<p id="rfc.section.5.2.1.p.17">This boolean property specifies whether an application considers it useful to be informed in case sent data was retransmitted more often than a certain threshold, or when an ICMP error message arrives. This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</p>
+<p id="rfc.section.5.2.1.p.18">Control checksum coverage on sending or receiving</p>
+<p id="rfc.section.5.2.1.p.19">This boolean property specifies whether the application considers it useful to enable / disable / configure a checksum when sending Content, or decide whether to require a checksum or not when receiving Content.  This property applies to Connections and Connection Groups. This is not a strict requirement, as it signifies a reduction in reliability. The default is full checksum coverage without being able to change it, and requiring a checksum when receiving.</p>
 <h1 id="rfc.section.5.2.2">
 <a href="#rfc.section.5.2.2">5.2.2.</a> <a href="#protocol-props" id="protocol-props">Protocol Properties</a>
 </h1>
-<p id="rfc.section.5.2.2.p.1">Protocol Properties represent the configuration of a transport protocols once it has been selected. A transport protocol may not support all Protocol Properties, depending on the available transport features. An application should specify the Protocol Properties as early as possible to help the TAPS system optimize. However, a TAPS system will only actually set those protocol properties that are actually supported by the chosen transport protocol. Some of these properties can also be set on individual messages, similar to the properties in <a href="#send-props" class="xref">Section 7.1</a>.</p>
-<p id="rfc.section.5.2.2.p.2">The default settings of these properties depends on the chosen protocol and on the system configuration.</p>
-<p id="rfc.section.5.2.2.p.3">Set timeout for aborting connection</p>
-<p id="rfc.section.5.2.2.p.4">This numeric property specifies how long to wait before aborting a connection.  It is given in seconds. This property applies to connections and connection groups.</p>
-<p id="rfc.section.5.2.2.p.5">Set timeout to suggest to the peer</p>
-<p id="rfc.section.5.2.2.p.6">This numeric property specifies the timeout to propose to the peer. It is given in seconds. This property applies to connections and connection groups.</p>
-<p id="rfc.section.5.2.2.p.7">Set retransmissions before &#8220;Excessive Retransmissions&#8221;</p>
-<p id="rfc.section.5.2.2.p.8">This numeric property specifies after how many retransmissions to inform the application about &#8220;Excessive Retransmissions&#8221;. It applies to connections and connection groups.</p>
-<p id="rfc.section.5.2.2.p.9">Set whether to use a checksum for sending</p>
-<p id="rfc.section.5.2.2.p.10">This boolean property specifies whether to use a checksum for sending messages on this connection. The default is to use checksums. This property applies to connections, connection groups, and messages.</p>
-<p id="rfc.section.5.2.2.p.11">Set length of send checksum</p>
-<p id="rfc.section.5.2.2.p.12">This numeric property specifies the length of the checksum of messages sent on this connection. It is given in Bytes. This property applies to connections, connection groups, and messages.</p>
-<p id="rfc.section.5.2.2.p.13">Set whether to require a checksum for receiving</p>
-<p id="rfc.section.5.2.2.p.14">This boolean property specifies whether to communicate to the remote endpoint that it does not require messages on this connection to be covered by a checksum. This property applies to connections, connection groups, and messages.</p>
-<p id="rfc.section.5.2.2.p.15">Set required minimum coverage of the checksum</p>
-<p id="rfc.section.5.2.2.p.16">This numeric property specifies the part of the received data that needs to be covered by a checksum. It is given in Bytes. This property applies to connections, connection groups, and messages.</p>
-<p id="rfc.section.5.2.2.p.17">Set scheduler for connections in a group</p>
-<p id="rfc.section.5.2.2.p.18">This property specifies which scheduler should be used among connections within a connection group. It applies to connection groups. For now we suggest we suggest the schedulers defined in <a href="#I-D.ietf-tsvwg-sctp-ndata" class="xref">[I-D.ietf-tsvwg-sctp-ndata]</a>.</p>
-<p id="rfc.section.5.2.2.p.19">Configure the priority of a connection for the scheduler</p>
-<p id="rfc.section.5.2.2.p.20">This property specifies what priority to assign to a connection within a connection group. It applies to a connection. We suggest the priority as described in <a href="#I-D.ietf-tsvwg-sctp-ndata" class="xref">[I-D.ietf-tsvwg-sctp-ndata]</a>.</p>
-<p id="rfc.section.5.2.2.p.21">Set low watermark for buffer to nofity the application</p>
-<p id="rfc.section.5.2.2.p.22">This numeric property specifies the buffer threshold below which the application wants to be informed. It is given in Bytes. This property applies to connections and connection group.</p>
-<p id="rfc.section.5.2.2.p.23">Maximum Message Size Before Connection Establishment</p>
-<p id="rfc.section.5.2.2.p.24">This numeric property can be queried by the application after creating a connection. It represents the maximum message size that can be sent before or during connection establishment, see also <a href="#send-idempotent" class="xref">Section 7.1.5</a>. It is given in Bytes.</p>
+<p id="rfc.section.5.2.2.p.1">Protocol Properties represent the configuration of a transport protocols once it has been selected. A transport protocol may not support all Protocol Properties, depending on the available transport features. An application should specify the Protocol Properties as early as possible to help the TAPS system optimize. However, a TAPS system will only actually set those protocol properties that are actually supported by the chosen transport protocol. These property all apply to Connections and Connection groups.  The default settings of these properties depends on the chosen protocol and on the system configuration.</p>
+<p id="rfc.section.5.2.2.p.2">Set timeout for aborting Connection</p>
+<p id="rfc.section.5.2.2.p.3">This numeric property specifies how long to wait before aborting a Connection.  It is given in seconds.</p>
+<p id="rfc.section.5.2.2.p.4">Set timeout to suggest to the peer</p>
+<p id="rfc.section.5.2.2.p.5">This numeric property specifies the timeout to propose to the peer. It is given in seconds.</p>
+<p id="rfc.section.5.2.2.p.6">Set retransmissions before &#8220;Excessive Retransmissions&#8221;</p>
+<p id="rfc.section.5.2.2.p.7">This numeric property specifies after how many retransmissions to inform the application about &#8220;Excessive Retransmissions&#8221;.</p>
+<p id="rfc.section.5.2.2.p.8">Set required minimum coverage of the checksum for receiving</p>
+<p id="rfc.section.5.2.2.p.9">This numeric property specifies the part of the received data that needs to be covered by a checksum. It is given in Bytes. A value of 0 means that no checksum is required, and a special value (e.g., -1) indicates full checksum coverage.</p>
+<p id="rfc.section.5.2.2.p.10">Set scheduler for connections in a group</p>
+<p id="rfc.section.5.2.2.p.11">This property specifies which scheduler should be used among Connections within a Connection Group. It applies to connection groups. For now we suggest we the schedulers defined in <a href="#I-D.ietf-tsvwg-sctp-ndata" class="xref">[I-D.ietf-tsvwg-sctp-ndata]</a>.</p>
+<p id="rfc.section.5.2.2.p.12">Maximum Content Size Before Connection Establishment</p>
+<p id="rfc.section.5.2.2.p.13">This numeric property can be queried by the application after creating a Connection. It represents the maximum Content size that can be sent before or during Connection establishment, see also <a href="#send-idempotent" class="xref">Section 7.1.5</a>. It is given in Bytes.</p>
 <h1 id="rfc.section.5.2.3">
 <a href="#rfc.section.5.2.3">5.2.3.</a> <a href="#path-selection-props" id="path-selection-props">Path Selection Properties</a>
 </h1>
@@ -806,7 +785,7 @@ address {
 <h1 id="rfc.section.7.1">
 <a href="#rfc.section.7.1">7.1.</a> <a href="#send-props" id="send-props">Send Properties</a>
 </h1>
-<p id="rfc.section.7.1.p.1">The Send action takes five per-Content properties which control how it will be sent down to the underlying Protocol Stack and transmitted. Note that some of these properties are not compatible with transport parameters; attempting to Send with such an incompatibility yields a SendError.</p>
+<p id="rfc.section.7.1.p.1">The Send action takes six per-Content properties which control how it will be sent down to the underlying Protocol Stack and transmitted. Note that some of these properties are not compatible with transport parameters; attempting to Send with such an incompatibility yields a SendError.</p>
 <h1 id="rfc.section.7.1.1">
 <a href="#rfc.section.7.1.1">7.1.1.</a> <a href="#send-lifetime" id="send-lifetime">Lifetime</a>
 </h1>
@@ -829,6 +808,10 @@ address {
 </h1>
 <p id="rfc.section.7.1.5.p.1">Idempotent is a boolean property. If true, the application-layer entity in the Content is safe to send to the remote endpoint more than once for a single Send action. It is used to mark data safe for certain 0-RTT establishment techniques, where retransmission of the 0-RTT data may cause the remote application to receive the Content multiple times.</p>
 <p id="rfc.section.7.1.5.p.2">[NOTE: we need some way to signal to the transport that we want to wait for 0RTT data on Initiate. Probably a transport parameter] [MICHAEL: why? As an app programmer, I can just use Send instead of Initiate.]</p>
+<h1 id="rfc.section.7.1.6">
+<a href="#rfc.section.7.1.6">7.1.6.</a> <a href="#send-checksum" id="send-checksum">Checksum</a>
+</h1>
+<p id="rfc.section.7.1.6.p.1">This numeric property specifies the length of the checksum to be used on the Content.  A value of 0 means that no checksum is required, and a special value (e.g. -1) can be used to indicate full checksum coverage (which is also the default). Only full coverage is guaranteed, any other requests are advisory.</p>
 <h1 id="rfc.section.7.2">
 <a href="#rfc.section.7.2">7.2.</a> <a href="#send-framing" id="send-framing">Sender-side Framing</a>
 </h1>
