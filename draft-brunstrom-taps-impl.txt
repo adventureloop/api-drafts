@@ -84,18 +84,18 @@ Table of Contents
        4.4.1.  Determining Successful Establishment  . . . . . . . .  12
      4.5.  Establishing multiplexed connections  . . . . . . . . . .  13
      4.6.  Handling racing with "unconnected" protocols  . . . . . .  13
-     4.7.  Implementing listeners  . . . . . . . . . . . . . . . . .  13
-   5.  Implementing Data Transfer  . . . . . . . . . . . . . . . . .  13
-     5.1.  Data transfer for streams, datagrams, and frames  . . . .  13
-       5.1.1.  Sending content . . . . . . . . . . . . . . . . . . .  13
+     4.7.  Implementing listeners  . . . . . . . . . . . . . . . . .  14
+   5.  Implementing Data Transfer  . . . . . . . . . . . . . . . . .  14
+     5.1.  Data transfer for streams, datagrams, and frames  . . . .  14
+       5.1.1.  Sending content . . . . . . . . . . . . . . . . . . .  14
        5.1.2.  Receiving content . . . . . . . . . . . . . . . . . .  14
      5.2.  Handling of data for fast-open protocols  . . . . . . . .  14
    6.  Implementing Maintenance Events . . . . . . . . . . . . . . .  15
    7.  Implementing Termination  . . . . . . . . . . . . . . . . . .  15
-   8.  Cached State  . . . . . . . . . . . . . . . . . . . . . . . .  15
-     8.1.  Protocol caches . . . . . . . . . . . . . . . . . . . . .  15
-     8.2.  Performance caches  . . . . . . . . . . . . . . . . . . .  15
-   9.  Specific Transport Protocol Considerations  . . . . . . . . .  15
+   8.  Cached State  . . . . . . . . . . . . . . . . . . . . . . . .  16
+     8.1.  Protocol caches . . . . . . . . . . . . . . . . . . . . .  16
+     8.2.  Performance caches  . . . . . . . . . . . . . . . . . . .  16
+   9.  Specific Transport Protocol Considerations  . . . . . . . . .  16
      9.1.  TCP . . . . . . . . . . . . . . . . . . . . . . . . . . .  16
      9.2.  UDP . . . . . . . . . . . . . . . . . . . . . . . . . . .  16
      9.3.  SCTP  . . . . . . . . . . . . . . . . . . . . . . . . . .  16
@@ -115,11 +115,11 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
      12.1.  Considerations for Candidate Gathering . . . . . . . . .  16
-     12.2.  Considerations for Candidate Racing  . . . . . . . . . .  16
+     12.2.  Considerations for Candidate Racing  . . . . . . . . . .  17
    13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  17
      13.1.  Normative References . . . . . . . . . . . . . . . . . .  17
      13.2.  Informative References . . . . . . . . . . . . . . . . .  17
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  17
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  18
 
 1.  Introduction
 
@@ -692,12 +692,43 @@ Internet-Draft             TAPS Implementation             February 2018
 
 4.5.  Establishing multiplexed connections
 
-   How to create a new stream on an existing connection.
+   Multiplexing data streams over a connection of a single transport
+   Protocol Instance requires, at minimum, two things: 1) the transport
+   Protocol Instance must be able to know the beginning and the end of
+   messages, in order to know what to assign and multiplex /
+   demultiplex; 2) there must be an identifier that allows to decide
+   which stream a message is assigned to.  When a new stream is
+   multiplexed on an already existing connection, there is no need for a
+   connection establishment procedure - every stream can be assumed to
+   immediately be available.
+
+   When the Connections that are offered to an application by the
+   Transport System are multiplexed, the Transport System may implement
+   the establishment of a new Connection by simply beginning to use a
+   new stream of an already established transport connection.  This,
+   then, means that there may not be any "establishment" message (like a
+   TCP SYN), but the application can simply start sending or receiving.
+   Therefore, when a Transport System's "Initiate" Action is called
+   without Content being handed over, it cannot be guaranteed that the
+   other endpoint will have any way to know about this, and hence a
+   passive endpoint's ConnectionReceived event may not be called upon an
+   active endpoint's Inititate.  Instead, calling the ConnectionReceived
+   event may be delayed until the first Content arrives.
 
 4.6.  Handling racing with "unconnected" protocols
 
    How to handle UDP, and allowing the application or anothe protocol to
    cause the next option to be tried.
+
+
+
+
+
+
+Brunstrom, et al.        Expires August 13, 2018               [Page 13]
+
+Internet-Draft             TAPS Implementation             February 2018
+
 
 4.7.  Implementing listeners
 
@@ -718,17 +749,6 @@ Internet-Draft             TAPS Implementation             February 2018
 5.1.1.1.  Send Completion
 
    How to determine when a send is effectively complete
-
-
-
-
-
-
-
-Brunstrom, et al.        Expires August 13, 2018               [Page 13]
-
-Internet-Draft             TAPS Implementation             February 2018
-
 
 5.1.1.2.  Batching Sends
 
@@ -758,6 +778,14 @@ Internet-Draft             TAPS Implementation             February 2018
    racing, this means that the data SHOULD be provided before the
    process of connection establishment has begun.  If the API allows the
    application to send 0-RTT data, it MUST provide an interface that
+
+
+
+Brunstrom, et al.        Expires August 13, 2018               [Page 14]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
    identifies this data as idempotent data.  In general, 0-RTT data may
    be replayed (for example, if a TCP SYN contains data, and the SYN is
    retransmitted, the data will be retransmitted as well), but racing
@@ -778,14 +806,6 @@ Internet-Draft             TAPS Implementation             February 2018
    cookies, previously established TLS tickets, or out-of-band
    distributed pre-shared keys (PSKs).  Implementations should be aware
    of security concerns around using these tokens across multiple
-
-
-
-Brunstrom, et al.        Expires August 13, 2018               [Page 14]
-
-Internet-Draft             TAPS Implementation             February 2018
-
-
    addresses or paths when racing.  In the case of TLS, any given ticket
    or PSK SHOULD only be used on one leaf node.  If implementations have
    multiple tickets available from a previous connection, each leaf node
@@ -814,6 +834,14 @@ Internet-Draft             TAPS Implementation             February 2018
 
    How to handle a failure generated by protocols
 
+
+
+
+Brunstrom, et al.        Expires August 13, 2018               [Page 15]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
 8.  Cached State
 
    Beyond a single connection's lifetime, it is useful to keep state and
@@ -830,17 +858,6 @@ Internet-Draft             TAPS Implementation             February 2018
    and features.
 
 9.  Specific Transport Protocol Considerations
-
-
-
-
-
-
-
-Brunstrom, et al.        Expires August 13, 2018               [Page 15]
-
-Internet-Draft             TAPS Implementation             February 2018
-
 
 9.1.  TCP
 
@@ -872,6 +889,15 @@ Internet-Draft             TAPS Implementation             February 2018
    interference to cause the implementation to select less secure, or
    entirely insecure, combinations of paths and protocols.
 
+
+
+
+
+Brunstrom, et al.        Expires August 13, 2018               [Page 16]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
 12.2.  Considerations for Candidate Racing
 
    See Section 5.2 for security considerations around racing with 0-RTT
@@ -890,14 +916,6 @@ Internet-Draft             TAPS Implementation             February 2018
    it is possible for the network to cause an implementation to consume
    significant on-device resources.  Implementations SHOULD limit the
    maximum amount of state allowed for any given node, including the
-
-
-
-Brunstrom, et al.        Expires August 13, 2018               [Page 16]
-
-Internet-Draft             TAPS Implementation             February 2018
-
-
    number of child nodes, especially when the state is based on results
    from the network.
 
@@ -928,6 +946,14 @@ Internet-Draft             TAPS Implementation             February 2018
               Fast Open", RFC 7413, DOI 10.17487/RFC7413, December 2014,
               <https://www.rfc-editor.org/info/rfc7413>.
 
+
+
+
+Brunstrom, et al.        Expires August 13, 2018               [Page 17]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
    [RFC7540]  Belshe, M., Peon, R., and M. Thomson, Ed., "Hypertext
               Transfer Protocol Version 2 (HTTP/2)", RFC 7540,
               DOI 10.17487/RFC7540, May 2015,
@@ -943,15 +969,6 @@ Authors' Addresses
    Anna Brunstrom (editor)
 
    Email: anna.brunstrom@kau.se
-
-
-
-
-
-
-Brunstrom, et al.        Expires August 13, 2018               [Page 17]
-
-Internet-Draft             TAPS Implementation             February 2018
 
 
    Tommy Pauly (editor)
@@ -982,23 +999,6 @@ Internet-Draft             TAPS Implementation             February 2018
    United Kingdom
 
    Email: csp@csperkins.org
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
