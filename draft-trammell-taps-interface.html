@@ -318,6 +318,9 @@ address {
 <link href="#rfc.references" rel="Chapter" title="13 References">
 <link href="#rfc.references.1" rel="Chapter" title="13.1 Normative References">
 <link href="#rfc.references.2" rel="Chapter" title="13.2 Informative References">
+<link href="#rfc.appendix.A" rel="Chapter" title="A Transport Parameters">
+<link href="#rfc.appendix.A.1" rel="Chapter" title="A.1 Application Preferences">
+<link href="#rfc.appendix.A.2" rel="Chapter" title="A.2 Specifying and Querying">
 <link href="#rfc.authors" rel="Chapter">
 
 
@@ -497,6 +500,12 @@ address {
 </li>
 <li>13.2.   <a href="#rfc.references.2">Informative References</a>
 </li>
+</ul><li>Appendix A.   <a href="#rfc.appendix.A">Transport Parameters</a>
+</li>
+<ul><li>A.1.   <a href="#rfc.appendix.A.1">Application Preferences</a>
+</li>
+<li>A.2.   <a href="#rfc.appendix.A.2">Specifying and Querying</a>
+</li>
 </ul><li><a href="#rfc.authors">Authors' Addresses</a>
 </li>
 
@@ -632,21 +641,22 @@ localSpecifier.withPort(443)
 </tr>
 </tbody>
 </table>
-<p id="rfc.section.5.2.p.4">All properties of the Transport Parameters are collected in a TransportParameters object:</p>
+<p id="rfc.section.5.2.p.4">Default preference levels and possible combinations of Transport Parameters and preference levels are specified in <a href="#appendix-preferences" class="xref">Appendix A.1</a>.</p>
+<p id="rfc.section.5.2.p.5">All properties of the Transport Parameters are collected in a TransportParameters object:</p>
 <pre>
 transportParameters := NewTransportParameters()
 </pre>
-<p id="rfc.section.5.2.p.5">The Individual properties, regardless whether thy are Protocol Selection Properties, Protocol Properties, Path Selection Properties, or Application Intents, are then added to the TransportParameters object:</p>
+<p id="rfc.section.5.2.p.6">The Individual properties, regardless whether thy are Protocol Selection Properties, Protocol Properties, Path Selection Properties, or Application Intents, are then added to the TransportParameters object:</p>
 <pre>
 transportParameters.addProperty(preference, name, value)
 </pre>
-<p id="rfc.section.5.2.p.6">For an existing connection, the Transport Parameters can be queried any time by using the following call on the Connection object:</p>
+<p id="rfc.section.5.2.p.7">For an existing connection, the Transport Parameters can be queried any time by using the following call on the Connection object:</p>
 <pre>
 transportParameters := connection.getTransportParameters()
 </pre>
-<p id="rfc.section.5.2.p.7">For most properties, it is beneficial for the application to set them as early as possible in order to help the transport system optimize.  Some parameters can also be set later in the lifetime of a connection.  However, Protocol Selection Properties and Path Selection Properties MUST be added to the TransportParameters object before calling Initiate() and SHOULD result in a runtime error if changed later.</p>
-<p id="rfc.section.5.2.p.8">Connections can be cloned at any time, before or after establishment.  A cloned connection and its parent are entangled: they share the same TransportParameters object, changing any parameter for one of them also changes the parameter for the other, connecting one of them also connects the other, etc.  Cloning connections during pre-establishment is encouraged, as it informs the transport system about the intent to form Connection Groups.</p>
-<p id="rfc.section.5.2.p.9">[Note that priority assignment ((see also <a href="#groups" class="xref">Section 6.4</a> for more details) is not shared among cloned connections. Therefore, the priority assignment MUST NOT be realized using the connection level TransportParameters object.]</p>
+<p id="rfc.section.5.2.p.8">For most properties, it is beneficial for the application to set them as early as possible in order to help the transport system optimize.  Some parameters can also be set later in the lifetime of a connection.  However, Protocol Selection Properties and Path Selection Properties MUST be added to the TransportParameters object before calling Initiate() and SHOULD result in a runtime error if changed later.  <a href="#appendix-specify-query-params" class="xref">Appendix A.2</a> gives an overview of what Transport Parameters can be specified and queried during which phase.</p>
+<p id="rfc.section.5.2.p.9">Connections can be cloned at any time, before or after establishment.  A cloned connection and its parent are entangled: they share the same TransportParameters object, changing any parameter for one of them also changes the parameter for the other, connecting one of them also connects the other, etc.  Cloning connections during pre-establishment is encouraged, as it informs the transport system about the intent to form Connection Groups.</p>
+<p id="rfc.section.5.2.p.10">[Note that priority assignment ((see also <a href="#groups" class="xref">Section 6.4</a> for more details) is not shared among cloned connections. Therefore, the priority assignment MUST NOT be realized using the connection level TransportParameters object.]</p>
 <h1 id="rfc.section.5.2.1">
 <a href="#rfc.section.5.2.1">5.2.1.</a> <a href="#protocol-selection-props" id="protocol-selection-props">Protocol Selection Properties</a>
 </h1>
@@ -1020,6 +1030,168 @@ securityParameters.SetIdentityChallengeCallback(challengeCallback)
 <a>Welzl, M.</a> and <a>S. Gjessing</a>, "<a href="https://tools.ietf.org/html/draft-ietf-taps-minset-01">A Minimal Set of Transport Services for TAPS Systems</a>", Internet-Draft draft-ietf-taps-minset-01, February 2018.</td>
 </tr>
 </tbody></table>
+<h1 id="rfc.appendix.A">
+<a href="#rfc.appendix.A">Appendix A.</a> <a href="#appendix-transport-params" id="appendix-transport-params">Transport Parameters</a>
+</h1>
+<p id="rfc.section.A.p.1">This appendix provides details about the usage of the Transport Parameters specified in <a href="#transport-params" class="xref">Section 5.2</a>. It clarifies what preference levels an application can set for which Transport Parameter, and during which phase an application can specify and query what kinds of Transport Parameters.</p>
+<h1 id="rfc.appendix.A.1">
+<a href="#rfc.appendix.A.1">A.1.</a> <a href="#appendix-preferences" id="appendix-preferences">Application Preferences</a>
+</h1>
+<p id="rfc.section.A.1.p.1">As described in <a href="#transport-params" class="xref">Section 5.2</a>, an application can specify its preference regarding a Transport Parameter, i.e., whether a certain property is required, preferred, to be avoided, prohibited, or an intention. If an application does not set its preference regarding a Transport Parameter, default preference levels apply as specified in the following table. A default preference of &#8220;None&#8221; means that the transport system assumes that an application does not have any preference regarding the corresponding Transport Parameter and may not take this parameter into account for protocol and path selection.</p>
+<p id="rfc.section.A.1.p.2">Not every Transport Parameter can be meaningfully assigned every preference level. For example, if an application explicitly prohibits selecting a transport protocol that allows to suggest a timeout to the peer, this restriction will unnecessarily limit transport protocol selection. Instead, the application could simply not use this feature if it is present in the selected transport protocol.</p>
+<p id="rfc.section.A.1.p.3">The following table illustrates which Transport Parameter has which default preference level and which alternative preference levels an application may set.</p>
+<table cellpadding="3" cellspacing="0" class="tt full center">
+<thead><tr>
+<th class="left">Transport Parameter</th>
+<th class="left">Require</th>
+<th class="left">Prefer</th>
+<th class="left">Avoid</th>
+<th class="left">Prohibit</th>
+<th class="left">Default</th>
+</tr></thead>
+<tbody>
+<tr>
+<td class="left">Reliable Data Transfer</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">Require</td>
+</tr>
+<tr>
+<td class="left">Preserve Data Ordering</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">No</td>
+<td class="left">Require</td>
+</tr>
+<tr>
+<td class="left">Configure Reliability per Content</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">Prefer</td>
+</tr>
+<tr>
+<td class="left">Request SACK</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">Prefer</td>
+</tr>
+<tr>
+<td class="left">Use 0-RTT with Idempotent Content</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">None</td>
+</tr>
+<tr>
+<td class="left">Use Connection Groups with priorities</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">No</td>
+<td class="left">No</td>
+<td class="left">None</td>
+</tr>
+<tr>
+<td class="left">Suggest timeout to peer</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">No</td>
+<td class="left">No</td>
+<td class="left">Prefer</td>
+</tr>
+<tr>
+<td class="left">Notification of special errors</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">Prefer</td>
+</tr>
+<tr>
+<td class="left">Control checksum coverage</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">Prefer</td>
+</tr>
+<tr>
+<td class="left">Use a certain network interface type</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">None</td>
+</tr>
+<tr>
+<td class="left">Application Intents</td>
+<td class="left">No</td>
+<td class="left">No</td>
+<td class="left">No</td>
+<td class="left">No</td>
+<td class="left">Intend</td>
+</tr>
+</tbody>
+</table>
+<p id="rfc.section.A.1.p.4">[List individual Intents? Reformulate some of them as preferences?]</p>
+<h1 id="rfc.appendix.A.2">
+<a href="#rfc.appendix.A.2">A.2.</a> <a href="#appendix-specify-query-params" id="appendix-specify-query-params">Specifying and Querying</a>
+</h1>
+<p id="rfc.section.A.2.p.1">An application may specify Transport Parameters for a connection within the Pre-Establishment Phase, i.e., before calling Initiate() on this connection, as described in <a href="#transport-params" class="xref">Section 5.2</a>. Specifically, Protocol Selection and Path Selection Properties MUST be specified during Pre-Establishment, as protocol and path selection occur during connection establishment. Protocol Properties, which express specific configuration of a transport protocol, and Application Intents can be specified either during pre-establishment or later in the lifetime of a connection. Note that it is beneficial to set these properties as early as possible, so the transport system can use them to optimize. An application may also specify Send Properties per individual Content, as specified in <a href="#send-props" class="xref">Section 7.1</a>.</p>
+<p id="rfc.section.A.2.p.2">An application may query the Transport Parameters that were specified for a connection at all times. Additionally, an application may query the Transport Parameters that apply to the actual connection at all times. However, some parameters may not yet be available during the Pre-Establishment Phase, so the application can most likely only obtain limited information at that point.</p>
+<p id="rfc.section.A.2.p.3">Note that it is possible that the transport protocol actually chosen by the transport system does not fully reflect the Transport Parameters that were originally set. For example, a certain Protocol Selection Property that an application specified as Preferred may not actually be present in the chosen configuration because none of the currently available transport protocols had this property.</p>
+<p id="rfc.section.A.2.p.4">The following table provides an overview of what an application can do during which phase:</p>
+<table cellpadding="3" cellspacing="0" class="tt full center">
+<thead><tr>
+<th class="left">Property Type</th>
+<th class="left">Pre-Establishment</th>
+<th class="left">Established</th>
+</tr></thead>
+<tbody>
+<tr>
+<td class="left">Set Protocol Selection Properties</td>
+<td class="left">Yes</td>
+<td class="left">No</td>
+</tr>
+<tr>
+<td class="left">Set Protocol Properties</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+</tr>
+<tr>
+<td class="left">Set Path Selection Properties</td>
+<td class="left">Yes</td>
+<td class="left">No</td>
+</tr>
+<tr>
+<td class="left">Set Application Intents</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+</tr>
+<tr>
+<td class="left">Set Send Properties</td>
+<td class="left">Yes (0-RTT)</td>
+<td class="left">Yes</td>
+</tr>
+<tr>
+<td class="left">Query specified Transport Parameters</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+</tr>
+<tr>
+<td class="left">Query actual Transport Parameters</td>
+<td class="left">Yes (limited)</td>
+<td class="left">Yes</td>
+</tr>
+</tbody>
+</table>
 <h1 id="rfc.authors"><a href="#rfc.authors">Authors' Addresses</a></h1>
 <div class="avoidbreak">
   <address class="vcard">
