@@ -5,14 +5,14 @@
 TAPS Working Group                                     A. Brunstrom, Ed.
 Internet-Draft
 Intended status: Informational                             T. Pauly, Ed.
-Expires: August 13, 2018                                      Apple Inc.
+Expires: August 16, 2018                                      Apple Inc.
                                                            K-J. Grinnemo
                                                      Karlstad University
                                                                 T. Jones
                                                   University of Aberdeen
                                                               C. Perkins
                                                    University of Glasgow
-                                                       February 09, 2018
+                                                       February 12, 2018
 
 
              Implementing Interfaces to Transport Services
@@ -40,7 +40,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on August 13, 2018.
+   This Internet-Draft will expire on August 16, 2018.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Brunstrom, et al.        Expires August 13, 2018                [Page 1]
+Brunstrom, et al.        Expires August 16, 2018                [Page 1]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -93,33 +93,33 @@ Table of Contents
    6.  Implementing Maintenance Events . . . . . . . . . . . . . . .  15
    7.  Implementing Termination  . . . . . . . . . . . . . . . . . .  15
    8.  Cached State  . . . . . . . . . . . . . . . . . . . . . . . .  16
-     8.1.  Protocol caches . . . . . . . . . . . . . . . . . . . . .  16
-     8.2.  Performance caches  . . . . . . . . . . . . . . . . . . .  16
-   9.  Specific Transport Protocol Considerations  . . . . . . . . .  16
-     9.1.  TCP . . . . . . . . . . . . . . . . . . . . . . . . . . .  16
-     9.2.  UDP . . . . . . . . . . . . . . . . . . . . . . . . . . .  16
-     9.3.  SCTP  . . . . . . . . . . . . . . . . . . . . . . . . . .  16
-     9.4.  QUIC  . . . . . . . . . . . . . . . . . . . . . . . . . .  16
-     9.5.  HTTP over TLS as a pseudotransport  . . . . . . . . . . .  16
-     9.6.  HTTP/2 transport  . . . . . . . . . . . . . . . . . . . .  16
-   10. Rendezvous and Environment Discovery  . . . . . . . . . . . .  16
-     10.1.  ICE and STUN . . . . . . . . . . . . . . . . . . . . . .  16
-   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  16
-   12. Security Considerations . . . . . . . . . . . . . . . . . . .  16
+     8.1.  Protocol caches . . . . . . . . . . . . . . . . . . . . .  17
+     8.2.  Performance caches  . . . . . . . . . . . . . . . . . . .  17
+   9.  Specific Transport Protocol Considerations  . . . . . . . . .  17
+     9.1.  TCP . . . . . . . . . . . . . . . . . . . . . . . . . . .  17
+     9.2.  UDP . . . . . . . . . . . . . . . . . . . . . . . . . . .  17
+     9.3.  SCTP  . . . . . . . . . . . . . . . . . . . . . . . . . .  17
+     9.4.  QUIC  . . . . . . . . . . . . . . . . . . . . . . . . . .  18
+     9.5.  HTTP over TLS as a pseudotransport  . . . . . . . . . . .  18
+     9.6.  HTTP/2 transport  . . . . . . . . . . . . . . . . . . . .  18
+   10. Rendezvous and Environment Discovery  . . . . . . . . . . . .  18
+     10.1.  ICE and STUN . . . . . . . . . . . . . . . . . . . . . .  18
+   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  18
+   12. Security Considerations . . . . . . . . . . . . . . . . . . .  18
 
 
 
-Brunstrom, et al.        Expires August 13, 2018                [Page 2]
+Brunstrom, et al.        Expires August 16, 2018                [Page 2]
 
 Internet-Draft             TAPS Implementation             February 2018
 
 
-     12.1.  Considerations for Candidate Gathering . . . . . . . . .  16
-     12.2.  Considerations for Candidate Racing  . . . . . . . . . .  17
-   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  17
-     13.1.  Normative References . . . . . . . . . . . . . . . . . .  17
-     13.2.  Informative References . . . . . . . . . . . . . . . . .  17
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  18
+     12.1.  Considerations for Candidate Gathering . . . . . . . . .  18
+     12.2.  Considerations for Candidate Racing  . . . . . . . . . .  18
+   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  19
+     13.1.  Normative References . . . . . . . . . . . . . . . . . .  19
+     13.2.  Informative References . . . . . . . . . . . . . . . . .  19
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  20
 
 1.  Introduction
 
@@ -150,7 +150,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
    o  For QUIC, one stream is a Connection object
 
-   o  For SCTP...
+   o  For SCTP, one stream is a Connection object
 
 3.  Implementing Pre-Establishment
 
@@ -165,7 +165,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 13, 2018                [Page 3]
+Brunstrom, et al.        Expires August 16, 2018                [Page 3]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -221,7 +221,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 13, 2018                [Page 4]
+Brunstrom, et al.        Expires August 16, 2018                [Page 4]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -277,7 +277,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 
 
 
-Brunstrom, et al.        Expires August 13, 2018                [Page 5]
+Brunstrom, et al.        Expires August 16, 2018                [Page 5]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -333,7 +333,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 13, 2018                [Page 6]
+Brunstrom, et al.        Expires August 16, 2018                [Page 6]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -389,7 +389,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 13, 2018                [Page 7]
+Brunstrom, et al.        Expires August 16, 2018                [Page 7]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -445,7 +445,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 13, 2018                [Page 8]
+Brunstrom, et al.        Expires August 16, 2018                [Page 8]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -454,7 +454,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
    1 [www.example.com:80, Any, Any Stream]
      1.1 [www.example.com:80, Any, SCTP]
-            1.1.1 [192.0.2.1:80, Any, SCTP]
+       1.1.1 [192.0.2.1:80, Any, SCTP]
      1.2 [www.example.com:80, Any, TCP]
        1.2.1 [192.0.2.1:80, Any, TCP]
 
@@ -501,7 +501,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 13, 2018                [Page 9]
+Brunstrom, et al.        Expires August 16, 2018                [Page 9]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -557,7 +557,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 13, 2018               [Page 10]
+Brunstrom, et al.        Expires August 16, 2018               [Page 10]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -613,7 +613,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 13, 2018               [Page 11]
+Brunstrom, et al.        Expires August 16, 2018               [Page 11]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -669,7 +669,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 13, 2018               [Page 12]
+Brunstrom, et al.        Expires August 16, 2018               [Page 12]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -725,7 +725,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 13, 2018               [Page 13]
+Brunstrom, et al.        Expires August 16, 2018               [Page 13]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -781,7 +781,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 13, 2018               [Page 14]
+Brunstrom, et al.        Expires August 16, 2018               [Page 14]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -829,23 +829,74 @@ Internet-Draft             TAPS Implementation             February 2018
 
    o  How gracefully to tear down at various protocol layers
 
-   o  How much to tear down for multiplexed protocols, or protocols
-      capable of multiplexing
+   With TCP, when an application closes a connection, this means that it
+   has no more data to send (but expects all data that has been handed
+   over to be reliably delivered).  However, with TCP only, "close" does
+   not mean that the application will stop receiving data.  This is
+   related to TCP's ability to support half-closed connections.
 
-   How to handle a failure generated by protocols
 
 
-
-
-Brunstrom, et al.        Expires August 13, 2018               [Page 15]
+Brunstrom, et al.        Expires August 16, 2018               [Page 15]
 
 Internet-Draft             TAPS Implementation             February 2018
 
+
+   SCTP is an example of a protocol that does not support such half-
+   closed connections.  Hence, with SCTP, the meaning of "close" is
+   stricter: an application has no more data to send (but expects all
+   data that has been handed over to be reliably delivered), and will
+   also not receive any more data.
+
+   Implementing a protocol independent transport system means that the
+   exposed semantics must be the strictest subset of the semantics of
+   all supported protocols.  Hence, as is common with all reliable
+   transport protocols, after a Close action, the application can expect
+   to have its reliability requirements honored regarding the data it
+   has given to the Transport System - but it cannot expect to be able
+   to read any more data after calling Close.
+
+   Abort differs from Close only in that no guarantees are given
+   regarding data that the application has handed over to the Tranport
+   System before calling Abort.
+
+   o  How much to tear down for multiplexed protocols, or protocols
+      capable of multiplexing
+
+   As explained in section Section 4.5, when a new stream is multiplexed
+   on an already existing connection of a Transport Protocol Instance,
+   there is no need for a connection establishment procedure.  Because
+   the Connections that are offered by the Transport System can be
+   implemented as streams that are multiplexed on a transport protocol's
+   connection, it can therefore not be guaranteed that one Endpoint's
+   Initiate action provokes a ConnectionReceived event at its peer.
+
+   For Close (provoking a Finished event) and Abort (provoking a
+   ConnectionError event), the same logic applies: while it is desirable
+   to be informed when a peer closes or aborts a Connection, whether
+   this is possible depends on the underlying protocol, and no
+   guarantees can be given.  With SCTP, the transport system can use the
+   stream reset procedure to cause a Finish event upon a Close action
+   from the peer [NEAT-flow-mapping].
+
+   How to handle a failure generated by protocols
 
 8.  Cached State
 
    Beyond a single connection's lifetime, it is useful to keep state and
    history.
+
+
+
+
+
+
+
+
+Brunstrom, et al.        Expires August 16, 2018               [Page 16]
+
+Internet-Draft             TAPS Implementation             February 2018
+
 
 8.1.  Protocol caches
 
@@ -864,6 +915,44 @@ Internet-Draft             TAPS Implementation             February 2018
 9.2.  UDP
 
 9.3.  SCTP
+
+   To support sender-side stream schedulers (which are implemented on
+   the sender side), a receiver-side Transport System should always
+   support message interleaving [RFC8260].
+
+   SCTP messages can be very large.  To allow the reception of large
+   messages in pieces, a "partial flag" can be used to inform a (native
+   SCTP) receiving application that a message is incomplete.  After
+   receiving the "partial flag", this application would know that the
+   next receive calls will only deliver remaining parts of the same
+   message (i.e., no messages or partial messages will arrive on other
+   streams until the message is complete) (see Section 8.1.20 in
+   [RFC6458]).  The "partial flag" can therefore facilitate the
+   implementation of the receiver buffer in the receiving application,
+   at the cost of limiting multiplexing and temporarily creating head-
+   of-line blocking delay at the receiver.
+
+   When a Transport System transfers Content, it seems natural to map
+   Content to SCTP messages in order to support properties such as
+   "Ordered" or "Lifetime" (which maps onto partially reliable delivery
+   with a SCTP_PR_SCTP_TTL policy [RFC6458]).  However, since
+   multiplexing of Connections onto SCTP streams may happen, and would
+   be hidden from the application, the Transport System requires a per-
+   stream receiver buffer anyway, so this potential benefit is lost and
+   the "partial flag" becomes unnecessary for the system.
+
+   The problem of long messages either requiring large receiver-side
+   buffers or getting in the way of multiplexing is addressed by message
+   interleaving [RFC8260], which is yet another reason why a receivers-
+   side transport system supporting SCTP should implement this
+   mechanism.
+
+
+
+Brunstrom, et al.        Expires August 16, 2018               [Page 17]
+
+Internet-Draft             TAPS Implementation             February 2018
+
 
 9.4.  QUIC
 
@@ -889,15 +978,6 @@ Internet-Draft             TAPS Implementation             February 2018
    interference to cause the implementation to select less secure, or
    entirely insecure, combinations of paths and protocols.
 
-
-
-
-
-Brunstrom, et al.        Expires August 13, 2018               [Page 16]
-
-Internet-Draft             TAPS Implementation             February 2018
-
-
 12.2.  Considerations for Candidate Racing
 
    See Section 5.2 for security considerations around racing with 0-RTT
@@ -918,6 +998,17 @@ Internet-Draft             TAPS Implementation             February 2018
    maximum amount of state allowed for any given node, including the
    number of child nodes, especially when the state is based on results
    from the network.
+
+
+
+
+
+
+
+Brunstrom, et al.        Expires August 16, 2018               [Page 18]
+
+Internet-Draft             TAPS Implementation             February 2018
+
 
 13.  References
 
@@ -942,22 +1033,38 @@ Internet-Draft             TAPS Implementation             February 2018
               Version 1.3", draft-ietf-tls-tls13-23 (work in progress),
               January 2018.
 
+   [NEAT-flow-mapping]
+              ""Transparent Flow Mapping for NEAT"", Workshop on Future
+              of Internet Transport (FIT 2017) , n.d..
+
+   [RFC6458]  Stewart, R., Tuexen, M., Poon, K., Lei, P., and V.
+              Yasevich, "Sockets API Extensions for the Stream Control
+              Transmission Protocol (SCTP)", RFC 6458,
+              DOI 10.17487/RFC6458, December 2011,
+              <https://www.rfc-editor.org/info/rfc6458>.
+
    [RFC7413]  Cheng, Y., Chu, J., Radhakrishnan, S., and A. Jain, "TCP
               Fast Open", RFC 7413, DOI 10.17487/RFC7413, December 2014,
               <https://www.rfc-editor.org/info/rfc7413>.
-
-
-
-
-Brunstrom, et al.        Expires August 13, 2018               [Page 17]
-
-Internet-Draft             TAPS Implementation             February 2018
-
 
    [RFC7540]  Belshe, M., Peon, R., and M. Thomson, Ed., "Hypertext
               Transfer Protocol Version 2 (HTTP/2)", RFC 7540,
               DOI 10.17487/RFC7540, May 2015,
               <https://www.rfc-editor.org/info/rfc7540>.
+
+   [RFC8260]  Stewart, R., Tuexen, M., Loreto, S., and R. Seggelmann,
+              "Stream Schedulers and User Message Interleaving for the
+              Stream Control Transmission Protocol", RFC 8260,
+              DOI 10.17487/RFC8260, November 2017,
+              <https://www.rfc-editor.org/info/rfc8260>.
+
+
+
+
+Brunstrom, et al.        Expires August 16, 2018               [Page 19]
+
+Internet-Draft             TAPS Implementation             February 2018
+
 
    [RFC8305]  Schinazi, D. and T. Pauly, "Happy Eyeballs Version 2:
               Better Connectivity Using Concurrency", RFC 8305,
@@ -1005,4 +1112,9 @@ Authors' Addresses
 
 
 
-Brunstrom, et al.        Expires August 13, 2018               [Page 18]
+
+
+
+
+
+Brunstrom, et al.        Expires August 16, 2018               [Page 20]

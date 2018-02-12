@@ -287,13 +287,13 @@ address {
 <link href="#rfc.section.3" rel="Chapter" title="3 Design Principles">
 <link href="#rfc.section.4" rel="Chapter" title="4 API Summary">
 <link href="#rfc.section.5" rel="Chapter" title="5 Pre-Establishment Phase">
-<link href="#rfc.section.5.1" rel="Chapter" title="5.1 Resolving Remote Endpoints">
+<link href="#rfc.section.5.1" rel="Chapter" title="5.1 Specifying Endpoints">
 <link href="#rfc.section.5.2" rel="Chapter" title="5.2 Specifying Transport Parameters">
 <link href="#rfc.section.5.2.1" rel="Chapter" title="5.2.1 Protocol Selection Properties">
 <link href="#rfc.section.5.2.2" rel="Chapter" title="5.2.2 Protocol Properties">
 <link href="#rfc.section.5.2.3" rel="Chapter" title="5.2.3 Path Selection Properties">
-<link href="#rfc.section.5.2.4" rel="Chapter" title="5.2.4 Socket Intents">
-<link href="#rfc.section.5.3" rel="Chapter" title="5.3 Specifying Cryptographic Parameters">
+<link href="#rfc.section.5.2.4" rel="Chapter" title="5.2.4 Application Intents">
+<link href="#rfc.section.5.3" rel="Chapter" title="5.3 Specifying Security Parameters and Callbacks">
 <link href="#rfc.section.6" rel="Chapter" title="6 Establishing Connections">
 <link href="#rfc.section.6.1" rel="Chapter" title="6.1 Active Open: Initiate">
 <link href="#rfc.section.6.2" rel="Chapter" title="6.2 Passive Open: Listen">
@@ -321,12 +321,12 @@ address {
 <link href="#rfc.authors" rel="Chapter">
 
 
-  <meta name="generator" content="xml2rfc version 2.8.5 - https://tools.ietf.org/tools/xml2rfc" />
+  <meta name="generator" content="xml2rfc version 2.9.2 - https://tools.ietf.org/tools/xml2rfc" />
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., Enghardt, T., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-trammell-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-2-09" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-02-12" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -350,7 +350,7 @@ address {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: August 13, 2018</td>
+<td class="left">Expires: August 16, 2018</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -399,7 +399,7 @@ address {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">February 09, 2018</td>
+<td class="right">February 12, 2018</td>
 </tr>
 
     	
@@ -415,7 +415,7 @@ address {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on August 13, 2018.</p>
+<p>This Internet-Draft will expire on August 16, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -435,7 +435,7 @@ address {
 </li>
 <li>5.   <a href="#rfc.section.5">Pre-Establishment Phase</a>
 </li>
-<ul><li>5.1.   <a href="#rfc.section.5.1">Resolving Remote Endpoints</a>
+<ul><li>5.1.   <a href="#rfc.section.5.1">Specifying Endpoints</a>
 </li>
 <li>5.2.   <a href="#rfc.section.5.2">Specifying Transport Parameters</a>
 </li>
@@ -445,9 +445,9 @@ address {
 </li>
 <li>5.2.3.   <a href="#rfc.section.5.2.3">Path Selection Properties</a>
 </li>
-<li>5.2.4.   <a href="#rfc.section.5.2.4">Socket Intents</a>
+<li>5.2.4.   <a href="#rfc.section.5.2.4">Application Intents</a>
 </li>
-</ul><li>5.3.   <a href="#rfc.section.5.3">Specifying Cryptographic Parameters</a>
+</ul><li>5.3.   <a href="#rfc.section.5.3">Specifying Security Parameters and Callbacks</a>
 </li>
 </ul><li>6.   <a href="#rfc.section.6">Establishing Connections</a>
 </li>
@@ -562,55 +562,114 @@ address {
 <a href="#rfc.section.5">5.</a> <a href="#pre-establishment-phase" id="pre-establishment-phase">Pre-Establishment Phase</a>
 </h1>
 <p id="rfc.section.5.p.1">Establishment begins with the creation of a Connection&#8230;</p>
-<p id="rfc.section.5.p.2">Connection := NewConnection(localSpecifier, remoteSpecifier, transportParameters, cryptographicParameters)</p>
-<p id="rfc.section.5.p.3">[NOTE: note also that framers and deframers should be bound to connections during pre-establishment, forward-reference <a href="#send-framing" class="xref">Section 7.2</a> and <a href="#receive-framing" class="xref">Section 8.2</a>]</p>
+<pre>
+Connection := NewConnection(localSpecifier, remoteSpecifier, transportParameters, cryptographicParameters)
+</pre>
+<p id="rfc.section.5.p.2">[NOTE: note also that framers and deframers should be bound to connections during pre-establishment, forward-reference <a href="#send-framing" class="xref">Section 7.2</a> and <a href="#receive-framing" class="xref">Section 8.2</a>]</p>
 <h1 id="rfc.section.5.1">
-<a href="#rfc.section.5.1">5.1.</a> <a href="#resolving" id="resolving">Resolving Remote Endpoints</a>
+<a href="#rfc.section.5.1">5.1.</a> <a href="#enpointspec" id="enpointspec">Specifying Endpoints</a>
 </h1>
-<p id="rfc.section.5.1.p.1">Name resolution is no explicit step of a transport service API.  Therefore, name resolution may be deferred until connection establishment to incorporate transport parameters.  Instead, a remoteSpecifier object representing the remote endpoint is created providing an appropriate endpoint representation, which include IP addresses, hostnames and URLs:</p>
-<p id="rfc.section.5.1.p.2">remoteSpecifier := Endpoint() remoteSpecifier.withUrl(&#8220;https://example.com&#8221;)</p>
-<p id="rfc.section.5.1.p.3">remoteSpecifier := Endpoint() remoteSpecifier.withHostname(&#8220;example.com&#8221; remoteSpecifier.withService(&#8220;https&#8221;)</p>
-<p id="rfc.section.5.1.p.4">remoteSpecifier := Endpoint() remoteSpecifier.withIPv6Address(2001:db8:4920:e29d:a420:7461:7073:0a) remoteSpecifier.withPort(443)</p>
-<p id="rfc.section.5.1.p.5">remoteSpecifier := Endpoint() remoteSpecifier.withIPv4Address(192.0.2.21) remoteSpecifier.withPort(443)</p>
-<p id="rfc.section.5.1.p.6">Implementations may also support additional endpoint representations and provide a single Endpoint() call that takes different endpoint representations.</p>
-<p id="rfc.section.5.1.p.7">Endpoint representations may imply transport protocols, pseudotransport protocols, or families of protocols, e.g., remoteSpecifier.withUrl(&#8220;https://example.com&#8221;) implies either using HTTP over TLS over TCP or using HTTP over QUIC over UDP.  Whether the protocols implied by the endpoint representation are provided by the transport system is implementation specific, but MUST BE tunable using pre-establishment properties.  Implementations SHOULD provide all parts of the implied transport stack they implement unless specified otherwise using pre-establishment properties.  For example, the transport system may provide TLS over TCP in the above example and let the application implement HTTP pseudo-transport itself.</p>
-<p id="rfc.section.5.1.p.8">[TASK: match with #initiate / #listen / #rendezvous and make sure the transport stack used is communicated ]</p>
+<p id="rfc.section.5.1.p.1">[NOTE: name resolution is no explict step within the transport API.  Name resolution can be perfoemed whey creating endpoint objects, but may be deferred until connection establishment to incorporate transport parameters.]</p>
+<p id="rfc.section.5.1.p.2">The transport service API uses Endpoint objects to refer to local and remote endpoints.  Endpoint objects can be configured using varios endpoint representation, including IP addresses, hostnames, URLs or inteface names as well as port numbers and service names:</p>
+<pre>
+remoteSpecifier := NewEndpoint()
+remoteSpecifier("https://example.com")
+</pre>
+<pre>
+remoteSpecifier := NewEndpoint()
+remoteSpecifier.withHostname("example.com")
+remoteSpecifier.withService("https")
+</pre>
+<pre>
+remoteSpecifier := NewEndpoint()
+remoteSpecifier.withIPv6Address(2001:db8:4920:e29d:a420:7461:7073:0a)
+remoteSpecifier.withPort(443)
+</pre>
+<pre>
+remoteSpecifier := NewEndpoint()
+remoteSpecifier.withIPv4Address(192.0.2.21)
+remoteSpecifier.withPort(443)
+</pre>
+<pre>
+localSpecifier := NewEndpoint()
+localSpecifier.withInterface("en0")
+localSpecifier.withPort(443)
+</pre>
+<p id="rfc.section.5.1.p.3">Implementations may also support additional endpoint representations and provide a single NewEndpoint() call that takes different endpoint representations.</p>
+<p id="rfc.section.5.1.p.4">Endpoint representations may imply transport protocols, pseudotransport protocols, or families of protocols, e.g., remoteSpecifier.withUrl(&#8220;https://example.com&#8221;) implies either using HTTP over TLS over TCP or using HTTP over QUIC over UDP.  Whether the protocols implied by the endpoint representation are provided by the transport system is implementation specific, but MUST BE tunable using pre-establishment properties.  Implementations SHOULD provide all parts of the implied transport stack they implement unless specified otherwise using pre-establishment properties.  For example, the transport system may provide TLS over TCP in the above example and let the application implement HTTP pseudo-transport itself.</p>
+<p id="rfc.section.5.1.p.5">[TASK: match with #initiate / #listen / #rendezvous and make sure the transport stack used is communicated ]</p>
 <h1 id="rfc.section.5.2">
 <a href="#rfc.section.5.2">5.2.</a> <a href="#transport-params" id="transport-params">Specifying Transport Parameters</a>
 </h1>
-<p id="rfc.section.5.2.p.1">When creating a connection, an application needs to specify transport parameters reflecting its requirements and preferences regarding its communication. These Transport parameters include Protocol Selection Properties, Protocol Properties (configuration of a transport protocol once it has been selected), Path Selection Properties, and Socket Intents (hints to the TAPS system what to optimize for).</p>
-<p id="rfc.section.5.2.p.2">Some Protocol Selection Properties are strict requirements that the application relies on, while others are hints of what transport features would be helpful for the application. For example, if an application asks for reliable data transfer, choosing a transport protocol such as UDP, which does not have this feature, will break the application&#8217;s functionality. On the other hand, the option to not require checksums when receiving an individual Content can help optimize for low latency, but if not present, it will most likely not break the fundamental assumptions of the application.</p>
-<p id="rfc.section.5.2.p.3">Moreover, there can be conflicts between properties set by the application: If multiple features are requested which are offered by different protocols, it may not be possible to satisfy all requirements. Consequently, a TAPS system must prioritize transport parameters and consider the relevant trade-offs, see also <a href="#TAPS-MINSET" class="xref">[TAPS-MINSET]</a>.</p>
-<p id="rfc.section.5.2.p.4">[Should it be possible for an application to specify which properties are most important to it, or to set properties as required?]</p>
-<p id="rfc.section.5.2.p.5">There need to be sensible defaults for the Protocol Selection Properties. The defaults given in the following section represent a configuration that can be implemented over TCP. An alternate set of default Protocol Selection Properties would represent a configuration that can be implemented over UDP.</p>
-<p id="rfc.section.5.2.p.6">Note that some parameters can also be set later in the lifetime of a connection. However, Protocol Selection Properties and Path Selection Properties must be specified before Initiate() to be useful. For other properties, it is beneficial for the application to set them as early as possible in order to help the TAPS system optimize.</p>
-<p id="rfc.section.5.2.p.7">Connections can be cloned at any time, before or after establishment.  A cloned connection and its parent are entangled: they share the same properties, changing any parameter for one of them also changes the parameter for the other, connecting one of them also connects the other, etc. There is only one exception: priority assignment ((see also <a href="#groups" class="xref">Section 6.4</a> for more details).  Cloning connections during pre-establishment is encouraged, as it informs the transport system about the intent to use Connection Groups.</p>
-<p id="rfc.section.5.2.p.8">Connection := Create(ProtocolSelectionProperties, ProtocolProperties, PathSelectionProperties, SocketIntents)</p>
-<p id="rfc.section.5.2.p.9">Connection.Configure(ProtocolProperties, SocketIntents)</p>
-<p id="rfc.section.5.2.p.10">Connection.QueryProperties()</p>
-<p id="rfc.section.5.2.p.11">Connection := Connection.Clone()</p>
+<p id="rfc.section.5.2.p.1">When creating a connection, an application needs to specify transport parameters reflecting its requirements and preferences regarding its communication. These Transport parameters include Protocol Selection Properties, Protocol Properties (specific configuration of a transport protocol once it has been selected), Path Selection Properties, and Application Intents (hints to the transport system what to optimize for).</p>
+<p id="rfc.section.5.2.p.2">Some properties are strict requirements that the application relies on, while others are hints of what transport features would be helpful for the application. For example, if an application asks for reliable data transfer, choosing a transport protocol such as UDP, which does not have this feature, will break the application&#8217;s functionality. On the other hand, the option to not require checksums when receiving an individual Content can help optimize for low latency, but if not present, it will most likely not break the fundamental assumptions of the application.</p>
+<p id="rfc.section.5.2.p.3">Moreover, there can be conflicts between properties set by the application: If multiple features are requested which are offered by different protocols, it may not be possible to satisfy all requirements.  Consequently, a transport system must prioritize Transport Parameters and consider the relevant trade-offs, see also <a href="#TAPS-MINSET" class="xref">[TAPS-MINSET]</a>.  To reflect that, some Transport Parameters can be specified with different preference, whereby the preference is one of the following levels:</p>
+<table cellpadding="3" cellspacing="0" class="tt full center">
+<thead><tr>
+<th class="left">Preference</th>
+<th class="left">Description</th>
+</tr></thead>
+<tbody>
+<tr>
+<td class="left"><samp>intend  </samp></td>
+<td class="left">Hint to the transport system (usually Application Intent)</td>
+</tr>
+<tr>
+<td class="left"><samp>require </samp></td>
+<td class="left">Fail if requested feature/property can not be met</td>
+</tr>
+<tr>
+<td class="left"><samp>prefer  </samp></td>
+<td class="left">Proceed if requested feature/property can not be met</td>
+</tr>
+<tr>
+<td class="left"><samp>avid    </samp></td>
+<td class="left">Proceed if requested feature/property can not be avoided</td>
+</tr>
+<tr>
+<td class="left"><samp>prohibit</samp></td>
+<td class="left">Fail if requested feature/property can not be avoided</td>
+</tr>
+</tbody>
+</table>
+<p id="rfc.section.5.2.p.4">All properties of the Transport Parameters are collected in a TransportParameters object:</p>
+<pre>
+transportParameters := NewTransportParameters()
+</pre>
+<p id="rfc.section.5.2.p.5">The Individual properties, regardless whether thy are Protocol Selection Properties, Protocol Properties, Path Selection Properties, or Application Intents, are then added to the TransportParameters object:</p>
+<pre>
+transportParameters.addProperty(preference, name, value)
+</pre>
+<p id="rfc.section.5.2.p.6">For an existing connection, the Transport Parameters can be queried any time by using the following call on the Connection object:</p>
+<pre>
+transportParameters := connection.getTransportParameters()
+</pre>
+<p id="rfc.section.5.2.p.7">For most properties, it is beneficial for the application to set them as early as possible in order to help the transport system optimize.  Some parameters can also be set later in the lifetime of a connection.  However, Protocol Selection Properties and Path Selection Properties MUST be added to the TransportParameters object before calling Initiate() and SHOULD result in a runtime error if changed later.</p>
+<p id="rfc.section.5.2.p.8">Connections can be cloned at any time, before or after establishment.  A cloned connection and its parent are entangled: they share the same TransportParameters object, changing any parameter for one of them also changes the parameter for the other, connecting one of them also connects the other, etc.  Cloning connections during pre-establishment is encouraged, as it informs the transport system about the intent to form Connection Groups.</p>
+<p id="rfc.section.5.2.p.9">[Note that priority assignment ((see also <a href="#groups" class="xref">Section 6.4</a> for more details) is not shared among cloned connections. Therefore, the priority assignment MUST NOT be realized using the connection level TransportParameters object.]</p>
 <h1 id="rfc.section.5.2.1">
 <a href="#rfc.section.5.2.1">5.2.1.</a> <a href="#protocol-selection-props" id="protocol-selection-props">Protocol Selection Properties</a>
 </h1>
-<p id="rfc.section.5.2.1.p.1">The following properties can be adjusted before establishing a Connection. They all apply to Connections and Connection Groups:</p>
-<p id="rfc.section.5.2.1.p.2">Reliable Data Transfer</p>
-<p id="rfc.section.5.2.1.p.3">This boolean property specifies whether the application needs the transport protocol to ensure that data is received completely and without corruption on the other side. This also entails being notified when a Connection is closed or aborted. This property applies to connections and connection groups.  This is a strict requirement. The default is to enable Reliable Data Transfer.</p>
-<p id="rfc.section.5.2.1.p.4">Preservation of data ordering</p>
-<p id="rfc.section.5.2.1.p.5">This boolean property specifies whether the application needs the transport protocol to assure that data is received by the application on the other end in the same order as it was sent. This property applies to connections and connection groups. This is a strict requirement. The default is to preserve data ordering.</p>
-<p id="rfc.section.5.2.1.p.6">Option to configure reliability for individual Content</p>
-<p id="rfc.section.5.2.1.p.7">This boolean property specifies whether an application considers it useful to indicate its reliability requirements on a per-Content basis. This property applies to connections and connection groups. This is not a strict requirement.  The default is to not have this option.</p>
-<p id="rfc.section.5.2.1.p.8">Option to request not to delay acknowledgement (SACK) of Content</p>
-<p id="rfc.section.5.2.1.p.9">This boolean property specifies whether an application considers it useful to request for Content that its acknowledgement be sent out as early as possible (SACK) instead of potentially being bundled with other acknowledgements. This property applies to connections and connection groups. This is not a strict requirement. The default is to not have this option.</p>
-<p id="rfc.section.5.2.1.p.10">Option to use 0-RTT session establishment with idempotent Content</p>
-<p id="rfc.section.5.2.1.p.11">This boolean property specifies whether an application would like to supply a Content to the transport protocol before Connection establishment, which will then be reliably transferred to the other side before or during connection establishment, potentially multiple times. See also <a href="#send-idempotent" class="xref">Section 7.1.5</a>.  This is a strict requirement. The default is to not have this option.</p>
-<p id="rfc.section.5.2.1.p.12">Option to use Connection Groups with priorities</p>
-<p id="rfc.section.5.2.1.p.13">This boolean property specifies whether an application considers it useful to create Connection Groups and explicitly prioritize between Connections within a Connection Group.</p>
-<p id="rfc.section.5.2.1.p.14">Suggest a timeout to the peer</p>
-<p id="rfc.section.5.2.1.p.15">This boolean property specifies whether an application considers it useful to propose a timeout until the connection is assumed to be lost. This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</p>
-<p id="rfc.section.5.2.1.p.16">Notification of special errors (excessive retransmissions, ICMP error message arrival)</p>
-<p id="rfc.section.5.2.1.p.17">This boolean property specifies whether an application considers it useful to be informed in case sent data was retransmitted more often than a certain threshold, or when an ICMP error message arrives. This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</p>
-<p id="rfc.section.5.2.1.p.18">Control checksum coverage on sending or receiving</p>
-<p id="rfc.section.5.2.1.p.19">This boolean property specifies whether the application considers it useful to enable / disable / configure a checksum when sending Content, or decide whether to require a checksum or not when receiving Content.  This property applies to Connections and Connection Groups. This is not a strict requirement, as it signifies a reduction in reliability. The default is full checksum coverage without being able to change it, and requiring a checksum when receiving.</p>
+<p id="rfc.section.5.2.1.p.1">The following properties can be adjusted before establishing a Connection.  There need to be sensible defaults for the Protocol Selection Properties. The defaults given in the following section represent a configuration that can be implemented over TCP. An alternate set of default Protocol Selection Properties would represent a configuration that can be implemented over UDP.</p>
+<p id="rfc.section.5.2.1.p.2">The following properties apply to Connections and Connection Groups:</p>
+<p id="rfc.section.5.2.1.p.3">Reliable Data Transfer</p>
+<p id="rfc.section.5.2.1.p.4">This boolean property specifies whether the application needs the transport protocol to ensure that data is received completely and without corruption on the other side. This also entails being notified when a Connection is closed or aborted. This property applies to connections and connection groups.  This is a strict requirement. The default is to enable Reliable Data Transfer.</p>
+<p id="rfc.section.5.2.1.p.5">Preservation of data ordering</p>
+<p id="rfc.section.5.2.1.p.6">This boolean property specifies whether the application needs the transport protocol to assure that data is received by the application on the other end in the same order as it was sent. This property applies to connections and connection groups. This is a strict requirement. The default is to preserve data ordering.</p>
+<p id="rfc.section.5.2.1.p.7">Option to configure reliability for individual Content</p>
+<p id="rfc.section.5.2.1.p.8">This boolean property specifies whether an application considers it useful to indicate its reliability requirements on a per-Content basis. This property applies to connections and connection groups. This is not a strict requirement.  The default is to not have this option.</p>
+<p id="rfc.section.5.2.1.p.9">Option to request not to delay acknowledgment (SACK) of Content</p>
+<p id="rfc.section.5.2.1.p.10">This boolean property specifies whether an application considers it useful to request for Content that its acknowledgment be sent out as early as possible (SACK) instead of potentially being bundled with other acknowledgments. This property applies to connections and connection groups. This is not a strict requirement. The default is to not have this option.</p>
+<p id="rfc.section.5.2.1.p.11">Option to use 0-RTT session establishment with idempotent Content</p>
+<p id="rfc.section.5.2.1.p.12">This boolean property specifies whether an application would like to supply a Content to the transport protocol before Connection establishment, which will then be reliably transferred to the other side before or during connection establishment, potentially multiple times. See also <a href="#send-idempotent" class="xref">Section 7.1.5</a>.  This is a strict requirement. The default is to not have this option.</p>
+<p id="rfc.section.5.2.1.p.13">Option to use Connection Groups with priorities</p>
+<p id="rfc.section.5.2.1.p.14">This boolean property specifies whether an application considers it useful to create Connection Groups and explicitly prioritize between Connections within a Connection Group.</p>
+<p id="rfc.section.5.2.1.p.15">Suggest a timeout to the peer</p>
+<p id="rfc.section.5.2.1.p.16">This boolean property specifies whether an application considers it useful to propose a timeout until the connection is assumed to be lost. This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</p>
+<p id="rfc.section.5.2.1.p.17">Notification of special errors (excessive retransmissions, ICMP error message arrival)</p>
+<p id="rfc.section.5.2.1.p.18">This boolean property specifies whether an application considers it useful to be informed in case sent data was retransmitted more often than a certain threshold, or when an ICMP error message arrives. This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</p>
+<p id="rfc.section.5.2.1.p.19">Control checksum coverage on sending or receiving</p>
+<p id="rfc.section.5.2.1.p.20">This boolean property specifies whether the application considers it useful to enable / disable / configure a checksum when sending Content, or decide whether to require a checksum or not when receiving Content.  This property applies to Connections and Connection Groups. This is not a strict requirement, as it signifies a reduction in reliability. The default is full checksum coverage without being able to change it, and requiring a checksum when receiving.</p>
 <h1 id="rfc.section.5.2.2">
 <a href="#rfc.section.5.2.2">5.2.2.</a> <a href="#protocol-props" id="protocol-props">Protocol Properties</a>
 </h1>
@@ -635,13 +694,13 @@ address {
 <p id="rfc.section.5.2.3.p.3">Interface Type to prefer</p>
 <p id="rfc.section.5.2.3.p.4">This property specifies which kind of access network interface, e.g., WiFi, Ethernet, or LTE, to prefer over others for this connection, in case they are available.  This is not a strict requirement. The default is to use the default interface configured in the system policy.</p>
 <p id="rfc.section.5.2.3.p.5">Interface Type to prohibit</p>
-<p id="rfc.section.5.2.3.p.6">This property specifies which kind of access network interface, e.g., WiFi, Ethternet, or LTE, to not use for this connection. This is a strict requirement and connection establishment will fail if no other interface is available. The default is to not prohibit any particular interface.</p>
+<p id="rfc.section.5.2.3.p.6">This property specifies which kind of access network interface, e.g., WiFi, Ethernet, or LTE, to not use for this connection. This is a strict requirement and connection establishment will fail if no other interface is available. The default is to not prohibit any particular interface.</p>
 <h1 id="rfc.section.5.2.4">
-<a href="#rfc.section.5.2.4">5.2.4.</a> <a href="#socket-intents" id="socket-intents">Socket Intents</a>
+<a href="#rfc.section.5.2.4">5.2.4.</a> <a href="#socket-intents" id="socket-intents">Application Intents</a>
 </h1>
-<p id="rfc.section.5.2.4.p.1">Socket Intents are a group of properties expressing what an application wants to achieve, knows, assumes or prefers regarding its communication. They are not strict requirements. In particular, they should not be used to express any Quality of Service expectations that an application might have. Instead, an application should express its intentions and its expected traffic characteristics in order to help the TAPS system make decisions that best match it, but on a best-effort basis. Even though Socket Intents do not represent Quality of Service requirements, a TAPS system may use them to determine a DSCP value, e.g. similar to Table 1 in <a href="#I-D.ietf-tsvwg-rtcweb-qos" class="xref">[I-D.ietf-tsvwg-rtcweb-qos]</a>.</p>
-<p id="rfc.section.5.2.4.p.2">Socket Intents can influence protocol selection, protocol configuration, path selection, and endpoint selection. For example, setting the &#8220;Timeliness&#8221; Intent to &#8220;Interactive&#8221; may lead the TAPS system to disable the Nagle algorithm for a connection, while setting the &#8220;Timeliness&#8221; to &#8220;Background&#8221; may lead it to setting the DSCP value to &#8220;scavenger&#8221;. If the &#8220;Size to be Sent&#8221; Intent is set on a series of messages, it may influence path selection, e.g., when the TAPS system schedules big messages over an interface with higher bandwidth, and small messages over an interface with lower latency.</p>
-<p id="rfc.section.5.2.4.p.3">Specifying Socket Intents is not mandatory. An application can specify any combination of Socket Intents. All Socket Intents can be specified for connections and connection groups. Some Intents can also be specified for individual messages, similar to the properties in <a href="#send-props" class="xref">Section 7.1</a>.</p>
+<p id="rfc.section.5.2.4.p.1">Application Intents are a group of properties expressing what an application wants to achieve, knows, assumes or prefers regarding its communication. They are not strict requirements. In particular, they should not be used to express any Quality of Service expectations that an application might have. Instead, an application should express its intentions and its expected traffic characteristics in order to help the TAPS system make decisions that best match it, but on a best-effort basis. Even though Application Intents do not represent Quality of Service requirements, a TAPS system may use them to determine a DSCP value, e.g. similar to Table 1 in <a href="#I-D.ietf-tsvwg-rtcweb-qos" class="xref">[I-D.ietf-tsvwg-rtcweb-qos]</a>.</p>
+<p id="rfc.section.5.2.4.p.2">Application Intents can influence protocol selection, protocol configuration, path selection, and endpoint selection. For example, setting the &#8220;Timeliness&#8221; Intent to &#8220;Interactive&#8221; may lead the TAPS system to disable the Nagle algorithm for a connection, while setting the &#8220;Timeliness&#8221; to &#8220;Background&#8221; may lead it to setting the DSCP value to &#8220;scavenger&#8221;. If the &#8220;Size to be Sent&#8221; Intent is set on a series of messages, it may influence path selection, e.g., when the TAPS system schedules big messages over an interface with higher bandwidth, and small messages over an interface with lower latency.</p>
+<p id="rfc.section.5.2.4.p.3">Specifying Application Intents is not mandatory. An application can specify any combination of Application Intents. All Application Intents can be specified for connections and connection groups. Some Intents can also be specified for individual messages, similar to the properties in <a href="#send-props" class="xref">Section 7.1</a>.</p>
 <p id="rfc.section.5.2.4.p.4">Traffic Category</p>
 <p id="rfc.section.5.2.4.p.5">This Intent specifies what the application expect the dominating traffic pattern to be. It applies to connections and connection groups</p>
 <p id="rfc.section.5.2.4.p.6">Possible Category values are:</p>
@@ -724,9 +783,61 @@ address {
 </dl>
 <p id="rfc.section.5.2.4.p.31">The default is &#8220;Balance Cost&#8221;.</p>
 <h1 id="rfc.section.5.3">
-<a href="#rfc.section.5.3">5.3.</a> <a href="#crypto-params" id="crypto-params">Specifying Cryptographic Parameters</a>
+<a href="#rfc.section.5.3">5.3.</a> <a href="#security-parameters" id="security-parameters">Specifying Security Parameters and Callbacks</a>
 </h1>
-<p id="rfc.section.5.3.p.1">[TASK: write me. separate out cryptographic parameters, since these bind to a local and a remote. chris?]</p>
+<p id="rfc.section.5.3.p.1">Common parameters such as TLS ciphersuites are known to implementations. Clients SHOULD use common safe defaults for these values whenever possible. However, as discussed in <a href="#I-D.pauly-taps-transport-security" class="xref">[I-D.pauly-taps-transport-security]</a>, many transport security protocols require specific security parameters and constraints from the client at the time of configuration and actively during a handshake. These configuration parameters are created as follows</p>
+<pre>
+securityParameters := NewSecurityParameters()
+</pre>
+<p id="rfc.section.5.3.p.2">Security configuration parameters and sample usage follow:</p>
+<p></p>
+
+<ul><li>Local identity and private keys: Used to perform private key operations and prove one&#8217;s identity to remote peers. (Note, if private keys are not available, e.g., since they are stored in HSMs, handshake callbacks MUST be used. See below for details.)</li></ul>
+<pre>
+securityParameters.AddIdentity(identity)
+securityParameters.AddPrivateKey(privateKey, publicKey)
+</pre>
+<p></p>
+
+<ul><li>Supported algorithms: Used to restrict what parameters are used by underlying transport security protocols.  When not specified, these algorithms SHOULD default to known and safe defaults for the system. Parameters include: ciphersuites, supported groups, and signature algorithms.</li></ul>
+<pre>
+securityParameters.AddSupportedGroup(22)    // secp256k1 
+securityParameters.AddCiphersuite(0xCCA9)   // TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256
+securityParameters.AddSignatureAlgorithm(7) // ed25519
+</pre>
+<p></p>
+
+<ul><li>Session cache: Used to tune cache capacity, lifetime, re-use, and eviction policies, e.g., LRU or FIFO.</li></ul>
+<pre>
+securityParameters.SetSessionCacheCapacity(1024)     // 1024 elements
+securityParameters.SetSessionCacheLifetime(24*60*60) // 24 hours
+securityParameters.SetSessionCacheReuse(1)           // One-time use
+</pre>
+<p></p>
+
+<ul><li>Pre-shared keying material: Used to install pre-shared keying material established out-of-band. Each pre-shared keying material is associated with some identity that typically identifies its use or has some protocol-specific meaning to peers.</li></ul>
+<pre>
+securityParameters.AddPreSharedKey(key, identity)
+</pre>
+<p id="rfc.section.5.3.p.7">Security decisions, especially pertaining to trust, are not static. Thus, once configured, parameters must also be supplied during live handshakes. These are best handled as client-provided callbacks. Security handshake callbacks include:</p>
+<p></p>
+
+<ul><li>Trust verification callback: Invoked when a peer&#8217;s trust must be validated before the handshake protocol can proceed.</li></ul>
+<pre>
+trustCallback := NewCallback({
+  // Handle trust, return the result
+}) 
+securityParameters.SetTrustVerificationCallback(trustCallback)
+</pre>
+<p></p>
+
+<ul><li>Identity challenge callback: Invoked when a private key operation is required, e.g., when local authentication is requested by a remote.</li></ul>
+<pre>
+challengeCallback := NewCallback({
+  // Handle challenge
+}) 
+securityParameters.SetIdentityChallengeCallback(challengeCallback)
+</pre>
 <h1 id="rfc.section.6">
 <a href="#rfc.section.6">6.</a> <a href="#establishing-connections" id="establishing-connections">Establishing Connections</a>
 </h1>
@@ -863,7 +974,7 @@ address {
 <h1 id="rfc.section.12">
 <a href="#rfc.section.12">12.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a>
 </h1>
-<p id="rfc.section.12.p.1">be paranoid</p>
+<p id="rfc.section.12.p.1">This document describes a generic API for interacting with a transport services (TAPS) system.  Part of this API includes configuration details for transport security protocols, as discussed in Section <a href="#security-parameters" class="xref">Section 5.3</a>. It does not recommend use (or disuse) of specific algorithms or protocols. Any API-compatible transport security protocol should work in a TAPS system.</p>
 <h1 id="rfc.references">
 <a href="#rfc.references">13.</a> References</h1>
 <h1 id="rfc.references.1">
@@ -888,6 +999,11 @@ address {
 <h1 id="rfc.references.2">
 <a href="#rfc.references.2">13.2.</a> Informative References</h1>
 <table><tbody>
+<tr>
+<td class="reference"><b id="I-D.pauly-taps-transport-security">[I-D.pauly-taps-transport-security]</b></td>
+<td class="top">
+<a>Pauly, T.</a>, <a>Rose, K.</a> and <a>C. Wood</a>, "<a href="https://tools.ietf.org/html/draft-pauly-taps-transport-security-01">A Survey of Transport Security Protocols</a>", Internet-Draft draft-pauly-taps-transport-security-01, January 2018.</td>
+</tr>
 <tr>
 <td class="reference"><b id="RFC0793">[RFC0793]</b></td>
 <td class="top">
@@ -1024,13 +1140,14 @@ address {
 	</span>
 	<span class="org vcardline">TU Berlin</span>
 	<span class="adr">
-	  
+	  <span class="vcardline">Marchstra&#223;e 23</span>
+
 	  <span class="vcardline">
-		<span class="locality"></span> 
+		<span class="locality">10587 Berlin</span>,  
 		<span class="region"></span>
 		<span class="code"></span>
 	  </span>
-	  <span class="country-name vcardline"></span>
+	  <span class="country-name vcardline">Germany</span>
 	</span>
 	<span class="vcardline">EMail: <a href="mailto:philipp@inet.tu-berlin.de">philipp@inet.tu-berlin.de</a></span>
 
@@ -1045,13 +1162,14 @@ address {
 	</span>
 	<span class="org vcardline">TU Berlin</span>
 	<span class="adr">
-	  
+	  <span class="vcardline">Marchstra&#223;e 23</span>
+
 	  <span class="vcardline">
-		<span class="locality"></span> 
+		<span class="locality">10587 Berlin</span>,  
 		<span class="region"></span>
 		<span class="code"></span>
 	  </span>
-	  <span class="country-name vcardline"></span>
+	  <span class="country-name vcardline">Germany</span>
 	</span>
 	<span class="vcardline">EMail: <a href="mailto:theresa@inet.tu-berlin.de">theresa@inet.tu-berlin.de</a></span>
 

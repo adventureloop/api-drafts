@@ -329,12 +329,12 @@ address {
 <link href="#rfc.authors" rel="Chapter">
 
 
-  <meta name="generator" content="xml2rfc version 2.8.5 - https://tools.ietf.org/tools/xml2rfc" />
+  <meta name="generator" content="xml2rfc version 2.9.2 - https://tools.ietf.org/tools/xml2rfc" />
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
   <meta name="dct.creator" content="Brunstrom, A., Ed., Pauly, T., Ed., Grinnemo, K-J., Jones, T., and C. Perkins" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-brunstrom-taps-impl-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-2-09" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-02-12" />
   <meta name="dct.abstract" content="The Transport Services architecture " />
   <meta name="description" content="The Transport Services architecture " />
 
@@ -358,7 +358,7 @@ address {
 <td class="right">T. Pauly, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: August 13, 2018</td>
+<td class="left">Expires: August 16, 2018</td>
 <td class="right">Apple Inc.</td>
 </tr>
 <tr>
@@ -387,7 +387,7 @@ address {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">February 09, 2018</td>
+<td class="right">February 12, 2018</td>
 </tr>
 
     	
@@ -403,7 +403,7 @@ address {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on August 13, 2018.</p>
+<p>This Internet-Draft will expire on August 16, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -523,7 +523,7 @@ address {
 <li>For TCP, one connection is a Connection object</li>
 <li>For UDP, one set of fully-specified local and remote endpoints is a Connection object</li>
 <li>For QUIC, one stream is a Connection object</li>
-<li>For SCTP&#8230;</li>
+<li>For SCTP, one stream is a Connection object</li>
 </ul>
 <h1 id="rfc.section.3">
 <a href="#rfc.section.3">3.</a> <a href="#implementing-pre-establishment" id="implementing-pre-establishment">Implementing Pre-Establishment</a>
@@ -649,7 +649,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <pre>
 1 [www.example.com:80, Any, Any Stream]
   1.1 [www.example.com:80, Any, SCTP]
-         1.1.1 [192.0.2.1:80, Any, SCTP]
+    1.1.1 [192.0.2.1:80, Any, SCTP]
   1.2 [www.example.com:80, Any, TCP]
     1.2.1 [192.0.2.1:80, Any, TCP]
 </pre>
@@ -716,7 +716,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <p id="rfc.section.4.4.1.p.1">Implementations may select the criteria by which a leaf node is considered to be successfully connected differently on a per-protocol basis. If the only protocol being used is a transport protocol with a clear handshake, like TCP, then the obvious choice is to declare that node &#8220;connected&#8221; when the last packet of the three-way handshake has been received. If the only protocol being used is an &#8220;unconnected&#8221; protocol, like UDP, the implementation may consider the node fully &#8220;connected&#8221; the moment it determines a route is present, before sending any packets on the network.</p>
 <p id="rfc.section.4.4.1.p.2">For protocol stacks with multiple handshakes, the decision becomes more nuanced. If the protocol stack involves both TLS and TCP, an implementation MAY determine that a leaf node is connected after the TCP handshake is complete, or it MAY wait for the TLS handshake to complete as well. The benefit of declaring completion when the TCP handshake finishes, and thus stopping the race for other branches of the tree, is that there will be less burden on the network from other connection attempts. On the other hand, by waiting until the TLS handshake is complete, an implementation avoids the scenario in which a TCP handshake completes quickly, but TLS negotiation is either very slow or fails altogether in particular network conditions or to a particular endpoint.</p>
 <h1 id="rfc.section.4.5">
-<a href="#rfc.section.4.5">4.5.</a> <a href="#establishing-multiplexed-connections" id="establishing-multiplexed-connections">Establishing multiplexed connections</a>
+<a href="#rfc.section.4.5">4.5.</a> <a href="#establish-mux" id="establish-mux">Establishing multiplexed connections</a>
 </h1>
 <p id="rfc.section.4.5.p.1">Multiplexing data streams over a connection of a single transport Protocol Instance requires, at minimum, two things: 1) the transport Protocol Instance must be able to know the beginning and the end of messages, in order to know what to assign and multiplex / demultiplex; 2) there must be an identifier that allows to decide which stream a message is assigned to. When a new stream is multiplexed on an already existing connection, there is no need for a connection establishment procedure &#8211; every stream can be assumed to immediately be available.</p>
 <p id="rfc.section.4.5.p.2">When the Connections that are offered to an application by the Transport System are multiplexed, the Transport System may implement the establishment of a new Connection by simply beginning to use a new stream of an already established transport connection. This, then, means that there may not be any &#8220;establishment&#8221; message (like a TCP SYN), but the application can simply start sending or receiving. Therefore, when a Transport System&#8217;s &#8220;Initiate&#8221; Action is called without Content being handed over, it cannot be guaranteed that the other endpoint will have any way to know about this, and hence a passive endpoint&#8217;s ConnectionReceived event may not be called upon an active endpoint&#8217;s Inititate.  Instead, calling the ConnectionReceived event may be delayed until the first Content arrives.</p>
@@ -778,11 +778,17 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <p id="rfc.section.7.p.1">How to handle termination requested by application:</p>
 <p></p>
 
-<ul>
-<li>How gracefully to tear down at various protocol layers</li>
-<li>How much to tear down for multiplexed protocols, or protocols capable of multiplexing</li>
-</ul>
-<p id="rfc.section.7.p.3">How to handle a failure generated by protocols</p>
+<ul><li>How gracefully to tear down at various protocol layers</li></ul>
+<p id="rfc.section.7.p.3">With TCP, when an application closes a connection, this means that it has no more data to send (but expects all data that has been handed over to be reliably delivered). However, with TCP only, &#8220;close&#8221; does not mean that the application will stop receiving data. This is related to TCP&#8217;s ability to support half-closed connections.</p>
+<p id="rfc.section.7.p.4">SCTP is an example of a protocol that does not support such half-closed connections.  Hence, with SCTP, the meaning of &#8220;close&#8221; is stricter: an application has no more data to send (but expects all data that has been handed over to be reliably delivered), and will also not receive any more data.</p>
+<p id="rfc.section.7.p.5">Implementing a protocol independent transport system means that the exposed semantics must be the strictest subset of the semantics of all supported protocols.  Hence, as is common with all reliable transport protocols, after a Close action, the application can expect to have its reliability requirements honored regarding the data it has given to the Transport System &#8211; but it cannot expect to be able to read any more data after calling Close.</p>
+<p id="rfc.section.7.p.6">Abort differs from Close only in that no guarantees are given regarding data that the application has handed over to the Tranport System before calling Abort.</p>
+<p></p>
+
+<ul><li>How much to tear down for multiplexed protocols, or protocols capable of multiplexing</li></ul>
+<p id="rfc.section.7.p.8">As explained in section <a href="#establish-mux" class="xref">Section 4.5</a>, when a new stream is multiplexed on an already existing connection of a Transport Protocol Instance, there is no need for a connection establishment procedure. Because the Connections that are offered by the Transport System can be implemented as streams that are multiplexed on a transport protocol&#8217;s connection, it can therefore not be guaranteed that one Endpoint&#8217;s Initiate action provokes a ConnectionReceived event at its peer.</p>
+<p id="rfc.section.7.p.9">For Close (provoking a Finished event) and Abort (provoking a ConnectionError event), the same logic applies: while it is desirable to be informed when a peer closes or aborts a Connection, whether this is possible depends on the underlying protocol, and no guarantees can be given. With SCTP, the transport system can use the stream reset procedure to cause a Finish event upon a Close action from the peer <a href="#NEAT-flow-mapping" class="xref">[NEAT-flow-mapping]</a>.</p>
+<p id="rfc.section.7.p.10">How to handle a failure generated by protocols</p>
 <h1 id="rfc.section.8">
 <a href="#rfc.section.8">8.</a> <a href="#cached-state" id="cached-state">Cached State</a>
 </h1>
@@ -807,6 +813,10 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <h1 id="rfc.section.9.3">
 <a href="#rfc.section.9.3">9.3.</a> <a href="#sctp" id="sctp">SCTP</a>
 </h1>
+<p id="rfc.section.9.3.p.1">To support sender-side stream schedulers (which are implemented on the sender side), a receiver-side Transport System should always support message interleaving <a href="#RFC8260" class="xref">[RFC8260]</a>.</p>
+<p id="rfc.section.9.3.p.2">SCTP messages can be very large. To allow the reception of large messages in pieces, a &#8220;partial flag&#8221; can be used to inform a (native SCTP) receiving application that a message is incomplete. After receiving the &#8220;partial flag&#8221;, this application would know that the next receive calls will only deliver remaining parts of the same message (i.e., no messages or partial messages will arrive on other streams until the message is complete) (see Section 8.1.20 in <a href="#RFC6458" class="xref">[RFC6458]</a>). The &#8220;partial flag&#8221; can therefore facilitate the implementation of the receiver buffer in the receiving application, at the cost of limiting multiplexing and temporarily creating head-of-line blocking delay at the receiver.</p>
+<p id="rfc.section.9.3.p.3">When a Transport System transfers Content, it seems natural to map Content to SCTP messages in order to support properties such as &#8220;Ordered&#8221; or &#8220;Lifetime&#8221; (which maps onto partially reliable delivery with a SCTP_PR_SCTP_TTL policy <a href="#RFC6458" class="xref">[RFC6458]</a>). However, since multiplexing of Connections onto SCTP streams may happen, and would be hidden from the application, the Transport System requires a per-stream receiver buffer anyway, so this potential benefit is lost and the &#8220;partial flag&#8221; becomes unnecessary for the system.</p>
+<p id="rfc.section.9.3.p.4">The problem of long messages either requiring large receiver-side buffers or getting in the way of multiplexing is addressed by message interleaving <a href="#RFC8260" class="xref">[RFC8260]</a>, which is yet another reason why a receivers-side transport system supporting SCTP should implement this mechanism.</p>
 <h1 id="rfc.section.9.4">
 <a href="#rfc.section.9.4">9.4.</a> <a href="#quic" id="quic">QUIC</a>
 </h1>
@@ -868,6 +878,15 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <a>Rescorla, E.</a>, "<a href="https://tools.ietf.org/html/draft-ietf-tls-tls13-23">The Transport Layer Security (TLS) Protocol Version 1.3</a>", Internet-Draft draft-ietf-tls-tls13-23, January 2018.</td>
 </tr>
 <tr>
+<td class="reference"><b id="NEAT-flow-mapping">[NEAT-flow-mapping]</b></td>
+<td class="top">"<a>&#8220;Transparent Flow Mapping for NEAT&#8220;</a>", Workshop on Future of Internet Transport (FIT 2017) , n.d..</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC6458">[RFC6458]</b></td>
+<td class="top">
+<a>Stewart, R.</a>, <a>Tuexen, M.</a>, <a>Poon, K.</a>, <a>Lei, P.</a> and <a>V. Yasevich</a>, "<a href="https://tools.ietf.org/html/rfc6458">Sockets API Extensions for the Stream Control Transmission Protocol (SCTP)</a>", RFC 6458, DOI 10.17487/RFC6458, December 2011.</td>
+</tr>
+<tr>
 <td class="reference"><b id="RFC7413">[RFC7413]</b></td>
 <td class="top">
 <a>Cheng, Y.</a>, <a>Chu, J.</a>, <a>Radhakrishnan, S.</a> and <a>A. Jain</a>, "<a href="https://tools.ietf.org/html/rfc7413">TCP Fast Open</a>", RFC 7413, DOI 10.17487/RFC7413, December 2014.</td>
@@ -876,6 +895,11 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <td class="reference"><b id="RFC7540">[RFC7540]</b></td>
 <td class="top">
 <a>Belshe, M.</a>, <a>Peon, R.</a> and <a>M. Thomson</a>, "<a href="https://tools.ietf.org/html/rfc7540">Hypertext Transfer Protocol Version 2 (HTTP/2)</a>", RFC 7540, DOI 10.17487/RFC7540, May 2015.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC8260">[RFC8260]</b></td>
+<td class="top">
+<a>Stewart, R.</a>, <a>Tuexen, M.</a>, <a>Loreto, S.</a> and <a>R. Seggelmann</a>, "<a href="https://tools.ietf.org/html/rfc8260">Stream Schedulers and User Message Interleaving for the Stream Control Transmission Protocol</a>", RFC 8260, DOI 10.17487/RFC8260, November 2017.</td>
 </tr>
 <tr>
 <td class="reference"><b id="RFC8305">[RFC8305]</b></td>
