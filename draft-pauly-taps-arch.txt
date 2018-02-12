@@ -863,12 +863,40 @@ Internet-Draft              TAPS Architecture              February 2018
 
 6.  Security Considerations
 
-   [TASK: discuss security considerations]
+   TAPS does not recommend use of specific security protocols or
+   algorithms.  Its goal is to offer ease of use for existing protocols
+   by providing a generic security-related interface.  Each provided
+   interface mimics an existing protocol-specific interface provided by
+   supported security protocols.  For example, trust verification
+   callbacks are common parts of TLS APIs.  TAPS exposes one for similar
+   purposes.  Clients must take care to use security APIs appropriately.
+   In cases where clients use said interface to provide sensitive keying
+   material, e.g., access to private keys or copies of pre-shared keys
+   (PSKs), key use must be validated.  For example, clients SHOULD NOT
+   use PSK material created for ESP with IETF-QUIC, and clients MUST NOT
+   use private keys intended for server authentication as a key for
+   client authentication.  Moreover, unlike certain transport features
+   such as TFO or ECN which can fall back to standard configurations,
+   TAPS systems MUST NOT permit fallbacks for security protocols.  For
+   example, if a clients requests TLS, yet TLS or the desired version
+   are not available, its connection MUST fail.  Clients are responsible
+   for implementing protocol or version fallback using a TAPS API if so
+   desired.
 
 7.  Normative References
 
    [I-D.brunstrom-taps-impl]
               "Implementing Interfaces to Transport Services", n.d..
+
+
+
+
+
+
+Pauly, et al.            Expires August 16, 2018               [Page 16]
+
+Internet-Draft              TAPS Architecture              February 2018
+
 
    [I-D.ietf-taps-minset]
               Welzl, M. and S. Gjessing, "A Minimal Set of Transport
@@ -889,14 +917,6 @@ Internet-Draft              TAPS Architecture              February 2018
               Congestion Control Mechanisms", RFC 8095,
               DOI 10.17487/RFC8095, March 2017,
               <https://www.rfc-editor.org/info/rfc8095>.
-
-
-
-
-Pauly, et al.            Expires August 16, 2018               [Page 16]
-
-Internet-Draft              TAPS Architecture              February 2018
-
 
 Authors' Addresses
 
@@ -924,6 +944,16 @@ Authors' Addresses
    Email: anna.brunstrom@kau.se
 
 
+
+
+
+
+
+Pauly, et al.            Expires August 16, 2018               [Page 17]
+
+Internet-Draft              TAPS Architecture              February 2018
+
+
    Gorry Fairhurst
    University of Aberdeen
 
@@ -945,15 +975,6 @@ Authors' Addresses
    Email: philipp@inet.tu-berlin.de
 
 
-
-
-
-
-Pauly, et al.            Expires August 16, 2018               [Page 17]
-
-Internet-Draft              TAPS Architecture              February 2018
-
-
    Chris Wood
    Apple Inc.
    One Apple Park Way
@@ -961,27 +982,6 @@ Internet-Draft              TAPS Architecture              February 2018
    United States of America
 
    Email: cawood@apple.com
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
