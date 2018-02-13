@@ -83,14 +83,14 @@ Table of Contents
      3.3.  Scope for API and Implementation Definitions  . . . . . .   5
    4.  Transport Services Architecture and Concepts  . . . . . . . .   6
      4.1.  Transport Services API Concepts . . . . . . . . . . . . .   7
-       4.1.1.  Objects . . . . . . . . . . . . . . . . . . . . . . .   9
+       4.1.1.  Objects . . . . . . . . . . . . . . . . . . . . . . .   8
        4.1.2.  Pre-Establishment . . . . . . . . . . . . . . . . . .   9
        4.1.3.  Establishment . . . . . . . . . . . . . . . . . . . .  10
        4.1.4.  Data Transfer . . . . . . . . . . . . . . . . . . . .  11
-       4.1.5.  Event Handling  . . . . . . . . . . . . . . . . . . .  12
+       4.1.5.  Event Handling  . . . . . . . . . . . . . . . . . . .  11
        4.1.6.  Termination . . . . . . . . . . . . . . . . . . . . .  13
      4.2.  Transport System Implementation Concepts  . . . . . . . .  13
-       4.2.1.  Gathering . . . . . . . . . . . . . . . . . . . . . .  15
+       4.2.1.  Gathering . . . . . . . . . . . . . . . . . . . . . .  14
        4.2.2.  Racing  . . . . . . . . . . . . . . . . . . . . . . .  15
    5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  16
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .  16
@@ -251,10 +251,10 @@ Internet-Draft              TAPS Architecture              February 2018
 3.3.  Scope for API and Implementation Definitions
 
    The Transport Services API is envisioned as the abstract model for a
-   family of APIs that all share a common way to expose transport
-   features and encourage flexibility.  The API definition
-   [I-D.trammell-taps-interface] is aimed at explaining to application
-   developers how to use this interface.
+   family of APIs that share a common way to expose transport features
+   and encourage flexibility.  The abstract API definition
+   [I-D.trammell-taps-interface] describes this interface and is aimed
+   at application developers.
 
    Implementations that provide the Transport Services API
    [I-D.brunstrom-taps-impl], on the other hand, will vary due to
@@ -292,19 +292,19 @@ Internet-Draft              TAPS Architecture              February 2018
 4.  Transport Services Architecture and Concepts
 
    The concepts defined in this document are intended primarily for use
-   in Internet Drafts and specifications.  While the specific
-   terminology may be used in specific implementations, it is expected
-   that there will remain a variety of terms used by running code.
+   in the documents and specifications that describe the Transport
+   Services architecture and API.  While the specific terminology may be
+   used in some implementations, it is expected that there will remain a
+   variety of terms used by running code.
 
    The architecture divides the concepts for Transport Services into two
-   categories: - API concepts, which are meant to be exposed to
-   applications - System-implementation concepts, which are meant to be
-   internally used when building systems that implement Transport
+   categories: 1) API concepts, which are meant to be exposed to
+   applications; and 2) System-implementation concepts, which are meant
+   to be internally used when building systems that implement Transport
    Services.
 
    The following diagram summarizes the top-level concepts in the
    architecture and how they relate to one another.
-
 
 
 
@@ -394,61 +394,32 @@ Pauly, et al.            Expires August 17, 2018                [Page 7]
 Internet-Draft              TAPS Architecture              February 2018
 
 
-   Pre-Establishment Section 4.1.2
+   o  Pre-Establishment (Section 4.1.2) encompasses the parameters that
+      an application can pass to describe its intent, requirements,
+      prohibitions, and preferences for its networking operations.  For
+      any system that provides generic Transport Services, these
+      properties should primarily offer knobs that apply across multiple
+      transports.  Properties may have a large impact on the rest of the
+      aspects of the interface: they can modify how establishment
+      occurs, they can influence the expectations around data transfer,
+      and they determine the set of events that will be supported.
 
+   o  Establishment (Section 4.1.3) focuses on the actions that an
+      application takes [MICHAEL: on? with?] the transport objects to
+      prepare for data transfer.
 
+   o  Data Transfer (Section 4.1.4) consists of how an application
+      represents data to be sent and received, the functions required to
+      send and receive that data, and how the application is notified of
+      the status of its data transfer.
 
-         Pre-Establishment encompasses the parameters that an
-         application can pass to describe its intent, requirements,
-         prohibitions, and preferences for its networking operations.
-         For any system that provides generic Transport Services, these
-         properties should primarily offer knobs that apply across
-         multiple transports.  Properties may have a large impact on the
-         rest of the aspects of the interface: they can modify how
-         establishment occurs, they can influence the expectations
-         around data transfer, and they determine the set of events that
-         will be supported.
+   o  Event Handling (Section 4.1.5) defines the set of properties that
+      an application may be notified of during the lifetime of transport
+      objects.  These may also provide opportunities for the application
+      to interact with the underlying transport.
 
-   Establishment Section 4.1.3
-
-
-
-         Establishment focuses on the actions that an application takes
-         [MICHAEL: on? with?] the transport objects to prepare for data
-         transfer.
-
-   Data Transfer Section 4.1.4
-
-
-
-         Data Transfer consists of how an application represents data to
-         be sent and received, the functions required to send and
-         receive that data, and how the application is notified of the
-         status of its data transfer.
-
-   Event Handling Section 4.1.5
-
-
-
-         Events define the set of properties that an application may be
-         notified of during the lifetime of transport objects.  These
-         may also provide opportunities for the application to interact
-         with the underlying transport.
-
-   Termination Section 4.1.6
-
-
-
-         Termination focuses on the methods by which data transmission
-         is ceased, and state is torn down in the transport.
-
-
-
-
-Pauly, et al.            Expires August 17, 2018                [Page 8]
-
-Internet-Draft              TAPS Architecture              February 2018
-
+   o  Termination (Section 4.1.6) focuses on the methods by which data
+      transmission is ceased, and state is torn down in the transport.
 
 4.1.1.  Objects
 
@@ -461,7 +432,7 @@ Internet-Draft              TAPS Architecture              February 2018
          generally capable of bi-directional communication.  It has
          state that represents the capability of being able to send or
          receive content between its local and remote endpoints.  This
-         capability may be based merely on the existence of a route
+         capability may be based merely on the existence of a path
          between the two endpoints and an application's permission to
          send and receive on its local endpoint; or may represent
          successful protocol handshakes at one or more layers that are
@@ -469,6 +440,14 @@ Internet-Draft              TAPS Architecture              February 2018
 
    Listener
 
+
+
+
+
+
+Pauly, et al.            Expires August 17, 2018                [Page 8]
+
+Internet-Draft              TAPS Architecture              February 2018
 
 
          A Listener is any object that can be used to prepare a
@@ -501,11 +480,6 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.            Expires August 17, 2018                [Page 9]
-
-Internet-Draft              TAPS Architecture              February 2018
-
-
          The Local Endpoint in a properties [MICHAEL: I can't parse "in
          a properties" here.  Should this be removed?] represents the
          application's view of itself that it wants to use for transport
@@ -523,6 +497,15 @@ Internet-Draft              TAPS Architecture              February 2018
          of options which may influence path selection include the
          interface type (such as a Wi-Fi Ethernet connection, or a
          Cellular LTE connection), characteristics of the path that are
+
+
+
+
+Pauly, et al.            Expires August 17, 2018                [Page 9]
+
+Internet-Draft              TAPS Architecture              February 2018
+
+
          locally known like Maximum Transmission Unit (MTU), or expected
          throughput or latency.
 
@@ -555,13 +538,6 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-
-
-Pauly, et al.            Expires August 17, 2018               [Page 10]
-
-Internet-Draft              TAPS Architecture              February 2018
-
-
          Initiate is the primary action that an application can take to
          create a Connection to a remote endpoint, and prepare any
          required local or remote state to be able to send and/or
@@ -576,6 +552,15 @@ Internet-Draft              TAPS Architecture              February 2018
 
          Listen is the action of marking a Listener as willing to accept
          incoming Connections.
+
+
+
+
+
+Pauly, et al.            Expires August 17, 2018               [Page 10]
+
+Internet-Draft              TAPS Architecture              February 2018
+
 
 4.1.4.  Data Transfer
 
@@ -610,14 +595,6 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-
-
-
-Pauly, et al.            Expires August 17, 2018               [Page 11]
-
-Internet-Draft              TAPS Architecture              February 2018
-
-
          Receive is the indication that the application is ready to
          asynchronously accept Content over a Connection from a Remote
          Endpoint, while the Content itself will be delivered in an
@@ -633,6 +610,12 @@ Internet-Draft              TAPS Architecture              February 2018
 
    Connection Ready
 
+
+
+
+Pauly, et al.            Expires August 17, 2018               [Page 11]
+
+Internet-Draft              TAPS Architecture              February 2018
 
 
          A Connection Ready event signals to an application that a given
@@ -668,12 +651,6 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-
-Pauly, et al.            Expires August 17, 2018               [Page 12]
-
-Internet-Draft              TAPS Architecture              February 2018
-
-
          A Content Sent event notifies the application of the status of
          its Send action.  This may be an error, an indication that
          Content has been processed by the protocol stack, or
@@ -685,6 +662,16 @@ Internet-Draft              TAPS Architecture              February 2018
 
    Path Properties Changed
 
+
+
+
+
+
+
+
+Pauly, et al.            Expires August 17, 2018               [Page 12]
+
+Internet-Draft              TAPS Architecture              February 2018
 
 
          A Path Properties Changed event notifies the application that
@@ -722,14 +709,6 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-
-
-
-Pauly, et al.            Expires August 17, 2018               [Page 13]
-
-Internet-Draft              TAPS Architecture              February 2018
-
-
          For multiplexing transport protocols, a Connection Group is a
          set of Connections that can be multiplexed together.
 
@@ -742,6 +721,13 @@ Internet-Draft              TAPS Architecture              February 2018
 
    Protocol Instance
 
+
+
+
+
+Pauly, et al.            Expires August 17, 2018               [Page 13]
+
+Internet-Draft              TAPS Architecture              February 2018
 
 
          A Protocol Instance is a single instance of one protocol,
@@ -778,14 +764,6 @@ Internet-Draft              TAPS Architecture              February 2018
          The Association Cache holds the state that the implementation
          keeps for each set of associated endpoints that have been used
          previously.  This can include DNS results, TLS session state,
-
-
-
-Pauly, et al.            Expires August 17, 2018               [Page 14]
-
-Internet-Draft              TAPS Architecture              February 2018
-
-
          previous success and quality of transport protocols over
          certain paths.
 
@@ -800,6 +778,14 @@ Internet-Draft              TAPS Architecture              February 2018
          Properties provided by the application, and a Transport
          Services system's policies and heuristics.  [MICHAEL: I find it
          awkward that the terms and headline here talk about "Gathering"
+
+
+
+Pauly, et al.            Expires August 17, 2018               [Page 14]
+
+Internet-Draft              TAPS Architecture              February 2018
+
+
          but then this description doesn't.  Maybe because "Path
          Selection" and "Protocol Selection" are indeed clearer, easier
          terms than this Identification/Gathering stuff?]
@@ -834,14 +820,6 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-
-
-
-Pauly, et al.            Expires August 17, 2018               [Page 15]
-
-Internet-Draft              TAPS Architecture              February 2018
-
-
          Path Racing is the act of attempting, or scheduling attempts
          for, multiple Protocol Stacks that differ based on a selection
          from the available Paths.
@@ -854,6 +832,15 @@ Internet-Draft              TAPS Architecture              February 2018
          attempts for, multiple Protocol Stacks that differ based on the
          specific representation of the remote and local endpoints, such
          as IP addresses resolved from a DNS hostname.
+
+
+
+
+
+Pauly, et al.            Expires August 17, 2018               [Page 15]
+
+Internet-Draft              TAPS Architecture              February 2018
+
 
 5.  IANA Considerations
 
@@ -888,16 +875,6 @@ Internet-Draft              TAPS Architecture              February 2018
    [I-D.brunstrom-taps-impl]
               "Implementing Interfaces to Transport Services", n.d..
 
-
-
-
-
-
-Pauly, et al.            Expires August 17, 2018               [Page 16]
-
-Internet-Draft              TAPS Architecture              February 2018
-
-
    [I-D.ietf-taps-minset]
               Welzl, M. and S. Gjessing, "A Minimal Set of Transport
               Services for TAPS Systems", draft-ietf-taps-minset-01
@@ -911,6 +888,15 @@ Internet-Draft              TAPS Architecture              February 2018
    [I-D.trammell-taps-interface]
               "An Abstract Application Layer Interface to Transport
               Services", n.d..
+
+
+
+
+
+Pauly, et al.            Expires August 17, 2018               [Page 16]
+
+Internet-Draft              TAPS Architecture              February 2018
+
 
    [RFC8095]  Fairhurst, G., Ed., Trammell, B., Ed., and M. Kuehlewind,
               Ed., "Services Provided by IETF Transport Protocols and
@@ -944,16 +930,6 @@ Authors' Addresses
    Email: anna.brunstrom@kau.se
 
 
-
-
-
-
-
-Pauly, et al.            Expires August 17, 2018               [Page 17]
-
-Internet-Draft              TAPS Architecture              February 2018
-
-
    Gorry Fairhurst
    University of Aberdeen
 
@@ -969,6 +945,15 @@ Internet-Draft              TAPS Architecture              February 2018
    Email: csp@csperkins.org
 
 
+
+
+
+
+Pauly, et al.            Expires August 17, 2018               [Page 17]
+
+Internet-Draft              TAPS Architecture              February 2018
+
+
    Philipp S. Tiesel
    TU Berlin
 
@@ -982,6 +967,21 @@ Internet-Draft              TAPS Architecture              February 2018
    United States of America
 
    Email: cawood@apple.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
