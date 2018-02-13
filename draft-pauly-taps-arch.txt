@@ -203,9 +203,8 @@ Internet-Draft              TAPS Architecture              February 2018
    receiving content) once, and expect that implementation to continue
    to function as the transports change.
 
-   Any Transport Services API must expose the basic set of transport
-   networking features.  This implies, at a minimum, the ability to use
-   the equivalent of both TCP and UDP socket interfaces.
+   Any Transport Services API must expose the distilled minimal set of
+   features offered by transport protocols [I-D.ietf-taps-minset].
 
 3.2.  Access to Specialized Features
 
@@ -218,6 +217,7 @@ Internet-Draft              TAPS Architecture              February 2018
 
    A specialized feature may be required by an application only when
    using a specific protocol, and not when using others.  For example,
+   if an application is using UDP, it may require control over the
 
 
 
@@ -226,7 +226,6 @@ Pauly, et al.            Expires August 17, 2018                [Page 4]
 Internet-Draft              TAPS Architecture              February 2018
 
 
-   if an application is using UDP, it may require control over the
    checksum or fragmentation behavior for UDP; if it used a protocol to
    frame its content over a byte stream like TCP, it would not need
    these options.  In such cases, the API should expose the features in
@@ -261,10 +260,12 @@ Internet-Draft              TAPS Architecture              February 2018
    system-specific support and the needs of the deployment scenario.  It
    is expected that all implementations of Transport Services will offer
    the entire mandatory API, but that some features will not be
-   functional in certain implementations.  For example, all
-   implementations should offer sufficient APIs to use basic transport
-   protocols like TCP and UDP, but it is possible that a very
-   constrained device may not have a full TCP implementation.
+   functional in certain implementations.  All implementations must
+   offer sufficient APIs to use the distilled minimal set of features
+   offered by transport protocols [I-D.ietf-taps-minset], including API
+   support for TCP and UDP transport, but it is possible that some very
+   constrained devices might not have, for example, a full TCP
+   implementation.
 
    In order to preserve flexibility and compatibility with future
    protocols, top-level features in the Transport Services API should
@@ -273,7 +274,6 @@ Internet-Draft              TAPS Architecture              February 2018
    explain the ramifications of each feature on existing protocols.  It
    is expected that the Implementation document will be updated and
    supplemented as new protocols and protocol features are developed.
-
 
 
 
