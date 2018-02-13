@@ -706,13 +706,13 @@ transportParameters := connection.getTransportParameters()
 <p id="rfc.section.5.2.3.p.5">Interface Type to prohibit</p>
 <p id="rfc.section.5.2.3.p.6">This property specifies which kind of access network interface, e.g., WiFi, Ethernet, or LTE, to not use for this connection. This is a strict requirement and connection establishment will fail if no other interface is available. The default is to not prohibit any particular interface.</p>
 <h1 id="rfc.section.5.2.4">
-<a href="#rfc.section.5.2.4">5.2.4.</a> <a href="#socket-intents" id="socket-intents">Application Intents</a>
+<a href="#rfc.section.5.2.4">5.2.4.</a> <a href="#intents" id="intents">Application Intents</a>
 </h1>
-<p id="rfc.section.5.2.4.p.1">Application Intents are a group of properties expressing what an application wants to achieve, knows, assumes or prefers regarding its communication. They are not strict requirements. In particular, they should not be used to express any Quality of Service expectations that an application might have. Instead, an application should express its intentions and its expected traffic characteristics in order to help the TAPS system make decisions that best match it, but on a best-effort basis. Even though Application Intents do not represent Quality of Service requirements, a TAPS system may use them to determine a DSCP value, e.g. similar to Table 1 in <a href="#I-D.ietf-tsvwg-rtcweb-qos" class="xref">[I-D.ietf-tsvwg-rtcweb-qos]</a>.</p>
-<p id="rfc.section.5.2.4.p.2">Application Intents can influence protocol selection, protocol configuration, path selection, and endpoint selection. For example, setting the &#8220;Timeliness&#8221; Intent to &#8220;Interactive&#8221; may lead the TAPS system to disable the Nagle algorithm for a connection, while setting the &#8220;Timeliness&#8221; to &#8220;Background&#8221; may lead it to setting the DSCP value to &#8220;scavenger&#8221;. If the &#8220;Size to be Sent&#8221; Intent is set on a series of messages, it may influence path selection, e.g., when the TAPS system schedules big messages over an interface with higher bandwidth, and small messages over an interface with lower latency.</p>
-<p id="rfc.section.5.2.4.p.3">Specifying Application Intents is not mandatory. An application can specify any combination of Application Intents. All Application Intents can be specified for connections and connection groups. Some Intents can also be specified for individual messages, similar to the properties in <a href="#send-props" class="xref">Section 7.1</a>.</p>
+<p id="rfc.section.5.2.4.p.1">Application Intents are a group of properties expressing what an application wants to achieve, knows, assumes or prefers regarding its communication. They are not strict requirements. In particular, they should not be used to express any Quality of Service expectations that an application might have. Instead, an application should express its intentions and its expected traffic characteristics in order to help the transport system make decisions that best match it, but on a best-effort basis. Even though Application Intents do not represent Quality of Service requirements, a transport system may use them to determine a DSCP value, e.g. similar to Table 1 in <a href="#I-D.ietf-tsvwg-rtcweb-qos" class="xref">[I-D.ietf-tsvwg-rtcweb-qos]</a>.</p>
+<p id="rfc.section.5.2.4.p.2">Application Intents can influence protocol selection, protocol configuration, path selection, and endpoint selection. For example, setting the &#8220;Timeliness&#8221; Intent to &#8220;Interactive&#8221; may lead the transport system to disable the Nagle algorithm for a connection, while setting the &#8220;Timeliness&#8221; to &#8220;Background&#8221; may lead it to setting the DSCP value to &#8220;scavenger&#8221;. If the &#8220;Size to be Sent&#8221; Intent is set on individual Content, it may influence path selection, e.g., when the TAPS system schedules big Content over an interface with higher bandwidth, and small Content over an interface with lower latency.</p>
+<p id="rfc.section.5.2.4.p.3">Specifying Application Intents is not mandatory. An application can specify any combination of Application Intents. All Application Intents can be specified for connections and cloning a Connection to form a Connection Group will clone the associated Intents along with the other transport parameters. Some Intents can also be specified for individual Content, similar to the properties in <a href="#send-props" class="xref">Section 7.1</a>.</p>
 <p id="rfc.section.5.2.4.p.4">Traffic Category</p>
-<p id="rfc.section.5.2.4.p.5">This Intent specifies what the application expect the dominating traffic pattern to be. It applies to connections and connection groups</p>
+<p id="rfc.section.5.2.4.p.5">This Intent specifies what the application expect the dominating traffic pattern to be.</p>
 <p id="rfc.section.5.2.4.p.6">Possible Category values are:</p>
 <p></p>
 
@@ -722,35 +722,19 @@ transportParameters := connection.getTransportParameters()
 <dt>Control:</dt>
 <dd style="margin-left: 8">Long lasting low bandwidth control channel, not bandwidth bound</dd>
 <dt>Stream:</dt>
-<dd style="margin-left: 8">Stream of bytes/messages with steady data rate</dd>
+<dd style="margin-left: 8">Stream of bytes/Content with steady data rate</dd>
 <dt>Bulk:</dt>
-<dd style="margin-left: 8">Bulk transfer of large messages, presumably bandwidth bound</dd>
+<dd style="margin-left: 8">Bulk transfer of large Content, presumably bandwidth bound</dd>
 </dl>
 <p id="rfc.section.5.2.4.p.8">The default is to not assume any particular traffic pattern. Most categories suggest the use of other intents to further describe the traffic pattern anticipated, e.g., the bulk category suggesting the use of the Message Size intents or the stream category suggesting the Stream Bitrate and Duration intents.</p>
 <p id="rfc.section.5.2.4.p.9">Size to be Sent / Received</p>
-<p id="rfc.section.5.2.4.p.10">This Intent specifies what the application expects the size of a transfer to be.  It is a numeric property and given in Bytes. It can also apply to individual messages.</p>
+<p id="rfc.section.5.2.4.p.10">This Intent specifies what the application expects the size of a transfer to be.  It is a numeric property and given in Bytes. This Intent can also apply to individual Content.</p>
 <p id="rfc.section.5.2.4.p.11">Duration</p>
-<p id="rfc.section.5.2.4.p.12">This Intent specifies what the application expects the lifetime of a transfer to be. It is a numeric property and given in milliseconds. It applies to connections and connection groups.</p>
+<p id="rfc.section.5.2.4.p.12">This Intent specifies what the application expects the lifetime of a transfer to be. It is a numeric property and given in milliseconds.</p>
 <p id="rfc.section.5.2.4.p.13">Stream Bitrate Sent / Received</p>
-<p id="rfc.section.5.2.4.p.14">This Intent specifies what the application expects the bitrate of a transfer to be. It is a numeric property and given in Bytes per second. It applies to connections and connection groups.</p>
-<p id="rfc.section.5.2.4.p.15">Burstiness</p>
-<p id="rfc.section.5.2.4.p.16">This Intent specifies what the application expects the sender-side burst characteristics of the traffic to be. The application can provide hints about the anticipated communication pattern, i.e., how it expects the number of sent bytes to vary over time and the expected length of sequences of consecutively sent messages. Note that the actual burst characteristics will depend on the network, especially at the receiver side. This Intents applies to connections and connection groups.</p>
-<p id="rfc.section.5.2.4.p.17">Possible Burstiness values are:</p>
-<p></p>
-
-<dl>
-<dt>No Bursts:</dt>
-<dd style="margin-left: 8">Application sends traffic at a constant rate</dd>
-<dt>Regular Bursts:</dt>
-<dd style="margin-left: 8">Application sends bursts of traffic periodically</dd>
-<dt>Random Bursts:</dt>
-<dd style="margin-left: 8">Application sends bursts of traffic irregularly</dd>
-<dt>Bulk:</dt>
-<dd style="margin-left: 8">Application sends a bulk of traffic</dd>
-</dl>
-<p id="rfc.section.5.2.4.p.19">The default is to not assume any particular burst characteristics.</p>
-<p id="rfc.section.5.2.4.p.20">Timeliness</p>
-<p id="rfc.section.5.2.4.p.21">This Intent specifies what delay characteristcs the applications prefers. It provides hints for the TAPS system whether to optimize for low latency or other criteria. Note that setting this Intents does not imply any guarantees on whether an application&#8217;s requirements can actually be satisfied. This Intents applies to connections, connection groups, or messages.</p>
+<p id="rfc.section.5.2.4.p.14">This Intent specifies what the application expects the bitrate of a transfer to be. It is a numeric property and given in Bytes per second.</p>
+<p id="rfc.section.5.2.4.p.15">Timeliness</p>
+<p id="rfc.section.5.2.4.p.16">This Intent specifies what delay characteristcs the applications prefers. It provides hints for the transport system whether to optimize for low latency or other criteria. Note that setting this Intents does not imply any guarantees on whether an application&#8217;s requirements can actually be satisfied. This Intent can also apply to individual Content.</p>
 <p></p>
 
 <dl>
@@ -763,9 +747,9 @@ transportParameters := connection.getTransportParameters()
 <dt>Background:</dt>
 <dd style="margin-left: 8">Delay and packet delay variation is no concern</dd>
 </dl>
-<p id="rfc.section.5.2.4.p.23">The default is &#8220;Transfer&#8221;.</p>
-<p id="rfc.section.5.2.4.p.24">Disruption Resilience</p>
-<p id="rfc.section.5.2.4.p.25">This Intent describes what an application knows about its own ability to deal with disruption of its communication, e.g., connection loss. It provides hints of how well an application assumes it can recover from such disturbances and can have an impact on the tradeoff between providing failover techniques and resource utilization. This Intent applies to connections, connection groups, and messages.</p>
+<p id="rfc.section.5.2.4.p.18">The default is &#8220;Transfer&#8221;.</p>
+<p id="rfc.section.5.2.4.p.19">Disruption Resilience</p>
+<p id="rfc.section.5.2.4.p.20">This Intent describes what an application knows about its own ability to deal with disruption of its communication, e.g., connection loss. It provides hints of how well an application assumes it can recover from such disturbances and can have an impact on the tradeoff between providing failover techniques and resource utilization. This Intent can also apply to individual Content.</p>
 <p></p>
 
 <dl>
@@ -776,9 +760,9 @@ transportParameters := connection.getTransportParameters()
 <dt>Resilient:</dt>
 <dd style="margin-left: 8">Disruptions have minimal impact for the application</dd>
 </dl>
-<p id="rfc.section.5.2.4.p.27">The default is &#8220;Sensitive&#8221;.</p>
-<p id="rfc.section.5.2.4.p.28">Cost Preferences</p>
-<p id="rfc.section.5.2.4.p.29">This Intent describes what an application prefers regarding monetary costs, e.g., whether it considers it acceptable to utilize limited data volume. It provides hints to the TAPS system on how to handle tradeoffs between cost and performance or reliability.  This Intent applies to connections, connection groups, and messages.</p>
+<p id="rfc.section.5.2.4.p.22">The default is &#8220;Sensitive&#8221;.</p>
+<p id="rfc.section.5.2.4.p.23">Cost Preferences</p>
+<p id="rfc.section.5.2.4.p.24">This Intent describes what an application prefers regarding monetary costs, e.g., whether it considers it acceptable to utilize limited data volume. It provides hints to the transport system on how to handle tradeoffs between cost and performance or reliability. This Intent can also apply to individual Content.</p>
 <p></p>
 
 <dl>
@@ -791,7 +775,7 @@ transportParameters := connection.getTransportParameters()
 <dt>Ignore Cost:</dt>
 <dd style="margin-left: 8">Ignore cost, choose transport solely based on other criteria</dd>
 </dl>
-<p id="rfc.section.5.2.4.p.31">The default is &#8220;Balance Cost&#8221;.</p>
+<p id="rfc.section.5.2.4.p.26">The default is &#8220;Balance Cost&#8221;.</p>
 <h1 id="rfc.section.5.3">
 <a href="#rfc.section.5.3">5.3.</a> <a href="#security-parameters" id="security-parameters">Specifying Security Parameters and Callbacks</a>
 </h1>
