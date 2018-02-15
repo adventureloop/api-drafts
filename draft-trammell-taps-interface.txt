@@ -104,8 +104,8 @@ Table of Contents
    8.  Receiving Data  . . . . . . . . . . . . . . . . . . . . . . .  21
      8.1.  Application-Layer Backpressure at the Receiver  . . . . .  22
      8.2.  Receiver-side Deframing over Stream Protocols . . . . . .  22
-   9.  Connection Termination  . . . . . . . . . . . . . . . . . . .  23
-   10. Event and Error Handling  . . . . . . . . . . . . . . . . . .  24
+   9.  Maintenance . . . . . . . . . . . . . . . . . . . . . . . . .  23
+   10. Connection Termination  . . . . . . . . . . . . . . . . . . .  23
 
 
 
@@ -114,16 +114,17 @@ Trammell, et al.         Expires August 19, 2018                [Page 2]
 Internet-Draft               TAPS Interface                February 2018
 
 
-   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  24
-   12. Security Considerations . . . . . . . . . . . . . . . . . . .  24
-   13. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  24
-   14. References  . . . . . . . . . . . . . . . . . . . . . . . . .  24
-     14.1.  Normative References . . . . . . . . . . . . . . . . . .  24
-     14.2.  Informative References . . . . . . . . . . . . . . . . .  25
+   11. Event and Error Handling  . . . . . . . . . . . . . . . . . .  24
+   12. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  24
+   13. Security Considerations . . . . . . . . . . . . . . . . . . .  24
+   14. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  24
+   15. References  . . . . . . . . . . . . . . . . . . . . . . . . .  25
+     15.1.  Normative References . . . . . . . . . . . . . . . . . .  25
+     15.2.  Informative References . . . . . . . . . . . . . . . . .  25
    Appendix A.  Transport Parameters . . . . . . . . . . . . . . . .  25
-     A.1.  Application Preferences . . . . . . . . . . . . . . . . .  25
+     A.1.  Application Preferences . . . . . . . . . . . . . . . . .  26
      A.2.  Specifying and Querying Properties  . . . . . . . . . . .  27
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  28
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  29
 
 1.  Introduction
 
@@ -161,7 +162,6 @@ Internet-Draft               TAPS Interface                February 2018
 
    The following notations, which can be combined, are used in this
    document:
-
 
 
 
@@ -1201,7 +1201,7 @@ Internet-Draft               TAPS Interface                February 2018
    some other indication is received that reception has failed.  Such
    conditions that irrevocably lead the the termination of the
    Connection are signaled using ConnectionError instead (see
-   Section 9).
+   Section 10).
 
 8.1.  Application-Layer Backpressure at the Receiver
 
@@ -1252,13 +1252,44 @@ Internet-Draft               TAPS Interface                February 2018
 
    Content := Deframer.Deframe(OctetStream, ...)
 
-9.  Connection Termination
+9.  Maintenance
+
+   The application can access the following properties on an established
+   Connection:
+
+   o  Transport Features of the protocols that were selected.  These
+      features correspond to the properties given in Section 5.2.1 and
+      can only be queried.
+
+   o  Protocol Properties of the protocols in use.  These properties
+      correspond to the properties given Section 5.2.2 and can be set
+      and queried.
+
+   o  Path Properties of the path(s) in use.  These properties can be
+      derived from the local provisioning domain, measurements by the
+      protocol stack, or other sources.  They can only be queried.
+
+   Properties := Connection.getProperties()
+
+   Appendix A.2 gives a more detailed overview of the different types of
+   properties that can be set and queried at different times.
+
+10.  Connection Termination
 
    Close terminates a Connection after satisfying all the requirements
    that were specified regarding the delivery of Content that the
    application has already given to the transport system.  For example,
    if reliable delivery was requested for Content handed over before
    calling Close, the transport system will ensure that such Content is
+
+
+
+
+Trammell, et al.         Expires August 19, 2018               [Page 23]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    indeed delivered.  If the peer still has data to send, it cannot be
    received after this call.
 
@@ -1278,30 +1309,18 @@ Internet-Draft               TAPS Interface                February 2018
 
    Connection -> ConnectionError<>
 
-
-
-
-
-
-
-
-Trammell, et al.         Expires August 19, 2018               [Page 23]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
-10.  Event and Error Handling
+11.  Event and Error Handling
 
    [NOTE: point out that events and errors may be handled differently,
    although they are the modeled the same in this specification.]
 
-11.  IANA Considerations
+12.  IANA Considerations
 
    RFC-EDITOR: Please remove this section before publication.
 
    This document has no actions for IANA.
 
-12.  Security Considerations
+13.  Security Considerations
 
    This document describes a generic API for interacting with a
    transport services (TAPS) system.  Part of this API includes
@@ -1310,15 +1329,26 @@ Internet-Draft               TAPS Interface                February 2018
    specific algorithms or protocols.  Any API-compatible transport
    security protocol should work in a TAPS system.
 
-13.  Acknowledgements
+14.  Acknowledgements
 
    This work has received funding from the European Union's Horizon 2020
    research and innovation programme under grant agreement No. 644334
    (NEAT).
 
-14.  References
 
-14.1.  Normative References
+
+
+
+
+
+Trammell, et al.         Expires August 19, 2018               [Page 24]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
+15.  References
+
+15.1.  Normative References
 
    [I-D.ietf-tsvwg-rtcweb-qos]
               Jones, P., Dhesikan, S., Jennings, C., and D. Druta, "DSCP
@@ -1336,17 +1366,7 @@ Internet-Draft               TAPS Interface                February 2018
               Fairhurst, G., Perkins, C., Tiesel, P., and C. Wood, "An
               Architecture for Transport Services", n.d..
 
-
-
-
-
-
-Trammell, et al.         Expires August 19, 2018               [Page 24]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
-14.2.  Informative References
+15.2.  Informative References
 
    [I-D.pauly-taps-transport-security]
               Pauly, T., Rose, K., and C. Wood, "A Survey of Transport
@@ -1373,6 +1393,15 @@ Appendix A.  Transport Parameters
    This appendix provides details about the usage of the Transport
    Parameters specified in Section 5.2.  It clarifies what preference
    levels an application can set for which Transport Parameter, and
+
+
+
+
+Trammell, et al.         Expires August 19, 2018               [Page 25]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    during which phase an application can specify and query what kinds of
    Transport Parameters.
 
@@ -1393,21 +1422,41 @@ A.1.  Application Preferences
    prohibits selecting a transport protocol that allows to suggest a
    timeout to the peer, this restriction will unnecessarily limit
    transport protocol selection.  Instead, the application could simply
-
-
-
-
-Trammell, et al.         Expires August 19, 2018               [Page 25]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    not use this feature if it is present in the selected transport
    protocol.
 
    The following table illustrates which Transport Parameter has which
    default preference level and which alternative preference levels an
    application may set.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Trammell, et al.         Expires August 19, 2018               [Page 26]
+
+Internet-Draft               TAPS Interface                February 2018
+
 
    +-------------------+---------+--------+-------+----------+---------+
    | Transport         | Require | Prefer | Avoid | Prohibit | Default |
@@ -1450,14 +1499,6 @@ Internet-Draft               TAPS Interface                February 2018
    | Intents           |         |        |       |          |         |
    +-------------------+---------+--------+-------+----------+---------+
 
-
-
-
-Trammell, et al.         Expires August 19, 2018               [Page 26]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    [List individual Intents?  Reformulate some of them as preferences?]
 
 A.2.  Specifying and Querying Properties
@@ -1465,6 +1506,13 @@ A.2.  Specifying and Querying Properties
    In this appendix we give an overview of the different types of
    properties, the objects to which they apply, and at what time an
    application can query them.
+
+
+
+Trammell, et al.         Expires August 19, 2018               [Page 27]
+
+Internet-Draft               TAPS Interface                February 2018
+
 
    During the Pre-Establishment phase, an application may specify
    Transport Parameters for a Connection as described in Section 5.2.
@@ -1505,15 +1553,6 @@ A.2.  Specifying and Querying Properties
    beneficial for an application to set these properties as early as
    possible, so the transport system can use them to optimize.
 
-
-
-
-
-Trammell, et al.         Expires August 19, 2018               [Page 27]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    Finally, an application may query the properties of the available
    paths and the properties of the path(s) chosen for a Connection at
    all times.
@@ -1523,6 +1562,13 @@ Internet-Draft               TAPS Interface                February 2018
 
    The following table shows the types of existing properties and what
    an application can do with them during what phase:
+
+
+
+Trammell, et al.         Expires August 19, 2018               [Page 28]
+
+Internet-Draft               TAPS Interface                February 2018
+
 
    +-----------+---------------------+-------------------+-------------+
    | Property  | Applies to          | Pre-Establishment | Established |
@@ -1561,15 +1607,6 @@ Authors' Addresses
    Email: ietf@trammell.ch
 
 
-
-
-
-
-Trammell, et al.         Expires August 19, 2018               [Page 28]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    Michael Welzl (editor)
    University of Oslo
    PO Box 1080 Blindern
@@ -1577,6 +1614,16 @@ Internet-Draft               TAPS Interface                February 2018
    Norway
 
    Email: michawe@ifi.uio.no
+
+
+
+
+
+
+
+Trammell, et al.         Expires August 19, 2018               [Page 29]
+
+Internet-Draft               TAPS Interface                February 2018
 
 
    Gorry Fairhurst
@@ -1612,20 +1659,6 @@ Internet-Draft               TAPS Interface                February 2018
    Email: philipp@inet.tu-berlin.de
 
 
-
-
-
-
-
-
-
-
-
-Trammell, et al.         Expires August 19, 2018               [Page 29]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    Theresa Enghardt
    TU Berlin
    Marchstrasse 23
@@ -1633,6 +1666,20 @@ Internet-Draft               TAPS Interface                February 2018
    Germany
 
    Email: theresa@inet.tu-berlin.de
+
+
+
+
+
+
+
+
+
+
+
+Trammell, et al.         Expires August 19, 2018               [Page 30]
+
+Internet-Draft               TAPS Interface                February 2018
 
 
    Chris Wood
@@ -1677,4 +1724,13 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.         Expires August 19, 2018               [Page 30]
+
+
+
+
+
+
+
+
+
+Trammell, et al.         Expires August 19, 2018               [Page 31]
