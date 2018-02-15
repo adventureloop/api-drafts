@@ -320,13 +320,14 @@ address {
 <link href="#rfc.references" rel="Chapter" title="15 References">
 <link href="#rfc.references.1" rel="Chapter" title="15.1 Normative References">
 <link href="#rfc.references.2" rel="Chapter" title="15.2 Informative References">
-<link href="#rfc.appendix.A" rel="Chapter" title="A Transport Parameters">
-<link href="#rfc.appendix.A.1" rel="Chapter" title="A.1 Application Preferences">
-<link href="#rfc.appendix.A.2" rel="Chapter" title="A.2 Specifying and Querying Properties">
+<link href="#rfc.appendix.A" rel="Chapter" title="A Sample API definition in Go">
+<link href="#rfc.appendix.B" rel="Chapter" title="B Transport Parameters">
+<link href="#rfc.appendix.B.1" rel="Chapter" title="B.1 Application Preferences">
+<link href="#rfc.appendix.B.2" rel="Chapter" title="B.2 Specifying and Querying Properties">
 <link href="#rfc.authors" rel="Chapter">
 
 
-  <meta name="generator" content="xml2rfc version 2.9.2 - https://tools.ietf.org/tools/xml2rfc" />
+  <meta name="generator" content="xml2rfc version 2.9.3 - https://tools.ietf.org/tools/xml2rfc" />
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., Enghardt, T., and C. Wood" />
@@ -506,11 +507,13 @@ address {
 </li>
 <li>15.2.   <a href="#rfc.references.2">Informative References</a>
 </li>
-</ul><li>Appendix A.   <a href="#rfc.appendix.A">Transport Parameters</a>
+</ul><li>Appendix A.   <a href="#rfc.appendix.A">Sample API definition in Go</a>
 </li>
-<ul><li>A.1.   <a href="#rfc.appendix.A.1">Application Preferences</a>
+<li>Appendix B.   <a href="#rfc.appendix.B">Transport Parameters</a>
 </li>
-<li>A.2.   <a href="#rfc.appendix.A.2">Specifying and Querying Properties</a>
+<ul><li>B.1.   <a href="#rfc.appendix.B.1">Application Preferences</a>
+</li>
+<li>B.2.   <a href="#rfc.appendix.B.2">Specifying and Querying Properties</a>
 </li>
 </ul><li><a href="#rfc.authors">Authors' Addresses</a>
 </li>
@@ -647,7 +650,7 @@ localSpecifier.withPort(443)
 </tr>
 </tbody>
 </table>
-<p id="rfc.section.5.2.p.4">Default preference levels and possible combinations of Transport Parameters and preference levels are specified in <a href="#appendix-preferences" class="xref">Appendix A.1</a>.</p>
+<p id="rfc.section.5.2.p.4">Default preference levels and possible combinations of Transport Parameters and preference levels are specified in <a href="#appendix-preferences" class="xref">Appendix B.1</a>.</p>
 <p id="rfc.section.5.2.p.5">All properties of the Transport Parameters are collected in a TransportParameters object:</p>
 <pre>
 transportParameters := NewTransportParameters()
@@ -660,7 +663,7 @@ transportParameters.addProperty(preference, name, value)
 <pre>
 transportParameters := connection.getTransportParameters()
 </pre>
-<p id="rfc.section.5.2.p.8">For most properties, it is beneficial for the application to set them as early as possible in order to help the transport system optimize.  Some parameters can also be set later in the lifetime of a connection.  However, Protocol Selection Properties and Path Selection Properties MUST be added to the TransportParameters object before calling Initiate() and SHOULD result in a runtime error if changed later.  <a href="#appendix-specify-query-params" class="xref">Appendix A.2</a> gives an overview of what Transport Parameters can be specified and queried during which phase.</p>
+<p id="rfc.section.5.2.p.8">For most properties, it is beneficial for the application to set them as early as possible in order to help the transport system optimize.  Some parameters can also be set later in the lifetime of a connection.  However, Protocol Selection Properties and Path Selection Properties MUST be added to the TransportParameters object before calling Initiate() and SHOULD result in a runtime error if changed later.  <a href="#appendix-specify-query-params" class="xref">Appendix B.2</a> gives an overview of what Transport Parameters can be specified and queried during which phase.</p>
 <p id="rfc.section.5.2.p.9">Connections can be cloned at any time, before or after establishment.  A cloned connection and its parent are entangled: they share the same TransportParameters object, changing any parameter for one of them also changes the parameter for the other, connecting one of them also connects the other, etc.  Cloning connections during pre-establishment is encouraged, as it informs the transport system about the intent to form Connection Groups.</p>
 <p id="rfc.section.5.2.p.10">[Note that priority assignment ((see also <a href="#groups" class="xref">Section 6.4</a> for more details) is not shared among cloned connections. Therefore, the priority assignment MUST NOT be realized using the connection level TransportParameters object.]</p>
 <h1 id="rfc.section.5.2.1">
@@ -801,7 +804,7 @@ securityParameters.AddPrivateKey(privateKey, publicKey)
 
 <ul><li>Supported algorithms: Used to restrict what parameters are used by underlying transport security protocols.  When not specified, these algorithms SHOULD default to known and safe defaults for the system. Parameters include: ciphersuites, supported groups, and signature algorithms.</li></ul>
 <pre>
-securityParameters.AddSupportedGroup(22)    // secp256k1 
+securityParameters.AddSupportedGroup(22)    // secp256k1
 securityParameters.AddCiphersuite(0xCCA9)   // TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256
 securityParameters.AddSignatureAlgorithm(7) // ed25519
 </pre>
@@ -826,7 +829,7 @@ securityParameters.AddPreSharedKey(key, identity)
 <pre>
 trustCallback := NewCallback({
   // Handle trust, return the result
-}) 
+})
 securityParameters.SetTrustVerificationCallback(trustCallback)
 </pre>
 <p></p>
@@ -835,7 +838,7 @@ securityParameters.SetTrustVerificationCallback(trustCallback)
 <pre>
 challengeCallback := NewCallback({
   // Handle challenge
-}) 
+})
 securityParameters.SetIdentityChallengeCallback(challengeCallback)
 </pre>
 <h1 id="rfc.section.6">
@@ -965,7 +968,7 @@ securityParameters.SetIdentityChallengeCallback(challengeCallback)
 <pre>
 Properties := Connection.getProperties()
 </pre>
-<p><a href="#appendix-specify-query-params" class="xref">Appendix A.2</a> gives a more detailed overview of the different types of properties that can be set and queried at different times.</p>
+<p><a href="#appendix-specify-query-params" class="xref">Appendix B.2</a> gives a more detailed overview of the different types of properties that can be set and queried at different times.</p>
 <h1 id="rfc.section.10">
 <a href="#rfc.section.10">10.</a> <a href="#termination" id="termination">Connection Termination</a>
 </h1>
@@ -993,7 +996,7 @@ Properties := Connection.getProperties()
 <h1 id="rfc.section.14">
 <a href="#rfc.section.14">14.</a> <a href="#acknowledgements" id="acknowledgements">Acknowledgements</a>
 </h1>
-<p id="rfc.section.14.p.1">This work has received funding from the European Union&#8217;s Horizon 2020 research and innovation programme under grant agreement No. 644334 (NEAT).</p>
+<p id="rfc.section.14.p.1">This work has received funding from the European Union&#8217;s Horizon 2020 research and innovation programme under grant agreements No. 644334 (NEAT) and No. 688421 (MAMI).</p>
 <h1 id="rfc.references">
 <a href="#rfc.references">15.</a> References</h1>
 <h1 id="rfc.references.1">
@@ -1040,15 +1043,145 @@ Properties := Connection.getProperties()
 </tr>
 </tbody></table>
 <h1 id="rfc.appendix.A">
-<a href="#rfc.appendix.A">Appendix A.</a> <a href="#appendix-transport-params" id="appendix-transport-params">Transport Parameters</a>
+<a href="#rfc.appendix.A">Appendix A.</a> <a href="#appendix-api-sketch" id="appendix-api-sketch">Sample API definition in Go</a>
 </h1>
-<p id="rfc.section.A.p.1">This appendix provides details about the usage of the Transport Parameters specified in <a href="#transport-params" class="xref">Section 5.2</a>. It clarifies what preference levels an application can set for which Transport Parameter, and during which phase an application can specify and query what kinds of Transport Parameters.</p>
-<h1 id="rfc.appendix.A.1">
-<a href="#rfc.appendix.A.1">A.1.</a> <a href="#appendix-preferences" id="appendix-preferences">Application Preferences</a>
+<p id="rfc.section.A.p.1">This document defines an abstract interface. To illustrate how this would map concretely into a programming language, this appendix contains an API interface definition in Go, using callbacks for event handling. The documentation for the API sketch is available online at https://godoc.org/github.com/mami-project/postsocket.</p>
+<pre>
+package postsocket
+
+import (
+        "crypto/tls"
+        "io"
+        "net"
+        "time"
+)
+
+type TransportContext interface {
+        NewTransportParameters() TransportParameters
+        NewSecurityParameters() SecurityParameters
+        NewRemote() Remote
+        NewLocal() Local
+        DefaultSendParameters() SendParameters
+
+        SetEventHandler(evh EventHandler)
+        SetFramingHandler(fh FramingHandler)
+
+  Preconnect(evh EventHandler, fh FramingHandler,
+             rem Remote, loc Local,
+             tp TransportParameters,
+             sp SecurityParameters) (Preconnection, error)
+
+  Initiate(rem Remote, loc Local,
+           tp TransportParameters,
+           sp SecurityParameters) (Connection, error)
+  Rendezvous(rem Remote, loc Local,
+             tp TransportParameters,
+             sp SecurityParameters) (Connection, error)
+  Listen(loc Local,
+         tp TransportParameters,
+         sp SecurityParameters) (Connection, error)
+}
+
+type Remote interface {
+        WithHostname(hostname string) Remote
+        WithAddress(address net.IP) Remote
+        WithPort(port uint16) Remote
+        WithServiceName(svc string) Remote
+}
+
+type Local interface {
+        WithInterface(iface string) Local
+        WithHostname(hostname string) Local
+        WithAddress(address net.IP) Local
+        WithPort(port uint16) Local
+        WithServiceName(svc string) Local
+}
+
+type ParameterIdentifier int
+
+const (
+        TransportFullyReliable = iota
+        // ... and so on
+)
+
+type TransportParameters interface {
+        Require(p ParameterIdentifier, v int) TransportParameters
+        Prefer(p ParameterIdentifier, v int) TransportParameters
+        Avoid(p ParameterIdentifier, v int) TransportParameters
+        Prohibit(p ParameterIdentifier, v int) TransportParameters
+}
+
+type SecurityParameters interface {
+        AddIdentity(c tls.Certificate) SecurityParameters
+        AddPSK(c tls.Certificate, k []byte) SecurityParameters
+        VerifyTrustWith(func(c tls.Certificate) (bool, error)) SecurityParameters
+        HandleChallengeWith(func() (bool, error)) SecurityParameters
+        Require(p ParameterIdentifier, v interface{} SecurityParameters
+        Prefer(p ParameterIdentifier, v interface{}) SecurityParameters
+        Avoid(p ParameterIdentifier, v interface{}) SecurityParameters
+        Prohibit(p ParameterIdentifier, v interface{}) SecurityParameters
+}
+
+type SendParameters struct {
+        Lifetime time.Duration
+        Niceness uint
+        Ordered bool
+        Immediate bool
+        Idempotent bool
+        CorruptionTolerant bool
+}
+
+type Preconnection interface {
+  AddSpecifier(rem Remote, loc Local,
+               tp TransportParameters, sp SecurityParameters)
+        Initiate() (Connection, error)
+        InitialSend(content interface{}, sp SendParameters) (Connection, error)
+        Rendezvous() (Connection, error)
+        Listen() (Connection, error)
+}
+
+type Connection interface {
+        Send(content interface{}, contentref interface{}, sp SendParameters) error
+
+        Clone() (Connection, error)
+        Close() error
+
+        GetEventHandler() EventHandler
+        SetEventHandler(evh EventHandler)
+
+        GetFramingHandler() FramingHandler
+        SetFramingHandler(fh FramingHandler)
+}
+
+type Content interface {
+        Bytes() []byte
+}
+
+// EventHandler defines the interface for connection event handlers.
+type EventHandler interface {
+        Ready(conn Connection, ante Connection)
+        Received(content Content, conn Connection)
+        Sent(conn Connection, contentref interface{})
+        Expired(conn Connection, contentref interface{})
+        Error(conn Connection, contentref interface{}, err error)
+        Closed(conn Connection, err error)
+}
+
+type FramingHandler interface {
+        Frame(content interface{}) ([]byte, error)
+        Deframe(in io.Reader) (Content, error)
+}
+</pre>
+<h1 id="rfc.appendix.B">
+<a href="#rfc.appendix.B">Appendix B.</a> <a href="#appendix-transport-params" id="appendix-transport-params">Transport Parameters</a>
 </h1>
-<p id="rfc.section.A.1.p.1">As described in <a href="#transport-params" class="xref">Section 5.2</a>, an application can specify its preference regarding a Transport Parameter, i.e., whether a certain property is required, preferred, to be avoided, prohibited, or an intention. If an application does not set its preference regarding a Transport Parameter, default preference levels apply as specified in the following table. A default preference of &#8220;None&#8221; means that the transport system assumes that an application does not have any preference regarding the corresponding Transport Parameter and may not take this parameter into account for protocol and path selection.</p>
-<p id="rfc.section.A.1.p.2">Not every Transport Parameter can be meaningfully assigned every preference level. For example, if an application explicitly prohibits selecting a transport protocol that allows to suggest a timeout to the peer, this restriction will unnecessarily limit transport protocol selection. Instead, the application could simply not use this feature if it is present in the selected transport protocol.</p>
-<p id="rfc.section.A.1.p.3">The following table illustrates which Transport Parameter has which default preference level and which alternative preference levels an application may set.</p>
+<p id="rfc.section.B.p.1">This appendix provides details about the usage of the Transport Parameters specified in <a href="#transport-params" class="xref">Section 5.2</a>. It clarifies what preference levels an application can set for which Transport Parameter, and during which phase an application can specify and query what kinds of Transport Parameters.</p>
+<h1 id="rfc.appendix.B.1">
+<a href="#rfc.appendix.B.1">B.1.</a> <a href="#appendix-preferences" id="appendix-preferences">Application Preferences</a>
+</h1>
+<p id="rfc.section.B.1.p.1">As described in <a href="#transport-params" class="xref">Section 5.2</a>, an application can specify its preference regarding a Transport Parameter, i.e., whether a certain property is required, preferred, to be avoided, prohibited, or an intention. If an application does not set its preference regarding a Transport Parameter, default preference levels apply as specified in the following table. A default preference of &#8220;None&#8221; means that the transport system assumes that an application does not have any preference regarding the corresponding Transport Parameter and may not take this parameter into account for protocol and path selection.</p>
+<p id="rfc.section.B.1.p.2">Not every Transport Parameter can be meaningfully assigned every preference level. For example, if an application explicitly prohibits selecting a transport protocol that allows to suggest a timeout to the peer, this restriction will unnecessarily limit transport protocol selection. Instead, the application could simply not use this feature if it is present in the selected transport protocol.</p>
+<p id="rfc.section.B.1.p.3">The following table illustrates which Transport Parameter has which default preference level and which alternative preference levels an application may set.</p>
 <table cellpadding="3" cellspacing="0" class="tt full center">
 <thead><tr>
 <th class="left">Transport Parameter</th>
@@ -1149,19 +1282,19 @@ Properties := Connection.getProperties()
 </tr>
 </tbody>
 </table>
-<p id="rfc.section.A.1.p.4">[List individual Intents? Reformulate some of them as preferences?]</p>
-<h1 id="rfc.appendix.A.2">
-<a href="#rfc.appendix.A.2">A.2.</a> <a href="#appendix-specify-query-params" id="appendix-specify-query-params">Specifying and Querying Properties</a>
+<p id="rfc.section.B.1.p.4">[List individual Intents? Reformulate some of them as preferences?]</p>
+<h1 id="rfc.appendix.B.2">
+<a href="#rfc.appendix.B.2">B.2.</a> <a href="#appendix-specify-query-params" id="appendix-specify-query-params">Specifying and Querying Properties</a>
 </h1>
-<p id="rfc.section.A.2.p.1">In this appendix we give an overview of the different types of properties, the objects to which they apply, and at what time an application can query them.</p>
-<p id="rfc.section.A.2.p.2">During the Pre-Establishment phase, an application may specify Transport Parameters for a Connection as described in <a href="#transport-params" class="xref">Section 5.2</a>.  Specifically, Protocol Selection Properties, Path Selection Properties, and Application Intents for the Connection MUST be specified during Pre-Establishment, as protocol and path selection occur during connection establishment. An application may query the Transport Parameters that were specified for a Connection at all times.</p>
-<p id="rfc.section.A.2.p.3">Transport Features represent the actual capabilities of specific Protocol Stacks. They are expressed in the same vocabulary as Protocol Selection Properties, but have a Boolean value expressing whether a Protocol Stack support the given Transport Feature or not. An application may query the Transport Features of Protocol Stacks at all times. Once a Connection is established, an application may query the Transport Features of the actually chosen protocols, the Protocol Stack Instances, for this Connection.</p>
-<p id="rfc.section.A.2.p.4">Note that it is possible that the Protocol Stack Instances actually chosen by the transport system do not fully reflect the Transport Parameters that were originally set. For example, a certain Protocol Selection Property that an application specified as Preferred may not actually be present in the chosen Protocol Stack Instances because none of the currently available transport protocols had this feature.</p>
-<p id="rfc.section.A.2.p.5">Protocol Stacks and Protocol Stack Instances also have Protocol Properties, which represent the specific configuration of a transport protocol. Their default values can be queried at all times, and an application can override these defaults for a specific Connection by specifying Protocol Properties either during pre-establishment or later in the lifetime of a Connection. This configuration is applied on the Protocol Stack Instance once it is bound to the Connection.</p>
-<p id="rfc.section.A.2.p.6">Note that some Protocol Properties set during Pre-Establishment may not apply to the actually chosen protocol later, and consequently not be set in the resulting Protocol Stack Instance. However, it is beneficial for an application to set these properties as early as possible, so the transport system can use them to optimize.</p>
-<p id="rfc.section.A.2.p.7">Finally, an application may query the properties of the available paths and the properties of the path(s) chosen for a Connection at all times.</p>
-<p id="rfc.section.A.2.p.8">An application may also specify Send Properties per individual Content, as specified in <a href="#send-props" class="xref">Section 7.1</a>.</p>
-<p id="rfc.section.A.2.p.9">The following table shows the types of existing properties and what an application can do with them during what phase:</p>
+<p id="rfc.section.B.2.p.1">In this appendix we give an overview of the different types of properties, the objects to which they apply, and at what time an application can query them.</p>
+<p id="rfc.section.B.2.p.2">During the Pre-Establishment phase, an application may specify Transport Parameters for a Connection as described in <a href="#transport-params" class="xref">Section 5.2</a>.  Specifically, Protocol Selection Properties, Path Selection Properties, and Application Intents for the Connection MUST be specified during Pre-Establishment, as protocol and path selection occur during connection establishment. An application may query the Transport Parameters that were specified for a Connection at all times.</p>
+<p id="rfc.section.B.2.p.3">Transport Features represent the actual capabilities of specific Protocol Stacks. They are expressed in the same vocabulary as Protocol Selection Properties, but have a Boolean value expressing whether a Protocol Stack support the given Transport Feature or not. An application may query the Transport Features of Protocol Stacks at all times. Once a Connection is established, an application may query the Transport Features of the actually chosen protocols, the Protocol Stack Instances, for this Connection.</p>
+<p id="rfc.section.B.2.p.4">Note that it is possible that the Protocol Stack Instances actually chosen by the transport system do not fully reflect the Transport Parameters that were originally set. For example, a certain Protocol Selection Property that an application specified as Preferred may not actually be present in the chosen Protocol Stack Instances because none of the currently available transport protocols had this feature.</p>
+<p id="rfc.section.B.2.p.5">Protocol Stacks and Protocol Stack Instances also have Protocol Properties, which represent the specific configuration of a transport protocol. Their default values can be queried at all times, and an application can override these defaults for a specific Connection by specifying Protocol Properties either during pre-establishment or later in the lifetime of a Connection. This configuration is applied on the Protocol Stack Instance once it is bound to the Connection.</p>
+<p id="rfc.section.B.2.p.6">Note that some Protocol Properties set during Pre-Establishment may not apply to the actually chosen protocol later, and consequently not be set in the resulting Protocol Stack Instance. However, it is beneficial for an application to set these properties as early as possible, so the transport system can use them to optimize.</p>
+<p id="rfc.section.B.2.p.7">Finally, an application may query the properties of the available paths and the properties of the path(s) chosen for a Connection at all times.</p>
+<p id="rfc.section.B.2.p.8">An application may also specify Send Properties per individual Content, as specified in <a href="#send-props" class="xref">Section 7.1</a>.</p>
+<p id="rfc.section.B.2.p.9">The following table shows the types of existing properties and what an application can do with them during what phase:</p>
 <table cellpadding="3" cellspacing="0" class="tt full center">
 <thead><tr>
 <th class="left">Property Type</th>
