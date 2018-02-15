@@ -335,7 +335,7 @@ address {
 
   <meta name="dct.creator" content="Brunstrom, A., Ed., Pauly, T., Ed., Grinnemo, K-J., Jones, T., and C. Perkins" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-brunstrom-taps-impl-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-02-14" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-02-15" />
   <meta name="dct.abstract" content="The Transport Services architecture " />
   <meta name="description" content="The Transport Services architecture " />
 
@@ -359,7 +359,7 @@ address {
 <td class="right">T. Pauly, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: August 18, 2018</td>
+<td class="left">Expires: August 19, 2018</td>
 <td class="right">Apple Inc.</td>
 </tr>
 <tr>
@@ -388,7 +388,7 @@ address {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">February 14, 2018</td>
+<td class="right">February 15, 2018</td>
 </tr>
 
     	
@@ -404,7 +404,7 @@ address {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on August 18, 2018.</p>
+<p>This Internet-Draft will expire on August 19, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -534,7 +534,29 @@ address {
 <h1 id="rfc.section.3.1">
 <a href="#rfc.section.3.1">3.1.</a> <a href="#configuration-time-errors" id="configuration-time-errors">Configuration-time errors</a>
 </h1>
-<p id="rfc.section.3.1.p.1">Invalid or impossible combinations properties should error out quickly to avoid unexpected results</p>
+<p id="rfc.section.3.1.p.1">When an application creates a new Connection, it specifies Transport Parameters reflecting its preferences regarding Protocol and Path Selection.</p>
+<p id="rfc.section.3.1.p.2">The transport system should have a list of supported protocols available, which each have Transport Features reflecting the capabilities of the protocol. Once an application specifies Transport Paratemeters, the transport system should match the required and prohibited properties against the Transport Features of the available protocols.</p>
+<p id="rfc.section.3.1.p.3">In the following cases the NewConnection() call should fail immediately:</p>
+<p></p>
+
+<ul>
+<li>The application requested Transport Parameters which include requirements or prohibitions that cannot be satisfied by any of the available protocols. For example, if an application requires &#8220;Option to configure reliability for individual Content&#8221;, but no such protocol is available on the host running the transport system, e.g., because SCTP is not supported by the operating system, this should result in an error.</li>
+<li>The application requested Transport Parameters which exclude each other, i.e., the required and prohibited properties cannot be satisfied by the same protocol. For example, if an application prohibits &#8220;Reliable Data Transfer&#8221; but then requires &#8220;Configure Reliability per Content&#8221;, this mismatch should result in an error.</li>
+</ul>
+<p id="rfc.section.3.1.p.5">It is important to fail as early as possible in such cases in order to avoid allocating resources, e.g., to endpoint resolution, only to find out later that there is no protocol that satisfies the requirements.</p>
+<p id="rfc.section.3.1.p.6">[The following probably belongs in later sections.]</p>
+<p id="rfc.section.3.1.p.7">Some errors will only become apparent after Initiate() has been called and Candidate Gathering and Racing has started or after it is complete.</p>
+<p id="rfc.section.3.1.p.8">In the following cases the Initiate() call should fail or the transport system should notify the application with an Error:</p>
+<p></p>
+
+<ul>
+<li>During Candidate Gathering, the transport system finds that there are no usable Candidates to Race.</li>
+<li>During Candidate Racing, the transport system finds that none of the configurations that satisfy all requirements given in the Transport Parameters actually work over the available paths.</li>
+</ul>
+<p id="rfc.section.3.1.p.10">In the following cases the transport system should notify the application with a Warning:</p>
+<p></p>
+
+<ul><li>At any point, the application attempts to set a Protocol Property which does not apply to the actually chosen protocol. In this case, the transport system should fail gracefully, i.e., give a warning to the application, but not terminate the Connection.</li></ul>
 <h1 id="rfc.section.3.2">
 <a href="#rfc.section.3.2">3.2.</a> <a href="#role-of-system-policy" id="role-of-system-policy">Role of system policy</a>
 </h1>
