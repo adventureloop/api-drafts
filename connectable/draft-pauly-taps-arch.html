@@ -306,7 +306,7 @@ address {
 <link href="#rfc.authors" rel="Chapter">
 
 
-  <meta name="generator" content="xml2rfc version 2.9.3 - https://tools.ietf.org/tools/xml2rfc" />
+  <meta name="generator" content="xml2rfc version 2.9.4 - https://tools.ietf.org/tools/xml2rfc" />
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
   <meta name="dct.creator" content="Pauly, T., Ed., Trammell, B., Ed., Brunstrom, A., Fairhurst, G., Perkins, C., Tiesel, P., and C. Wood" />
@@ -648,57 +648,35 @@ address {
 <a href="#rfc.section.4.2">4.2.</a> <a href="#transport-system-implementation-concepts" id="transport-system-implementation-concepts">Transport System Implementation Concepts</a>
 </h1>
 <p id="rfc.section.4.2.p.1">The Transport System Implementation Concepts define the set of objects used internally to a system or library to provide the functionality of transport networking, as required by the abstract interface.</p>
-<p id="rfc.section.4.2.p.2">Connection Group</p>
 <p></p>
 
-<ul class="empty"><li><ul class="empty"><li>For multiplexing transport protocols, a Connection Group is a set of Connections that can be multiplexed together.</li></ul></li></ul>
-<p id="rfc.section.4.2.p.4">Path</p>
-<p></p>
-
-<ul class="empty"><li><ul class="empty"><li>A Path represents an available set of properties of a network route on which packets may be sent or received.</li></ul></li></ul>
-<p id="rfc.section.4.2.p.6">Protocol Instance</p>
-<p></p>
-
-<ul class="empty"><li><ul class="empty"><li>A Protocol Instance is a single instance of one protocol, including any state it has necessary to establish connectivity or send and receive content.</li></ul></li></ul>
-<p id="rfc.section.4.2.p.8">Protocol Stack</p>
-<p></p>
-
-<ul class="empty"><li><ul class="empty"><li>A Protocol Stack is a set of Protocol Instances (including relevant application, security, transport, or Internet protocols) that are used together to establish connectivity or send and receive content. A single stack may be simple (a single transport protocol instance over IP), or complex (multiple application protocol streams going through a single security and transport protocol, over IP; or, a multi-path transport protocol over multiple transport sub-flows).</li></ul></li></ul>
-<p id="rfc.section.4.2.p.10">System Policy</p>
-<p></p>
-
-<ul class="empty"><li><ul class="empty"><li>A Transport Service System Policy defines the algorithm it uses to take connection properties from the application, and determine how it will gather candidate paths and protocols <a href="#gathering" class="xref">Section 4.2.1</a> and race the candidates during establishment <a href="#racing" class="xref">Section 4.2.2</a>.</li></ul></li></ul>
-<p id="rfc.section.4.2.p.12">Association Cache</p>
-<p></p>
-
-<ul class="empty"><li><ul class="empty"><li>The Association Cache holds the state that the implementation keeps for each set of associated endpoints that have been used previously. This can include DNS results, TLS session state, previous success and quality of transport protocols over certain paths.</li></ul></li></ul>
+<ul>
+<li>Connection Group: For multiplexing transport protocols, a Connection Group is a set of Connections that can be multiplexed together.</li>
+<li>Path: A Path represents an available set of properties of a network route on which packets may be sent or received.</li>
+<li>Protocol Instance: A Protocol Instance is a single instance of one protocol, including any state it has necessary to establish connectivity or send and receive content.</li>
+<li>Protocol Stack: A Protocol Stack is a set of Protocol Instances (including relevant application, security, transport, or Internet protocols) that are used together to establish connectivity or send and receive content. A single stack may be simple (a single transport protocol instance over IP), or complex (multiple application protocol streams going through a single security and transport protocol, over IP; or, a multi-path transport protocol over multiple transport sub-flows).</li>
+<li>System Policy: A Transport Service System Policy defines the algorithm it uses to take connection properties from the application, and determine how it will gather candidate paths and protocols <a href="#gathering" class="xref">Section 4.2.1</a> and race the candidates during establishment <a href="#racing" class="xref">Section 4.2.2</a>.</li>
+<li>Association Cache: The Association Cache holds the state that the implementation keeps for each set of associated endpoints that have been used previously. This can include DNS results, TLS session state, previous success and quality of transport protocols over certain paths.</li>
+</ul>
 <h1 id="rfc.section.4.2.1">
 <a href="#rfc.section.4.2.1">4.2.1.</a> <a href="#gathering" id="gathering">Gathering</a>
 </h1>
-<p id="rfc.section.4.2.1.p.1">Path Candidate Identification/Gathering</p>
 <p></p>
 
-<ul class="empty"><li><ul class="empty"><li>Path Selection represents the act of choosing one or more paths that are available to use based on the Path Selection Properties provided by the application, and a Transport Services system&#8217;s policies and heuristics.  [MICHAEL: I find it awkward that the terms and headline here talk about &#8220;Gathering&#8221; but then this description doesn&#8217;t. Maybe because &#8220;Path Selection&#8221; and &#8220;Protocol Selection&#8221; are indeed clearer, easier terms than this Identification/Gathering stuff?]</li></ul></li></ul>
-<p id="rfc.section.4.2.1.p.3">Protocol Candidate Identification/Gathering</p>
-<p></p>
-
-<ul class="empty"><li><ul class="empty"><li>Protocol Selection represents the act of choosing one or more sets of protocol options that are available to use based on the Protocol Properties provided by the application, and a Transport Services system&#8217;s policies and heuristics.  [MICHAEL: Same as above, here&#8230;]</li></ul></li></ul>
+<ul>
+<li>Path Selection: Path Selection represents the act of choosing one or more paths that are available to use based on the Path Selection Properties provided by the application, and a Transport Services system&#8217;s policies and heuristics.</li>
+<li>Protocol Selection: Protocol Selection represents the act of choosing one or more sets of protocol options that are available to use based on the Protocol Properties provided by the application, and a Transport Services system&#8217;s policies and heuristics.</li>
+</ul>
 <h1 id="rfc.section.4.2.2">
 <a href="#rfc.section.4.2.2">4.2.2.</a> <a href="#racing" id="racing">Racing</a>
 </h1>
-<p id="rfc.section.4.2.2.p.1">Protocol Option Racing</p>
-<p id="rfc.section.4.2.2.p.2">[MICHAEL: About all the definitions below: I believe you can&#8217;t &#8220;attempt a stack&#8221;, you can only attempt to <em>use</em> a stack. Not easy to fix in a nice way because of the &#8220;scheduling attempts for&#8221;, but I think as it stands, this is grammatically broken. Then again, I&#8217;m no native speaker!]</p>
 <p></p>
 
-<ul class="empty"><li><ul class="empty"><li>Protocol Racing is the act of attempting, or scheduling attempts for, multiple Protocol Stacks that differ based on the composition of protocols or the options used for protocols.</li></ul></li></ul>
-<p id="rfc.section.4.2.2.p.4">Path Racing</p>
-<p></p>
-
-<ul class="empty"><li><ul class="empty"><li>Path Racing is the act of attempting, or scheduling attempts for, multiple Protocol Stacks that differ based on a selection from the available Paths.</li></ul></li></ul>
-<p id="rfc.section.4.2.2.p.6">Endpoint Racing</p>
-<p></p>
-
-<ul class="empty"><li><ul class="empty"><li>Endpoint Racing is the act of attempting, or scheduling attempts for, multiple Protocol Stacks that differ based on the specific representation of the remote and local endpoints, such as IP addresses resolved from a DNS hostname.</li></ul></li></ul>
+<ul>
+<li>Protocol Option Racing: Protocol Racing is the act of attempting to establish, or scheduling attempts to establish, multiple Protocol Stacks that differ based on the composition of protocols or the options used for protocols.</li>
+<li>Path Racing: Path Racing is the act of attempting to establish, or scheduling attempts to establish, multiple Protocol Stacks that differ based on a selection from the available Paths.</li>
+<li>Endpoint Racing: Endpoint Racing is the act of attempting to establish, or scheduling attempts to establish, multiple Protocol Stacks that differ based on the specific representation of the remote and local endpoints, such as IP addresses resolved from a DNS hostname.</li>
+</ul>
 <h1 id="rfc.section.5">
 <a href="#rfc.section.5">5.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a>
 </h1>

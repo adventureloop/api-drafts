@@ -91,12 +91,12 @@ Table of Contents
        4.1.6.  Termination Actions . . . . . . . . . . . . . . . . .  13
      4.2.  Transport System Implementation Concepts  . . . . . . . .  13
        4.2.1.  Gathering . . . . . . . . . . . . . . . . . . . . . .  14
-       4.2.2.  Racing  . . . . . . . . . . . . . . . . . . . . . . .  15
-   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  15
-   6.  Security Considerations . . . . . . . . . . . . . . . . . . .  15
-   7.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  16
-   8.  Normative References  . . . . . . . . . . . . . . . . . . . .  16
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  17
+       4.2.2.  Racing  . . . . . . . . . . . . . . . . . . . . . . .  14
+   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  14
+   6.  Security Considerations . . . . . . . . . . . . . . . . . . .  14
+   7.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  15
+   8.  Normative References  . . . . . . . . . . . . . . . . . . . .  15
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
 
 1.  Introduction
 
@@ -693,35 +693,35 @@ Internet-Draft              TAPS Architecture              February 2018
    functionality of transport networking, as required by the abstract
    interface.
 
-   Connection Group
+   o  Connection Group: For multiplexing transport protocols, a
+      Connection Group is a set of Connections that can be multiplexed
+      together.
 
+   o  Path: A Path represents an available set of properties of a
+      network route on which packets may be sent or received.
 
+   o  Protocol Instance: A Protocol Instance is a single instance of one
+      protocol, including any state it has necessary to establish
+      connectivity or send and receive content.
 
-         For multiplexing transport protocols, a Connection Group is a
-         set of Connections that can be multiplexed together.
+   o  Protocol Stack: A Protocol Stack is a set of Protocol Instances
+      (including relevant application, security, transport, or Internet
+      protocols) that are used together to establish connectivity or
+      send and receive content.  A single stack may be simple (a single
+      transport protocol instance over IP), or complex (multiple
+      application protocol streams going through a single security and
+      transport protocol, over IP; or, a multi-path transport protocol
+      over multiple transport sub-flows).
 
-   Path
+   o  System Policy: A Transport Service System Policy defines the
+      algorithm it uses to take connection properties from the
+      application, and determine how it will gather candidate paths and
+      protocols Section 4.2.1 and race the candidates during
+      establishment Section 4.2.2.
 
-
-
-         A Path represents an available set of properties of a network
-         route on which packets may be sent or received.
-
-   Protocol Instance
-
-
-
-         A Protocol Instance is a single instance of one protocol,
-         including any state it has necessary to establish connectivity
-         or send and receive content.
-
-   Protocol Stack
-
-
-
-         A Protocol Stack is a set of Protocol Instances (including
-         relevant application, security, transport, or Internet
-         protocols) that are used together to establish connectivity or
+   o  Association Cache: The Association Cache holds the state that the
+      implementation keeps for each set of associated endpoints that
+      have been used previously.  This can include DNS results, TLS
 
 
 
@@ -730,97 +730,38 @@ Pauly, et al.            Expires August 20, 2018               [Page 13]
 Internet-Draft              TAPS Architecture              February 2018
 
 
-         send and receive content.  A single stack may be simple (a
-         single transport protocol instance over IP), or complex
-         (multiple application protocol streams going through a single
-         security and transport protocol, over IP; or, a multi-path
-         transport protocol over multiple transport sub-flows).
-
-   System Policy
-
-
-
-         A Transport Service System Policy defines the algorithm it uses
-         to take connection properties from the application, and
-         determine how it will gather candidate paths and protocols
-         Section 4.2.1 and race the candidates during establishment
-         Section 4.2.2.
-
-   Association Cache
-
-
-
-         The Association Cache holds the state that the implementation
-         keeps for each set of associated endpoints that have been used
-         previously.  This can include DNS results, TLS session state,
-         previous success and quality of transport protocols over
-         certain paths.
+      session state, previous success and quality of transport protocols
+      over certain paths.
 
 4.2.1.  Gathering
 
-   Path Candidate Identification/Gathering
+   o  Path Selection: Path Selection represents the act of choosing one
+      or more paths that are available to use based on the Path
+      Selection Properties provided by the application, and a Transport
+      Services system's policies and heuristics.
 
-
-
-         Path Selection represents the act of choosing one or more paths
-         that are available to use based on the Path Selection
-         Properties provided by the application, and a Transport
-         Services system's policies and heuristics.  [MICHAEL: I find it
-         awkward that the terms and headline here talk about "Gathering"
-         but then this description doesn't.  Maybe because "Path
-         Selection" and "Protocol Selection" are indeed clearer, easier
-         terms than this Identification/Gathering stuff?]
-
-   Protocol Candidate Identification/Gathering
-
-
-
-         Protocol Selection represents the act of choosing one or more
-         sets of protocol options that are available to use based on the
-         Protocol Properties provided by the application, and a
-
-
-
-Pauly, et al.            Expires August 20, 2018               [Page 14]
-
-Internet-Draft              TAPS Architecture              February 2018
-
-
-         Transport Services system's policies and heuristics.  [MICHAEL:
-         Same as above, here...]
+   o  Protocol Selection: Protocol Selection represents the act of
+      choosing one or more sets of protocol options that are available
+      to use based on the Protocol Properties provided by the
+      application, and a Transport Services system's policies and
+      heuristics.
 
 4.2.2.  Racing
 
-   Protocol Option Racing
+   o  Protocol Option Racing: Protocol Racing is the act of attempting
+      to establish, or scheduling attempts to establish, multiple
+      Protocol Stacks that differ based on the composition of protocols
+      or the options used for protocols.
 
-   [MICHAEL: About all the definitions below: I believe you can't
-   "attempt a stack", you can only attempt to _use_ a stack.  Not easy
-   to fix in a nice way because of the "scheduling attempts for", but I
-   think as it stands, this is grammatically broken.  Then again, I'm no
-   native speaker!]
+   o  Path Racing: Path Racing is the act of attempting to establish, or
+      scheduling attempts to establish, multiple Protocol Stacks that
+      differ based on a selection from the available Paths.
 
-
-
-         Protocol Racing is the act of attempting, or scheduling
-         attempts for, multiple Protocol Stacks that differ based on the
-         composition of protocols or the options used for protocols.
-
-   Path Racing
-
-
-
-         Path Racing is the act of attempting, or scheduling attempts
-         for, multiple Protocol Stacks that differ based on a selection
-         from the available Paths.
-
-   Endpoint Racing
-
-
-
-         Endpoint Racing is the act of attempting, or scheduling
-         attempts for, multiple Protocol Stacks that differ based on the
-         specific representation of the remote and local endpoints, such
-         as IP addresses resolved from a DNS hostname.
+   o  Endpoint Racing: Endpoint Racing is the act of attempting to
+      establish, or scheduling attempts to establish, multiple Protocol
+      Stacks that differ based on the specific representation of the
+      remote and local endpoints, such as IP addresses resolved from a
+      DNS hostname.
 
 5.  IANA Considerations
 
@@ -834,17 +775,17 @@ Internet-Draft              TAPS Architecture              February 2018
    algorithms.  Its goal is to offer ease of use for existing protocols
    by providing a generic security-related interface.  Each provided
    interface mimics an existing protocol-specific interface provided by
+   supported security protocols.  For example, trust verification
+   callbacks are common parts of TLS APIs.  TAPS exposes one for similar
+   purposes.  Clients must take care to use security APIs appropriately.
 
 
 
-Pauly, et al.            Expires August 20, 2018               [Page 15]
+Pauly, et al.            Expires August 20, 2018               [Page 14]
 
 Internet-Draft              TAPS Architecture              February 2018
 
 
-   supported security protocols.  For example, trust verification
-   callbacks are common parts of TLS APIs.  TAPS exposes one for similar
-   purposes.  Clients must take care to use security APIs appropriately.
    In cases where clients use said interface to provide sensitive keying
    material, e.g., access to private keys or copies of pre-shared keys
    (PSKs), key use must be validated.  For example, clients SHOULD NOT
@@ -893,7 +834,10 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.            Expires August 20, 2018               [Page 16]
+
+
+
+Pauly, et al.            Expires August 20, 2018               [Page 15]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -949,7 +893,7 @@ Authors' Addresses
 
 
 
-Pauly, et al.            Expires August 20, 2018               [Page 17]
+Pauly, et al.            Expires August 20, 2018               [Page 16]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -1005,4 +949,4 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.            Expires August 20, 2018               [Page 18]
+Pauly, et al.            Expires August 20, 2018               [Page 17]
