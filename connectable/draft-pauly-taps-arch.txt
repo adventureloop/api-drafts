@@ -88,15 +88,15 @@ Table of Contents
        4.1.3.  Establishment Actions . . . . . . . . . . . . . . . .  11
        4.1.4.  Data Transfer Objects and Actions . . . . . . . . . .  11
        4.1.5.  Event Handling  . . . . . . . . . . . . . . . . . . .  12
-       4.1.6.  Termination Actions . . . . . . . . . . . . . . . . .  12
+       4.1.6.  Termination Actions . . . . . . . . . . . . . . . . .  13
      4.2.  Transport System Implementation Concepts  . . . . . . . .  13
        4.2.1.  Gathering . . . . . . . . . . . . . . . . . . . . . .  14
-       4.2.2.  Racing  . . . . . . . . . . . . . . . . . . . . . . .  14
+       4.2.2.  Racing  . . . . . . . . . . . . . . . . . . . . . . .  15
    5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  15
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .  15
    7.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  16
    8.  Normative References  . . . . . . . . . . . . . . . . . . . .  16
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  17
 
 1.  Introduction
 
@@ -458,13 +458,13 @@ Internet-Draft              TAPS Architecture              February 2018
  |   +---------------+     :      +------------+ Connection:
  |                         :      ^   ^    |     Finished  :
  +-- Local Endpoint        :      |   |    |               :
- |                         :      |   |    +-----+         :
- +-- Remote Endpoint       :      |   |          |Content  :
- |                         :      |   |Send()    |Received :
- +-- Path Selection        :      | +---------+  |         :
- |   Properties            :      | | Content |<-+         :
- |                         :      | +---------+            :
- +-- Protocol Selection    :      |                        :
+ |                         :      |   |    +---------+     :
+ +-- Remote Endpoint       :      |   |              |     :
+ |                         :      |   |Send()        |     :
+ +-- Path Selection        :      | +---------+      v     :
+ |   Properties            :      | | Content |  Content   :
+ |                         :      | | to send |  Received  :
+ +-- Protocol Selection    :      | +---------+            :
  |   Properties            :      |                        :
  |                         :      |                        :
  +-- Specific Protocol     :      |                        :
@@ -490,13 +490,13 @@ Internet-Draft              TAPS Architecture              February 2018
       influence the choice of transport that Connection will use.  A
       Preconnection can be fully specified and represent a single
       possible Connection, or it can be partially specified such that it
-      represents a family of possible Connections.
+      represents a family of possible Connections.  The Local Endpoint
+      MUST be specified if the Preconnection is used to Listen() for
+      incoming connections, but is OPTIONAL if it is used to Initiate()
+      connections.  The Remote Endpoint MUST be specified in the
+      Preconnection is used to Initiate() connections, but is OPTIONAL
+      if it is used to Listen() for incoming connections.
 
-   o  Connection: A Connection object represents an active transport
-      protocol instance that can send and/or receive Content between a
-      Local Endpoint and a Remote Endpoint.  It holds state pertaining
-      to the underlying transport protocol instance and any ongoing data
-      transfer.
 
 
 
@@ -505,6 +505,14 @@ Pauly, et al.            Expires August 20, 2018                [Page 9]
 
 Internet-Draft              TAPS Architecture              February 2018
 
+
+   o  Connection: A Connection object represents an active transport
+      protocol instance that can send and/or receive Content between a
+      Local Endpoint and a Remote Endpoint.  It holds state pertaining
+      to the underlying transport protocol instance and any ongoing data
+      transfer.  This represents, for example, an active connection in a
+      connection-oriented protocol such as TCP, or a fully-specified
+      5-tuple for a connectionless protocol such as UDP.
 
    o  Listener: A Listener object accepts incoming transport protocol
       connections from Remote Endpoints and generates corresponding
@@ -519,16 +527,13 @@ Internet-Draft              TAPS Architecture              February 2018
       Examples include "IP address + port", "hostname + port", and "DNS
       service name".
 
-   o  Remote Endpoint: The Remote Endpoint in a properties [MICHAEL: I
-      can't parse "in a properties" here.  Should this be removed?]
-      represents the application's view of a peer that can participate
-      in a transport connection.
+   o  Remote Endpoint: The Remote Endpoint represents the application's
+      name for a peer that can participate in a transport connection.
+      For example, a DNS name for the peer.
 
-   o  Local Endpoint: The Local Endpoint in a properties [MICHAEL: I
-      can't parse "in a properties" here.  Should this be removed?]
-      represents the application's view of itself that it wants to use
-      for transport connections.  This may be optional, or may be
-      generic (a wild card address, for example).
+   o  Local Endpoint: The Local Endpoint represents the application's
+      name for itself that it wants to use for transport connections.
+      For example, a local interface name or address.
 
    o  Path Selection Properties: The Path Selection Properties consist
       of the options that an application may set on a Preconnection to
@@ -548,12 +553,7 @@ Internet-Draft              TAPS Architecture              February 2018
       preferences.  Examples include reliability, service class,
       multipath support, and fast open support.
 
-   o  Specific Protocol Properties: The Specific Protocol Properties
-      refer to the subset of Protocol Properties options that apply to a
-      single protocol (transport protocol, IP, or security protocol).
-      The presence of such Properties on a Preconnection does not
-      necessarily require that a specific protocol must be used when a
-      Connection is established from that Preconnection, but that if
+
 
 
 
@@ -562,6 +562,12 @@ Pauly, et al.            Expires August 20, 2018               [Page 10]
 Internet-Draft              TAPS Architecture              February 2018
 
 
+   o  Specific Protocol Properties: The Specific Protocol Properties
+      refer to the subset of Protocol Properties options that apply to a
+      single protocol (transport protocol, IP, or security protocol).
+      The presence of such Properties on a Preconnection does not
+      necessarily require that a specific protocol must be used when a
+      Connection is established from that Preconnection, but that if
       this protocol is employed, a particular set of options should be
       used.  This is critical to allow compatibility with Protocol
       Properties on peers.
@@ -575,7 +581,9 @@ Internet-Draft              TAPS Architecture              February 2018
       handshake; for other protocols, this may just establish local
       state; and for peer-to-peer protocols, this may begin the process
       of a simultaneous open.  The Initiate() action consumes a
-      Preconnection object and creates a Connection object.
+      Preconnection object and creates a Connection object.  Resolution
+      of the remote endpoint identifier occurs during the Initiate()
+      call.
 
    o  Listen() is the action of marking a Listener as willing to accept
       incoming Connections.  It consumes a Preconnection object.  The
@@ -603,20 +611,19 @@ Internet-Draft              TAPS Architecture              February 2018
       operation may be delivered back to the application in an event
       Section 4.1.5.
 
-   o  Receive() is an action that indicates that the application is
-      ready to asynchronously accept Content over a Connection from a
-      Remote Endpoint, while the Content itself will be delivered in an
-      event Section 4.1.5.  The interface to Receive may include options
-      specific to the Content that is to be delivered to the
-      application.
-
-
 
 
 Pauly, et al.            Expires August 20, 2018               [Page 11]
 
 Internet-Draft              TAPS Architecture              February 2018
 
+
+   o  Receive() is an action that indicates that the application is
+      ready to asynchronously accept Content over a Connection from a
+      Remote Endpoint, while the Content itself will be delivered in an
+      event Section 4.1.5.  The interface to Receive may include options
+      specific to the Content that is to be delivered to the
+      application.
 
 4.1.5.  Event Handling
 
@@ -655,6 +662,18 @@ Internet-Draft              TAPS Architecture              February 2018
       the application that some property of the Connection has changed
       that may influence how and where data is sent and/or received.
 
+
+
+
+
+
+
+
+Pauly, et al.            Expires August 20, 2018               [Page 12]
+
+Internet-Draft              TAPS Architecture              February 2018
+
+
 4.1.6.  Termination Actions
 
    o  Close() is the action an application may take on a Connection to
@@ -666,13 +685,6 @@ Internet-Draft              TAPS Architecture              February 2018
       indicate a Close, but with the additional indication that the
       transport system should not attempt to deliver any outstanding
       data.
-
-
-
-Pauly, et al.            Expires August 20, 2018               [Page 12]
-
-Internet-Draft              TAPS Architecture              February 2018
-
 
 4.2.  Transport System Implementation Concepts
 
@@ -710,6 +722,14 @@ Internet-Draft              TAPS Architecture              February 2018
          A Protocol Stack is a set of Protocol Instances (including
          relevant application, security, transport, or Internet
          protocols) that are used together to establish connectivity or
+
+
+
+Pauly, et al.            Expires August 20, 2018               [Page 13]
+
+Internet-Draft              TAPS Architecture              February 2018
+
+
          send and receive content.  A single stack may be simple (a
          single transport protocol instance over IP), or complex
          (multiple application protocol streams going through a single
@@ -722,14 +742,6 @@ Internet-Draft              TAPS Architecture              February 2018
 
          A Transport Service System Policy defines the algorithm it uses
          to take connection properties from the application, and
-
-
-
-Pauly, et al.            Expires August 20, 2018               [Page 13]
-
-Internet-Draft              TAPS Architecture              February 2018
-
-
          determine how it will gather candidate paths and protocols
          Section 4.2.1 and race the candidates during establishment
          Section 4.2.2.
@@ -766,6 +778,14 @@ Internet-Draft              TAPS Architecture              February 2018
          Protocol Selection represents the act of choosing one or more
          sets of protocol options that are available to use based on the
          Protocol Properties provided by the application, and a
+
+
+
+Pauly, et al.            Expires August 20, 2018               [Page 14]
+
+Internet-Draft              TAPS Architecture              February 2018
+
+
          Transport Services system's policies and heuristics.  [MICHAEL:
          Same as above, here...]
 
@@ -779,11 +799,6 @@ Internet-Draft              TAPS Architecture              February 2018
    think as it stands, this is grammatically broken.  Then again, I'm no
    native speaker!]
 
-
-
-Pauly, et al.            Expires August 20, 2018               [Page 14]
-
-Internet-Draft              TAPS Architecture              February 2018
 
 
          Protocol Racing is the act of attempting, or scheduling
@@ -819,6 +834,14 @@ Internet-Draft              TAPS Architecture              February 2018
    algorithms.  Its goal is to offer ease of use for existing protocols
    by providing a generic security-related interface.  Each provided
    interface mimics an existing protocol-specific interface provided by
+
+
+
+Pauly, et al.            Expires August 20, 2018               [Page 15]
+
+Internet-Draft              TAPS Architecture              February 2018
+
+
    supported security protocols.  For example, trust verification
    callbacks are common parts of TLS APIs.  TAPS exposes one for similar
    purposes.  Clients must take care to use security APIs appropriately.
@@ -834,13 +857,6 @@ Internet-Draft              TAPS Architecture              February 2018
    are not available, its connection MUST fail.  Clients are responsible
    for implementing protocol or version fallback using a TAPS API if so
    desired.
-
-
-
-Pauly, et al.            Expires August 20, 2018               [Page 15]
-
-Internet-Draft              TAPS Architecture              February 2018
-
 
 7.  Acknowledgements
 
@@ -873,6 +889,15 @@ Internet-Draft              TAPS Architecture              February 2018
               DOI 10.17487/RFC8095, March 2017,
               <https://www.rfc-editor.org/info/rfc8095>.
 
+
+
+
+
+Pauly, et al.            Expires August 20, 2018               [Page 16]
+
+Internet-Draft              TAPS Architecture              February 2018
+
+
 Authors' Addresses
 
    Tommy Pauly (editor)
@@ -882,20 +907,6 @@ Authors' Addresses
    United States of America
 
    Email: tpauly@apple.com
-
-
-
-
-
-
-
-
-
-
-
-Pauly, et al.            Expires August 20, 2018               [Page 16]
-
-Internet-Draft              TAPS Architecture              February 2018
 
 
    Brian Trammell (editor)
@@ -934,6 +945,15 @@ Internet-Draft              TAPS Architecture              February 2018
    Email: philipp@inet.tu-berlin.de
 
 
+
+
+
+
+Pauly, et al.            Expires August 20, 2018               [Page 17]
+
+Internet-Draft              TAPS Architecture              February 2018
+
+
    Chris Wood
    Apple Inc.
    One Apple Park Way
@@ -949,4 +969,40 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.            Expires August 20, 2018               [Page 17]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Pauly, et al.            Expires August 20, 2018               [Page 18]
