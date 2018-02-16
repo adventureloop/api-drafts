@@ -85,26 +85,26 @@ Table of Contents
        5.2.1.  Transport Preferences . . . . . . . . . . . . . . . .   7
        5.2.2.  Protocol Properties . . . . . . . . . . . . . . . . .  10
        5.2.3.  Application Intents . . . . . . . . . . . . . . . . .  11
-       5.2.4.  Transport Parameters Object . . . . . . . . . . . . .  14
-     5.3.  Specifying Security Parameters and Callbacks  . . . . . .  15
+       5.2.4.  Transport Parameters Object . . . . . . . . . . . . .  13
+     5.3.  Specifying Security Parameters and Callbacks  . . . . . .  14
    6.  Establishing Connections  . . . . . . . . . . . . . . . . . .  16
-     6.1.  Active Open: Initiate . . . . . . . . . . . . . . . . . .  17
-     6.2.  Passive Open: Listen  . . . . . . . . . . . . . . . . . .  18
+     6.1.  Active Open: Initiate . . . . . . . . . . . . . . . . . .  16
+     6.2.  Passive Open: Listen  . . . . . . . . . . . . . . . . . .  17
      6.3.  Peer to Peer Establishment: Rendezvous  . . . . . . . . .  18
-     6.4.  Connection Groups . . . . . . . . . . . . . . . . . . . .  19
-   7.  Sending Data  . . . . . . . . . . . . . . . . . . . . . . . .  19
+     6.4.  Connection Groups . . . . . . . . . . . . . . . . . . . .  18
+   7.  Sending Data  . . . . . . . . . . . . . . . . . . . . . . . .  18
      7.1.  Send Parameters . . . . . . . . . . . . . . . . . . . . .  20
-       7.1.1.  Content Properties  . . . . . . . . . . . . . . . . .  21
-       7.1.2.  Protocol Properties . . . . . . . . . . . . . . . . .  22
+       7.1.1.  Content Properties  . . . . . . . . . . . . . . . . .  20
+       7.1.2.  Protocol Properties . . . . . . . . . . . . . . . . .  21
        7.1.3.  Application Intents . . . . . . . . . . . . . . . . .  22
-     7.2.  Sender-side Framing . . . . . . . . . . . . . . . . . . .  23
+     7.2.  Sender-side Framing . . . . . . . . . . . . . . . . . . .  22
    8.  Receiving Data  . . . . . . . . . . . . . . . . . . . . . . .  23
-     8.1.  Application-Layer Backpressure at the Receiver  . . . . .  24
+     8.1.  Application-Layer Backpressure at the Receiver  . . . . .  23
      8.2.  Receiver-side Deframing over Stream Protocols . . . . . .  24
-   9.  Maintenance . . . . . . . . . . . . . . . . . . . . . . . . .  25
+   9.  Maintenance . . . . . . . . . . . . . . . . . . . . . . . . .  24
    10. Connection Termination  . . . . . . . . . . . . . . . . . . .  25
-   11. Event and Error Handling  . . . . . . . . . . . . . . . . . .  26
-   12. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  26
+   11. Event and Error Handling  . . . . . . . . . . . . . . . . . .  25
+   12. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  25
    13. Security Considerations . . . . . . . . . . . . . . . . . . .  26
 
 
@@ -115,14 +115,14 @@ Internet-Draft               TAPS Interface                February 2018
 
 
    14. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  26
-   15. References  . . . . . . . . . . . . . . . . . . . . . . . . .  27
-     15.1.  Normative References . . . . . . . . . . . . . . . . . .  27
-     15.2.  Informative References . . . . . . . . . . . . . . . . .  27
+   15. References  . . . . . . . . . . . . . . . . . . . . . . . . .  26
+     15.1.  Normative References . . . . . . . . . . . . . . . . . .  26
+     15.2.  Informative References . . . . . . . . . . . . . . . . .  26
    Appendix A.  Sample API definition in Go  . . . . . . . . . . . .  27
    Appendix B.  Transport Parameters . . . . . . . . . . . . . . . .  30
      B.1.  Application Preferences . . . . . . . . . . . . . . . . .  30
-     B.2.  Specifying and Querying Parameters  . . . . . . . . . . .  32
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  34
+     B.2.  Specifying and Querying Parameters  . . . . . . . . . . .  31
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  33
 
 1.  Introduction
 
@@ -421,27 +421,27 @@ Internet-Draft               TAPS Interface                February 2018
 
    The following properties apply to Connections and Connection Groups:
 
-5.2.1.1.  Reliable Data Transfer
+   o  Reliable Data Transfer: This boolean property specifies whether
+      the application needs the transport protocol to ensure that data
+      is received completely and without corruption on the other side.
+      This also entails being notified when a Connection is closed or
+      aborted.  This property applies to connections and connection
+      groups.  This is a strict requirement.  The default is to enable
+      Reliable Data Transfer.
 
-   This boolean property specifies whether the application needs the
-   transport protocol to ensure that data is received completely and
-   without corruption on the other side.  This also entails being
-   notified when a Connection is closed or aborted.  This property
-   applies to connections and connection groups.  This is a strict
-   requirement.  The default is to enable Reliable Data Transfer.
+   o  Preservation of data ordering: This boolean property specifies
+      whether the application needs the transport protocol to assure
+      that data is received by the application on the other end in the
+      same order as it was sent.  This property applies to connections
+      and connection groups.  This is a strict requirement.  The default
+      is to preserve data ordering.
 
-5.2.1.2.  Preservation of data ordering
-
-   This boolean property specifies whether the application needs the
-   transport protocol to assure that data is received by the application
-   on the other end in the same order as it was sent.  This property
-   applies to connections and connection groups.  This is a strict
-   requirement.  The default is to preserve data ordering.
-
-
-
-
-
+   o  Configure reliability for individual Content: This boolean
+      property specifies whether an application considers it useful to
+      indicate its reliability requirements on a per-Content basis.
+      This property applies to connections and connection groups.  This
+      is not a strict requirement.  The default is to not have this
+      option.
 
 
 
@@ -450,54 +450,54 @@ Trammell, et al.         Expires August 20, 2018                [Page 8]
 Internet-Draft               TAPS Interface                February 2018
 
 
-5.2.1.3.  Configure reliability for individual Content
+   o  Request not to delay acknowledgment (SACK) of Content: This
+      boolean property specifies whether an application considers it
+      useful to request for Content that its acknowledgment be sent out
+      as early as possible (SACK) instead of potentially being bundled
+      with other acknowledgments.  This property applies to connections
+      and connection groups.  This is not a strict requirement.  The
+      default is to not have this option.
 
-   This boolean property specifies whether an application considers it
-   useful to indicate its reliability requirements on a per-Content
-   basis.  This property applies to connections and connection groups.
-   This is not a strict requirement.  The default is to not have this
-   option.
+   o  Use 0-RTT session establishment with idempotent Content: This
+      boolean property specifies whether an application would like to
+      supply a Content to the transport protocol before Connection
+      establishment, which will then be reliably transferred to the
+      other side before or during connection establishment, potentially
+      multiple times.  See also Section 7.1.1.5.  This is a strict
+      requirement.  The default is to not have this option.
 
-5.2.1.4.  Request not to delay acknowledgment (SACK) of Content
+   o  Use Connection Groups with priorities: This boolean property
+      specifies whether an application considers it useful to create
+      Connection Groups and explicitly prioritize between Connections
+      within a Connection Group.
 
-   This boolean property specifies whether an application considers it
-   useful to request for Content that its acknowledgment be sent out as
-   early as possible (SACK) instead of potentially being bundled with
-   other acknowledgments.  This property applies to connections and
-   connection groups.  This is not a strict requirement.  The default is
-   to not have this option.
+   o  Suggest a timeout to the peer: This boolean property specifies
+      whether an application considers it useful to propose a timeout
+      until the connection is assumed to be lost.  This property applies
+      to Connections and Connection Groups.  This is not a strict
+      requirement.  The default is to have this option.
 
-5.2.1.5.  Use 0-RTT session establishment with idempotent Content
+   o  Notification of special errors (excessive retransmissions, ICMP
+      error message arrival): This boolean property specifies whether an
+      application considers it useful to be informed in case sent data
+      was retransmitted more often than a certain threshold, or when an
+      ICMP error message arrives.  This property applies to Connections
+      and Connection Groups.  This is not a strict requirement.  The
+      default is to have this option.
 
-   This boolean property specifies whether an application would like to
-   supply a Content to the transport protocol before Connection
-   establishment, which will then be reliably transferred to the other
-   side before or during connection establishment, potentially multiple
-   times.  See also Section 7.1.1.5.  This is a strict requirement.  The
-   default is to not have this option.
+   o  Control checksum coverage on sending or receiving: This boolean
+      property specifies whether the application considers it useful to
+      enable / disable / configure a checksum when sending Content, or
+      decide whether to require a checksum or not when receiving
+      Content.  This property applies to Connections and Connection
+      Groups.  This is not a strict requirement, as it signifies a
+      reduction in reliability.  The default is full checksum coverage
+      without being able to change it, and requiring a checksum when
+      receiving.
 
-5.2.1.6.  Use Connection Groups with priorities
-
-   This boolean property specifies whether an application considers it
-   useful to create Connection Groups and explicitly prioritize between
-   Connections within a Connection Group.
-
-5.2.1.7.  Suggest a timeout to the peer
-
-   This boolean property specifies whether an application considers it
-   useful to propose a timeout until the connection is assumed to be
-   lost.  This property applies to Connections and Connection Groups.
-   This is not a strict requirement.  The default is to have this
-   option.
-
-5.2.1.8.  Notification of special errors (excessive retransmissions,
-          ICMP error message arrival)
-
-   This boolean property specifies whether an application considers it
-   useful to be informed in case sent data was retransmitted more often
-   than a certain threshold, or when an ICMP error message arrives.
-   This property applies to Connections and Connection Groups.  This is
-   not a strict requirement.  The default is to have this option.
+   o  Interface Type to prefer: This property specifies which kind of
+      access network interface, e.g., WiFi, Ethernet, or LTE, to prefer
+      over others for this connection, in case they are available.  This
 
 
 
@@ -506,32 +506,14 @@ Trammell, et al.         Expires August 20, 2018                [Page 9]
 Internet-Draft               TAPS Interface                February 2018
 
 
-5.2.1.9.  Control checksum coverage on sending or receiving
+      is not a strict requirement.  The default is to use the default
+      interface configured in the system policy.
 
-   This boolean property specifies whether the application considers it
-   useful to enable / disable / configure a checksum when sending
-   Content, or decide whether to require a checksum or not when
-   receiving Content.  This property applies to Connections and
-   Connection Groups.  This is not a strict requirement, as it signifies
-   a reduction in reliability.  The default is full checksum coverage
-   without being able to change it, and requiring a checksum when
-   receiving.
-
-5.2.1.10.  Interface Type to prefer
-
-   This property specifies which kind of access network interface, e.g.,
-   WiFi, Ethernet, or LTE, to prefer over others for this connection, in
-   case they are available.  This is not a strict requirement.  The
-   default is to use the default interface configured in the system
-   policy.
-
-5.2.1.11.  Interface Type to prohibit
-
-   This property specifies which kind of access network interface, e.g.,
-   WiFi, Ethernet, or LTE, to not use for this connection.  This is a
-   strict requirement and connection establishment will fail if no other
-   interface is available.  The default is to not prohibit any
-   particular interface.
+   o  Interface Type to prohibit: This property specifies which kind of
+      access network interface, e.g., WiFi, Ethernet, or LTE, to not use
+      for this connection.  This is a strict requirement and connection
+      establishment will fail if no other interface is available.  The
+      default is to not prohibit any particular interface.
 
 5.2.2.  Protocol Properties
 
@@ -546,14 +528,32 @@ Internet-Draft               TAPS Interface                February 2018
    of these properties depends on the chosen protocol and on the system
    configuration.
 
-5.2.2.1.  Set timeout for aborting Connection
+   o  Set timeout for aborting Connection: This numeric property
+      specifies how long to wait before aborting a Connection.  It is
+      given in seconds.
 
-   This numeric property specifies how long to wait before aborting a
-   Connection.  It is given in seconds.
+   o  Set timeout to suggest to the peer: This numeric property
+      specifies the timeout to propose to the peer.  It is given in
+      seconds.
 
+   o  Set retransmissions before "Excessive Retransmissions": This
+      numeric property specifies after how many retransmissions to
+      inform the application about "Excessive Retransmissions".
 
+   o  Set required minimum coverage of the checksum for receiving: This
+      numeric property specifies the part of the received data that
+      needs to be covered by a checksum.  It is given in Bytes.  A value
+      of 0 means that no checksum is required, and a special value
+      (e.g., -1) indicates full checksum coverage.
 
+   o  Set scheduler for connections in a group: This property specifies
+      which scheduler should be used among Connections within a
+      Connection Group.  It applies to connection groups.  For now we
+      suggest we the schedulers defined in [I-D.ietf-tsvwg-sctp-ndata].
 
+   o  Maximum Content Size Before Connection Establishment: This numeric
+      property can be queried by the application after creating a
+      Connection.  It represents the maximum Content size that can be
 
 
 
@@ -562,36 +562,8 @@ Trammell, et al.         Expires August 20, 2018               [Page 10]
 Internet-Draft               TAPS Interface                February 2018
 
 
-5.2.2.2.  Set timeout to suggest to the peer
-
-   This numeric property specifies the timeout to propose to the peer.
-   It is given in seconds.
-
-5.2.2.3.  Set retransmissions before "Excessive Retransmissions"
-
-   This numeric property specifies after how many retransmissions to
-   inform the application about "Excessive Retransmissions".
-
-5.2.2.4.  Set required minimum coverage of the checksum for receiving
-
-   This numeric property specifies the part of the received data that
-   needs to be covered by a checksum.  It is given in Bytes.  A value of
-   0 means that no checksum is required, and a special value (e.g., -1)
-   indicates full checksum coverage.
-
-5.2.2.5.  Set scheduler for connections in a group
-
-   This property specifies which scheduler should be used among
-   Connections within a Connection Group.  It applies to connection
-   groups.  For now we suggest we the schedulers defined in
-   [I-D.ietf-tsvwg-sctp-ndata].
-
-5.2.2.6.  Maximum Content Size Before Connection Establishment
-
-   This numeric property can be queried by the application after
-   creating a Connection.  It represents the maximum Content size that
-   can be sent before or during Connection establishment, see also
-   Section 7.1.1.5.  It is given in Bytes.
+      sent before or during Connection establishment, see also
+      Section 7.1.1.5.  It is given in Bytes.
 
 5.2.3.  Application Intents
 
@@ -610,14 +582,6 @@ Internet-Draft               TAPS Interface                February 2018
    Application Intents can influence protocol selection, protocol
    configuration, path selection, and endpoint selection.  For example,
    setting the "Timeliness" Intent to "Interactive" may lead the
-
-
-
-Trammell, et al.         Expires August 20, 2018               [Page 11]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    transport system to disable the Nagle algorithm for a connection,
    while setting the "Timeliness" to "Background" may lead it to setting
    the DSCP value to "scavenger".  If the "Size to be Sent" Intent is
@@ -647,6 +611,13 @@ Internet-Draft               TAPS Interface                February 2018
 
    Stream:  Stream of bytes/Content with steady data rate
 
+
+
+Trammell, et al.         Expires August 20, 2018               [Page 11]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    Bulk:  Bulk transfer of large Content, presumably bandwidth bound
 
    The default is to not assume any particular traffic pattern.  Most
@@ -665,14 +636,6 @@ Internet-Draft               TAPS Interface                February 2018
 
    This Intent specifies what the application expects the lifetime of a
    transfer to be.  It is a numeric property and given in milliseconds.
-
-
-
-
-Trammell, et al.         Expires August 20, 2018               [Page 12]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
    Stream Bitrate Sent / Received
 
@@ -702,6 +665,15 @@ Internet-Draft               TAPS Interface                February 2018
 
    The default is "Transfer".
 
+
+
+
+
+Trammell, et al.         Expires August 20, 2018               [Page 12]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
 5.2.3.4.  Disruption Resilience
 
    This Intent describes what an application knows about its own ability
@@ -720,15 +692,6 @@ Internet-Draft               TAPS Interface                February 2018
    Resilient:  Disruptions have minimal impact for the application
 
    The default is "Sensitive".
-
-
-
-
-
-Trammell, et al.         Expires August 20, 2018               [Page 13]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
 5.2.3.5.  Cost Preferences
 
@@ -760,6 +723,13 @@ Internet-Draft               TAPS Interface                February 2018
 
    transportParameters := NewTransportParameters()
 
+
+
+Trammell, et al.         Expires August 20, 2018               [Page 13]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    The Individual parameters are then added to the TransportParameters
    object.  While Protocol Properties and Application Intents use the
    "add" call, Transport Preferences use special calls for the levels
@@ -777,14 +747,6 @@ Internet-Draft               TAPS Interface                February 2018
 
    For an existing connection, the Transport Parameters can be queried
    any time by using the following call on the Connection object:
-
-
-
-
-Trammell, et al.         Expires August 20, 2018               [Page 14]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
    transportParameters := connection.getTransportParameters()
 
@@ -816,6 +778,14 @@ Internet-Draft               TAPS Interface                February 2018
    the client at the time of configuration and actively during a
    handshake.  These configuration parameters are created as follows
 
+
+
+
+Trammell, et al.         Expires August 20, 2018               [Page 14]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    securityParameters := NewSecurityParameters()
 
    Security configuration parameters and sample usage follow:
@@ -833,14 +803,6 @@ Internet-Draft               TAPS Interface                February 2018
       these algorithms SHOULD default to known and safe defaults for the
       system.  Parameters include: ciphersuites, supported groups, and
       signature algorithms.
-
-
-
-
-Trammell, et al.         Expires August 20, 2018               [Page 15]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
 securityParameters.AddSupportedGroup(22)    // secp256k1
 securityParameters.AddCiphersuite(0xCCA9)   // TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256
@@ -873,6 +835,13 @@ securityParameters.AddSignatureAlgorithm(7) // ed25519
    })
    securityParameters.SetTrustVerificationCallback(trustCallback)
 
+
+
+Trammell, et al.         Expires August 20, 2018               [Page 15]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    o  Identity challenge callback: Invoked when a private key operation
       is required, e.g., when local authentication is requested by a
       remote.
@@ -890,14 +859,6 @@ securityParameters.AddSignatureAlgorithm(7) // ed25519
    before establishment, as these parameters will be used to select
    candidate Paths and Protocol Stacks for the Connection.
    Establishment may be active, using the Initiate() Action; passive,
-
-
-
-Trammell, et al.         Expires August 20, 2018               [Page 16]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    using the Listen() Action; or simultaneous for peer-to-peer, using
    the Rendezvous() Action.  These Actions are described in the
    subsections below.
@@ -929,6 +890,14 @@ Internet-Draft               TAPS Interface                February 2018
    The Ready event occurs after Initiate has established a transport-
    layer connection on at least one usable candidate Protocol Stack over
    at least one candidate Path.  No Receive events (see Section 8) will
+
+
+
+Trammell, et al.         Expires August 20, 2018               [Page 16]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    occur until after the Ready event for connections established using
    Initiate.  [MICHAEL: This is a difficult read.  Can we phrase this as
    "...will occur before the Ready event for connections...", or did you
@@ -944,15 +913,6 @@ Internet-Draft               TAPS Interface                February 2018
    connection can be established to the remote endpoint (e.g.  because
    the remote endpoint is not accepting connections, or the application
    is prohibited from opening a connection by the operating system).
-
-
-
-
-
-Trammell, et al.         Expires August 20, 2018               [Page 17]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
 6.2.  Passive Open: Listen
 
@@ -987,6 +947,13 @@ Internet-Draft               TAPS Interface                February 2018
 
    Connection -> ListenError<>
 
+
+
+Trammell, et al.         Expires August 20, 2018               [Page 17]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    A ListenError occurs either when the set of local specifier,
    transport and cryptographic parameters cannot be fulfilled for
    listening, when the local specifier cannot be resolved, or when the
@@ -999,16 +966,6 @@ Internet-Draft               TAPS Interface                February 2018
    Connection -> Ready<>
 
    Connection -> RendezvousError<>
-
-
-
-
-
-
-Trammell, et al.         Expires August 20, 2018               [Page 18]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
 6.4.  Connection Groups
 
@@ -1044,6 +1001,15 @@ Internet-Draft               TAPS Interface                February 2018
 
    Once a Connection has been established, it can be used for sending
    data.  Data is sent by passing a Content object and additional
+
+
+
+
+Trammell, et al.         Expires August 20, 2018               [Page 18]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    parameters Section 7.1 to the Send action on an established
    connection:
 
@@ -1058,14 +1024,6 @@ Internet-Draft               TAPS Interface                February 2018
 
    If Send is called on a Connection which has not yet been established,
    an Initiate action will be implicitly performed simultaneously with
-
-
-
-Trammell, et al.         Expires August 20, 2018               [Page 19]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    the Send.  Used together with the Idempotent property (see
    Section 7.1.1.5), this can be used to send data during establishment
    for 0-RTT session resumption on Protocol Stacks that support it.
@@ -1100,6 +1058,14 @@ Internet-Draft               TAPS Interface                February 2018
 
    Connection -> SendError<contentRef>
 
+
+
+
+Trammell, et al.         Expires August 20, 2018               [Page 19]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    A SendError occurs when Content could not be sent due to an error
    condition: some failure of the underlying Protocol Stack, or a set of
    send parameters not consistent with the Connection's transport
@@ -1113,15 +1079,6 @@ Internet-Draft               TAPS Interface                February 2018
 
    If Send Parameters should be overridden for a specific content, an
    empty sent parameter Object can be acquired and all desired Send
-
-
-
-
-Trammell, et al.         Expires August 20, 2018               [Page 20]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    Parameters can be added to that object.  A Send Parameters object can
    be reused for sending multiple contents with the same properties.
 
@@ -1157,6 +1114,14 @@ Internet-Draft               TAPS Interface                February 2018
    as a non-negative integer.  Content with Niceness 0 will yield to
    Content with Niceness 1, which will yield to Content with Niceness 2,
    and so on.  Niceness may be used as a sender-side scheduling
+
+
+
+Trammell, et al.         Expires August 20, 2018               [Page 20]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    construct only, or be used to specify priorities on the wire for
    Protocol Stacks supporting prioritization.
 
@@ -1170,13 +1135,6 @@ Internet-Draft               TAPS Interface                February 2018
    delivered after the last Content passed to the same Connection via
    the Send action; if false, this Content may be delivered out of
    order.
-
-
-
-Trammell, et al.         Expires August 20, 2018               [Page 21]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
 7.1.1.4.  Immediate
 
@@ -1212,6 +1170,14 @@ Internet-Draft               TAPS Interface                February 2018
    [NOTE: this will be mostly protocol specific stuff as urgent data for
    TCP - maybe also move Checksum here]
 
+
+
+
+Trammell, et al.         Expires August 20, 2018               [Page 21]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
 7.1.3.  Application Intents
 
 7.1.3.1.  Size to be Received
@@ -1226,13 +1192,6 @@ Internet-Draft               TAPS Interface                February 2018
    to be sent with.  This is useful as input for any transport that does
    packet pacing.  It is a numeric property and given in Bytes per
    second.
-
-
-
-Trammell, et al.         Expires August 20, 2018               [Page 22]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
 7.1.3.3.  Stream Bitrate Received
 
@@ -1267,6 +1226,14 @@ Internet-Draft               TAPS Interface                February 2018
    array of octets, the on-the-wire representation of the content to be
    handed down to the Protocol Stack.  It consists of a Framer object
    with a single Action, Frame.  Since the Framer depends on the
+
+
+
+Trammell, et al.         Expires August 20, 2018               [Page 22]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    protocol used at the application layer, it is bound to the Connection
    during the pre-establishment phase:
 
@@ -1282,13 +1249,6 @@ Internet-Draft               TAPS Interface                February 2018
    Once a Connection is established, Content may be received on it.  The
    interface notifies the application that content has been received via
    the Received event:
-
-
-
-Trammell, et al.         Expires August 20, 2018               [Page 23]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
    Connection -> Received<Content>
 
@@ -1323,6 +1283,13 @@ Internet-Draft               TAPS Interface                February 2018
    implementation-platform specific, this document does not specify the
    exact nature of this interface.
 
+
+
+Trammell, et al.         Expires August 20, 2018               [Page 23]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
 8.2.  Receiver-side Deframing over Stream Protocols
 
    The Receive event is intended to be fired once per application-layer
@@ -1338,14 +1305,6 @@ Internet-Draft               TAPS Interface                February 2018
    on the observation that, since many of our current application
    protocols evolved over TCP, which does not provide message boundary
    preservation, and since many of these protocols require message
-
-
-
-Trammell, et al.         Expires August 20, 2018               [Page 24]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    boundaries to function, each application layer protocol has defined
    its own framing.  A Deframer allows an application to push this
    deframing down into the interface, in order to transform an octet
@@ -1377,6 +1336,16 @@ Internet-Draft               TAPS Interface                February 2018
       correspond to the properties given Section 5.2.2 and can be set
       and queried.
 
+
+
+
+
+
+Trammell, et al.         Expires August 20, 2018               [Page 24]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    o  Path Properties of the path(s) in use.  These properties can be
       derived from the local provisioning domain, measurements by the
       protocol stack, or other sources.  They can only be queried.
@@ -1393,15 +1362,6 @@ Internet-Draft               TAPS Interface                February 2018
    application has already given to the transport system.  For example,
    if reliable delivery was requested for Content handed over before
    calling Close, the transport system will ensure that such Content is
-
-
-
-
-Trammell, et al.         Expires August 20, 2018               [Page 25]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    indeed delivered.  If the peer still has data to send, it cannot be
    received after this call.
 
@@ -1432,6 +1392,16 @@ Internet-Draft               TAPS Interface                February 2018
 
    This document has no actions for IANA.
 
+
+
+
+
+
+Trammell, et al.         Expires August 20, 2018               [Page 25]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
 13.  Security Considerations
 
    This document describes a generic API for interacting with a
@@ -1446,17 +1416,6 @@ Internet-Draft               TAPS Interface                February 2018
    This work has received funding from the European Union's Horizon 2020
    research and innovation programme under grant agreements No. 644334
    (NEAT) and No. 688421 (MAMI).
-
-
-
-
-
-
-
-Trammell, et al.         Expires August 20, 2018               [Page 26]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
 15.  References
 
@@ -1489,6 +1448,16 @@ Internet-Draft               TAPS Interface                February 2018
               RFC 793, DOI 10.17487/RFC0793, September 1981,
               <https://www.rfc-editor.org/info/rfc793>.
 
+
+
+
+
+
+Trammell, et al.         Expires August 20, 2018               [Page 26]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    [RFC8095]  Fairhurst, G., Ed., Trammell, B., Ed., and M. Kuehlewind,
               Ed., "Services Provided by IETF Transport Protocols and
               Congestion Control Mechanisms", RFC 8095,
@@ -1505,15 +1474,6 @@ Appendix A.  Sample API definition in Go
    This document defines an abstract interface.  To illustrate how this
    would map concretely into a programming language, this appendix
    contains an API interface definition in Go, using callbacks for event
-
-
-
-
-Trammell, et al.         Expires August 20, 2018               [Page 27]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    handling.  The documentation for the API sketch is available online
    at https://godoc.org/github.com/mami-project/postsocket.
 
@@ -1546,6 +1506,14 @@ type TransportContext interface {
            sp SecurityParameters) (Connection, error)
   Rendezvous(rem Remote, loc Local,
              tp TransportParameters,
+
+
+
+Trammell, et al.         Expires August 20, 2018               [Page 27]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
              sp SecurityParameters) (Connection, error)
   Listen(loc Local,
          tp TransportParameters,
@@ -1562,14 +1530,6 @@ type Remote interface {
 type Local interface {
         WithInterface(iface string) Local
         WithHostname(hostname string) Local
-
-
-
-Trammell, et al.         Expires August 20, 2018               [Page 28]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
         WithAddress(address net.IP) Local
         WithPort(port uint16) Local
         WithServiceName(svc string) Local
@@ -1602,6 +1562,14 @@ type SecurityParameters interface {
 
 type SendParameters struct {
         Lifetime time.Duration
+
+
+
+Trammell, et al.         Expires August 20, 2018               [Page 28]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
         Niceness uint
         Ordered bool
         Immediate bool
@@ -1617,14 +1585,6 @@ type Preconnection interface {
         Rendezvous() (Connection, error)
         Listen() (Connection, error)
 }
-
-
-
-
-Trammell, et al.         Expires August 20, 2018               [Page 29]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
 type Connection interface {
         Send(content interface{}, contentref interface{}, sp SendParameters) error
@@ -1658,6 +1618,14 @@ type FramingHandler interface {
         Deframe(in io.Reader) (Content, error)
 }
 
+
+
+
+Trammell, et al.         Expires August 20, 2018               [Page 29]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
 Appendix B.  Transport Parameters
 
    This appendix provides details about the usage of the Transport
@@ -1674,14 +1642,6 @@ B.1.  Application Preferences
    intention.  If an application does not set its preference regarding a
    Transport Parameter, default preference levels apply as specified in
    the following table.  A default preference of "None" means that the
-
-
-
-Trammell, et al.         Expires August 20, 2018               [Page 30]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    transport system assumes that an application does not have any
    preference regarding the corresponding Transport Parameter and may
    not take this parameter into account for protocol and path selection.
@@ -1717,23 +1677,7 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Trammell, et al.         Expires August 20, 2018               [Page 31]
+Trammell, et al.         Expires August 20, 2018               [Page 30]
 
 Internet-Draft               TAPS Interface                February 2018
 
@@ -1789,7 +1733,7 @@ B.2.  Specifying and Querying Parameters
 
 
 
-Trammell, et al.         Expires August 20, 2018               [Page 32]
+Trammell, et al.         Expires August 20, 2018               [Page 31]
 
 Internet-Draft               TAPS Interface                February 2018
 
@@ -1845,7 +1789,7 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.         Expires August 20, 2018               [Page 33]
+Trammell, et al.         Expires August 20, 2018               [Page 32]
 
 Internet-Draft               TAPS Interface                February 2018
 
@@ -1901,7 +1845,7 @@ Authors' Addresses
 
 
 
-Trammell, et al.         Expires August 20, 2018               [Page 34]
+Trammell, et al.         Expires August 20, 2018               [Page 33]
 
 Internet-Draft               TAPS Interface                February 2018
 
@@ -1957,7 +1901,7 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.         Expires August 20, 2018               [Page 35]
+Trammell, et al.         Expires August 20, 2018               [Page 34]
 
 Internet-Draft               TAPS Interface                February 2018
 
@@ -2013,4 +1957,4 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.         Expires August 20, 2018               [Page 36]
+Trammell, et al.         Expires August 20, 2018               [Page 35]
