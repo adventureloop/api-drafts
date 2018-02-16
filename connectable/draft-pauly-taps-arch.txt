@@ -83,20 +83,20 @@ Table of Contents
      3.3.  Scope for API and Implementation Definitions  . . . . . .   5
    4.  Transport Services Architecture and Concepts  . . . . . . . .   6
      4.1.  Transport Services API Concepts . . . . . . . . . . . . .   7
-       4.1.1.  Basic Objects . . . . . . . . . . . . . . . . . . . .   8
-       4.1.2.  Pre-Establishment . . . . . . . . . . . . . . . . . .   9
-       4.1.3.  Establishment Actions . . . . . . . . . . . . . . . .  10
-       4.1.4.  Data Transfer Objects and Actions . . . . . . . . . .  10
-       4.1.5.  Event Handling  . . . . . . . . . . . . . . . . . . .  11
-       4.1.6.  Termination Actions . . . . . . . . . . . . . . . . .  11
-     4.2.  Transport System Implementation Concepts  . . . . . . . .  12
-       4.2.1.  Gathering . . . . . . . . . . . . . . . . . . . . . .  13
-       4.2.2.  Racing  . . . . . . . . . . . . . . . . . . . . . . .  13
-   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  14
-   6.  Security Considerations . . . . . . . . . . . . . . . . . . .  14
-   7.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  15
-   8.  Normative References  . . . . . . . . . . . . . . . . . . . .  15
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  15
+       4.1.1.  Basic Objects . . . . . . . . . . . . . . . . . . . .   9
+       4.1.2.  Pre-Establishment . . . . . . . . . . . . . . . . . .  10
+       4.1.3.  Establishment Actions . . . . . . . . . . . . . . . .  11
+       4.1.4.  Data Transfer Objects and Actions . . . . . . . . . .  11
+       4.1.5.  Event Handling  . . . . . . . . . . . . . . . . . . .  12
+       4.1.6.  Termination Actions . . . . . . . . . . . . . . . . .  12
+     4.2.  Transport System Implementation Concepts  . . . . . . . .  13
+       4.2.1.  Gathering . . . . . . . . . . . . . . . . . . . . . .  14
+       4.2.2.  Racing  . . . . . . . . . . . . . . . . . . . . . . .  14
+   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  15
+   6.  Security Considerations . . . . . . . . . . . . . . . . . . .  15
+   7.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  16
+   8.  Normative References  . . . . . . . . . . . . . . . . . . . .  16
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
 
 1.  Introduction
 
@@ -421,6 +421,64 @@ Internet-Draft              TAPS Architecture              February 2018
    o  Termination (Section 4.1.6) focuses on the methods by which data
       transmission is ceased, and state is torn down in the transport.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Pauly, et al.            Expires August 20, 2018                [Page 8]
+
+Internet-Draft              TAPS Architecture              February 2018
+
+
+     Pre-Establishment     :       Established             : Termination
+     -----------------     :       -----------             : -----------
+                           :                     Close()   :
+     +---------------+ Initiate() +------------+ Abort()   :
+ +-->| Preconnection |----------->| Connection |---------------> Closed
+ |   +---------------+     :      +------------+ Connection:
+ |                         :      ^   ^    |     Finished  :
+ +-- Local Endpoint        :      |   |    |               :
+ |                         :      |   |    +-----+         :
+ +-- Remote Endpoint       :      |   |          |Content  :
+ |                         :      |   |Send()    |Received :
+ +-- Path Selection        :      | +---------+  |         :
+ |   Properties            :      | | Content |<-+         :
+ |                         :      | +---------+            :
+ +-- Protocol Selection    :      |                        :
+ |   Properties            :      |                        :
+ |                         :      |                        :
+ +-- Specific Protocol     :      |                        :
+ |   Properties            :      |                        :
+ |                         :      |                        :
+ |   +----------+          :      |                        :
+ +-->| Listener |-----------------+                        :
+     +----------+ Connection Received                      :
+           ^               :                               :
+           |               :                               :
+        Listen()           :                               :
+
+                  Figure 2: The lifetime of a connection
+
 4.1.1.  Basic Objects
 
    o  Preconnection: A Preconnection object is a representation of a
@@ -440,16 +498,16 @@ Internet-Draft              TAPS Architecture              February 2018
       to the underlying transport protocol instance and any ongoing data
       transfer.
 
-   o  Listener: A Listener object accepts incoming transport protocol
-      connections from Remote Endpoints and generates corresponding
 
 
 
-Pauly, et al.            Expires August 20, 2018                [Page 8]
+Pauly, et al.            Expires August 20, 2018                [Page 9]
 
 Internet-Draft              TAPS Architecture              February 2018
 
 
+   o  Listener: A Listener object accepts incoming transport protocol
+      connections from Remote Endpoints and generates corresponding
       Connection objects.  It is created from a Preconnection object
       that specifies the type of incoming connections it will accept.
 
@@ -496,16 +554,15 @@ Internet-Draft              TAPS Architecture              February 2018
       The presence of such Properties on a Preconnection does not
       necessarily require that a specific protocol must be used when a
       Connection is established from that Preconnection, but that if
-      this protocol is employed, a particular set of options should be
 
 
 
-
-Pauly, et al.            Expires August 20, 2018                [Page 9]
+Pauly, et al.            Expires August 20, 2018               [Page 10]
 
 Internet-Draft              TAPS Architecture              February 2018
 
 
+      this protocol is employed, a particular set of options should be
       used.  This is critical to allow compatibility with Protocol
       Properties on peers.
 
@@ -556,8 +613,7 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-
-Pauly, et al.            Expires August 20, 2018               [Page 10]
+Pauly, et al.            Expires August 20, 2018               [Page 11]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -613,7 +669,7 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.            Expires August 20, 2018               [Page 11]
+Pauly, et al.            Expires August 20, 2018               [Page 12]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -669,7 +725,7 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.            Expires August 20, 2018               [Page 12]
+Pauly, et al.            Expires August 20, 2018               [Page 13]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -725,7 +781,7 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.            Expires August 20, 2018               [Page 13]
+Pauly, et al.            Expires August 20, 2018               [Page 14]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -781,7 +837,7 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.            Expires August 20, 2018               [Page 14]
+Pauly, et al.            Expires August 20, 2018               [Page 15]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -837,7 +893,7 @@ Authors' Addresses
 
 
 
-Pauly, et al.            Expires August 20, 2018               [Page 15]
+Pauly, et al.            Expires August 20, 2018               [Page 16]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -893,4 +949,4 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.            Expires August 20, 2018               [Page 16]
+Pauly, et al.            Expires August 20, 2018               [Page 17]

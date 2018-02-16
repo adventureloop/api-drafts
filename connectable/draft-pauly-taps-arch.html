@@ -548,6 +548,37 @@ address {
 <li>Event Handling (<a href="#events" class="xref">Section 4.1.5</a>) defines the set of properties that an application may be notified of during the lifetime of transport objects. These may also provide opportunities for the application to interact with the underlying transport.</li>
 <li>Termination (<a href="#termination" class="xref">Section 4.1.6</a>) focuses on the methods by which data transmission is ceased, and state is torn down in the transport.</li>
 </ul>
+<div id="rfc.figure.2"></div>
+<div id="fig-lifetime"></div>
+<pre>
+     Pre-Establishment     :       Established             : Termination
+     -----------------     :       -----------             : -----------
+                           :                     Close()   :
+     +---------------+ Initiate() +------------+ Abort()   :
+ +--&gt;| Preconnection |-----------&gt;| Connection |---------------&gt; Closed
+ |   +---------------+     :      +------------+ Connection:
+ |                         :      ^   ^    |     Finished  :
+ +-- Local Endpoint        :      |   |    |               :
+ |                         :      |   |    +-----+         :
+ +-- Remote Endpoint       :      |   |          |Content  :
+ |                         :      |   |Send()    |Received :
+ +-- Path Selection        :      | +---------+  |         :
+ |   Properties            :      | | Content |&lt;-+         :
+ |                         :      | +---------+            :
+ +-- Protocol Selection    :      |                        :
+ |   Properties            :      |                        :
+ |                         :      |                        :
+ +-- Specific Protocol     :      |                        :
+ |   Properties            :      |                        :
+ |                         :      |                        :
+ |   +----------+          :      |                        :
+ +--&gt;| Listener |-----------------+                        :
+     +----------+ Connection Received                      :
+           ^               :                               :
+           |               :                               :
+        Listen()           :                               :
+</pre>
+<p class="figure">Figure 2: The lifetime of a connection</p>
 <h1 id="rfc.section.4.1.1">
 <a href="#rfc.section.4.1.1">4.1.1.</a> <a href="#objects" id="objects">Basic Objects</a>
 </h1>
