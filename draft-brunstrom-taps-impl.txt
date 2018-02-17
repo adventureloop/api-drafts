@@ -5,14 +5,14 @@
 TAPS Working Group                                     A. Brunstrom, Ed.
 Internet-Draft
 Intended status: Informational                             T. Pauly, Ed.
-Expires: August 20, 2018                                      Apple Inc.
+Expires: August 21, 2018                                      Apple Inc.
                                                            K-J. Grinnemo
                                                      Karlstad University
                                                                 T. Jones
                                                   University of Aberdeen
                                                               C. Perkins
                                                    University of Glasgow
-                                                       February 16, 2018
+                                                       February 17, 2018
 
 
              Implementing Interfaces to Transport Services
@@ -40,7 +40,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on August 20, 2018.
+   This Internet-Draft will expire on August 21, 2018.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Brunstrom, et al.        Expires August 20, 2018                [Page 1]
+Brunstrom, et al.        Expires August 21, 2018                [Page 1]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -90,9 +90,11 @@ Table of Contents
        5.1.1.  Sending content . . . . . . . . . . . . . . . . . . .  15
        5.1.2.  Receiving content . . . . . . . . . . . . . . . . . .  15
      5.2.  Handling of data for fast-open protocols  . . . . . . . .  15
-   6.  Implementing Maintenance Events . . . . . . . . . . . . . . .  16
-   7.  Implementing Termination  . . . . . . . . . . . . . . . . . .  16
-   8.  Cached State  . . . . . . . . . . . . . . . . . . . . . . . .  17
+   6.  Implementing Maintenance  . . . . . . . . . . . . . . . . . .  16
+     6.1.  Changing Protocol Properties  . . . . . . . . . . . . . .  16
+     6.2.  Maintenance Events  . . . . . . . . . . . . . . . . . . .  17
+   7.  Implementing Termination  . . . . . . . . . . . . . . . . . .  17
+   8.  Cached State  . . . . . . . . . . . . . . . . . . . . . . . .  18
      8.1.  Protocol caches . . . . . . . . . . . . . . . . . . . . .  18
      8.2.  Performance caches  . . . . . . . . . . . . . . . . . . .  18
    9.  Specific Transport Protocol Considerations  . . . . . . . . .  18
@@ -104,23 +106,23 @@ Table of Contents
      9.6.  HTTP/2 transport  . . . . . . . . . . . . . . . . . . . .  19
    10. Rendezvous and Environment Discovery  . . . . . . . . . . . .  19
      10.1.  ICE and STUN . . . . . . . . . . . . . . . . . . . . . .  19
-   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  19
-   12. Security Considerations . . . . . . . . . . . . . . . . . . .  19
 
 
 
-Brunstrom, et al.        Expires August 20, 2018                [Page 2]
+Brunstrom, et al.        Expires August 21, 2018                [Page 2]
 
 Internet-Draft             TAPS Implementation             February 2018
 
 
+   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  19
+   12. Security Considerations . . . . . . . . . . . . . . . . . . .  19
      12.1.  Considerations for Candidate Gathering . . . . . . . . .  19
      12.2.  Considerations for Candidate Racing  . . . . . . . . . .  19
    13. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  20
    14. References  . . . . . . . . . . . . . . . . . . . . . . . . .  20
      14.1.  Normative References . . . . . . . . . . . . . . . . . .  20
      14.2.  Informative References . . . . . . . . . . . . . . . . .  20
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  21
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  22
 
 1.  Introduction
 
@@ -163,9 +165,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-
-
-Brunstrom, et al.        Expires August 20, 2018                [Page 3]
+Brunstrom, et al.        Expires August 21, 2018                [Page 3]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -221,7 +221,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 20, 2018                [Page 4]
+Brunstrom, et al.        Expires August 21, 2018                [Page 4]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -277,7 +277,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 20, 2018                [Page 5]
+Brunstrom, et al.        Expires August 21, 2018                [Page 5]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -333,7 +333,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 
 
 
-Brunstrom, et al.        Expires August 20, 2018                [Page 6]
+Brunstrom, et al.        Expires August 21, 2018                [Page 6]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -389,7 +389,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 20, 2018                [Page 7]
+Brunstrom, et al.        Expires August 21, 2018                [Page 7]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -445,7 +445,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 20, 2018                [Page 8]
+Brunstrom, et al.        Expires August 21, 2018                [Page 8]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -501,7 +501,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 20, 2018                [Page 9]
+Brunstrom, et al.        Expires August 21, 2018                [Page 9]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -557,7 +557,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 20, 2018               [Page 10]
+Brunstrom, et al.        Expires August 21, 2018               [Page 10]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -613,7 +613,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 20, 2018               [Page 11]
+Brunstrom, et al.        Expires August 21, 2018               [Page 11]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -669,7 +669,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 20, 2018               [Page 12]
+Brunstrom, et al.        Expires August 21, 2018               [Page 12]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -725,7 +725,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 20, 2018               [Page 13]
+Brunstrom, et al.        Expires August 21, 2018               [Page 13]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -781,7 +781,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 20, 2018               [Page 14]
+Brunstrom, et al.        Expires August 21, 2018               [Page 14]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -837,7 +837,7 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 20, 2018               [Page 15]
+Brunstrom, et al.        Expires August 21, 2018               [Page 15]
 
 Internet-Draft             TAPS Implementation             February 2018
 
@@ -869,7 +869,36 @@ Internet-Draft             TAPS Implementation             February 2018
    send the same early application data, yet encoded (encrypted)
    differently on the wire.
 
-6.  Implementing Maintenance Events
+6.  Implementing Maintenance
+
+6.1.  Changing Protocol Properties
+
+   Appendix A.1 of [I-D.ietf-taps-minset] explains, using primitives
+   that are described in [RFC8303] and [RFC8304], how to implement
+   changing the following protocol properties of an established
+   connection with the TCP and UDP.  Below, we amend this description
+   for other protocols (if applicable): * Set timeout for aborting
+   Connection: for SCTP, this can be done using the primitive
+   CHANGE_TIMEOUT.SCTP described in section 4 of [RFC8303].  * Set
+   timeout to suggest to the peer * Set retransmissions before
+   "Excessive Retransmissions" * Set required minimum coverage of the
+   checksum for receiving: for UDP-Lite, this can be done using the
+   primitive SET_MIN_CHECKSUM_COVERAGE.UDP-Lite described in section 4
+   of [RFC8303].  * Set scheduler for connections in a group: for SCTP,
+   this can be done using the primitive SET_STREAM_SCHEDULER.SCTP
+   described in section 4 of [RFC8303].  * Set priority for a connection
+   in a group: for SCTP, this can be done using the primitive
+   CONFIGURE_STREAM_SCHEDULER.SCTP described in section 4 of [RFC8303].
+
+
+
+
+Brunstrom, et al.        Expires August 21, 2018               [Page 16]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
+6.2.  Maintenance Events
 
    Implications of a network change on a protocol
 
@@ -890,13 +919,6 @@ Internet-Draft             TAPS Implementation             February 2018
    over to be reliably delivered).  However, with TCP only, "close" does
    not mean that the application will stop receiving data.  This is
    related to TCP's ability to support half-closed connections.
-
-
-
-Brunstrom, et al.        Expires August 20, 2018               [Page 16]
-
-Internet-Draft             TAPS Implementation             February 2018
-
 
    SCTP is an example of a protocol that does not support such half-
    closed connections.  Hence, with SCTP, the meaning of "close" is
@@ -924,6 +946,14 @@ Internet-Draft             TAPS Implementation             February 2018
    there is no need for a connection establishment procedure.  Because
    the Connections that are offered by the Transport System can be
    implemented as streams that are multiplexed on a transport protocol's
+
+
+
+Brunstrom, et al.        Expires August 21, 2018               [Page 17]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
    connection, it can therefore not be guaranteed that one Endpoint's
    Initiate action provokes a ConnectionReceived event at its peer.
 
@@ -941,18 +971,6 @@ Internet-Draft             TAPS Implementation             February 2018
 
    Beyond a single connection's lifetime, it is useful to keep state and
    history.
-
-
-
-
-
-
-
-
-Brunstrom, et al.        Expires August 20, 2018               [Page 17]
-
-Internet-Draft             TAPS Implementation             February 2018
-
 
 8.1.  Protocol caches
 
@@ -984,6 +1002,14 @@ Internet-Draft             TAPS Implementation             February 2018
    message (i.e., no messages or partial messages will arrive on other
    streams until the message is complete) (see Section 8.1.20 in
    [RFC6458]).  The "partial flag" can therefore facilitate the
+
+
+
+Brunstrom, et al.        Expires August 21, 2018               [Page 18]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
    implementation of the receiver buffer in the receiving application,
    at the cost of limiting multiplexing and temporarily creating head-
    of-line blocking delay at the receiver.
@@ -1002,13 +1028,6 @@ Internet-Draft             TAPS Implementation             February 2018
    interleaving [RFC8260], which is yet another reason why a receivers-
    side transport system supporting SCTP should implement this
    mechanism.
-
-
-
-Brunstrom, et al.        Expires August 20, 2018               [Page 18]
-
-Internet-Draft             TAPS Implementation             February 2018
-
 
 9.4.  QUIC
 
@@ -1039,6 +1058,14 @@ Internet-Draft             TAPS Implementation             February 2018
    See Section 5.2 for security considerations around racing with 0-RTT
    data.
 
+
+
+
+Brunstrom, et al.        Expires August 21, 2018               [Page 19]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
    An attacker that knows a particular device is racing several options
    during connection establishment may be able to block packets for the
    first connection attempt, thus inducing the device to fall back to a
@@ -1055,17 +1082,6 @@ Internet-Draft             TAPS Implementation             February 2018
    number of child nodes, especially when the state is based on results
    from the network.
 
-
-
-
-
-
-
-Brunstrom, et al.        Expires August 20, 2018               [Page 19]
-
-Internet-Draft             TAPS Implementation             February 2018
-
-
 13.  Acknowledgements
 
    This work has received funding from the European Union's Horizon 2020
@@ -1075,6 +1091,11 @@ Internet-Draft             TAPS Implementation             February 2018
 14.  References
 
 14.1.  Normative References
+
+   [I-D.ietf-taps-minset]
+              Welzl, M. and S. Gjessing, "A Minimal Set of Transport
+              Services for TAPS Systems", draft-ietf-taps-minset-01
+              (work in progress), February 2018.
 
    [I-D.pauly-taps-arch]
               "An Architecture for Transport Services", n.d..
@@ -1090,14 +1111,25 @@ Internet-Draft             TAPS Implementation             February 2018
               and Secure Transport", draft-ietf-quic-transport-09 (work
               in progress), January 2018.
 
+
+
+
+
+
+
+Brunstrom, et al.        Expires August 21, 2018               [Page 20]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
    [I-D.ietf-tls-tls13]
               Rescorla, E., "The Transport Layer Security (TLS) Protocol
               Version 1.3", draft-ietf-tls-tls13-24 (work in progress),
               February 2018.
 
    [NEAT-flow-mapping]
-              ""Transparent Flow Mapping for NEAT"", Workshop on Future
-              of Internet Transport (FIT 2017) , n.d..
+              "Transparent Flow Mapping for NEAT (in Workshop on Future
+              of Internet Transport (FIT 2017))", n.d..
 
    [RFC6458]  Stewart, R., Tuexen, M., Poon, K., Lei, P., and V.
               Yasevich, "Sockets API Extensions for the Stream Control
@@ -1114,24 +1146,37 @@ Internet-Draft             TAPS Implementation             February 2018
               DOI 10.17487/RFC7540, May 2015,
               <https://www.rfc-editor.org/info/rfc7540>.
 
-
-
-
-Brunstrom, et al.        Expires August 20, 2018               [Page 20]
-
-Internet-Draft             TAPS Implementation             February 2018
-
-
    [RFC8260]  Stewart, R., Tuexen, M., Loreto, S., and R. Seggelmann,
               "Stream Schedulers and User Message Interleaving for the
               Stream Control Transmission Protocol", RFC 8260,
               DOI 10.17487/RFC8260, November 2017,
               <https://www.rfc-editor.org/info/rfc8260>.
 
+   [RFC8303]  Welzl, M., Tuexen, M., and N. Khademi, "On the Usage of
+              Transport Features Provided by IETF Transport Protocols",
+              RFC 8303, DOI 10.17487/RFC8303, February 2018,
+              <https://www.rfc-editor.org/info/rfc8303>.
+
+   [RFC8304]  Fairhurst, G. and T. Jones, "Transport Features of the
+              User Datagram Protocol (UDP) and Lightweight UDP (UDP-
+              Lite)", RFC 8304, DOI 10.17487/RFC8304, February 2018,
+              <https://www.rfc-editor.org/info/rfc8304>.
+
    [RFC8305]  Schinazi, D. and T. Pauly, "Happy Eyeballs Version 2:
               Better Connectivity Using Concurrency", RFC 8305,
               DOI 10.17487/RFC8305, December 2017,
               <https://www.rfc-editor.org/info/rfc8305>.
+
+
+
+
+
+
+
+Brunstrom, et al.        Expires August 21, 2018               [Page 21]
+
+Internet-Draft             TAPS Implementation             February 2018
+
 
 Authors' Addresses
 
@@ -1173,4 +1218,15 @@ Authors' Addresses
 
 
 
-Brunstrom, et al.        Expires August 20, 2018               [Page 21]
+
+
+
+
+
+
+
+
+
+
+
+Brunstrom, et al.        Expires August 21, 2018               [Page 22]

@@ -305,7 +305,9 @@ address {
 <link href="#rfc.section.5.1.1" rel="Chapter" title="5.1.1 Sending content">
 <link href="#rfc.section.5.1.2" rel="Chapter" title="5.1.2 Receiving content">
 <link href="#rfc.section.5.2" rel="Chapter" title="5.2 Handling of data for fast-open protocols">
-<link href="#rfc.section.6" rel="Chapter" title="6 Implementing Maintenance Events">
+<link href="#rfc.section.6" rel="Chapter" title="6 Implementing Maintenance">
+<link href="#rfc.section.6.1" rel="Chapter" title="6.1 Changing Protocol Properties">
+<link href="#rfc.section.6.2" rel="Chapter" title="6.2 Maintenance Events">
 <link href="#rfc.section.7" rel="Chapter" title="7 Implementing Termination">
 <link href="#rfc.section.8" rel="Chapter" title="8 Cached State">
 <link href="#rfc.section.8.1" rel="Chapter" title="8.1 Protocol caches">
@@ -330,12 +332,12 @@ address {
 <link href="#rfc.authors" rel="Chapter">
 
 
-  <meta name="generator" content="xml2rfc version 2.9.3 - https://tools.ietf.org/tools/xml2rfc" />
+  <meta name="generator" content="xml2rfc version 2.9.4 - https://tools.ietf.org/tools/xml2rfc" />
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
   <meta name="dct.creator" content="Brunstrom, A., Ed., Pauly, T., Ed., Grinnemo, K-J., Jones, T., and C. Perkins" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-brunstrom-taps-impl-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-02-16" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-02-17" />
   <meta name="dct.abstract" content="The Transport Services architecture " />
   <meta name="description" content="The Transport Services architecture " />
 
@@ -359,7 +361,7 @@ address {
 <td class="right">T. Pauly, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: August 20, 2018</td>
+<td class="left">Expires: August 21, 2018</td>
 <td class="right">Apple Inc.</td>
 </tr>
 <tr>
@@ -388,7 +390,7 @@ address {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">February 16, 2018</td>
+<td class="right">February 17, 2018</td>
 </tr>
 
     	
@@ -404,7 +406,7 @@ address {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on August 20, 2018.</p>
+<p>This Internet-Draft will expire on August 21, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -460,9 +462,13 @@ address {
 </li>
 </ul><li>5.2.   <a href="#rfc.section.5.2">Handling of data for fast-open protocols</a>
 </li>
-</ul><li>6.   <a href="#rfc.section.6">Implementing Maintenance Events</a>
+</ul><li>6.   <a href="#rfc.section.6">Implementing Maintenance</a>
 </li>
-<li>7.   <a href="#rfc.section.7">Implementing Termination</a>
+<ul><li>6.1.   <a href="#rfc.section.6.1">Changing Protocol Properties</a>
+</li>
+<li>6.2.   <a href="#rfc.section.6.2">Maintenance Events</a>
+</li>
+</ul><li>7.   <a href="#rfc.section.7">Implementing Termination</a>
 </li>
 <li>8.   <a href="#rfc.section.8">Cached State</a>
 </li>
@@ -787,16 +793,23 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <p id="rfc.section.5.2.p.4">It is also possible that protocol stacks within a particular leaf node use 0-RTT handshakes without any idempotent application data. For example, TCP Fast Open could use a Client Hello from a TLS as its 0-RTT data, shortening the cumulative handshake time.</p>
 <p id="rfc.section.5.2.p.5">0-RTT handshakes often rely on previous state, such as TCP Fast Open cookies, previously established TLS tickets, or out-of-band distributed pre-shared keys (PSKs). Implementations should be aware of security concerns around using these tokens across multiple addresses or paths when racing. In the case of TLS, any given ticket or PSK SHOULD only be used on one leaf node. If implementations have multiple tickets available from a previous connection, each leaf node attempt MUST use a different ticket. In effect, each leaf node will send the same early application data, yet encoded (encrypted) differently on the wire.</p>
 <h1 id="rfc.section.6">
-<a href="#rfc.section.6">6.</a> <a href="#implementing-maintenance-events" id="implementing-maintenance-events">Implementing Maintenance Events</a>
+<a href="#rfc.section.6">6.</a> <a href="#implementing-maintenance" id="implementing-maintenance">Implementing Maintenance</a>
 </h1>
-<p id="rfc.section.6.p.1">Implications of a network change on a protocol</p>
+<h1 id="rfc.section.6.1">
+<a href="#rfc.section.6.1">6.1.</a> <a href="#changing-protocol-properties" id="changing-protocol-properties">Changing Protocol Properties</a>
+</h1>
+<p id="rfc.section.6.1.p.1">Appendix A.1 of <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a> explains, using primitives that are described in <a href="#RFC8303" class="xref">[RFC8303]</a> and <a href="#RFC8304" class="xref">[RFC8304]</a>, how to implement changing the following protocol properties of an established connection with the TCP and UDP. Below, we amend this description for other protocols (if applicable): * Set timeout for aborting Connection: for SCTP, this can be done using the primitive CHANGE_TIMEOUT.SCTP described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.  * Set timeout to suggest to the peer * Set retransmissions before &#8220;Excessive Retransmissions&#8221; * Set required minimum coverage of the checksum for receiving: for UDP-Lite, this can be done using the primitive SET_MIN_CHECKSUM_COVERAGE.UDP-Lite described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.  * Set scheduler for connections in a group: for SCTP, this can be done using the primitive SET_STREAM_SCHEDULER.SCTP described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.  * Set priority for a connection in a group: for SCTP, this can be done using the primitive CONFIGURE_STREAM_SCHEDULER.SCTP described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.</p>
+<h1 id="rfc.section.6.2">
+<a href="#rfc.section.6.2">6.2.</a> <a href="#maintenance-events" id="maintenance-events">Maintenance Events</a>
+</h1>
+<p id="rfc.section.6.2.p.1">Implications of a network change on a protocol</p>
 <p></p>
 
 <ul>
 <li>Multipath or migratable protocols</li>
 <li>Single-path protocols</li>
 </ul>
-<p id="rfc.section.6.p.3">Quality changes</p>
+<p id="rfc.section.6.2.p.3">Quality changes</p>
 <h1 id="rfc.section.7">
 <a href="#rfc.section.7">7.</a> <a href="#implementing-termination" id="implementing-termination">Implementing Termination</a>
 </h1>
@@ -885,6 +898,11 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <a href="#rfc.references.1">14.1.</a> Normative References</h1>
 <table><tbody>
 <tr>
+<td class="reference"><b id="I-D.ietf-taps-minset">[I-D.ietf-taps-minset]</b></td>
+<td class="top">
+<a>Welzl, M.</a> and <a>S. Gjessing</a>, "<a href="https://tools.ietf.org/html/draft-ietf-taps-minset-01">A Minimal Set of Transport Services for TAPS Systems</a>", Internet-Draft draft-ietf-taps-minset-01, February 2018.</td>
+</tr>
+<tr>
 <td class="reference"><b id="I-D.pauly-taps-arch">[I-D.pauly-taps-arch]</b></td>
 <td class="top">"<a>An Architecture for Transport Services</a>", n.d..</td>
 </tr>
@@ -908,7 +926,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 </tr>
 <tr>
 <td class="reference"><b id="NEAT-flow-mapping">[NEAT-flow-mapping]</b></td>
-<td class="top">"<a>&#8220;Transparent Flow Mapping for NEAT&#8220;</a>", Workshop on Future of Internet Transport (FIT 2017) , n.d..</td>
+<td class="top">"<a>Transparent Flow Mapping for NEAT (in Workshop on Future of Internet Transport (FIT 2017))</a>", n.d..</td>
 </tr>
 <tr>
 <td class="reference"><b id="RFC6458">[RFC6458]</b></td>
@@ -929,6 +947,16 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <td class="reference"><b id="RFC8260">[RFC8260]</b></td>
 <td class="top">
 <a>Stewart, R.</a>, <a>Tuexen, M.</a>, <a>Loreto, S.</a> and <a>R. Seggelmann</a>, "<a href="https://tools.ietf.org/html/rfc8260">Stream Schedulers and User Message Interleaving for the Stream Control Transmission Protocol</a>", RFC 8260, DOI 10.17487/RFC8260, November 2017.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC8303">[RFC8303]</b></td>
+<td class="top">
+<a>Welzl, M.</a>, <a>Tuexen, M.</a> and <a>N. Khademi</a>, "<a href="https://tools.ietf.org/html/rfc8303">On the Usage of Transport Features Provided by IETF Transport Protocols</a>", RFC 8303, DOI 10.17487/RFC8303, February 2018.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC8304">[RFC8304]</b></td>
+<td class="top">
+<a>Fairhurst, G.</a> and <a>T. Jones</a>, "<a href="https://tools.ietf.org/html/rfc8304">Transport Features of the User Datagram Protocol (UDP) and Lightweight UDP (UDP-Lite)</a>", RFC 8304, DOI 10.17487/RFC8304, February 2018.</td>
 </tr>
 <tr>
 <td class="reference"><b id="RFC8305">[RFC8305]</b></td>
