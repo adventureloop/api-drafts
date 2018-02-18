@@ -117,7 +117,7 @@ Internet-Draft               TAPS Interface                February 2018
      15.1.  Normative References . . . . . . . . . . . . . . . . . .  27
      15.2.  Informative References . . . . . . . . . . . . . . . . .  27
    Appendix A.  Sample API definition in Go  . . . . . . . . . . . .  28
-   Appendix B.  Transport Parameters . . . . . . . . . . . . . . . .  30
+   Appendix B.  Transport Parameters . . . . . . . . . . . . . . . .  31
      B.1.  Application Preferences . . . . . . . . . . . . . . . . .  31
      B.2.  Specifying and Querying Parameters  . . . . . . . . . . .  33
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  34
@@ -1525,6 +1525,7 @@ Appendix A.  Sample API definition in Go
 package postsocket
 
 import (
+  "crypto"
   "crypto/tls"
   "io"
   "net"
@@ -1561,7 +1562,6 @@ type Remote interface {
   WithHostname(hostname string) Remote
   WithAddress(address net.IP) Remote
   WithPort(port uint16) Remote
-  WithServiceName(svc string) Remote
 
 
 
@@ -1570,6 +1570,7 @@ Trammell, et al.         Expires August 22, 2018               [Page 28]
 Internet-Draft               TAPS Interface                February 2018
 
 
+  WithServiceName(svc string) Remote
 }
 
 type Local interface {
@@ -1594,11 +1595,39 @@ type TransportParameters interface {
   Prohibit(p ParameterIdentifier, v int) TransportParameters
 }
 
+type SecurityMetadata struct {
+  cert tls.Certificate
+  // ... and so on
+}
+
+const (
+  SecurityCallbackResultSuccess = 0x00
+  SecurityCallbackResultFailure = 0x01
+  SecurityCallbackResultPending = 0x02
+)
+
+type SecurityCallbackResult int
+
 type SecurityParameters interface {
   AddIdentity(c tls.Certificate) SecurityParameters
-  AddPSK(c tls.Certificate, k []byte) SecurityParameters
-  VerifyTrustWith(func(c tls.Certificate) (bool, error)) SecurityParameters
-  HandleChallengeWith(func() (bool, error)) SecurityParameters
+  AddPrivateKey(sk crypto.PrivateKey, pk crypto.PublicKey) SecurityParameters
+  AddPreSharedKey(key []byte, identity string) SecurityParameters
+  AddSupportedGroup(g uint16) SecurityParameters
+  AddCiphersuite(cs uint16) SecurityParameters
+  AddSignatureAlgorithm(cs uint16) SecurityParameters
+  SetSessionCacheCapacity(c int) SecurityParameters
+  SetSessionCacheLifetime(t int) SecurityParameters
+  SetSessionCacheReuse(c int) SecurityParameters
+
+
+
+Trammell, et al.         Expires August 22, 2018               [Page 29]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
+  VerifyTrustWith(func(m SecurityMetadata) (bool, error)) SecurityCallbackResult
+  HandleChallengeWith(func(m SecurityMetadata) (bool, error)) SecurityCallbackResult
   Require(p ParameterIdentifier, v interface{} SecurityParameters
   Prefer(p ParameterIdentifier, v interface{}) SecurityParameters
   Avoid(p ParameterIdentifier, v interface{}) SecurityParameters
@@ -1618,14 +1647,6 @@ type SendParameters struct {
 type Preconnection interface {
   AddSpecifier(rem Remote, loc Local,
                tp TransportParameters, sp SecurityParameters)
-
-
-
-Trammell, et al.         Expires August 22, 2018               [Page 29]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
   Initiate() (Connection, error)
   InitialSend(content interface{}, sp SendParameters) (Connection, error)
   Rendezvous() (Connection, error)
@@ -1653,6 +1674,14 @@ type Content interface {
 // EventHandler defines the interface for connection event handlers.
 type EventHandler interface {
   Ready(conn Connection, ante Connection)
+
+
+
+Trammell, et al.         Expires August 22, 2018               [Page 30]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
   Received(content Content, conn Connection)
   Sent(conn Connection, contentref interface{})
   Expired(conn Connection, contentref interface{})
@@ -1674,13 +1703,6 @@ Appendix B.  Transport Parameters
    levels an application can set for which Transport Parameter, and
    during which phase an application can specify and query what kinds of
    Transport Parameters.
-
-
-
-Trammell, et al.         Expires August 22, 2018               [Page 30]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
 B.1.  Application Preferences
 
@@ -1705,28 +1727,6 @@ B.1.  Application Preferences
    The following table illustrates which Transport Parameter has which
    default preference level and which alternative preference levels an
    application may set.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
