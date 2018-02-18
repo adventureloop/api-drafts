@@ -96,13 +96,13 @@ Table of Contents
      7.1.  Send Parameters . . . . . . . . . . . . . . . . . . . . .  20
        7.1.1.  Content Properties  . . . . . . . . . . . . . . . . .  21
      7.2.  Sender-side Framing . . . . . . . . . . . . . . . . . . .  23
-   8.  Receiving Data  . . . . . . . . . . . . . . . . . . . . . . .  23
-     8.1.  Application-Layer Backpressure at the Receiver  . . . . .  24
-     8.2.  Receiver-side Deframing over Stream Protocols . . . . . .  24
+   8.  Receiving Data  . . . . . . . . . . . . . . . . . . . . . . .  24
+     8.1.  Application-Layer Back-Pressure at the Receiver . . . . .  24
+     8.2.  Receiver-side De-framing over Stream Protocols  . . . . .  24
    9.  Introspection . . . . . . . . . . . . . . . . . . . . . . . .  25
    10. Connection Termination  . . . . . . . . . . . . . . . . . . .  26
-   11. Event and Error Handling  . . . . . . . . . . . . . . . . . .  26
-   12. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  26
+   11. Event and Error Handling  . . . . . . . . . . . . . . . . . .  27
+   12. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  27
    13. Security Considerations . . . . . . . . . . . . . . . . . . .  27
    14. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  27
    15. References  . . . . . . . . . . . . . . . . . . . . . . . . .  27
@@ -115,7 +115,7 @@ Internet-Draft               TAPS Interface                February 2018
 
 
      15.1.  Normative References . . . . . . . . . . . . . . . . . .  27
-     15.2.  Informative References . . . . . . . . . . . . . . . . .  27
+     15.2.  Informative References . . . . . . . . . . . . . . . . .  28
    Appendix A.  Sample API definition in Go  . . . . . . . . . . . .  28
    Appendix B.  Transport Parameters . . . . . . . . . . . . . . . .  31
      B.1.  Application Preferences . . . . . . . . . . . . . . . . .  31
@@ -885,7 +885,7 @@ Internet-Draft               TAPS Interface                February 2018
    Once Initiate is called, the candidate Protocol Stack(s) may cause
    one or more transport-layer connections to be created to the
    specified remote endpoint.  The caller may immediately begin sending
-   Content on the Connection (see Section 7) after calling Initate,
+   Content on the Connection (see Section 7) after calling Initate(),
    though it may wait for one of the following events before doing so.
 
    Connection -> Ready<>
@@ -986,10 +986,10 @@ Internet-Draft               TAPS Interface                February 2018
    parameter for one of them also changes the parameter for all others,
    closing one of them also closes all others, etc.
 
-   There is only one Protocol Property that is not entangled, i.e. it is
-   a separate per-Connection Property for individual Connections in the
-   group: a priority.  This priority, which can be represented as a non-
-   negative integer or float, expresses a desired share of the
+   There is only one Protocol Property that is not entangled, i.e., it
+   is a separate per-Connection Property for individual Connections in
+   the group: a priority.  This priority, which can be represented as a
+   non-negative integer or float, expresses a desired share of the
    Connection Group's available network capacity, such that an ideal
    transport system implementation would assign the Connection the
    capacity share P x C/sum_P, where P = priority, C = total available
@@ -1009,6 +1009,10 @@ Trammell, et al.         Expires August 22, 2018               [Page 18]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   [TASK: If Clone() is a method on Connection, it cannot be called
+   during pre-establishment, since we don't have a Connection at that
+   time (csp)]
 
 7.  Sending Data
 
@@ -1036,8 +1040,8 @@ Internet-Draft               TAPS Interface                February 2018
 
    Connection -> Sent<contentRef>
 
-   The Sent event occurs when a previous Send action has completed, i.e.
-   when the data derived from the Content has been passed down or
+   The Sent event occurs when a previous Send action has completed,
+   i.e., when the data derived from the Content has been passed down or
    through the underlying Protocol Stack and is no longer the
    responsibility of the implementation of this interface.  The exact
    disposition of Content when the Sent event occurs is specific to the
@@ -1053,10 +1057,6 @@ Internet-Draft               TAPS Interface                February 2018
 
    Connection -> Expired<contentRef>
 
-   The Expired event occurs when a previous Send action expired before
-   completion; i.e. when the data derived from the Content was not sent
-   before its Lifetime (see Section 7.1.1.1) expired.  This is separate
-   from SendError, as it is an expected behavior for partially reliable
 
 
 
@@ -1066,6 +1066,10 @@ Trammell, et al.         Expires August 22, 2018               [Page 19]
 Internet-Draft               TAPS Interface                February 2018
 
 
+   The Expired event occurs when a previous Send action expired before
+   completion; i.e. when the data derived from the Content was not sent
+   before its Lifetime (see Section 7.1.1.1) expired.  This is separate
+   from SendError, as it is an expected behavior for partially reliable
    transports.  The Expired event contains an implementation-specific
    reference to the Content to which it applies.
 
@@ -1110,10 +1114,6 @@ Internet-Draft               TAPS Interface                February 2018
    the contents will be sent down to the underlying Protocol Stack and
    transmitted.
 
-   If Send Parameters should be overridden for a specific content, an
-   empty sent parameter Object can be acquired and all desired Send
-   Parameters can be added to that object.  A sendParameters object can
-   be reused for sending multiple contents with the same properties.
 
 
 
@@ -1121,6 +1121,11 @@ Trammell, et al.         Expires August 22, 2018               [Page 20]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   If Send Parameters should be overridden for a specific content, an
+   empty sent parameter Object can be acquired and all desired Send
+   Parameters can be added to that object.  A sendParameters object can
+   be reused for sending multiple contents with the same properties.
 
    sendParameters := NewSendParameters()
    sendParameters.add(parameter, value)
@@ -1161,12 +1166,7 @@ Internet-Draft               TAPS Interface                February 2018
    has a convenient property: priority increases as both Niceness and
    Lifetime decrease.
 
-7.1.1.3.  Ordered
 
-   Ordered is a boolean property.  If true, this Content should be
-   delivered after the last Content passed to the same Connection via
-   the Send action; if false, this Content may be delivered out of
-   order.
 
 
 
@@ -1177,6 +1177,13 @@ Trammell, et al.         Expires August 22, 2018               [Page 21]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+7.1.1.3.  Ordered
+
+   Ordered is a boolean property.  If true, this Content should be
+   delivered after the last Content passed to the same Connection via
+   the Send action; if false, this Content may be delivered out of
+   order.
 
 7.1.1.4.  Immediate
 
@@ -1205,7 +1212,7 @@ Internet-Draft               TAPS Interface                February 2018
    indicate the default.  Only full coverage is guaranteed, any other
    requests are advisory.
 
-7.1.1.7.  Immediate Acknowledgment
+7.1.1.7.  Immediate Acknowledgement
 
    This boolean property specifies, if true, that an application wants
    this Content to be acknowledged immediately by the receiver.  In case
@@ -1215,14 +1222,7 @@ Internet-Draft               TAPS Interface                February 2018
    applications that maintain tight control over the send buffer (see
    Section 7).
 
-7.1.1.8.  Send Bitrate
 
-   This numeric property in Bytes per second specifies at what bitrate
-   the application wishes the content to be sent.  A transport
-   supporting this feature will not exceed the requested Send Bitrate
-   even if flow-control and congestion control allow higher bitrates.
-   This helps to avid bursty traffic pattern on busy video streaming
-   servers.
 
 
 
@@ -1233,6 +1233,15 @@ Trammell, et al.         Expires August 22, 2018               [Page 22]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+7.1.1.8.  Send Bitrate
+
+   This numeric property in Bytes per second specifies at what bitrate
+   the application wishes the content to be sent.  A transport
+   supporting this feature will not exceed the requested Send Bitrate
+   even if flow-control and congestion control allow higher bitrates.
+   This helps to avid bursty traffic pattern on busy video streaming
+   servers.
 
    [PHILS: this my be removed if there is no consensus this this is
    useful.  See https://www.usenix.org/conference/atc12/technical-
@@ -1272,6 +1281,15 @@ Internet-Draft               TAPS Interface                February 2018
 
    OctetArray := Framer.Frame(Content)
 
+
+
+
+
+Trammell, et al.         Expires August 22, 2018               [Page 23]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    Sender-side framing is a convenience feature of the interface, for
    parity with receiver-side framing (see Section 8.2).
 
@@ -1282,13 +1300,6 @@ Internet-Draft               TAPS Interface                February 2018
    the Received event:
 
    Connection -> Received<Content>
-
-
-
-Trammell, et al.         Expires August 22, 2018               [Page 23]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
    As with sending, the type of the Content to be passed is dependent on
    the implementation, and on the constraints on the Protocol Stacks
@@ -1313,7 +1324,7 @@ Internet-Draft               TAPS Interface                February 2018
    Connection are signaled using ConnectionError instead (see
    Section 10).
 
-8.1.  Application-Layer Backpressure at the Receiver
+8.1.  Application-Layer Back-Pressure at the Receiver
 
    Implementations of this interface must provide some way for the
    application to indicate that it is temporarily not ready to receive
@@ -1321,23 +1332,12 @@ Internet-Draft               TAPS Interface                February 2018
    implementation-platform specific, this document does not specify the
    exact nature of this interface.
 
-8.2.  Receiver-side Deframing over Stream Protocols
+8.2.  Receiver-side De-framing over Stream Protocols
 
    The Receive event is intended to be fired once per application-layer
    Content sent by the remote endpoint; i.e., it is a desired property
    of this interface that a Send at one end of a Connection maps to
    exactly one Receive on the other end.  This is possible with Protocol
-   Stacks that provide message boundary preservation, but is not the
-   case over Protocol Stacks that provide a simple octet stream
-   transport.
-
-   For preserving message boundaries over stream transports, this
-   interface provides receiver-side deframing.  This facility is based
-   on the observation that, since many of our current application
-   protocols evolved over TCP, which does not provide message boundary
-   preservation, and since many of these protocols require message
-   boundaries to function, each application layer protocol has defined
-   its own framing.  A Deframer allows an application to push this
 
 
 
@@ -1346,10 +1346,21 @@ Trammell, et al.         Expires August 22, 2018               [Page 24]
 Internet-Draft               TAPS Interface                February 2018
 
 
-   deframing down into the interface, in order to transform an octet
+   Stacks that provide message boundary preservation, but is not the
+   case over Protocol Stacks that provide a simple octet stream
+   transport.
+
+   For preserving message boundaries over stream transports, this
+   interface provides receiver-side de-framing.  This facility is based
+   on the observation that, since many of our current application
+   protocols evolved over TCP, which does not provide message boundary
+   preservation, and since many of these protocols require message
+   boundaries to function, each application layer protocol has defined
+   its own framing.  A Deframer allows an application to push this de-
+   framing down into the interface, in order to transform an octet
    stream into a sequence of Content.
 
-   Concretely, receiver-side deframing allows a caller to provide the
+   Concretely, receiver-side de-framing allows a caller to provide the
    interface with a function that takes an octet stream, as provided by
    the underlying Protocol Stack, reads and returns a sigle Content of
    an appropriate type for the application and platform, and leaves the
@@ -1384,6 +1395,13 @@ Internet-Draft               TAPS Interface                February 2018
       correspond to the properties given in Section 5.2 and can only be
       queried.
 
+
+
+Trammell, et al.         Expires August 22, 2018               [Page 25]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    o  Transport Features of the protocols that were selected, once the
       Connection has been established.  These features correspond to the
       properties given in Section 5.2 and can only be queried.
@@ -1394,14 +1412,6 @@ Internet-Draft               TAPS Interface                February 2018
 
    o  Path Properties of the path(s) in use, once the Connection has
       been established.  These properties can be derived from the local
-
-
-
-Trammell, et al.         Expires August 22, 2018               [Page 25]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
       provisioning domain, measurements by the protocol stack, or other
       sources.  They can only be queried.
 
@@ -1436,16 +1446,6 @@ Internet-Draft               TAPS Interface                February 2018
 
    Connection -> ConnectionError<>
 
-11.  Event and Error Handling
-
-   [NOTE: point out that events and errors may be handled differently,
-   although they are the modeled the same in this specification.]
-
-12.  IANA Considerations
-
-   RFC-EDITOR: Please remove this section before publication.
-
-   This document has no actions for IANA.
 
 
 
@@ -1457,6 +1457,17 @@ Trammell, et al.         Expires August 22, 2018               [Page 26]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+11.  Event and Error Handling
+
+   [NOTE: point out that events and errors may be handled differently,
+   although they are the modeled the same in this specification.]
+
+12.  IANA Considerations
+
+   RFC-EDITOR: Please remove this section before publication.
+
+   This document has no actions for IANA.
 
 13.  Security Considerations
 
@@ -1493,6 +1504,16 @@ Internet-Draft               TAPS Interface                February 2018
               Fairhurst, G., Perkins, C., Tiesel, P., and C. Wood, "An
               Architecture for Transport Services", n.d..
 
+
+
+
+
+
+Trammell, et al.         Expires August 22, 2018               [Page 27]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
 15.2.  Informative References
 
    [I-D.pauly-taps-transport-security]
@@ -1503,16 +1524,6 @@ Internet-Draft               TAPS Interface                February 2018
    [RFC0793]  Postel, J., "Transmission Control Protocol", STD 7,
               RFC 793, DOI 10.17487/RFC0793, September 1981,
               <https://www.rfc-editor.org/info/rfc793>.
-
-
-
-
-
-
-Trammell, et al.         Expires August 22, 2018               [Page 27]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
    [RFC8095]  Fairhurst, G., Ed., Trammell, B., Ed., and M. Kuehlewind,
               Ed., "Services Provided by IETF Transport Protocols and
@@ -1551,6 +1562,14 @@ type TransportContext interface {
   DefaultSendParameters() SendParameters
 
   SetEventHandler(evh EventHandler)
+
+
+
+Trammell, et al.         Expires August 22, 2018               [Page 28]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
   SetFramingHandler(fh FramingHandler)
 
   Preconnect(evh EventHandler, fh FramingHandler,
@@ -1562,14 +1581,6 @@ type TransportContext interface {
            tp TransportParameters,
            sp SecurityParameters) (Connection, error)
   Rendezvous(rem Remote, loc Local,
-
-
-
-Trammell, et al.         Expires August 22, 2018               [Page 28]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
              tp TransportParameters,
              sp SecurityParameters) (Connection, error)
   Listen(loc Local,
@@ -1607,6 +1618,14 @@ type TransportParameters interface {
 }
 
 type SecurityMetadata struct {
+
+
+
+Trammell, et al.         Expires August 22, 2018               [Page 29]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
   cert tls.Certificate
   // ... and so on
 }
@@ -1618,13 +1637,6 @@ const (
 )
 
 type SecurityCallbackResult int
-
-
-
-Trammell, et al.         Expires August 22, 2018               [Page 29]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
 type SecurityParameters interface {
   AddIdentity(c tls.Certificate) SecurityParameters
@@ -1663,6 +1675,13 @@ type Preconnection interface {
   Listen() (Connection, error)
 }
 
+
+
+Trammell, et al.         Expires August 22, 2018               [Page 30]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
 type Connection interface {
   Send(content interface{}, contentref interface{}, sp SendParameters) error
 
@@ -1674,14 +1693,6 @@ type Connection interface {
 
   GetFramingHandler() FramingHandler
   SetFramingHandler(fh FramingHandler)
-
-
-
-Trammell, et al.         Expires August 22, 2018               [Page 30]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
 }
 
 type Content interface {
@@ -1719,6 +1730,14 @@ B.1.  Application Preferences
    As described in Section 5.2, an application can specify its
    preference regarding a Transport Parameter, i.e., whether a certain
    property is required, preferred, to be avoided, prohibited, or an
+
+
+
+Trammell, et al.         Expires August 22, 2018               [Page 31]
+
+Internet-Draft               TAPS Interface                February 2018
+
+
    intention.  If an application does not set its preference regarding a
    Transport Parameter, default preference levels apply as specified in
    the following table.  A default preference of "None" means that the
@@ -1730,14 +1749,6 @@ B.1.  Application Preferences
    preference level.  For example, if an application explicitly
    prohibits selecting a transport protocol that allows to suggest a
    timeout to the RemoteEndpoint, this restriction will unnecessarily
-
-
-
-Trammell, et al.         Expires August 22, 2018               [Page 31]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    limit transport protocol selection.  Instead, the application could
    simply not use this feature if it is present in the selected
    transport protocol.
@@ -1745,17 +1756,6 @@ Internet-Draft               TAPS Interface                February 2018
    The following table illustrates which Transport Parameter has which
    default preference level and which alternative preference levels an
    application may set.
-
-
-
-
-
-
-
-
-
-
-
 
 
 
