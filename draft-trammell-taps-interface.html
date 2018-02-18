@@ -297,7 +297,7 @@ address {
 <link href="#rfc.section.6" rel="Chapter" title="6 Establishing Connections">
 <link href="#rfc.section.6.1" rel="Chapter" title="6.1 Active Open: Initiate">
 <link href="#rfc.section.6.2" rel="Chapter" title="6.2 Passive Open: Listen">
-<link href="#rfc.section.6.3" rel="Chapter" title="6.3 Peer to Peer Establishment: Rendezvous">
+<link href="#rfc.section.6.3" rel="Chapter" title="6.3 Peer-to-Peer Establishment: Rendezvous">
 <link href="#rfc.section.6.4" rel="Chapter" title="6.4 Connection Groups">
 <link href="#rfc.section.7" rel="Chapter" title="7 Sending Data">
 <link href="#rfc.section.7.1" rel="Chapter" title="7.1 Send Parameters">
@@ -456,7 +456,7 @@ address {
 </li>
 <li>6.2.   <a href="#rfc.section.6.2">Passive Open: Listen</a>
 </li>
-<li>6.3.   <a href="#rfc.section.6.3">Peer to Peer Establishment: Rendezvous</a>
+<li>6.3.   <a href="#rfc.section.6.3">Peer-to-Peer Establishment: Rendezvous</a>
 </li>
 <li>6.4.   <a href="#rfc.section.6.4">Connection Groups</a>
 </li>
@@ -602,10 +602,15 @@ localSpecifier := NewEndpoint()
 localSpecifier.withInterface("en0")
 localSpecifier.withPort(443)
 </pre>
+<pre>
+localSpecifier := NewLocalEndpoint()
+localSpecifier.withStunServer(address, port, credentials)
+</pre>
 <p id="rfc.section.5.1.p.2">Implementations may also support additional endpoint representations and provide a single NewEndpoint() call that takes different endpoint representations.</p>
 <p id="rfc.section.5.1.p.3">[TASK: match with #initiate / #listen / #rendezvous and make sure the transport stack used is communicated ]</p>
-<p id="rfc.section.5.1.p.4">The transport services API resolves names internally, when Initiate() is called to transform a Preconnection object into a Connection. The API does not need an explicit name resolution method, although it may be useful to provide one for reasons unrelated to transport.</p>
-<p id="rfc.section.5.1.p.5">[NOTE: the API needs MUST be explicit about when name resolution occurs, since the act of resolving a name leaks information, and there may be security implications if this happens unexpectedly.]</p>
+<p id="rfc.section.5.1.p.4">Multiple endpoint identifiers can be specified for each LocalEndpoint and RemoteEndoint.  For example, a LocalEndpoint could be configured with two interface names, or a RemoteEndpoint could be specified via both IPv4 and IPv6 addresses.  The multiple identifiers refer to the same endpoint.</p>
+<p id="rfc.section.5.1.p.5">The transport services API will resolve names internally, when the Initiate(), Listen(), or Rendezvous() method is called establish a connection.  The API does not need the application to resolve names, and premature name resolution can damage performance by limiting the scope for alternate path discovery during connection establishment.  The Resolve() method is, however, provided to resolve a LocalEndpoint or a RemoteEndpoint in cases where this is required, for example with some NAT traversal protocols (see <a href="#rendezvous" class="xref">Section 6.3</a>).</p>
+<p id="rfc.section.5.1.p.6">[NOTE: the API needs MUST be explicit about when name resolution occurs, since the act of resolving a name leaks information, and there may be security implications if this happens unexpectedly.]</p>
 <h1 id="rfc.section.5.2">
 <a href="#rfc.section.5.2">5.2.</a> <a href="#transport-params" id="transport-params">Specifying Transport Parameters</a>
 </h1>
@@ -854,17 +859,26 @@ securityParameters.SetIdentityChallengeCallback(challengeCallback)
 <p id="rfc.section.6.2.p.2">Preconnection.Listen()</p>
 <p id="rfc.section.6.2.p.3">Before calling Listen, the caller must have initialized the Preconnection during the pre-establishment phase with local endpoint specifiers, as well as all parameters necessary for Protocol Stack selection.  The Listen() action consumes the Preconnection. Once Listen() has been called, no further parameters may be bound to the Preconnection, and no subsequent establishment call may be made on the Preconnection.</p>
 <p id="rfc.section.6.2.p.4">Preconnection -&gt; ConnectionReceived&lt;Connection&gt;</p>
-<p id="rfc.section.6.2.p.5">The ConnectionReceived event occurs when a remote endpoint has established a transport-layer connection to this Preconnection or when the remote endpoint has sent its first Content, causing a new Connection to be created. The resulting Connection is contained within the ConnectionReceived event, and is ready to use as soon as it is passed to the application via the event.</p>
+<p id="rfc.section.6.2.p.5">The ConnectionReceived event occurs when a RemoteEndpoint has established a transport-layer connection to this Preconnection (for connection-oriented transport protocols), or when the first Content has been received from the remote endpoint (for connectionless protocols), causing a new Connection to be created. The resulting Connection is contained within the ConnectionReceived event, and is ready to use as soon as it is passed to the application via the event.</p>
 <p id="rfc.section.6.2.p.6">PreConnection -&gt; Error&lt;&gt;</p>
-<p id="rfc.section.6.2.p.7">A ListenError occurs either when the set of local specifier, transport and cryptographic parameters cannot be fulfilled for listening, when the local specifier cannot be resolved, or when the application is prohibited from listening by the operating system.</p>
+<p id="rfc.section.6.2.p.7">A ListenError occurs either when the Preconnection cannot be fulfilled for listening, when the LocalEndpoint (or RemoteEndpoint, if specified) cannot be resolved, or when the application is prohibited from listening by policy.</p>
 <h1 id="rfc.section.6.3">
-<a href="#rfc.section.6.3">6.3.</a> <a href="#rendezvous" id="rendezvous">Peer to Peer Establishment: Rendezvous</a>
+<a href="#rfc.section.6.3">6.3.</a> <a href="#rendezvous" id="rendezvous">Peer-to-Peer Establishment: Rendezvous</a>
 </h1>
-<p id="rfc.section.6.3.p.1">Preconnection.Rendezvous()</p>
-<p id="rfc.section.6.3.p.2">Preconnection -&gt; Ready&lt;&gt;</p>
-<p id="rfc.section.6.3.p.3">PreConnection -&gt; RendezvousError&lt;contentRef, error&gt;</p>
-<p id="rfc.section.6.3.p.4">An RendezvousError  occurs when&#8230;</p>
-<p id="rfc.section.6.3.p.5">[NOTE: this section to be completed in resolution to issue #6]</p>
+<p id="rfc.section.6.3.p.1">Simultaneous peer-to-peer connection establishment is supported by the Rendezvous() action:</p>
+<p id="rfc.section.6.3.p.2">Preconnection.Rendezvous()</p>
+<p id="rfc.section.6.3.p.3">The Preconnection object must be specified with both a LocalEndpoint and a RemoteEndpoint, and also the transport and security parameters needed for protocol stack selection. The Rendezvous() action causes the Preconnection to listen on the LocalEndpoint for an incoming connection from the RemoteEndpoint, while simultaneously trying to establish a connection from the LocalEndpoint to the RemoteEndpoint.  This corresponds to a TCP simultaneous open, for example.</p>
+<p id="rfc.section.6.3.p.4">The Rendezvous() action consumes the Preconnection. Once Rendezvous() has been called, no further parameters may be bound to the Preconnection, and no subsequent establishment call may be made on the Preconnection.</p>
+<p id="rfc.section.6.3.p.5">Preconnection -&gt; Rendezvoused&lt;Connection&gt;</p>
+<p id="rfc.section.6.3.p.6">The Rendezvoused&lt;&gt; event occurs when a connection is established with the RemoteEndpoint. For connection-oriented transports, this occurs when the transport-layer connection is established; for connectionless transports, it occurs when the first Content is received from the RemoteEndpoint. The resulting Connection is contained within the Rendezvoused&lt;&gt; event, and is ready to use as soon as it is passed to the application via the event.</p>
+<p id="rfc.section.6.3.p.7">Preconnection -&gt; RendezvousError&lt;contentRef, error&gt;</p>
+<p id="rfc.section.6.3.p.8">An RendezvousError occurs either when the Preconnection cannot be fulfilled for listening, when the LocalEndpoint or RemoteEndpoint cannot be resolved, when no transport-layer connection can be established to the RemoteEndpoint, or when the application is prohibited from rendezvous by policy.</p>
+<p id="rfc.section.6.3.p.9">When using some NAT traversal protocols, e.g., ICE <a href="#RFC5245" class="xref">[RFC5245]</a>, it is expected that the LocalEndpoint will be configured with some method of discovering NAT bindings, e.g., a STUN server. In this case, the LocalEndpoint may resolve to a mixture of local and server reflexive addresses. The Resolve() method on the Preconnection can be used to discover these bindings:</p>
+<pre>
+PreconnectionBindings := Preconnection.Resolve()
+</pre>
+<p id="rfc.section.6.3.p.10">The Resolve() call returns a list of Preconnection objects, that represent the concrete addresses, local and server reflexive, on which a Rendezvous() for the Preconnection will listen for incoming connections. This list can be passed to a peer via a signalling protocol, such as SIP or WebRTC, to configure the remote.</p>
+<p id="rfc.section.6.3.p.11">[NOTE: This API is sufficient for TCP-style simultaneous open, but should be considered experimental for ICE-like protocols.]</p>
 <h1 id="rfc.section.6.4">
 <a href="#rfc.section.6.4">6.4.</a> <a href="#groups" id="groups">Connection Groups</a>
 </h1>
@@ -1065,6 +1079,11 @@ Connection.setProperties()
 <td class="reference"><b id="RFC0793">[RFC0793]</b></td>
 <td class="top">
 <a>Postel, J.</a>, "<a href="https://tools.ietf.org/html/rfc793">Transmission Control Protocol</a>", STD 7, RFC 793, DOI 10.17487/RFC0793, September 1981.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC5245">[RFC5245]</b></td>
+<td class="top">
+<a>Rosenberg, J.</a>, "<a href="https://tools.ietf.org/html/rfc5245">Interactive Connectivity Establishment (ICE): A Protocol for Network Address Translator (NAT) Traversal for Offer/Answer Protocols</a>", RFC 5245, DOI 10.17487/RFC5245, April 2010.</td>
 </tr>
 <tr>
 <td class="reference"><b id="RFC8095">[RFC8095]</b></td>
