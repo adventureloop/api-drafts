@@ -655,7 +655,7 @@ localSpecifier.withPort(443)
 <li>Request not to delay acknowledgment of Content: This boolean property specifies whether an application considers it useful to request for Content that its acknowledgment be sent out as early as possible instead of potentially being bundled with other acknowledgments. This property applies to connections and connection groups. This is not a strict requirement. The default is to not have this option.</li>
 <li>Use 0-RTT session establishment with idempotent Content: This boolean property specifies whether an application would like to supply a Content to the transport protocol before Connection establishment, which will then be reliably transferred to the other side before or during connection establishment, potentially multiple times.  See also <a href="#send-idempotent" class="xref">Section 7.1.1.5</a>.  This is a strict requirement. The default is to not have this option.</li>
 <li>Use Connection Groups with priorities: This boolean property specifies whether an application considers it useful to create Connection Groups and explicitly prioritize between Connections within a Connection Group.  This is not a strict requirement.  The default is to not have this option.</li>
-<li>Suggest a timeout to the peer: This boolean property specifies whether an application considers it useful to propose a timeout until the connection is assumed to be lost.  This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</li>
+<li>Suggest a timeout to the RemoteEndpoint: This boolean property specifies whether an application considers it useful to propose a timeout until the connection is assumed to be lost.  This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</li>
 <li>Notification of special errors (excessive retransmissions, ICMP error message arrival): This boolean property specifies whether an application considers it useful to be informed in case sent data was retransmitted more often than a certain threshold, or when an ICMP error message arrives. This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</li>
 <li>Control checksum coverage on sending or receiving: This boolean property specifies whether the application considers it useful to enable / disable / configure a checksum when sending Content, or decide whether to require a checksum or not when receiving Content.  This property applies to Connections and Connection Groups. This is not a strict requirement, as it signifies a reduction in reliability. The default is full checksum coverage without being able to change it, and requiring a checksum when receiving.</li>
 <li>Interface Type to prefer: This property specifies which kind of access network interface, e.g., WiFi, Ethernet, or LTE, to prefer over others for this connection, in case they are available.  This is not a strict requirement. The default is to use the default interface configured in the system policy.</li>
@@ -669,7 +669,7 @@ localSpecifier.withPort(443)
 
 <ul>
 <li>Set timeout for aborting Connection: This numeric property specifies how long to wait before aborting a Connection attempt.  It is given in seconds.</li>
-<li>Set timeout to suggest to the peer: This numeric property specifies the timeout to propose to the peer. It is given in seconds.</li>
+<li>Set timeout to suggest to the RemoteEndpoint: This numeric property specifies the timeout to propose to the RemoteEndpoint. It is given in seconds.</li>
 <li>Set retransmissions before &#8220;Excessive Retransmissions&#8221;: This numeric property specifies after how many retransmissions to inform the application about &#8220;Excessive Retransmissions&#8221;.</li>
 <li>Set required minimum coverage of the checksum for receiving: This numeric property specifies the part of the received data that needs to be covered by a checksum. It is given in Bytes. A value of 0 means that no checksum is required, and a special value (e.g., -1) indicates full checksum coverage.</li>
 <li>Set scheduler for connections in a group: This property specifies which scheduler should be used among Connections within a Connection Group. It applies to connection groups. For now we suggest we the schedulers defined in <a href="#I-D.ietf-tsvwg-sctp-ndata" class="xref">[I-D.ietf-tsvwg-sctp-ndata]</a>.</li>
@@ -783,7 +783,7 @@ securityParameters := NewSecurityParameters()
 <p id="rfc.section.5.3.p.2">Security configuration parameters and sample usage follow:</p>
 <p></p>
 
-<ul><li>Local identity and private keys: Used to perform private key operations and prove one&#8217;s identity to remote peers. (Note, if private keys are not available, e.g., since they are stored in HSMs, handshake callbacks MUST be used. See below for details.)</li></ul>
+<ul><li>Local identity and private keys: Used to perform private key operations and prove one&#8217;s identity to the RemoteEndpoint. (Note, if private keys are not available, e.g., since they are stored in HSMs, handshake callbacks MUST be used. See below for details.)</li></ul>
 <pre>
 securityParameters.AddIdentity(identity)
 securityParameters.AddPrivateKey(privateKey, publicKey)
@@ -806,14 +806,14 @@ securityParameters.SetSessionCacheReuse(1)           // One-time use
 </pre>
 <p></p>
 
-<ul><li>Pre-shared keying material: Used to install pre-shared keying material established out-of-band. Each pre-shared keying material is associated with some identity that typically identifies its use or has some protocol-specific meaning to peers.</li></ul>
+<ul><li>Pre-shared keying material: Used to install pre-shared keying material established out-of-band. Each pre-shared keying material is associated with some identity that typically identifies its use or has some protocol-specific meaning to the RemoteEndpoint.</li></ul>
 <pre>
 securityParameters.AddPreSharedKey(key, identity)
 </pre>
 <p id="rfc.section.5.3.p.7">Security decisions, especially pertaining to trust, are not static. Thus, once configured, parameters must also be supplied during live handshakes. These are best handled as client-provided callbacks. Security handshake callbacks include:</p>
 <p></p>
 
-<ul><li>Trust verification callback: Invoked when a peer&#8217;s trust must be validated before the handshake protocol can proceed.</li></ul>
+<ul><li>Trust verification callback: Invoked when a RemoteEndpoint&#8217;s trust must be validated before the handshake protocol can proceed.</li></ul>
 <pre>
 trustCallback := NewCallback({
   // Handle trust, return the result
@@ -836,24 +836,24 @@ securityParameters.SetIdentityChallengeCallback(challengeCallback)
 <h1 id="rfc.section.6.1">
 <a href="#rfc.section.6.1">6.1.</a> <a href="#initiate" id="initiate">Active Open: Initiate</a>
 </h1>
-<p id="rfc.section.6.1.p.1">Active open is the action of establishing a connection to an endpoint presumed to be listening for incoming connection requests, commonly used by clients in client-server interactions. Active open is supported by this interface through the Initiate action:</p>
+<p id="rfc.section.6.1.p.1">Active open is the action of establishing a connection to a RemoteEndpoint presumed to be listening for incoming connection requests. Active open is used by clients in client-server interactions. Active open is supported by this interface through the Initiate action:</p>
 <p id="rfc.section.6.1.p.2">Connection := Preconnection.Initiate()</p>
-<p id="rfc.section.6.1.p.3">Before calling Initiate, the caller must have populated a Preconnection object with local and remote endpoint specifiers, as well as all parameters necessary for candidate selection. After calling Initiate, no further parameters may be bound to the Connection. The Initiate() call consumes the Preconnection and creates a Connection object. A Preconnection can only be initiated once.</p>
+<p id="rfc.section.6.1.p.3">Before calling Initiate, the caller must have populated a Preconnection object with a RemoteEndpoint specifier, optionally a LocalEndpoint specifier (if not specified, the system will attempt to determine a suitable LocalEndpoint), as well as all parameters necessary for candidate selection. After calling Initiate, no further parameters may be bound to the Connection. The Initiate() call consumes the Preconnection and creates a Connection object. A Preconnection can only be initiated once.</p>
 <p id="rfc.section.6.1.p.4">Once Initiate is called, the candidate Protocol Stack(s) may cause one or more transport-layer connections to be created to the specified remote endpoint.  The caller may immediately begin sending Content on the Connection (see <a href="#sending" class="xref">Section 7</a>) after calling Initate, though it may wait for one of the following events before doing so.</p>
 <p id="rfc.section.6.1.p.5">Connection -&gt; Ready&lt;&gt;</p>
 <p id="rfc.section.6.1.p.6">The Ready event occurs after Initiate has established a transport-layer connection on at least one usable candidate Protocol Stack over at least one candidate Path. No Receive events (see <a href="#receiving" class="xref">Section 8</a>) will occur before the Ready event for connections established using Initiate.</p>
 <p id="rfc.section.6.1.p.7">Connection -&gt; InitiateError&lt;&gt;</p>
-<p id="rfc.section.6.1.p.8">An InitiateError occurs either when the set of local and remote specifiers and transport and cryptographic parameters cannot be fulfilled on a connection for initiation (e.g. the set of available Paths and/or Protocol Stacks meeting the constraints is empty), when the remote specifier cannot be resolved, or when no transport-layer connection can be established to the remote endpoint (e.g.  because the remote endpoint is not accepting connections, or the application is prohibited from opening a connection by the operating system).</p>
+<p id="rfc.section.6.1.p.8">An InitiateError event occurs either when the set of local and remote specifiers and transport and cryptographic parameters cannot be fulfilled on a connection for initiation (e.g. the set of available Paths and/or Protocol Stacks meeting the constraints is empty), when the RemoteEndpoint cannot be resolved, or when no transport-layer connection can be established to the RemoteEndpoint (e.g., because the RemoteEndpoint is not accepting connections, or the application is prohibited from opening a connection by the operating system).</p>
 <h1 id="rfc.section.6.2">
 <a href="#rfc.section.6.2">6.2.</a> <a href="#listen" id="listen">Passive Open: Listen</a>
 </h1>
 <p id="rfc.section.6.2.p.1">Passive open is the action of waiting for connections from remote endpoints, commonly used by servers in client-server interactions. Passive open is supported by this interface through the Listen action:</p>
 <p id="rfc.section.6.2.p.2">Preconnection.Listen()</p>
-<p id="rfc.section.6.2.p.3">Before calling Listen, the caller must have initialized the Preconnection during the pre-establishment phase with local endpoint specifiers, as well as all parameters necessary for Protocol Stack selection.  The Listen() action consumes the Preconnection. Once Listen() has been called, no further parameters may be bound to the Preconnection, and no subsequent establishment call may be made on the Preconnection.</p>
+<p id="rfc.section.6.2.p.3">Before calling Listen, the caller must have initialized the Preconnection during the pre-establishment phase with a LocalEndpoint specifier, as well as all parameters necessary for Protocol Stack selection. A RemoteEndpoint may optionally be specified, to constrain what connections are accepted.  The Listen() action consumes the Preconnection. Once Listen() has been called, no further parameters may be bound to the Preconnection, and no subsequent establishment call may be made on the Preconnection.</p>
 <p id="rfc.section.6.2.p.4">Preconnection -&gt; ConnectionReceived&lt;Connection&gt;</p>
-<p id="rfc.section.6.2.p.5">The ConnectionReceived event occurs when a remote endpoint has established a transport-layer connection to this Preconnection or when the remote endpoint has sent its first Content, causing a new Connection to be created. The resulting Connection is contained within the ConnectionReceived event, and is ready to use as soon as it is passed to the application via the event.</p>
+<p id="rfc.section.6.2.p.5">The ConnectionReceived event occurs when a RemoteEndpoint has established a transport-layer connection to this Preconnection (for connection-oriented transports), or when the RemoteEndpoint has sent its first Content (for connectionless transports), causing a new Connection to be created. The resulting Connection is contained within the ConnectionReceived event, and is ready to use as soon as it is passed to the application via the event.</p>
 <p id="rfc.section.6.2.p.6">PreConnection -&gt; Error&lt;&gt;</p>
-<p id="rfc.section.6.2.p.7">A ListenError occurs either when the set of local specifier, transport and cryptographic parameters cannot be fulfilled for listening, when the local specifier cannot be resolved, or when the application is prohibited from listening by the operating system.</p>
+<p id="rfc.section.6.2.p.7">A ListenError occurs either when the set of LocalEndpoint specifier, transport and cryptographic parameters cannot be fulfilled for listening, when the LocalEndpoint specifier cannot be resolved, or when the application is prohibited from listening by the operating system.</p>
 <h1 id="rfc.section.6.3">
 <a href="#rfc.section.6.3">6.3.</a> <a href="#rendezvous" id="rendezvous">Peer to Peer Establishment: Rendezvous</a>
 </h1>
@@ -1003,9 +1003,9 @@ Connection.setProperties()
 <h1 id="rfc.section.10">
 <a href="#rfc.section.10">10.</a> <a href="#termination" id="termination">Connection Termination</a>
 </h1>
-<p id="rfc.section.10.p.1">Close terminates a Connection after satisfying all the requirements that were specified regarding the delivery of Content that the application has already given to the transport system. For example, if reliable delivery was requested for Content handed over before calling Close, the transport system will ensure that such Content is indeed delivered. If the peer still has data to send, it cannot be received after this call.</p>
+<p id="rfc.section.10.p.1">Close terminates a Connection after satisfying all the requirements that were specified regarding the delivery of Content that the application has already given to the transport system. For example, if reliable delivery was requested for Content handed over before calling Close, the transport system will ensure that such Content is indeed delivered. If the RemoteEndpoint still has data to send, it cannot be received after this call.</p>
 <p id="rfc.section.10.p.2">Connection.Close()</p>
-<p id="rfc.section.10.p.3">The Closed event can inform the application that the peer has closed the Connection; however, there is no guarantee that a remote close will be signaled.</p>
+<p id="rfc.section.10.p.3">The Closed event can inform the application that the RemoteEndpoint has closed the Connection; however, there is no guarantee that a remote close will be signaled.</p>
 <p id="rfc.section.10.p.4">Connection -&gt; Closed&lt;&gt;</p>
 <p id="rfc.section.10.p.5">Abort terminates a Connection without delivering remaining data:</p>
 <p id="rfc.section.10.p.6">Connection.Abort()</p>
@@ -1236,7 +1236,7 @@ type FramingHandler interface {
 <a href="#rfc.appendix.B.1">B.1.</a> <a href="#appendix-preferences" id="appendix-preferences">Application Preferences</a>
 </h1>
 <p id="rfc.section.B.1.p.1">As described in <a href="#transport-params" class="xref">Section 5.2</a>, an application can specify its preference regarding a Transport Parameter, i.e., whether a certain property is required, preferred, to be avoided, prohibited, or an intention. If an application does not set its preference regarding a Transport Parameter, default preference levels apply as specified in the following table. A default preference of &#8220;None&#8221; means that the transport system assumes that an application does not have any preference regarding the corresponding Transport Parameter and may not take this parameter into account for protocol and path selection.</p>
-<p id="rfc.section.B.1.p.2">Not every Transport Parameter can be meaningfully assigned every preference level. For example, if an application explicitly prohibits selecting a transport protocol that allows to suggest a timeout to the peer, this restriction will unnecessarily limit transport protocol selection. Instead, the application could simply not use this feature if it is present in the selected transport protocol.</p>
+<p id="rfc.section.B.1.p.2">Not every Transport Parameter can be meaningfully assigned every preference level. For example, if an application explicitly prohibits selecting a transport protocol that allows to suggest a timeout to the RemoteEndpoint, this restriction will unnecessarily limit transport protocol selection. Instead, the application could simply not use this feature if it is present in the selected transport protocol.</p>
 <p id="rfc.section.B.1.p.3">The following table illustrates which Transport Parameter has which default preference level and which alternative preference levels an application may set.</p>
 <table cellpadding="3" cellspacing="0" class="tt full center">
 <thead><tr>
@@ -1297,7 +1297,7 @@ type FramingHandler interface {
 <td class="left">None</td>
 </tr>
 <tr>
-<td class="left">Suggest timeout to peer</td>
+<td class="left">Suggest timeout to RemoteEndpoint</td>
 <td class="left">Yes</td>
 <td class="left">Yes</td>
 <td class="left">No</td>
