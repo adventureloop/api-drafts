@@ -565,44 +565,41 @@ address {
 <a href="#rfc.section.5">5.</a> <a href="#pre-establishment-phase" id="pre-establishment-phase">Pre-Establishment Phase</a>
 </h1>
 <p id="rfc.section.5.p.1">The pre-establishment phase allows applications to specify parameters for the connections they&#8217;re about to make, or to query the API about potential connections they could make.</p>
-<p id="rfc.section.5.p.2">A Preconnection object represents a potential connection. It has state that describes parameters of a Connection that might exist in the future.  This state comprises information about the local and remote endpoints (see <a href="#endpointspec" class="xref">Section 5.1</a>), the transport parameters (see <a href="#transport-params" class="xref">Section 5.2</a>), and the security parameters (see <a href="#security-parameters" class="xref">Section 5.3</a>):</p>
+<p id="rfc.section.5.p.2">A Preconnection object represents a potential connection. It has state that describes parameters of a Connection that might exist in the future.  This state comprises LocalEndpoint and RemoteEndpoint objects that denote the endpoints of the potential connection (see <a href="#endpointspec" class="xref">Section 5.1</a>), the transport parameters (see <a href="#transport-params" class="xref">Section 5.2</a>), and the security parameters (see <a href="#security-parameters" class="xref">Section 5.3</a>):</p>
 <pre>
-   localEndpoint   := ...
-   remoteEndpoint  := ...
-   transportParams := ...
-   securityParams  := ...
-
-   preConnection := NewPreconnection(localEndpoint, remoteEndpoint,
-                                     transportParams, securityParams);
+   preConnection := NewPreconnection(LocalEndpoint, 
+                                     RemoteEndpoint,
+                                     TransportParams, 
+                                     SecurityParams);
 
 </pre>
-<p id="rfc.section.5.p.3">The Local Endpoint MUST be specified if the Preconnection is used to Listen() for incoming connections, but is OPTIONAL if it is used to Initiate() connections. The Remote Endpoint MUST be specified in the Preconnection is used to Initiate() connections, but is OPTIONAL if it is used to Listen() for incoming connections.</p>
+<p id="rfc.section.5.p.3">The LocalEndpoint MUST be specified if the Preconnection is used to Listen() for incoming connections, but is OPTIONAL if it is used to Initiate() connections. The RemoteEndpoint MUST be specified in the Preconnection is used to Initiate() connections, but is OPTIONAL if it is used to Listen() for incoming connections.</p>
 <p id="rfc.section.5.p.4">[NOTE: note also that framers and de-framers should be bound to the Preconnection object during pre-establishment, forward-reference <a href="#send-framing" class="xref">Section 7.2</a> and <a href="#receive-framing" class="xref">Section 8.2</a>]</p>
 <h1 id="rfc.section.5.1">
 <a href="#rfc.section.5.1">5.1.</a> <a href="#endpointspec" id="endpointspec">Specifying Endpoints</a>
 </h1>
-<p id="rfc.section.5.1.p.1">The transport services API uses Endpoint objects to refer to local and remote endpoints.  Endpoint objects can be configured using various representations of endpoint identifiers, including IP addresses, hostnames, or interface names as well as port numbers and service names:</p>
+<p id="rfc.section.5.1.p.1">The transport services API uses the LocalEndpoint and RemoteEndpoint types to refer to the endpoints of a transport connection.  Subtypes of these represent various different types of endpoint identifiers, such as IP addresses, DNS names, and interface names, as well as port numbers and service names.</p>
 <pre>
-remoteSpecifier := NewEndpoint()
+remoteSpecifier := NewRemoteEndpoint()
 remoteSpecifier.withHostname("example.com")
 remoteSpecifier.withService("https")
 </pre>
 <pre>
-remoteSpecifier := NewEndpoint()
+remoteSpecifier := NewRemoteEndpoint()
 remoteSpecifier.withIPv6Address(2001:db8:4920:e29d:a420:7461:7073:0a)
 remoteSpecifier.withPort(443)
 </pre>
 <pre>
-remoteSpecifier := NewEndpoint()
+remoteSpecifier := NewRemoteEndpoint()
 remoteSpecifier.withIPv4Address(192.0.2.21)
 remoteSpecifier.withPort(443)
 </pre>
 <pre>
-localSpecifier := NewEndpoint()
+localSpecifier := NewLocalEndpoint()
 localSpecifier.withInterface("en0")
 localSpecifier.withPort(443)
 </pre>
-<p id="rfc.section.5.1.p.2">Implementations may also support additional endpoint representations and provide a single NewEndpoint() call that takes different endpoint representations.</p>
+<p id="rfc.section.5.1.p.2">Implementations may also support additional endpoint representations.</p>
 <p id="rfc.section.5.1.p.3">[TASK: match with #initiate / #listen / #rendezvous and make sure the transport stack used is communicated ]</p>
 <p id="rfc.section.5.1.p.4">The transport services API resolves names internally, when Initiate() is called to transform a Preconnection object into a Connection. The API does not need an explicit name resolution method, although it may be useful to provide one for reasons unrelated to transport.</p>
 <p id="rfc.section.5.1.p.5">[NOTE: the API needs MUST be explicit about when name resolution occurs, since the act of resolving a name leaks information, and there may be security implications if this happens unexpectedly.]</p>

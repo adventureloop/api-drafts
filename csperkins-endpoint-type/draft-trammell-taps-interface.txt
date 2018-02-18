@@ -81,7 +81,7 @@ Table of Contents
    4.  API Summary . . . . . . . . . . . . . . . . . . . . . . . . .   5
    5.  Pre-Establishment Phase . . . . . . . . . . . . . . . . . . .   5
      5.1.  Specifying Endpoints  . . . . . . . . . . . . . . . . . .   6
-     5.2.  Specifying Transport Parameters . . . . . . . . . . . . .   7
+     5.2.  Specifying Transport Parameters . . . . . . . . . . . . .   6
        5.2.1.  Transport Preferences . . . . . . . . . . . . . . . .   7
        5.2.2.  Protocol Properties . . . . . . . . . . . . . . . . .  10
        5.2.3.  Application Intents . . . . . . . . . . . . . . . . .  11
@@ -255,24 +255,24 @@ Internet-Draft               TAPS Interface                February 2018
 
    A Preconnection object represents a potential connection.  It has
    state that describes parameters of a Connection that might exist in
-   the future.  This state comprises information about the local and
-   remote endpoints (see Section 5.1), the transport parameters (see
-   Section 5.2), and the security parameters (see Section 5.3):
+   the future.  This state comprises LocalEndpoint and RemoteEndpoint
+   objects that denote the endpoints of the potential connection (see
+   Section 5.1), the transport parameters (see Section 5.2), and the
+   security parameters (see Section 5.3):
 
-     localEndpoint   := ...
-     remoteEndpoint  := ...
-     transportParams := ...
-     securityParams  := ...
-
-     preConnection := NewPreconnection(localEndpoint, remoteEndpoint,
-                                       transportParams, securityParams);
+      preConnection := NewPreconnection(LocalEndpoint,
+                                        RemoteEndpoint,
+                                        TransportParams,
+                                        SecurityParams);
 
 
-   The Local Endpoint MUST be specified if the Preconnection is used to
+   The LocalEndpoint MUST be specified if the Preconnection is used to
    Listen() for incoming connections, but is OPTIONAL if it is used to
-   Initiate() connections.  The Remote Endpoint MUST be specified in the
+   Initiate() connections.  The RemoteEndpoint MUST be specified in the
    Preconnection is used to Initiate() connections, but is OPTIONAL if
    it is used to Listen() for incoming connections.
+
+
 
 
 
@@ -288,31 +288,29 @@ Internet-Draft               TAPS Interface                February 2018
 
 5.1.  Specifying Endpoints
 
-   The transport services API uses Endpoint objects to refer to local
-   and remote endpoints.  Endpoint objects can be configured using
-   various representations of endpoint identifiers, including IP
-   addresses, hostnames, or interface names as well as port numbers and
-   service names:
+   The transport services API uses the LocalEndpoint and RemoteEndpoint
+   types to refer to the endpoints of a transport connection.  Subtypes
+   of these represent various different types of endpoint identifiers,
+   such as IP addresses, DNS names, and interface names, as well as port
+   numbers and service names.
 
-   remoteSpecifier := NewEndpoint()
+   remoteSpecifier := NewRemoteEndpoint()
    remoteSpecifier.withHostname("example.com")
    remoteSpecifier.withService("https")
 
-   remoteSpecifier := NewEndpoint()
+   remoteSpecifier := NewRemoteEndpoint()
    remoteSpecifier.withIPv6Address(2001:db8:4920:e29d:a420:7461:7073:0a)
    remoteSpecifier.withPort(443)
 
-   remoteSpecifier := NewEndpoint()
+   remoteSpecifier := NewRemoteEndpoint()
    remoteSpecifier.withIPv4Address(192.0.2.21)
    remoteSpecifier.withPort(443)
 
-   localSpecifier := NewEndpoint()
+   localSpecifier := NewLocalEndpoint()
    localSpecifier.withInterface("en0")
    localSpecifier.withPort(443)
 
-   Implementations may also support additional endpoint representations
-   and provide a single NewEndpoint() call that takes different endpoint
-   representations.
+   Implementations may also support additional endpoint representations.
 
    [TASK: match with #initiate / #listen / #rendezvous and make sure the
    transport stack used is communicated ]
@@ -326,10 +324,12 @@ Internet-Draft               TAPS Interface                February 2018
    occurs, since the act of resolving a name leaks information, and
    there may be security implications if this happens unexpectedly.]
 
+5.2.  Specifying Transport Parameters
 
-
-
-
+   A Preconnection object holds parameters reflecting the application's
+   requirements and preferences for the transport.  These include
+   Transport Preferences (towards protocol selection and path selection)
+   as well as Application Intents (hints to the transport system what to
 
 
 
@@ -338,12 +338,6 @@ Trammell, et al.         Expires August 22, 2018                [Page 6]
 Internet-Draft               TAPS Interface                February 2018
 
 
-5.2.  Specifying Transport Parameters
-
-   A Preconnection object holds parameters reflecting the application's
-   requirements and preferences for the transport.  These include
-   Transport Preferences (towards protocol selection and path selection)
-   as well as Application Intents (hints to the transport system what to
    optimize for) and Protocol Properties (to configure transport
    protocols).
 
@@ -384,6 +378,12 @@ Internet-Draft               TAPS Interface                February 2018
    pre-establishment phase, but cannot be changed once a Connection has
    been established.
 
+   To reflect the needs of an individual connection, they can be
+   specified with different preference, whereby the preference is one of
+   the following levels:
+
+
+
 
 
 
@@ -393,10 +393,6 @@ Trammell, et al.         Expires August 22, 2018                [Page 7]
 
 Internet-Draft               TAPS Interface                February 2018
 
-
-   To reflect the needs of an individual connection, they can be
-   specified with different preference, whereby the preference is one of
-   the following levels:
 
    +-------------+-----------------------------------------------------+
    | Preference  | Effect                                              |
@@ -442,6 +438,10 @@ Internet-Draft               TAPS Interface                February 2018
    o  Configure reliability for individual Content: This boolean
       property specifies whether an application considers it useful to
       indicate its reliability requirements on a per-Content basis.
+      This property applies to connections and connection groups.  This
+      is not a strict requirement.  The default is to not have this
+      option.
+
 
 
 
@@ -449,10 +449,6 @@ Trammell, et al.         Expires August 22, 2018                [Page 8]
 
 Internet-Draft               TAPS Interface                February 2018
 
-
-      This property applies to connections and connection groups.  This
-      is not a strict requirement.  The default is to not have this
-      option.
 
    o  Request not to delay acknowledgment of Content: This boolean
       property specifies whether an application considers it useful to
@@ -497,7 +493,11 @@ Internet-Draft               TAPS Interface                February 2018
       Content.  This property applies to Connections and Connection
       Groups.  This is not a strict requirement, as it signifies a
       reduction in reliability.  The default is full checksum coverage
+      without being able to change it, and requiring a checksum when
+      receiving.
 
+   o  Interface Type to prefer: This property specifies which kind of
+      access network interface, e.g., WiFi, Ethernet, or LTE, to prefer
 
 
 
@@ -506,11 +506,6 @@ Trammell, et al.         Expires August 22, 2018                [Page 9]
 Internet-Draft               TAPS Interface                February 2018
 
 
-      without being able to change it, and requiring a checksum when
-      receiving.
-
-   o  Interface Type to prefer: This property specifies which kind of
-      access network interface, e.g., WiFi, Ethernet, or LTE, to prefer
       over others for this connection, in case they are available.  This
       is not a strict requirement.  The default is to use the default
       interface configured in the system policy.
@@ -553,6 +548,11 @@ Internet-Draft               TAPS Interface                February 2018
       of 0 means that no checksum is required, and a special value
       (e.g., -1) indicates full checksum coverage.
 
+   o  Set scheduler for connections in a group: This property specifies
+      which scheduler should be used among Connections within a
+      Connection Group.  It applies to connection groups.  For now we
+      suggest we the schedulers defined in [I-D.ietf-tsvwg-sctp-ndata].
+
 
 
 
@@ -561,11 +561,6 @@ Trammell, et al.         Expires August 22, 2018               [Page 10]
 
 Internet-Draft               TAPS Interface                February 2018
 
-
-   o  Set scheduler for connections in a group: This property specifies
-      which scheduler should be used among Connections within a
-      Connection Group.  It applies to connection groups.  For now we
-      suggest we the schedulers defined in [I-D.ietf-tsvwg-sctp-ndata].
 
    o  Maximum Content Size Before Connection Establishment: This numeric
       property represents the maximum Content size that can be sent
@@ -609,6 +604,11 @@ Internet-Draft               TAPS Interface                February 2018
 
    [PHILS:: Some Intents, i.e., Traffic Category, Size to be Received,
    Receive Bit-rate, Timeliness, Cost Preferences are really useful for
+   per-content path selection.  As the latter is out of scope for v1, I
+   removed them from the Send Parameters for now]
+
+
+
 
 
 
@@ -617,9 +617,6 @@ Trammell, et al.         Expires August 22, 2018               [Page 11]
 
 Internet-Draft               TAPS Interface                February 2018
 
-
-   per-content path selection.  As the latter is out of scope for v1, I
-   removed them from the Send Parameters for now]
 
 5.2.3.1.  Traffic Category
 
@@ -667,15 +664,15 @@ Internet-Draft               TAPS Interface                February 2018
    Intents does not imply any guarantees on whether an application's
    requirements can actually be satisfied.
 
+   Stream:  Delay and packet delay variation should be kept as low as
+      possible
+
 
 
 Trammell, et al.         Expires August 22, 2018               [Page 12]
 
 Internet-Draft               TAPS Interface                February 2018
 
-
-   Stream:  Delay and packet delay variation should be kept as low as
-      possible
 
    Interactive:  Delay should be kept as low as possible, but some
       variation is tolerable
@@ -719,6 +716,9 @@ Internet-Draft               TAPS Interface                February 2018
    object.  While Protocol Properties and Application Intents use the
    "add" call, Transport Preferences use special calls for the levels
    defined in Section 5.2.
+
+
+
 
 
 
