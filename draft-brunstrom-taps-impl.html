@@ -310,7 +310,7 @@ address {
 <link href="#rfc.section.6.2" rel="Chapter" title="6.2 Maintenance Events">
 <link href="#rfc.section.7" rel="Chapter" title="7 Implementing Termination">
 <link href="#rfc.section.8" rel="Chapter" title="8 Cached State">
-<link href="#rfc.section.8.1" rel="Chapter" title="8.1 Protocol caches">
+<link href="#rfc.section.8.1" rel="Chapter" title="8.1 Protocol state caches">
 <link href="#rfc.section.8.2" rel="Chapter" title="8.2 Performance caches">
 <link href="#rfc.section.9" rel="Chapter" title="9 Specific Transport Protocol Considerations">
 <link href="#rfc.section.9.1" rel="Chapter" title="9.1 TCP">
@@ -472,7 +472,7 @@ address {
 </li>
 <li>8.   <a href="#rfc.section.8">Cached State</a>
 </li>
-<ul><li>8.1.   <a href="#rfc.section.8.1">Protocol caches</a>
+<ul><li>8.1.   <a href="#rfc.section.8.1">Protocol state caches</a>
 </li>
 <li>8.2.   <a href="#rfc.section.8.2">Performance caches</a>
 </li>
@@ -591,7 +591,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 </pre>
 <p id="rfc.section.4.p.5">Any one of these sub-entries on the aggregate connection attempt would satisfy the original application intent. The concern of this document is the algorithm defining which of these options to try, when, and in what order.</p>
 <h1 id="rfc.section.4.1">
-<a href="#rfc.section.4.1">4.1.</a> <a href="#candidate-gathering" id="candidate-gathering">Candidate Gathering</a>
+<a href="#rfc.section.4.1">4.1.</a> <a href="#gathering" id="gathering">Candidate Gathering</a>
 </h1>
 <p id="rfc.section.4.1.p.1">The step of gathering candidates involves identifying which paths, protocols, and endpoints may be used for a given Connection. This list is determined by the requirements, prohibitions, and preferences of the application as specified in the Path Selection Properties and Protocol Selection Properties.</p>
 <h1 id="rfc.section.4.1.1">
@@ -840,15 +840,34 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <h1 id="rfc.section.8">
 <a href="#rfc.section.8">8.</a> <a href="#cached-state" id="cached-state">Cached State</a>
 </h1>
-<p id="rfc.section.8.p.1">Beyond a single connection&#8217;s lifetime, it is useful to keep state and history.</p>
+<p id="rfc.section.8.p.1">Beyond a single Connection&#8217;s lifetime, it is useful for an implementation to keep state and history. This cached state can help improve future Connection establishment due to re-using results and credentials, and favoring paths and protocols that performed well in the past.</p>
+<p id="rfc.section.8.p.2">Cached state may be associated with different Endpoints for the same Connection, depending on the protocol generating the cached content. For example, certificates for TLS are generally associated with a hostname, and thus should be cached based on a Connection&#8217;s hostname Endpoint (if applicable). On the other hand, performance characteristics of a path are more likely tied to the IP address and subnet being used.</p>
 <h1 id="rfc.section.8.1">
-<a href="#rfc.section.8.1">8.1.</a> <a href="#protocol-caches" id="protocol-caches">Protocol caches</a>
+<a href="#rfc.section.8.1">8.1.</a> <a href="#protocol-state-caches" id="protocol-state-caches">Protocol state caches</a>
 </h1>
-<p id="rfc.section.8.1.p.1">Caching for DNS, TLS, etc. Associated with sets of endpoints for future use.</p>
+<p id="rfc.section.8.1.p.1">Some protocols will have long-term state to be cached in association with Endpoints. This state often has some time after which it is expired, so the implementation SHOULD allow each protocol to specify an expiration for cached content.</p>
+<p id="rfc.section.8.1.p.2">Examples of cached protocol state include:</p>
+<p></p>
+
+<ul>
+<li>The DNS protocol can cache resolution answers (A and AAAA queries, for example), associated with a Time To Live (TTL) to be used for future hostname resolutions without requiring asking the DNS resolver again.</li>
+<li>TLS caches session state and tickets based on a hostname, which can be used for resuming sessions with a server.</li>
+<li>TCP can cache cookies for use in TCP Fast Open</li>
+</ul>
+<p id="rfc.section.8.1.p.4">Cached state is primarily used during Connection establishment for a single Protocol Stack, but may be used to influence an implementation&#8217;s preference between several candidate Protocol Stacks. For example, if two IP address Endpoints are otherwise equally preferred, an implementation may choose to attempt a connection to an address for which it has a TCP Fast Open cookie.</p>
 <h1 id="rfc.section.8.2">
 <a href="#rfc.section.8.2">8.2.</a> <a href="#performance-caches" id="performance-caches">Performance caches</a>
 </h1>
-<p id="rfc.section.8.2.p.1">Caching of round trip time (RTT), success rate with various protocols and features.</p>
+<p id="rfc.section.8.2.p.1">In addition to protocol state, Protocol Instances SHOULD provide data into a performance-oriented cache to help guide future protocol and path selection. Some performance information can be gathered generically across several protocols to allow predictive comparisons between protocols on given paths:</p>
+<p></p>
+
+<ul>
+<li>Observed Round Trip Time</li>
+<li>Connection Establishment latency</li>
+<li>Connection Establishment success rate</li>
+</ul>
+<p id="rfc.section.8.2.p.3">These items can be cached on a per-address and per-subnet granularity, and averaged between different values. The information SHOULD be cached on a per-network basis, since it is expected that different network attachments will have different performance characteristics.</p>
+<p id="rfc.section.8.2.p.4">An implementation should use this information, when possible, to determine preference between candidate paths, endpoints, and protocol options. Eligible options that historically had significantly better performance than others SHOULD be selected first when gathering candidates <a href="#gathering" class="xref">Section 4.1</a> to ensure better performance for the application.</p>
 <h1 id="rfc.section.9">
 <a href="#rfc.section.9">9.</a> <a href="#specific-transport-protocol-considerations" id="specific-transport-protocol-considerations">Specific Transport Protocol Considerations</a>
 </h1>

@@ -95,17 +95,17 @@ Table of Contents
      6.2.  Maintenance Events  . . . . . . . . . . . . . . . . . . .  18
    7.  Implementing Termination  . . . . . . . . . . . . . . . . . .  18
    8.  Cached State  . . . . . . . . . . . . . . . . . . . . . . . .  19
-     8.1.  Protocol caches . . . . . . . . . . . . . . . . . . . . .  19
-     8.2.  Performance caches  . . . . . . . . . . . . . . . . . . .  19
-   9.  Specific Transport Protocol Considerations  . . . . . . . . .  19
-     9.1.  TCP . . . . . . . . . . . . . . . . . . . . . . . . . . .  19
-     9.2.  UDP . . . . . . . . . . . . . . . . . . . . . . . . . . .  19
-     9.3.  SCTP  . . . . . . . . . . . . . . . . . . . . . . . . . .  19
-     9.4.  QUIC  . . . . . . . . . . . . . . . . . . . . . . . . . .  20
-     9.5.  HTTP over TLS as a pseudotransport  . . . . . . . . . . .  20
-     9.6.  HTTP/2 transport  . . . . . . . . . . . . . . . . . . . .  20
-   10. Rendezvous and Environment Discovery  . . . . . . . . . . . .  20
-     10.1.  ICE and STUN . . . . . . . . . . . . . . . . . . . . . .  20
+     8.1.  Protocol state caches . . . . . . . . . . . . . . . . . .  19
+     8.2.  Performance caches  . . . . . . . . . . . . . . . . . . .  20
+   9.  Specific Transport Protocol Considerations  . . . . . . . . .  20
+     9.1.  TCP . . . . . . . . . . . . . . . . . . . . . . . . . . .  20
+     9.2.  UDP . . . . . . . . . . . . . . . . . . . . . . . . . . .  20
+     9.3.  SCTP  . . . . . . . . . . . . . . . . . . . . . . . . . .  20
+     9.4.  QUIC  . . . . . . . . . . . . . . . . . . . . . . . . . .  21
+     9.5.  HTTP over TLS as a pseudotransport  . . . . . . . . . . .  21
+     9.6.  HTTP/2 transport  . . . . . . . . . . . . . . . . . . . .  21
+   10. Rendezvous and Environment Discovery  . . . . . . . . . . . .  21
+     10.1.  ICE and STUN . . . . . . . . . . . . . . . . . . . . . .  21
 
 
 
@@ -114,15 +114,15 @@ Brunstrom, et al.        Expires August 23, 2018                [Page 2]
 Internet-Draft             TAPS Implementation             February 2018
 
 
-   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  20
-   12. Security Considerations . . . . . . . . . . . . . . . . . . .  20
-     12.1.  Considerations for Candidate Gathering . . . . . . . . .  20
-     12.2.  Considerations for Candidate Racing  . . . . . . . . . .  20
-   13. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  21
-   14. References  . . . . . . . . . . . . . . . . . . . . . . . . .  21
-     14.1.  Normative References . . . . . . . . . . . . . . . . . .  21
-     14.2.  Informative References . . . . . . . . . . . . . . . . .  21
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  23
+   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  21
+   12. Security Considerations . . . . . . . . . . . . . . . . . . .  21
+     12.1.  Considerations for Candidate Gathering . . . . . . . . .  21
+     12.2.  Considerations for Candidate Racing  . . . . . . . . . .  22
+   13. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  22
+   14. References  . . . . . . . . . . . . . . . . . . . . . . . . .  22
+     14.1.  Normative References . . . . . . . . . . . . . . . . . .  22
+     14.2.  Informative References . . . . . . . . . . . . . . . . .  23
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  24
 
 1.  Introduction
 
@@ -1025,18 +1025,80 @@ Internet-Draft             TAPS Implementation             February 2018
 
 8.  Cached State
 
-   Beyond a single connection's lifetime, it is useful to keep state and
-   history.
+   Beyond a single Connection's lifetime, it is useful for an
+   implementation to keep state and history.  This cached state can help
+   improve future Connection establishment due to re-using results and
+   credentials, and favoring paths and protocols that performed well in
+   the past.
 
-8.1.  Protocol caches
+   Cached state may be associated with different Endpoints for the same
+   Connection, depending on the protocol generating the cached content.
+   For example, certificates for TLS are generally associated with a
+   hostname, and thus should be cached based on a Connection's hostname
+   Endpoint (if applicable).  On the other hand, performance
+   characteristics of a path are more likely tied to the IP address and
+   subnet being used.
 
-   Caching for DNS, TLS, etc.  Associated with sets of endpoints for
-   future use.
+8.1.  Protocol state caches
+
+   Some protocols will have long-term state to be cached in association
+   with Endpoints.  This state often has some time after which it is
+   expired, so the implementation SHOULD allow each protocol to specify
+   an expiration for cached content.
+
+   Examples of cached protocol state include:
+
+   o  The DNS protocol can cache resolution answers (A and AAAA queries,
+      for example), associated with a Time To Live (TTL) to be used for
+      future hostname resolutions without requiring asking the DNS
+      resolver again.
+
+   o  TLS caches session state and tickets based on a hostname, which
+      can be used for resuming sessions with a server.
+
+   o  TCP can cache cookies for use in TCP Fast Open
+
+
+
+
+Brunstrom, et al.        Expires August 23, 2018               [Page 19]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
+   Cached state is primarily used during Connection establishment for a
+   single Protocol Stack, but may be used to influence an
+   implementation's preference between several candidate Protocol
+   Stacks.  For example, if two IP address Endpoints are otherwise
+   equally preferred, an implementation may choose to attempt a
+   connection to an address for which it has a TCP Fast Open cookie.
 
 8.2.  Performance caches
 
-   Caching of round trip time (RTT), success rate with various protocols
-   and features.
+   In addition to protocol state, Protocol Instances SHOULD provide data
+   into a performance-oriented cache to help guide future protocol and
+   path selection.  Some performance information can be gathered
+   generically across several protocols to allow predictive comparisons
+   between protocols on given paths:
+
+   o  Observed Round Trip Time
+
+   o  Connection Establishment latency
+
+   o  Connection Establishment success rate
+
+   These items can be cached on a per-address and per-subnet
+   granularity, and averaged between different values.  The information
+   SHOULD be cached on a per-network basis, since it is expected that
+   different network attachments will have different performance
+   characteristics.
+
+   An implementation should use this information, when possible, to
+   determine preference between candidate paths, endpoints, and protocol
+   options.  Eligible options that historically had significantly better
+   performance than others SHOULD be selected first when gathering
+   candidates Section 4.1 to ensure better performance for the
+   application.
 
 9.  Specific Transport Protocol Considerations
 
@@ -1052,20 +1114,20 @@ Internet-Draft             TAPS Implementation             February 2018
 
    SCTP messages can be very large.  To allow the reception of large
    messages in pieces, a "partial flag" can be used to inform a (native
+
+
+
+Brunstrom, et al.        Expires August 23, 2018               [Page 20]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
    SCTP) receiving application that a message is incomplete.  After
    receiving the "partial flag", this application would know that the
    next receive calls will only deliver remaining parts of the same
    message (i.e., no messages or partial messages will arrive on other
    streams until the message is complete) (see Section 8.1.20 in
    [RFC6458]).  The "partial flag" can therefore facilitate the
-
-
-
-Brunstrom, et al.        Expires August 23, 2018               [Page 19]
-
-Internet-Draft             TAPS Implementation             February 2018
-
-
    implementation of the receiver buffer in the receiving application,
    at the cost of limiting multiplexing and temporarily creating head-
    of-line blocking delay at the receiver.
@@ -1109,18 +1171,17 @@ Internet-Draft             TAPS Implementation             February 2018
    interference to cause the implementation to select less secure, or
    entirely insecure, combinations of paths and protocols.
 
+
+
+Brunstrom, et al.        Expires August 23, 2018               [Page 21]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
 12.2.  Considerations for Candidate Racing
 
    See Section 5.2 for security considerations around racing with 0-RTT
    data.
-
-
-
-
-Brunstrom, et al.        Expires August 23, 2018               [Page 20]
-
-Internet-Draft             TAPS Implementation             February 2018
-
 
    An attacker that knows a particular device is racing several options
    during connection establishment may be able to block packets for the
@@ -1164,19 +1225,21 @@ Internet-Draft             TAPS Implementation             February 2018
               "An Abstract Application Layer Interface to Transport
               Services", n.d..
 
+
+
+
+
+Brunstrom, et al.        Expires August 23, 2018               [Page 22]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
 14.2.  Informative References
 
    [I-D.ietf-quic-transport]
               Iyengar, J. and M. Thomson, "QUIC: A UDP-Based Multiplexed
               and Secure Transport", draft-ietf-quic-transport-09 (work
               in progress), January 2018.
-
-
-
-Brunstrom, et al.        Expires August 23, 2018               [Page 21]
-
-Internet-Draft             TAPS Implementation             February 2018
-
 
    [I-D.ietf-tls-tls13]
               Rescorla, E., "The Transport Layer Security (TLS) Protocol
@@ -1218,21 +1281,19 @@ Internet-Draft             TAPS Implementation             February 2018
               Lite)", RFC 8304, DOI 10.17487/RFC8304, February 2018,
               <https://www.rfc-editor.org/info/rfc8304>.
 
+
+
+
+
+Brunstrom, et al.        Expires August 23, 2018               [Page 23]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
    [RFC8305]  Schinazi, D. and T. Pauly, "Happy Eyeballs Version 2:
               Better Connectivity Using Concurrency", RFC 8305,
               DOI 10.17487/RFC8305, December 2017,
               <https://www.rfc-editor.org/info/rfc8305>.
-
-
-
-
-
-
-
-Brunstrom, et al.        Expires August 23, 2018               [Page 22]
-
-Internet-Draft             TAPS Implementation             February 2018
-
 
 Authors' Addresses
 
@@ -1280,9 +1341,4 @@ Authors' Addresses
 
 
 
-
-
-
-
-
-Brunstrom, et al.        Expires August 23, 2018               [Page 23]
+Brunstrom, et al.        Expires August 23, 2018               [Page 24]
