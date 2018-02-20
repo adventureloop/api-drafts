@@ -304,8 +304,8 @@ address {
 <link href="#rfc.section.7.1.1" rel="Chapter" title="7.1.1 Content Properties">
 <link href="#rfc.section.7.2" rel="Chapter" title="7.2 Sender-side Framing">
 <link href="#rfc.section.8" rel="Chapter" title="8 Receiving Data">
-<link href="#rfc.section.8.1" rel="Chapter" title="8.1 Application-Layer Back-Pressure at the Receiver">
-<link href="#rfc.section.8.2" rel="Chapter" title="8.2 Receiver-side De-framing over Stream Protocols">
+<link href="#rfc.section.8.1" rel="Chapter" title="8.1 Application-Layer Backpressure at the Receiver">
+<link href="#rfc.section.8.2" rel="Chapter" title="8.2 Receiver-side Deframing over Stream Protocols">
 <link href="#rfc.section.9" rel="Chapter" title="9 Introspection">
 <link href="#rfc.section.10" rel="Chapter" title="10 Connection Termination">
 <link href="#rfc.section.11" rel="Chapter" title="11 Event and Error Handling">
@@ -327,7 +327,7 @@ address {
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., Enghardt, T., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-trammell-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-02-18" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-02-20" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -351,7 +351,7 @@ address {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: August 22, 2018</td>
+<td class="left">Expires: August 24, 2018</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -400,7 +400,7 @@ address {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">February 18, 2018</td>
+<td class="right">February 20, 2018</td>
 </tr>
 
     	
@@ -416,7 +416,7 @@ address {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on August 22, 2018.</p>
+<p>This Internet-Draft will expire on August 24, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -470,9 +470,9 @@ address {
 </li>
 </ul><li>8.   <a href="#rfc.section.8">Receiving Data</a>
 </li>
-<ul><li>8.1.   <a href="#rfc.section.8.1">Application-Layer Back-Pressure at the Receiver</a>
+<ul><li>8.1.   <a href="#rfc.section.8.1">Application-Layer Backpressure at the Receiver</a>
 </li>
-<li>8.2.   <a href="#rfc.section.8.2">Receiver-side De-framing over Stream Protocols</a>
+<li>8.2.   <a href="#rfc.section.8.2">Receiver-side Deframing over Stream Protocols</a>
 </li>
 </ul><li>9.   <a href="#rfc.section.9">Introspection</a>
 </li>
@@ -839,7 +839,7 @@ securityParameters.SetIdentityChallengeCallback(challengeCallback)
 <p id="rfc.section.6.1.p.1">Active open is the action of establishing a connection to a RemoteEndpoint presumed to be listening for incoming connection requests. Active open is used by clients in client-server interactions. Active open is supported by this interface through the Initiate action:</p>
 <p id="rfc.section.6.1.p.2">Connection := Preconnection.Initiate()</p>
 <p id="rfc.section.6.1.p.3">Before calling Initiate, the caller must have populated a Preconnection object with a RemoteEndpoint specifier, optionally a LocalEndpoint specifier (if not specified, the system will attempt to determine a suitable LocalEndpoint), as well as all parameters necessary for candidate selection. After calling Initiate, no further parameters may be bound to the Connection. The Initiate() call consumes the Preconnection and creates a Connection object. A Preconnection can only be initiated once.</p>
-<p id="rfc.section.6.1.p.4">Once Initiate is called, the candidate Protocol Stack(s) may cause one or more transport-layer connections to be created to the specified remote endpoint.  The caller may immediately begin sending Content on the Connection (see <a href="#sending" class="xref">Section 7</a>) after calling Initate(), though it may wait for one of the following events before doing so.</p>
+<p id="rfc.section.6.1.p.4">Once Initiate is called, the candidate Protocol Stack(s) may cause one or more transport-layer connections to be created to the specified remote endpoint.  The caller may immediately begin sending Content on the Connection (see <a href="#sending" class="xref">Section 7</a>) after calling Initate, though it may wait for one of the following events before doing so.</p>
 <p id="rfc.section.6.1.p.5">Connection -&gt; Ready&lt;&gt;</p>
 <p id="rfc.section.6.1.p.6">The Ready event occurs after Initiate has established a transport-layer connection on at least one usable candidate Protocol Stack over at least one candidate Path. No Receive events (see <a href="#receiving" class="xref">Section 8</a>) will occur before the Ready event for connections established using Initiate.</p>
 <p id="rfc.section.6.1.p.7">Connection -&gt; InitiateError&lt;&gt;</p>
@@ -868,9 +868,8 @@ securityParameters.SetIdentityChallengeCallback(challengeCallback)
 <p id="rfc.section.6.4.p.1">Groups of Connections can be created using Clone action:</p>
 <p id="rfc.section.6.4.p.2">Connection := Connection.Clone()</p>
 <p id="rfc.section.6.4.p.3">Calling this once yields a group of two Connections: the parent Connection &#8211; whose Clone action was called &#8211; and the resulting clone. Calling Clone on any of these two Connections adds a third Connection to the group, and so on.  All Connections in a group are entangled. This means that they automatically share all properties: changing a parameter for one of them also changes the parameter for all others, closing one of them also closes all others, etc.</p>
-<p id="rfc.section.6.4.p.4">There is only one Protocol Property that is not entangled, i.e., it is a separate per-Connection Property for individual Connections in the group: a priority.  This priority, which can be represented as a non-negative integer or float, expresses a desired share of the Connection Group&#8217;s available network capacity, such that an ideal transport system implementation would assign the Connection the capacity share P x C/sum_P, where P = priority, C = total available capacity and sum_P = sum of all priority values that are used for the Connections in the same Connection Group.  The priority setting is purely advisory; no guarantees are given.</p>
+<p id="rfc.section.6.4.p.4">There is only one Protocol Property that is not entangled, i.e. it is a separate per-Connection Property for individual Connections in the group: a priority.  This priority, which can be represented as a non-negative integer or float, expresses a desired share of the Connection Group&#8217;s available network capacity, such that an ideal transport system implementation would assign the Connection the capacity share P x C/sum_P, where P = priority, C = total available capacity and sum_P = sum of all priority values that are used for the Connections in the same Connection Group.  The priority setting is purely advisory; no guarantees are given.</p>
 <p id="rfc.section.6.4.p.5">Connection Groups should be created (i.e., the Clone action should be used) as early as possible, ideally already during the Pre-Establishment phase, in order to aid the Transport System in choosing and configuring the right protocols (see also <a href="#transport-params" class="xref">Section 5.2</a>).</p>
-<p id="rfc.section.6.4.p.6">[TASK: If Clone() is a method on Connection, it cannot be called during pre-establishment, since we don&#8217;t have a Connection at that time (csp)]</p>
 <h1 id="rfc.section.7">
 <a href="#rfc.section.7">7.</a> <a href="#sending" id="sending">Sending Data</a>
 </h1>
@@ -880,7 +879,7 @@ securityParameters.SetIdentityChallengeCallback(challengeCallback)
 <p id="rfc.section.7.p.4">If Send is called on a Connection which has not yet been established, an Initiate action will be implicitly performed simultaneously with the Send.  Used together with the Idempotent property (see <a href="#send-idempotent" class="xref">Section 7.1.1.5</a>), this can be used to send data during establishment for 0-RTT session resumption on Protocol Stacks that support it.</p>
 <p id="rfc.section.7.p.5">Like all Actions in this interface, the Send action is asynchronous.</p>
 <p id="rfc.section.7.p.6">Connection -&gt; Sent&lt;contentRef&gt;</p>
-<p id="rfc.section.7.p.7">The Sent event occurs when a previous Send action has completed, i.e., when the data derived from the Content has been passed down or through the underlying Protocol Stack and is no longer the responsibility of the implementation of this interface. The exact disposition of Content when the Sent event occurs is specific to the implementation and the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. The Sent event contains an implementation-specific reference to the Content to which it applies.</p>
+<p id="rfc.section.7.p.7">The Sent event occurs when a previous Send action has completed, i.e. when the data derived from the Content has been passed down or through the underlying Protocol Stack and is no longer the responsibility of the implementation of this interface. The exact disposition of Content when the Sent event occurs is specific to the implementation and the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. The Sent event contains an implementation-specific reference to the Content to which it applies.</p>
 <p id="rfc.section.7.p.8">Sent events allow an application to obtain an understanding of the amount of buffering it creates. That is, if an application calls the Send action multiple times without waiting for a Sent event, it has created more buffer inside the transport system than an application that only issues a Send after this event fires.</p>
 <p id="rfc.section.7.p.9">Connection -&gt; Expired&lt;contentRef&gt;</p>
 <p id="rfc.section.7.p.10">The Expired event occurs when a previous Send action expired before completion; i.e. when the data derived from the Content was not sent before its Lifetime (see <a href="#send-lifetime" class="xref">Section 7.1.1.1</a>) expired. This is separate from SendError, as it is an expected behavior for partially reliable transports. The Expired event contains an implementation-specific reference to the Content to which it applies.</p>
@@ -927,7 +926,7 @@ sendParameters.add(parameter, value)
 </h1>
 <p id="rfc.section.7.1.1.6.p.1">This numeric property specifies the length of the section of content, starting from byte 0, that the application assumes will be received without corruption due to lower layer errors. It is used to specify options for simple integrity protection via checksums. By default, the entire Content is protected by checksum. A value of 0 means that no checksum is required, and a special value (e.g. -1) can be used to indicate the default. Only full coverage is guaranteed, any other requests are advisory.</p>
 <h1 id="rfc.section.7.1.1.7">
-<a href="#rfc.section.7.1.1.7">7.1.1.7.</a> <a href="#send-ackimmed" id="send-ackimmed">Immediate Acknowledgement</a>
+<a href="#rfc.section.7.1.1.7">7.1.1.7.</a> <a href="#send-ackimmed" id="send-ackimmed">Immediate Acknowledgment</a>
 </h1>
 <p id="rfc.section.7.1.1.7.p.1">This boolean property specifies, if true, that an application wants this Content to be acknowledged immediately by the receiver. In case of reliable transmission, this informs the transport protocol on the sender side faster that it can remove the Content from its buffer; therefore this property can be useful for latency-critical applications that maintain tight control over the send buffer (see <a href="#sending" class="xref">Section 7</a>).</p>
 <h1 id="rfc.section.7.1.1.8">
@@ -969,15 +968,15 @@ sendParameters.add(parameter, value)
 <p id="rfc.section.8.p.5">Connection -&gt; ReceiveError&lt;&gt;</p>
 <p id="rfc.section.8.p.6">A ReceiveError occurs when data is received by the underlying Protocol Stack that cannot be fully retrieved or deframed, or when some other indication is received that reception has failed. Such conditions that irrevocably lead the the termination of the Connection are signaled using ConnectionError instead (see <a href="#termination" class="xref">Section 10</a>).</p>
 <h1 id="rfc.section.8.1">
-<a href="#rfc.section.8.1">8.1.</a> <a href="#receive-backpressure" id="receive-backpressure">Application-Layer Back-Pressure at the Receiver</a>
+<a href="#rfc.section.8.1">8.1.</a> <a href="#receive-backpressure" id="receive-backpressure">Application-Layer Backpressure at the Receiver</a>
 </h1>
 <p id="rfc.section.8.1.p.1">Implementations of this interface must provide some way for the application to indicate that it is temporarily not ready to receive new Content. Since the mechanisms of event handling are implementation-platform specific, this document does not specify the exact nature of this interface.</p>
 <h1 id="rfc.section.8.2">
-<a href="#rfc.section.8.2">8.2.</a> <a href="#receive-framing" id="receive-framing">Receiver-side De-framing over Stream Protocols</a>
+<a href="#rfc.section.8.2">8.2.</a> <a href="#receive-framing" id="receive-framing">Receiver-side Deframing over Stream Protocols</a>
 </h1>
 <p id="rfc.section.8.2.p.1">The Receive event is intended to be fired once per application-layer Content sent by the remote endpoint; i.e., it is a desired property of this interface that a Send at one end of a Connection maps to exactly one Receive on the other end. This is possible with Protocol Stacks that provide message boundary preservation, but is not the case over Protocol Stacks that provide a simple octet stream transport.</p>
-<p id="rfc.section.8.2.p.2">For preserving message boundaries over stream transports, this interface provides receiver-side de-framing. This facility is based on the observation that, since many of our current application protocols evolved over TCP, which does not provide message boundary preservation, and since many of these protocols require message boundaries to function, each application layer protocol has defined its own framing. A Deframer allows an application to push this de-framing down into the interface, in order to transform an octet stream into a sequence of Content.</p>
-<p id="rfc.section.8.2.p.3">Concretely, receiver-side de-framing allows a caller to provide the interface with a function that takes an octet stream, as provided by the underlying Protocol Stack, reads and returns a sigle Content of an appropriate type for the application and platform, and leaves the octet stream at the start of the next Content. It consists of a Deframer object with a single Action, Deframe.  Since the Deframer depends on the protocol used at the application layer, it is bound to the Connection during the pre-establishment phase:</p>
+<p id="rfc.section.8.2.p.2">For preserving message boundaries over stream transports, this interface provides receiver-side deframing. This facility is based on the observation that, since many of our current application protocols evolved over TCP, which does not provide message boundary preservation, and since many of these protocols require message boundaries to function, each application layer protocol has defined its own framing. A Deframer allows an application to push this deframing down into the interface, in order to transform an octet stream into a sequence of Content.</p>
+<p id="rfc.section.8.2.p.3">Concretely, receiver-side deframing allows a caller to provide the interface with a function that takes an octet stream, as provided by the underlying Protocol Stack, reads and returns a sigle Content of an appropriate type for the application and platform, and leaves the octet stream at the start of the next Content. It consists of a Deframer object with a single Action, Deframe.  Since the Deframer depends on the protocol used at the application layer, it is bound to the Connection during the pre-establishment phase:</p>
 <p id="rfc.section.8.2.p.4">Connection.DeframeWith(Deframer)</p>
 <p id="rfc.section.8.2.p.5">Content := Deframer.Deframe(OctetStream, &#8230;)</p>
 <h1 id="rfc.section.9">

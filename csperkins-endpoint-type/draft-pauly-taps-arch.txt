@@ -5,7 +5,7 @@
 TAPS Working Group                                         T. Pauly, Ed.
 Internet-Draft                                                Apple Inc.
 Intended status: Informational                          B. Trammell, Ed.
-Expires: August 22, 2018                                      ETH Zurich
+Expires: August 24, 2018                                      ETH Zurich
                                                             A. Brunstrom
                                                      Karlstad University
                                                             G. Fairhurst
@@ -16,7 +16,7 @@ Expires: August 22, 2018                                      ETH Zurich
                                                                TU Berlin
                                                                  C. Wood
                                                               Apple Inc.
-                                                       February 18, 2018
+                                                       February 20, 2018
 
 
                  An Architecture for Transport Services
@@ -47,13 +47,13 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on August 22, 2018.
+   This Internet-Draft will expire on August 24, 2018.
 
 
 
 
 
-Pauly, et al.            Expires August 22, 2018                [Page 1]
+Pauly, et al.            Expires August 24, 2018                [Page 1]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Pauly, et al.            Expires August 22, 2018                [Page 2]
+Pauly, et al.            Expires August 24, 2018                [Page 2]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -165,7 +165,7 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.            Expires August 22, 2018                [Page 3]
+Pauly, et al.            Expires August 24, 2018                [Page 3]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -221,7 +221,7 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.            Expires August 22, 2018                [Page 4]
+Pauly, et al.            Expires August 24, 2018                [Page 4]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -277,7 +277,7 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.            Expires August 22, 2018                [Page 5]
+Pauly, et al.            Expires August 24, 2018                [Page 5]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -333,7 +333,7 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.            Expires August 22, 2018                [Page 6]
+Pauly, et al.            Expires August 24, 2018                [Page 6]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -389,7 +389,7 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.            Expires August 22, 2018                [Page 7]
+Pauly, et al.            Expires August 24, 2018                [Page 7]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -445,7 +445,7 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.            Expires August 22, 2018                [Page 8]
+Pauly, et al.            Expires August 24, 2018                [Page 8]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -457,9 +457,9 @@ Internet-Draft              TAPS Architecture              February 2018
  +-->| Preconnection |----------->| Connection |---------------> Closed
  |   +---------------+     :      +------------+ Connection:
  |                         :      ^   ^    |     Finished  :
- +-- LocalEndpoint         :      |   |    |               :
+ +-- Local Endpoint        :      |   |    |               :
  |                         :      |   |    +---------+     :
- +-- RemoteEndpoint        :      |   |              |     :
+ +-- Remote Endpoint       :      |   |              |     :
  |                         :      |   |Send()        |     :
  +-- Path Selection        :      | +---------+      v     :
  |   Properties            :      | | Content |  Content   :
@@ -483,17 +483,17 @@ Internet-Draft              TAPS Architecture              February 2018
 
    o  Preconnection: A Preconnection object is a representation of a
       potential connection.  It has state that describes parameters of a
-      Connection that might exist in the future: the LocalEndpoint from
-      which that Connection will be established, the RemoteEndpoint to
+      Connection that might exist in the future: the Local Endpoint from
+      which that Connection will be established, the Remote Endpoint to
       which it will connect, and Path Selection Properties, Protocol
       Selection Properties, and Specific Protocol Properties that
       influence the choice of transport that Connection will use.  A
       Preconnection can be fully specified and represent a single
       possible Connection, or it can be partially specified such that it
-      represents a family of possible Connections.  The LocalEndpoint
+      represents a family of possible Connections.  The Local Endpoint
       MUST be specified if the Preconnection is used to Listen() for
       incoming connections, but is OPTIONAL if it is used to Initiate()
-      connections.  The RemoteEndpoint MUST be specified in the
+      connections.  The Remote Endpoint MUST be specified in the
       Preconnection is used to Initiate() connections, but is OPTIONAL
       if it is used to Listen() for incoming connections.
 
@@ -501,44 +501,44 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.            Expires August 22, 2018                [Page 9]
+Pauly, et al.            Expires August 24, 2018                [Page 9]
 
 Internet-Draft              TAPS Architecture              February 2018
 
 
    o  Connection: A Connection object represents an active transport
       protocol instance that can send and/or receive Content between a
-      LocalEndpoint and a RemoteEndpoint.  It holds state pertaining to
-      the underlying transport protocol instance and any ongoing data
+      Local Endpoint and a Remote Endpoint.  It holds state pertaining
+      to the underlying transport protocol instance and any ongoing data
       transfer.  This represents, for example, an active connection in a
       connection-oriented protocol such as TCP, or a fully-specified
       5-tuple for a connectionless protocol such as UDP.
 
    o  Listener: A Listener object accepts incoming transport protocol
-      connections from RemoteEndpoints and generates corresponding
+      connections from Remote Endpoints and generates corresponding
       Connection objects.  It is created from a Preconnection object
       that specifies the type of incoming connections it will accept.
 
 4.1.2.  Pre-Establishment
 
-   o  RemoteEndpoint: The RemoteEndpoint represents the application's
+   o  Remote Endpoint: The Remote Endpoint represents the application's
       name for a peer that can participate in a transport connection.
-      For example, a DNS name for the peer.
+      For example, the combination of a DNS name for the peer and a
+      service name/port.
 
-   o  LocalEndpoint: The LocalEndpoint represents the application's name
-      for itself that it wants to use for transport connections.  For
-      example, a local interface name or address.
+   o  Local Endpoint: The Local Endpoint represents the application's
+      name for itself that it wants to use for transport connections.
+      For example, a local interface name or address.
 
    o  Path Selection Properties: The Path Selection Properties consist
       of the options that an application may set on a Preconnection to
-      influence the selection of path between itself and the
-      RemoteEndpoint.  These options can come in the form of
-      requirements, prohibitions, or preferences.  Examples of options
-      which may influence path selection include the interface type
-      (such as a Wi-Fi Ethernet connection, or a Cellular LTE
-      connection), characteristics of the path that are locally known
-      like Maximum Transmission Unit (MTU), or expected throughput or
-      latency.
+      influence the selection of path between itself and the Remote
+      Endpoint.  These options can come in the form of requirements,
+      prohibitions, or preferences.  Examples of options which may
+      influence path selection include the interface type (such as a Wi-
+      Fi Ethernet connection, or a Cellular LTE connection),
+      characteristics of the path that are locally known like Maximum
+      Transmission Unit (MTU), or expected throughput or latency.
 
    o  Protocol Selection Properties: The Protocol Selection Properties
       consist of the options that an application may set on a
@@ -557,7 +557,7 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.            Expires August 22, 2018               [Page 10]
+Pauly, et al.            Expires August 24, 2018               [Page 10]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -607,13 +607,13 @@ Internet-Draft              TAPS Architecture              February 2018
 
    o  Receive() is an action that indicates that the application is
       ready to asynchronously accept Content over a Connection from a
-      RemoteEndpoint, while the Content itself will be delivered in an
+      Remote Endpoint, while the Content itself will be delivered in an
       event Section 4.1.5.  The interface to Receive may include options
 
 
 
 
-Pauly, et al.            Expires August 22, 2018               [Page 11]
+Pauly, et al.            Expires August 24, 2018               [Page 11]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -669,7 +669,7 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.            Expires August 22, 2018               [Page 12]
+Pauly, et al.            Expires August 24, 2018               [Page 12]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -725,7 +725,7 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.            Expires August 22, 2018               [Page 13]
+Pauly, et al.            Expires August 24, 2018               [Page 13]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -757,7 +757,7 @@ Internet-Draft              TAPS Architecture              February 2018
    o  Endpoint Racing: Endpoint Racing is the act of attempting to
       establish, or scheduling attempts to establish, multiple Protocol
       Stacks that differ based on the specific representation of the
-      RemoteEndpoint and the LocalEndpoint, such as IP addresses
+      Remote Endpoint and the Local Endpoint, such as IP addresses
       resolved from a DNS hostname.
 
 5.  IANA Considerations
@@ -781,7 +781,7 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.            Expires August 22, 2018               [Page 14]
+Pauly, et al.            Expires August 24, 2018               [Page 14]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -837,7 +837,7 @@ Authors' Addresses
 
 
 
-Pauly, et al.            Expires August 22, 2018               [Page 15]
+Pauly, et al.            Expires August 24, 2018               [Page 15]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -893,7 +893,7 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.            Expires August 22, 2018               [Page 16]
+Pauly, et al.            Expires August 24, 2018               [Page 16]
 
 Internet-Draft              TAPS Architecture              February 2018
 
@@ -949,4 +949,4 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.            Expires August 22, 2018               [Page 17]
+Pauly, et al.            Expires August 24, 2018               [Page 17]

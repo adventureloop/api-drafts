@@ -311,7 +311,7 @@ address {
 
   <meta name="dct.creator" content="Pauly, T., Ed., Trammell, B., Ed., Brunstrom, A., Fairhurst, G., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-pauly-taps-arch-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-02-18" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-02-20" />
   <meta name="dct.abstract" content="This document provides an overview of the architecture of Transport Services, a system for exposing the features of transport protocols to applications. This architecture serves as a basis for Application Programming Interfaces (APIs) and implementations that provide flexibile transport networking services. It defines the common set of terminology and concepts to be used in more detailed discussion of transport services." />
   <meta name="description" content="This document provides an overview of the architecture of Transport Services, a system for exposing the features of transport protocols to applications. This architecture serves as a basis for Application Programming Interfaces (APIs) and implementations that provide flexibile transport networking services. It defines the common set of terminology and concepts to be used in more detailed discussion of transport services." />
 
@@ -335,7 +335,7 @@ address {
 <td class="right">B. Trammell, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: August 22, 2018</td>
+<td class="left">Expires: August 24, 2018</td>
 <td class="right">ETH Zurich</td>
 </tr>
 <tr>
@@ -380,7 +380,7 @@ address {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">February 18, 2018</td>
+<td class="right">February 20, 2018</td>
 </tr>
 
     	
@@ -396,7 +396,7 @@ address {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on August 22, 2018.</p>
+<p>This Internet-Draft will expire on August 24, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -558,9 +558,9 @@ address {
  +--&gt;| Preconnection |-----------&gt;| Connection |---------------&gt; Closed
  |   +---------------+     :      +------------+ Connection:
  |                         :      ^   ^    |     Finished  :
- +-- LocalEndpoint         :      |   |    |               :
+ +-- Local Endpoint        :      |   |    |               :
  |                         :      |   |    +---------+     :
- +-- RemoteEndpoint        :      |   |              |     :
+ +-- Remote Endpoint       :      |   |              |     :
  |                         :      |   |Send()        |     :
  +-- Path Selection        :      | +---------+      v     :
  |   Properties            :      | | Content |  Content   :
@@ -585,9 +585,9 @@ address {
 <p></p>
 
 <ul>
-<li>Preconnection: A Preconnection object is a representation of a potential connection. It has state that describes parameters of a Connection that might exist in the future: the LocalEndpoint from which that Connection will be established, the RemoteEndpoint to which it will connect, and Path Selection Properties, Protocol Selection Properties, and Specific Protocol Properties that influence the choice of transport that Connection will use. A Preconnection can be fully specified and represent a single possible Connection, or it can be partially specified such that it represents a family of possible Connections. The LocalEndpoint MUST be specified if the Preconnection is used to Listen() for incoming connections, but is OPTIONAL if it is used to Initiate() connections. The RemoteEndpoint MUST be specified in the Preconnection is used to Initiate() connections, but is OPTIONAL if it is used to Listen() for incoming connections.</li>
-<li>Connection: A Connection object represents an active transport protocol instance that can send and/or receive Content between a LocalEndpoint and a RemoteEndpoint. It holds state pertaining to the underlying transport protocol instance and any ongoing data transfer. This represents, for example, an active connection in a connection-oriented protocol such as TCP, or a fully-specified 5-tuple for a connectionless protocol such as UDP.</li>
-<li>Listener: A Listener object accepts incoming transport protocol connections from RemoteEndpoints  and generates corresponding Connection objects. It is created from a Preconnection object that specifies the type of incoming connections it will accept.</li>
+<li>Preconnection: A Preconnection object is a representation of a potential connection. It has state that describes parameters of a Connection that might exist in the future: the Local Endpoint from which that Connection will be established, the Remote Endpoint to which it will connect, and Path Selection Properties, Protocol Selection Properties, and Specific Protocol Properties that influence the choice of transport that Connection will use. A Preconnection can be fully specified and represent a single possible Connection, or it can be partially specified such that it represents a family of possible Connections. The Local Endpoint MUST be specified if the Preconnection is used to Listen() for incoming connections, but is OPTIONAL if it is used to Initiate() connections. The Remote Endpoint MUST be specified in the Preconnection is used to Initiate() connections, but is OPTIONAL if it is used to Listen() for incoming connections.</li>
+<li>Connection: A Connection object represents an active transport protocol instance that can send and/or receive Content between a Local Endpoint and a Remote Endpoint. It holds state pertaining to the underlying transport protocol instance and any ongoing data transfer. This represents, for example, an active connection in a connection-oriented protocol such as TCP, or a fully-specified 5-tuple for a connectionless protocol such as UDP.</li>
+<li>Listener: A Listener object accepts incoming transport protocol connections from Remote Endpoints  and generates corresponding Connection objects. It is created from a Preconnection object that specifies the type of incoming connections it will accept.</li>
 </ul>
 <h1 id="rfc.section.4.1.2">
 <a href="#rfc.section.4.1.2">4.1.2.</a> <a href="#preestablishment" id="preestablishment">Pre-Establishment</a>
@@ -595,9 +595,9 @@ address {
 <p></p>
 
 <ul>
-<li>RemoteEndpoint: The RemoteEndpoint represents the application&#8217;s name for a peer that can participate in a transport connection. For example, a DNS name for the peer.</li>
-<li>LocalEndpoint: The LocalEndpoint represents the application&#8217;s name for itself that it wants to use for transport connections. For example, a local interface name or address.</li>
-<li>Path Selection Properties: The Path Selection Properties consist of the options that an application may set on a Preconnection to influence the selection of path between itself and the RemoteEndpoint. These options can come in the form of requirements, prohibitions, or preferences. Examples of options which may influence path selection include the interface type (such as a Wi-Fi Ethernet connection, or a Cellular LTE connection), characteristics of the path that are locally known like Maximum Transmission Unit (MTU), or expected throughput or latency.</li>
+<li>Remote Endpoint: The Remote Endpoint represents the application&#8217;s name for a peer that can participate in a transport connection. For example, the combination of a DNS name for the peer and a service name/port.</li>
+<li>Local Endpoint: The Local Endpoint represents the application&#8217;s name for itself that it wants to use for transport connections. For example, a local interface name or address.</li>
+<li>Path Selection Properties: The Path Selection Properties consist of the options that an application may set on a Preconnection to influence the selection of path between itself and the Remote Endpoint. These options can come in the form of requirements, prohibitions, or preferences. Examples of options which may influence path selection include the interface type (such as a Wi-Fi Ethernet connection, or a Cellular LTE connection), characteristics of the path that are locally known like Maximum Transmission Unit (MTU), or expected throughput or latency.</li>
 <li>Protocol Selection Properties: The Protocol Selection Properties consist of the options that an application may set on a Preconnection to influence the selection of transport protocol, configure the behavior of generic transport protocol features. These options come in the form of requirements, prohibitions, and preferences. Examples include reliability, service class, multipath support, and fast open support.</li>
 <li>Specific Protocol Properties: The Specific Protocol Properties refer to the subset of Protocol Properties options that apply to a single protocol (transport protocol, IP, or security protocol). The presence of such Properties on a Preconnection does not necessarily require that a specific protocol must be used when a Connection is established from that Preconnection, but that if this protocol is employed, a particular set of options should be used. This is critical to allow compatibility with Protocol Properties on peers.</li>
 </ul>
@@ -618,7 +618,7 @@ address {
 <ul>
 <li>Content: A Content object is a unit of data that can be represented as bytes that can be transferred between two endpoints over a transport connection. The bytes within a unit of Content are assumed to be ordered within the unit itself. That is, if an application does not care about the order in which a peer receives two distinct spans of bytes, those spans of bytes are considered independent units of Content. Content may or may not be usable if incomplete or corrupted. Boundaries of Content may or may not be understood or transmitted by transport protocols. That is, what one application considers to be two units of Content sent on a stream-based transport may be treated as a single unit of Content by the application on the other side.</li>
 <li>Send() is the action to transmit Content over a Connection to a remote endpoint. The interface to Send may include options specific to how this Content is to be sent. Status of the Send operation may be delivered back to the application in an event <a href="#events" class="xref">Section 4.1.5</a>.</li>
-<li>Receive() is an action that indicates that the application is ready to asynchronously accept Content over a Connection from a RemoteEndpoint, while the Content itself will be delivered in an event <a href="#events" class="xref">Section 4.1.5</a>. The interface to Receive may include options specific to the Content that is to be delivered to the application.</li>
+<li>Receive() is an action that indicates that the application is ready to asynchronously accept Content over a Connection from a Remote Endpoint, while the Content itself will be delivered in an event <a href="#events" class="xref">Section 4.1.5</a>. The interface to Receive may include options specific to the Content that is to be delivered to the application.</li>
 </ul>
 <h1 id="rfc.section.4.1.5">
 <a href="#rfc.section.4.1.5">4.1.5.</a> <a href="#events" id="events">Event Handling</a>
@@ -674,7 +674,7 @@ address {
 <ul>
 <li>Protocol Option Racing: Protocol Racing is the act of attempting to establish, or scheduling attempts to establish, multiple Protocol Stacks that differ based on the composition of protocols or the options used for protocols.</li>
 <li>Path Racing: Path Racing is the act of attempting to establish, or scheduling attempts to establish, multiple Protocol Stacks that differ based on a selection from the available Paths.</li>
-<li>Endpoint Racing: Endpoint Racing is the act of attempting to establish, or scheduling attempts to establish, multiple Protocol Stacks that differ based on the specific representation of the RemoteEndpoint and the LocalEndpoint, such as IP addresses resolved from a DNS hostname.</li>
+<li>Endpoint Racing: Endpoint Racing is the act of attempting to establish, or scheduling attempts to establish, multiple Protocol Stacks that differ based on the specific representation of the Remote Endpoint and the Local Endpoint, such as IP addresses resolved from a DNS hostname.</li>
 </ul>
 <h1 id="rfc.section.5">
 <a href="#rfc.section.5">5.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a>
