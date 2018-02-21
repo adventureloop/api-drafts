@@ -100,7 +100,7 @@ Table of Contents
      7.2.  Sender-side Framing . . . . . . . . . . . . . . . . . . .  24
    8.  Receiving Data  . . . . . . . . . . . . . . . . . . . . . . .  25
      8.1.  Application-Layer Back-Pressure at the Receiver . . . . .  25
-     8.2.  Receiver-side De-framing over Stream Protocols  . . . . .  25
+     8.2.  Receiver-side De-framing over Stream Protocols  . . . . .  26
    9.  Introspection . . . . . . . . . . . . . . . . . . . . . . . .  26
    10. Connection Termination  . . . . . . . . . . . . . . . . . . .  27
    11. Event and Error Handling  . . . . . . . . . . . . . . . . . .  28
@@ -905,8 +905,12 @@ Internet-Draft               TAPS Interface                February 2018
    one or more candidate transport-layer connections to be created to
    the specified remote endpoint.  The caller may immediately begin
    sending Content on the Connection (see Section 7) after calling
-   Initate(), though it may wait for one of the following events before
-   doing so.
+   Initate(); note that any idempotent data sent while the Connection is
+   being established may be sent multiple times or on multiple
+   candidates.
+
+   The following events may be sent by the Connection after Initiate()
+   is called:
 
    Connection -> Ready<>
 
@@ -918,14 +922,15 @@ Internet-Draft               TAPS Interface                February 2018
 
    Connection -> InitiateError<>
 
-   An InitiateError occurs either when the set of local and remote
-   specifiers and transport and cryptographic parameters cannot be
-   fulfilled on a connection for initiation (e.g. the set of available
-   Paths and/or Protocol Stacks meeting the constraints is empty), when
-   the remote specifier cannot be resolved, or when no transport-layer
-   connection can be established to the remote endpoint (e.g.  because
-   the remote endpoint is not accepting connections, or the application
-   is prohibited from opening a connection by the operating system).
+   An InitiateError occurs either when the set of transport and
+   cryptographic parameters cannot be fulfilled on a connection for
+   initiation (e.g. the set of available Paths and/or Protocol Stacks
+   meeting the constraints is empty) or reconciled with the local and/or
+   remote endpoints; when the remote specifier cannot be resolved; or
+   when no transport-layer connection can be established to the remote
+   endpoint (e.g. because the remote endpoint is not accepting
+   connections, or the application is prohibited from opening a
+   connection by the operating system).
 
 6.2.  Passive Open: Listen
 
@@ -941,11 +946,6 @@ Internet-Draft               TAPS Interface                February 2018
    specifiers, as well as all parameters necessary for Protocol Stack
    selection.  The Listen() action consumes the Preconnection.  Once
    Listen() has been called, no further parameters may be bound to the
-   Preconnection, and no subsequent establishment call may be made on
-   the Preconnection.
-
-   Preconnection -> ConnectionReceived<Connection>
-
 
 
 
@@ -953,6 +953,11 @@ Trammell, et al.         Expires August 25, 2018               [Page 17]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   Preconnection, and no subsequent establishment call may be made on
+   the Preconnection.
+
+   Preconnection -> ConnectionReceived<Connection>
 
    The ConnectionReceived event occurs when a RemoteEndpoint has
    established a transport-layer connection to this Preconnection (for
@@ -997,11 +1002,6 @@ Internet-Draft               TAPS Interface                February 2018
    when the transport-layer connection is established; for
    connectionless transports, it occurs when the first Content is
    received from the RemoteEndpoint.  The resulting Connection is
-   contained within the Rendezvoused<> event, and is ready to use as
-   soon as it is passed to the application via the event.
-
-   Preconnection -> RendezvousError<contentRef, error>
-
 
 
 
@@ -1009,6 +1009,11 @@ Trammell, et al.         Expires August 25, 2018               [Page 18]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   contained within the Rendezvoused<> event, and is ready to use as
+   soon as it is passed to the application via the event.
+
+   Preconnection -> RendezvousError<contentRef, error>
 
    An RendezvousError occurs either when the Preconnection cannot be
    fulfilled for listening, when the LocalEndpoint or RemoteEndpoint
@@ -1053,11 +1058,6 @@ Internet-Draft               TAPS Interface                February 2018
    the group: a priority.  This priority, which can be represented as a
    non-negative integer or float, expresses a desired share of the
    Connection Group's available network capacity, such that an ideal
-   transport system implementation would assign the Connection the
-   capacity share P x C/sum_P, where P = priority, C = total available
-   capacity and sum_P = sum of all priority values that are used for the
-   Connections in the same Connection Group.  The priority setting is
-   purely advisory; no guarantees are given.
 
 
 
@@ -1065,6 +1065,12 @@ Trammell, et al.         Expires August 25, 2018               [Page 19]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   transport system implementation would assign the Connection the
+   capacity share P x C/sum_P, where P = priority, C = total available
+   capacity and sum_P = sum of all priority values that are used for the
+   Connections in the same Connection Group.  The priority setting is
+   purely advisory; no guarantees are given.
 
    Connection Groups should be created (i.e., the Clone action should be
    used) as early as possible, ideally already during the Pre-
@@ -1107,12 +1113,6 @@ Internet-Draft               TAPS Interface                February 2018
    responsibility of the implementation of this interface.  The exact
    disposition of Content when the Sent event occurs is specific to the
    implementation and the constraints on the Protocol Stacks implied by
-   the Connection's transport parameters.  The Sent event contains an
-   implementation-specific reference to the Content to which it applies.
-
-   Sent events allow an application to obtain an understanding of the
-   amount of buffering it creates.  That is, if an application calls the
-   Send action multiple times without waiting for a Sent event, it has
 
 
 
@@ -1122,6 +1122,12 @@ Trammell, et al.         Expires August 25, 2018               [Page 20]
 Internet-Draft               TAPS Interface                February 2018
 
 
+   the Connection's transport parameters.  The Sent event contains an
+   implementation-specific reference to the Content to which it applies.
+
+   Sent events allow an application to obtain an understanding of the
+   amount of buffering it creates.  That is, if an application calls the
+   Send action multiple times without waiting for a Sent event, it has
    created more buffer inside the transport system than an application
    that only issues a Send after this event fires.
 
@@ -1164,12 +1170,6 @@ Internet-Draft               TAPS Interface                February 2018
    [PHILS: Cleanup done.  From my perspective, there are Parameters
    (including Intents), that belong in both categories.  Besides those
    that are useful for per-connection and per-content path-selection (I
-   removed those for v1), there remain two dual-use properties: "Send
-   Bitrate" (path selection in connection / shaping and de-bursting in )
-   and "Timeliness" (path selection and DSCP default in connection /
-   buffering and DSCP per content) -- in both cases, I don't see how to
-   achieve the functionality when having them only in one of the
-   places.]
 
 
 
@@ -1177,6 +1177,13 @@ Trammell, et al.         Expires August 25, 2018               [Page 21]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   removed those for v1), there remain two dual-use properties: "Send
+   Bitrate" (path selection in connection / shaping and de-bursting in )
+   and "Timeliness" (path selection and DSCP default in connection /
+   buffering and DSCP per content) -- in both cases, I don't see how to
+   achieve the functionality when having them only in one of the
+   places.]
 
    The Send action takes per-Content send parameters which control how
    the contents will be sent down to the underlying Protocol Stack and
@@ -1219,13 +1226,6 @@ Internet-Draft               TAPS Interface                February 2018
    as a non-negative integer.  Content with Niceness 0 will yield to
    Content with Niceness 1, which will yield to Content with Niceness 2,
    and so on.  Niceness may be used as a sender-side scheduling
-   construct only, or be used to specify priorities on the wire for
-   Protocol Stacks supporting prioritization.
-
-   Note that this inversion of normal schemes for expressing priority
-   has a convenient property: priority increases as both Niceness and
-   Lifetime decrease.
-
 
 
 
@@ -1233,6 +1233,13 @@ Trammell, et al.         Expires August 25, 2018               [Page 22]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   construct only, or be used to specify priorities on the wire for
+   Protocol Stacks supporting prioritization.
+
+   Note that this inversion of normal schemes for expressing priority
+   has a convenient property: priority increases as both Niceness and
+   Lifetime decrease.
 
 7.1.1.3.  Ordered
 
@@ -1275,13 +1282,6 @@ Internet-Draft               TAPS Interface                February 2018
    of reliable transmission, this informs the transport protocol on the
    sender side faster that it can remove the Content from its buffer;
    therefore this property can be useful for latency-critical
-   applications that maintain tight control over the send buffer (see
-   Section 7).
-
-
-
-
-
 
 
 
@@ -1289,6 +1289,9 @@ Trammell, et al.         Expires August 25, 2018               [Page 23]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   applications that maintain tight control over the send buffer (see
+   Section 7).
 
 7.1.1.8.  Send Bitrate
 
@@ -1335,9 +1338,6 @@ Internet-Draft               TAPS Interface                February 2018
 
    Connection.FrameWith(Framer)
 
-   OctetArray := Framer.Frame(Content)
-
-
 
 
 
@@ -1345,6 +1345,8 @@ Trammell, et al.         Expires August 25, 2018               [Page 24]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   OctetArray := Framer.Frame(Content)
 
    Sender-side framing is a convenience feature of the interface, for
    parity with receiver-side framing (see Section 8.2).
@@ -1388,12 +1390,10 @@ Internet-Draft               TAPS Interface                February 2018
    implementation-platform specific, this document does not specify the
    exact nature of this interface.
 
-8.2.  Receiver-side De-framing over Stream Protocols
 
-   The Receive event is intended to be fired once per application-layer
-   Content sent by the remote endpoint; i.e., it is a desired property
-   of this interface that a Send at one end of a Connection maps to
-   exactly one Receive on the other end.  This is possible with Protocol
+
+
+
 
 
 
@@ -1402,6 +1402,12 @@ Trammell, et al.         Expires August 25, 2018               [Page 25]
 Internet-Draft               TAPS Interface                February 2018
 
 
+8.2.  Receiver-side De-framing over Stream Protocols
+
+   The Receive event is intended to be fired once per application-layer
+   Content sent by the remote endpoint; i.e., it is a desired property
+   of this interface that a Send at one end of a Connection maps to
+   exactly one Receive on the other end.  This is possible with Protocol
    Stacks that provide message boundary preservation, but is not the
    case over Protocol Stacks that provide a simple octet stream
    transport.
@@ -1445,18 +1451,18 @@ Internet-Draft               TAPS Interface                February 2018
       Establishing, Established, Closed.  [TASK: can connections be in a
       Closing state? (csp)]
 
-   o  Transport Features of the protocols that conform to the Required
-      and Prohibited Transport Preferences, which might be selected by
-      the transport system during Establishment.  These features
-      correspond to the properties given in Section 5.2 and can only be
-      queried.
-
 
 
 Trammell, et al.         Expires August 25, 2018               [Page 26]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   o  Transport Features of the protocols that conform to the Required
+      and Prohibited Transport Preferences, which might be selected by
+      the transport system during Establishment.  These features
+      correspond to the properties given in Section 5.2 and can only be
+      queried.
 
    o  Transport Features of the protocols that were selected, once the
       Connection has been established.  These features correspond to the
@@ -1500,12 +1506,6 @@ Internet-Draft               TAPS Interface                February 2018
    aborted the Connection; however, there is no guarantee that an abort
    will be signaled:
 
-   Connection -> ConnectionError<>
-
-
-
-
-
 
 
 
@@ -1513,6 +1513,8 @@ Trammell, et al.         Expires August 25, 2018               [Page 27]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   Connection -> ConnectionError<>
 
 11.  Event and Error Handling
 
@@ -1557,11 +1559,9 @@ Internet-Draft               TAPS Interface                February 2018
               Packet Markings for WebRTC QoS", draft-ietf-tsvwg-rtcweb-
               qos-18 (work in progress), August 2016.
 
-   [I-D.ietf-tsvwg-sctp-ndata]
-              Stewart, R., Tuexen, M., Loreto, S., and R. Seggelmann,
-              "Stream Schedulers and User Message Interleaving for the
-              Stream Control Transmission Protocol", draft-ietf-tsvwg-
-              sctp-ndata-13 (work in progress), September 2017.
+
+
+
 
 
 
@@ -1569,6 +1569,12 @@ Trammell, et al.         Expires August 25, 2018               [Page 28]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   [I-D.ietf-tsvwg-sctp-ndata]
+              Stewart, R., Tuexen, M., Loreto, S., and R. Seggelmann,
+              "Stream Schedulers and User Message Interleaving for the
+              Stream Control Transmission Protocol", draft-ietf-tsvwg-
+              sctp-ndata-13 (work in progress), September 2017.
 
    [TAPS-ARCH]
               Pauly, T., Ed., Trammell, B., Ed., Brunstrom, A.,
@@ -1613,12 +1619,6 @@ Appendix A.  Sample API definition in Go
 
 package postsocket
 
-import (
-  "crypto"
-  "crypto/tls"
-  "io"
-  "net"
-
 
 
 Trammell, et al.         Expires August 25, 2018               [Page 29]
@@ -1626,6 +1626,11 @@ Trammell, et al.         Expires August 25, 2018               [Page 29]
 Internet-Draft               TAPS Interface                February 2018
 
 
+import (
+  "crypto"
+  "crypto/tls"
+  "io"
+  "net"
   "time"
 )
 
@@ -1670,11 +1675,6 @@ type Local interface {
   WithServiceName(svc string) Local
 }
 
-type ParameterIdentifier int
-
-const (
-  TransportFullyReliable = iota
-
 
 
 Trammell, et al.         Expires August 25, 2018               [Page 30]
@@ -1682,6 +1682,10 @@ Trammell, et al.         Expires August 25, 2018               [Page 30]
 Internet-Draft               TAPS Interface                February 2018
 
 
+type ParameterIdentifier int
+
+const (
+  TransportFullyReliable = iota
   // ... and so on
 )
 
@@ -1726,10 +1730,6 @@ type SecurityParameters interface {
 type SendParameters struct {
   Lifetime time.Duration
   Niceness uint
-  Ordered bool
-  Immediate bool
-  Idempotent bool
-  CorruptionProtection int
 
 
 
@@ -1738,6 +1738,10 @@ Trammell, et al.         Expires August 25, 2018               [Page 31]
 Internet-Draft               TAPS Interface                February 2018
 
 
+  Ordered bool
+  Immediate bool
+  Idempotent bool
+  CorruptionProtection int
   AckImmediate bool
 }
 
@@ -1782,10 +1786,6 @@ type EventHandler interface {
 
 type FramingHandler interface {
   Frame(content interface{}) ([]byte, error)
-  Deframe(in io.Reader) (Content, error)
-}
-
-
 
 
 
@@ -1793,6 +1793,9 @@ Trammell, et al.         Expires August 25, 2018               [Page 32]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+  Deframe(in io.Reader) (Content, error)
+}
 
 Appendix B.  Transport Parameters
 
@@ -1825,9 +1828,6 @@ B.1.  Application Preferences
    The following table illustrates which Transport Parameter has which
    default preference level and which alternative preference levels an
    application may set.
-
-
-
 
 
 
