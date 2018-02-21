@@ -676,17 +676,23 @@ localSpecifier.withStunServer(address, port, credentials)
 <h1 id="rfc.section.5.2.2">
 <a href="#rfc.section.5.2.2">5.2.2.</a> <a href="#protocol-props" id="protocol-props">Protocol Properties</a>
 </h1>
-<p id="rfc.section.5.2.2.p.1">Protocol Properties represent the configuration of a transport protocol once it has been selected. A transport protocol may not support all Protocol Properties, depending on the available transport features.  As with Transport Preferences (<a href="#transport-prefs" class="xref">Section 5.2.1</a>), Protocol Properties are specified on the Preconnection object, and are using during initiation of a Connection to help the system choose an appropriate transport.  The system will only actually set those protocol properties that are actually supported by the chosen transport protocol.  These properties all apply to Connections and Connection groups.  The default settings of these properties depends on the chosen protocol and on the system configuration.</p>
+<p id="rfc.section.5.2.2.p.1">Protocol Properties represent the configuration that protocols should use once they have been selected. Some properties apply generically across multiple transport protocols, in which case they may be used by the system to help select candidate protocols. Other properties only apply to specific protocols. As with Transport Preferences (<a href="#transport-prefs" class="xref">Section 5.2.1</a>), Protocol Properties are specified on the Preconnection object. The default settings of these properties will vary based on the specific protocols being used and the system&#8217;s configuration.</p>
+<p id="rfc.section.5.2.2.p.2">Generic Protocol Properties include:</p>
 <p></p>
 
 <ul>
-<li>Set timeout for aborting Connection: This numeric property specifies how long to wait before aborting a Connection attempt.  It is given in seconds.</li>
+<li>Set timeout for aborting Connection establishment: This numeric property specifies how long to wait before aborting a Connection attempt.  It is given in seconds.</li>
 <li>Set timeout to suggest to the peer: This numeric property specifies the timeout to propose to the peer. It is given in seconds.</li>
 <li>Set retransmissions before &#8220;Excessive Retransmissions&#8221;: This numeric property specifies after how many retransmissions to inform the application about &#8220;Excessive Retransmissions&#8221;.</li>
 <li>Set required minimum coverage of the checksum for receiving: This numeric property specifies the part of the received data that needs to be covered by a checksum. It is given in Bytes. A value of 0 means that no checksum is required, and a special value (e.g., -1) indicates full checksum coverage.</li>
+</ul>
+<p></p>
+
+<ul>
 <li>Set scheduler for connections in a group: This property specifies which scheduler should be used among Connections within a Connection Group. It applies to connection groups. For now we suggest we the schedulers defined in <a href="#I-D.ietf-tsvwg-sctp-ndata" class="xref">[I-D.ietf-tsvwg-sctp-ndata]</a>.</li>
 <li>Maximum Content Size Before Connection Establishment: This numeric property represents the maximum Content size that can be sent before or during Connection establishment, see also <a href="#send-idempotent" class="xref">Section 7.1.1.5</a>.  It is given in Bytes.</li>
 </ul>
+<p id="rfc.section.5.2.2.p.5">In order to specify Specific Protocol Properties, the application can attach a set of options to the Preconnection object, associated with a specific protocol.  For example, the application could specify a set of TCP Options to use if and only if TCP is selected by the system, including options such as the Maximum Segment Size (MSS), and options around Acknowledgement Stretching. Such properties should not be assumed to apply across different protocols, but must be possible to specify if required by the application.</p>
 <h1 id="rfc.section.5.2.3">
 <a href="#rfc.section.5.2.3">5.2.3.</a> <a href="#intents" id="intents">Application Intents</a>
 </h1>
