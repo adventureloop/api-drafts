@@ -289,26 +289,24 @@ address {
 <link href="#rfc.section.5" rel="Chapter" title="5 Pre-Establishment Phase">
 <link href="#rfc.section.5.1" rel="Chapter" title="5.1 Specifying Endpoints">
 <link href="#rfc.section.5.2" rel="Chapter" title="5.2 Specifying Transport Parameters">
-<link href="#rfc.section.5.2.1" rel="Chapter" title="5.2.1 Transport Preferences">
-<link href="#rfc.section.5.2.2" rel="Chapter" title="5.2.2 Protocol Properties">
-<link href="#rfc.section.5.2.3" rel="Chapter" title="5.2.3 Application Intents">
+<link href="#rfc.section.5.2.1" rel="Chapter" title="5.2.1 Protocol Selection Properties">
+<link href="#rfc.section.5.2.2" rel="Chapter" title="5.2.2 Path Selection Properties">
+<link href="#rfc.section.5.2.3" rel="Chapter" title="5.2.3 Protocol Properties">
 <link href="#rfc.section.5.2.4" rel="Chapter" title="5.2.4 Transport Parameters Object">
 <link href="#rfc.section.5.3" rel="Chapter" title="5.3 Specifying Security Parameters and Callbacks">
 <link href="#rfc.section.6" rel="Chapter" title="6 Establishing Connections">
 <link href="#rfc.section.6.1" rel="Chapter" title="6.1 Active Open: Initiate">
 <link href="#rfc.section.6.2" rel="Chapter" title="6.2 Passive Open: Listen">
-<link href="#rfc.section.6.3" rel="Chapter" title="6.3 Peer to Peer Establishment: Rendezvous">
+<link href="#rfc.section.6.3" rel="Chapter" title="6.3 Peer-to-Peer Establishment: Rendezvous">
 <link href="#rfc.section.6.4" rel="Chapter" title="6.4 Connection Groups">
 <link href="#rfc.section.7" rel="Chapter" title="7 Sending Data">
 <link href="#rfc.section.7.1" rel="Chapter" title="7.1 Send Parameters">
 <link href="#rfc.section.7.1.1" rel="Chapter" title="7.1.1 Content Properties">
-<link href="#rfc.section.7.1.2" rel="Chapter" title="7.1.2 Protocol Properties">
-<link href="#rfc.section.7.1.3" rel="Chapter" title="7.1.3 Application Intents">
 <link href="#rfc.section.7.2" rel="Chapter" title="7.2 Sender-side Framing">
 <link href="#rfc.section.8" rel="Chapter" title="8 Receiving Data">
-<link href="#rfc.section.8.1" rel="Chapter" title="8.1 Application-Layer Backpressure at the Receiver">
-<link href="#rfc.section.8.2" rel="Chapter" title="8.2 Receiver-side Deframing over Stream Protocols">
-<link href="#rfc.section.9" rel="Chapter" title="9 Maintenance">
+<link href="#rfc.section.8.1" rel="Chapter" title="8.1 Application-Layer Back-Pressure at the Receiver">
+<link href="#rfc.section.8.2" rel="Chapter" title="8.2 Receiver-side De-framing over Stream Protocols">
+<link href="#rfc.section.9" rel="Chapter" title="9 Setting and Querying of Connection Properties">
 <link href="#rfc.section.10" rel="Chapter" title="10 Connection Termination">
 <link href="#rfc.section.11" rel="Chapter" title="11 Event and Error Handling">
 <link href="#rfc.section.12" rel="Chapter" title="12 IANA Considerations">
@@ -324,12 +322,12 @@ address {
 <link href="#rfc.authors" rel="Chapter">
 
 
-  <meta name="generator" content="xml2rfc version 2.9.3 - https://tools.ietf.org/tools/xml2rfc" />
+  <meta name="generator" content="xml2rfc version 2.9.6 - https://tools.ietf.org/tools/xml2rfc" />
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
-  <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., Enghardt, T., and C. Wood" />
+  <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-trammell-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-02-16" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-02-23" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -353,8 +351,16 @@ address {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: August 20, 2018</td>
+<td class="left">Expires: August 27, 2018</td>
 <td class="right">University of Oslo</td>
+</tr>
+<tr>
+<td class="left"></td>
+<td class="right">T. Enghardt</td>
+</tr>
+<tr>
+<td class="left"></td>
+<td class="right">TU Berlin</td>
 </tr>
 <tr>
 <td class="left"></td>
@@ -386,10 +392,6 @@ address {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">T. Enghardt</td>
-</tr>
-<tr>
-<td class="left"></td>
 <td class="right">TU Berlin</td>
 </tr>
 <tr>
@@ -402,7 +404,7 @@ address {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">February 16, 2018</td>
+<td class="right">February 23, 2018</td>
 </tr>
 
     	
@@ -418,7 +420,7 @@ address {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on August 20, 2018.</p>
+<p>This Internet-Draft will expire on August 27, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -442,11 +444,11 @@ address {
 </li>
 <li>5.2.   <a href="#rfc.section.5.2">Specifying Transport Parameters</a>
 </li>
-<ul><li>5.2.1.   <a href="#rfc.section.5.2.1">Transport Preferences</a>
+<ul><li>5.2.1.   <a href="#rfc.section.5.2.1">Protocol Selection Properties</a>
 </li>
-<li>5.2.2.   <a href="#rfc.section.5.2.2">Protocol Properties</a>
+<li>5.2.2.   <a href="#rfc.section.5.2.2">Path Selection Properties</a>
 </li>
-<li>5.2.3.   <a href="#rfc.section.5.2.3">Application Intents</a>
+<li>5.2.3.   <a href="#rfc.section.5.2.3">Protocol Properties</a>
 </li>
 <li>5.2.4.   <a href="#rfc.section.5.2.4">Transport Parameters Object</a>
 </li>
@@ -458,7 +460,7 @@ address {
 </li>
 <li>6.2.   <a href="#rfc.section.6.2">Passive Open: Listen</a>
 </li>
-<li>6.3.   <a href="#rfc.section.6.3">Peer to Peer Establishment: Rendezvous</a>
+<li>6.3.   <a href="#rfc.section.6.3">Peer-to-Peer Establishment: Rendezvous</a>
 </li>
 <li>6.4.   <a href="#rfc.section.6.4">Connection Groups</a>
 </li>
@@ -468,19 +470,15 @@ address {
 </li>
 <ul><li>7.1.1.   <a href="#rfc.section.7.1.1">Content Properties</a>
 </li>
-<li>7.1.2.   <a href="#rfc.section.7.1.2">Protocol Properties</a>
-</li>
-<li>7.1.3.   <a href="#rfc.section.7.1.3">Application Intents</a>
-</li>
 </ul><li>7.2.   <a href="#rfc.section.7.2">Sender-side Framing</a>
 </li>
 </ul><li>8.   <a href="#rfc.section.8">Receiving Data</a>
 </li>
-<ul><li>8.1.   <a href="#rfc.section.8.1">Application-Layer Backpressure at the Receiver</a>
+<ul><li>8.1.   <a href="#rfc.section.8.1">Application-Layer Back-Pressure at the Receiver</a>
 </li>
-<li>8.2.   <a href="#rfc.section.8.2">Receiver-side Deframing over Stream Protocols</a>
+<li>8.2.   <a href="#rfc.section.8.2">Receiver-side De-framing over Stream Protocols</a>
 </li>
-</ul><li>9.   <a href="#rfc.section.9">Maintenance</a>
+</ul><li>9.   <a href="#rfc.section.9">Setting and Querying of Connection Properties</a>
 </li>
 <li>10.   <a href="#rfc.section.10">Connection Termination</a>
 </li>
@@ -570,20 +568,24 @@ address {
 <h1 id="rfc.section.5">
 <a href="#rfc.section.5">5.</a> <a href="#pre-establishment-phase" id="pre-establishment-phase">Pre-Establishment Phase</a>
 </h1>
-<p id="rfc.section.5.p.1">Establishment begins with the creation of a Connection&#8230;</p>
+<p id="rfc.section.5.p.1">The pre-establishment phase allows applications to specify parameters for the connections they&#8217;re about to make, or to query the API about potential connections they could make.</p>
+<p id="rfc.section.5.p.2">A Preconnection object represents a potential connection. It has state that describes parameters of a Connection that might exist in the future.  This state comprises information about the local and remote endpoints (see <a href="#endpointspec" class="xref">Section 5.1</a>), the transport parameters (see <a href="#transport-params" class="xref">Section 5.2</a>), and the security parameters (see <a href="#security-parameters" class="xref">Section 5.3</a>):</p>
 <pre>
-Connection := NewConnection(localSpecifier, remoteSpecifier, transportParameters, cryptographicParameters)
+   localEndpoint   := ...
+   remoteEndpoint  := ...
+   transportParams := ...
+   securityParams  := ...
+
+   preConnection := NewPreconnection(localEndpoint, remoteEndpoint,
+                                     transportParams, securityParams);
+
 </pre>
-<p id="rfc.section.5.p.2">[NOTE: note also that framers and deframers should be bound to connections during pre-establishment, forward-reference <a href="#send-framing" class="xref">Section 7.2</a> and <a href="#receive-framing" class="xref">Section 8.2</a>]</p>
+<p id="rfc.section.5.p.3">The Local Endpoint MUST be specified if the Preconnection is used to Listen() for incoming connections, but is OPTIONAL if it is used to Initiate() connections. The Remote Endpoint MUST be specified in the Preconnection is used to Initiate() connections, but is OPTIONAL if it is used to Listen() for incoming connections.</p>
+<p id="rfc.section.5.p.4">[NOTE: note also that framers and de-framers should be bound to the Preconnection object during pre-establishment, forward-reference <a href="#send-framing" class="xref">Section 7.2</a> and <a href="#receive-framing" class="xref">Section 8.2</a>]</p>
 <h1 id="rfc.section.5.1">
-<a href="#rfc.section.5.1">5.1.</a> <a href="#enpointspec" id="enpointspec">Specifying Endpoints</a>
+<a href="#rfc.section.5.1">5.1.</a> <a href="#endpointspec" id="endpointspec">Specifying Endpoints</a>
 </h1>
-<p id="rfc.section.5.1.p.1">[NOTE: name resolution is no explict step within the transport API.  Name resolution can be perfoemed whey creating endpoint objects, but may be deferred until connection establishment to incorporate transport parameters.]</p>
-<p id="rfc.section.5.1.p.2">The transport service API uses Endpoint objects to refer to local and remote endpoints.  Endpoint objects can be configured using varios endpoint representation, including IP addresses, hostnames, URLs or inteface names as well as port numbers and service names:</p>
-<pre>
-remoteSpecifier := NewEndpoint()
-remoteSpecifier("https://example.com")
-</pre>
+<p id="rfc.section.5.1.p.1">The transport services API uses Endpoint objects to refer to local and remote endpoints.  Endpoint objects can be configured using various representations of endpoint identifiers, including IP addresses, hostnames, or interface names as well as port numbers and service names:</p>
 <pre>
 remoteSpecifier := NewEndpoint()
 remoteSpecifier.withHostname("example.com")
@@ -604,28 +606,23 @@ localSpecifier := NewEndpoint()
 localSpecifier.withInterface("en0")
 localSpecifier.withPort(443)
 </pre>
-<p id="rfc.section.5.1.p.3">Implementations may also support additional endpoint representations and provide a single NewEndpoint() call that takes different endpoint representations.</p>
-<p id="rfc.section.5.1.p.4">Endpoint representations may imply transport protocols, pseudotransport protocols, or families of protocols, e.g., remoteSpecifier.withUrl(&#8220;https://example.com&#8221;) implies either using HTTP over TLS over TCP or using HTTP over QUIC over UDP.  Whether the protocols implied by the endpoint representation are provided by the transport system is implementation specific, but MUST BE tunable using pre-establishment properties.  Implementations SHOULD provide all parts of the implied transport stack they implement unless specified otherwise using pre-establishment properties.  For example, the transport system may provide TLS over TCP in the above example and let the application implement HTTP pseudo-transport itself.</p>
-<p id="rfc.section.5.1.p.5">[TASK: match with #initiate / #listen / #rendezvous and make sure the transport stack used is communicated ]</p>
+<pre>
+localSpecifier := NewLocalEndpoint()
+localSpecifier.withStunServer(address, port, credentials)
+</pre>
+<p id="rfc.section.5.1.p.2">Implementations may also support additional endpoint representations and provide a single NewEndpoint() call that takes different endpoint representations.</p>
+<p id="rfc.section.5.1.p.3">[TASK: match with #initiate / #listen / #rendezvous and make sure the transport stack used is communicated ]</p>
+<p id="rfc.section.5.1.p.4">Multiple endpoint identifiers can be specified for each LocalEndpoint and RemoteEndoint.  For example, a LocalEndpoint could be configured with two interface names, or a RemoteEndpoint could be specified via both IPv4 and IPv6 addresses.  The multiple identifiers refer to the same endpoint.</p>
+<p id="rfc.section.5.1.p.5">The transport services API will resolve names internally, when the Initiate(), Listen(), or Rendezvous() method is called establish a connection.  The API does not need the application to resolve names, and premature name resolution can damage performance by limiting the scope for alternate path discovery during connection establishment.  The Resolve() method is, however, provided to resolve a LocalEndpoint or a RemoteEndpoint in cases where this is required, for example with some NAT traversal protocols (see <a href="#rendezvous" class="xref">Section 6.3</a>).</p>
+<p id="rfc.section.5.1.p.6">[NOTE: the API needs MUST be explicit about when name resolution occurs, since the act of resolving a name leaks information, and there may be security implications if this happens unexpectedly.]</p>
 <h1 id="rfc.section.5.2">
 <a href="#rfc.section.5.2">5.2.</a> <a href="#transport-params" id="transport-params">Specifying Transport Parameters</a>
 </h1>
-<p id="rfc.section.5.2.p.1">When creating a connection, an application needs to specify transport parameters reflecting its requirements and preferences regarding its communication. These Transport parameters include <em>Transport Preferences</em> (towards protocol selection and path selection) as well as <em>Application Intents</em> (hints to the transport system what to optimize for) and <em>Protocol Properties</em> (to configure transport protocols).</p>
-<p id="rfc.section.5.2.p.2">All Transport Parameters are organized within a single name space, that is shared with Send Parameters (see <a href="#send-params" class="xref">Section 7.1</a>). While Application Intents and Protocol Properties take parameter specific values, Transport Preferences use one of five fixed levels (see <a href="#transport-prefs" class="xref">Section 5.2.1</a>).</p>
-<p id="rfc.section.5.2.p.3">Some parameters express strict requirements that the application relies on, while others are hints of what transport features would be helpful for the application. For example, if an application asks for reliable data transfer, choosing a transport protocol such as UDP, which does not have this feature, will break the application&#8217;s functionality. On the other hand, the option to not require checksums when receiving an individual Content can help optimize for low latency, but if not present, it will most likely not break the fundamental assumptions of the application.  Moreover, there can be conflicts between parameters set by the application: If multiple features are requested which are offered by different protocols, it may not be possible to satisfy all requirements.  Consequently, a transport system must prioritize Transport Parameters and consider the relevant trade-offs, see also <a href="#TAPS-MINSET" class="xref">[TAPS-MINSET]</a>.</p>
-<p id="rfc.section.5.2.p.4">Default preference levels and possible combinations of Transport Parameters and preference levels are specified in <a href="#appendix-preferences" class="xref">Appendix B.1</a>.</p>
-<h1 id="rfc.section.5.2.1">
-<a href="#rfc.section.5.2.1">5.2.1.</a> <a href="#transport-prefs" id="transport-prefs">Transport Preferences</a>
-</h1>
-<p id="rfc.section.5.2.1.p.1">Transport Preferences drive protocol selection and path selection on connection establishment.  Not all transport protocols work on all paths. Thus, transport protocol selection is tied to path selection, which may involve choosing between multiple local interfaces that are connected to different access networks.</p>
-<p id="rfc.section.5.2.1.p.2">Transport Preferences should be specified as early as possible to take effect and may not be changed after establishing a connection:</p>
-<p></p>
-
-<ul>
-<li>Preferences effecting protocol selection MUST be added to the TransportParameters object before establishing a connection.  Changing them later SHOULD result in a runtime error.</li>
-<li>Preferences effecting path selection MAY be changed but only effect future connection migrations or path selection for multipath protocols.</li>
-</ul>
-<p id="rfc.section.5.2.1.p.4">To reflect the needs of an individual connection, they can be specified with different preference, whereby the preference is one of the following levels:</p>
+<p id="rfc.section.5.2.p.1">A Preconnection object holds parameters reflecting the application&#8217;s requirements and preferences for the transport.  These include Protocol Selection and Path Selection Properties and Protocol Properties (to configure transport protocols).</p>
+<p id="rfc.section.5.2.p.2">Some parameters express strict requirements that the application relies on, while others are hints of what transport features would be helpful for the application. For example, if an application asks for reliable data transfer, choosing a transport protocol such as UDP, which does not have this feature, will break the application&#8217;s functionality. On the other hand, the option to not require checksums when receiving an individual Content can help optimize for low latency, but if not present, it will most likely not break the fundamental assumptions of the application.</p>
+<p id="rfc.section.5.2.p.3">Some Transport Parameters do not relate to requirements regarding the capabilities of a protocol or to protocol configuration, but are Application Intents. Intents reflect what the application wants to achieve, knows, assumes, or prefers regarding its own communication. They provide hints to the transport system what to optimize for, e.g., an application might want to optimize the new connection for low latency or high throughput. Intents can influence path selection or be generic connection properties.</p>
+<p id="rfc.section.5.2.p.4">Note that there can be conflicts between parameters set by the application: If multiple features are requested which are offered by different protocols, it may not be possible to satisfy all requirements.  Consequently, a transport system must prioritize Transport Parameters and consider the relevant trade-offs, see also <a href="#TAPS-MINSET" class="xref">[TAPS-MINSET]</a>.</p>
+<p id="rfc.section.5.2.p.5">To reflect the needs of an individual connection, they can be specified with different preference levels from the following table , whereby the preference is one of the following levels:</p>
 <table cellpadding="3" cellspacing="0" class="tt full center">
 <thead><tr>
 <th class="left">Preference</th>
@@ -645,7 +642,7 @@ localSpecifier.withPort(443)
 <td class="left">None / clear defaults</td>
 </tr>
 <tr>
-<td class="left"><samp>avid    </samp></td>
+<td class="left"><samp>avoid   </samp></td>
 <td class="left">Proceed if requested feature/property can not be avoided</td>
 </tr>
 <tr>
@@ -654,165 +651,64 @@ localSpecifier.withPort(443)
 </tr>
 </tbody>
 </table>
-<p id="rfc.section.5.2.1.p.5">There need to be sensible defaults for the Transport Preferences.  There need to be sensible defaults for the Protocol Selection Properties. The defaults given in the following section represent a configuration that can be implemented over TCP. An alternate set of default Protocol Selection Properties would represent a configuration that can be implemented over UDP.</p>
-<p id="rfc.section.5.2.1.p.6">The following properties apply to Connections and Connection Groups:</p>
-<h1 id="rfc.section.5.2.1.1">
-<a href="#rfc.section.5.2.1.1">5.2.1.1.</a> <a href="#reliable-data-transfer" id="reliable-data-transfer">Reliable Data Transfer</a>
+<p id="rfc.section.5.2.p.6">Default preference levels and possible combinations of Transport Parameters and preference levels are specified in <a href="#appendix-preferences" class="xref">Appendix B.1</a>.</p>
+<h1 id="rfc.section.5.2.1">
+<a href="#rfc.section.5.2.1">5.2.1.</a> <a href="#protocol-selection-props" id="protocol-selection-props">Protocol Selection Properties</a>
 </h1>
-<p id="rfc.section.5.2.1.1.p.1">This boolean property specifies whether the application needs the transport protocol to ensure that data is received completely and without corruption on the other side. This also entails being notified when a Connection is closed or aborted. This property applies to connections and connection groups.  This is a strict requirement. The default is to enable Reliable Data Transfer.</p>
-<h1 id="rfc.section.5.2.1.2">
-<a href="#rfc.section.5.2.1.2">5.2.1.2.</a> <a href="#preservation-of-data-ordering" id="preservation-of-data-ordering">Preservation of data ordering</a>
-</h1>
-<p id="rfc.section.5.2.1.2.p.1">This boolean property specifies whether the application needs the transport protocol to assure that data is received by the application on the other end in the same order as it was sent. This property applies to connections and connection groups. This is a strict requirement. The default is to preserve data ordering.</p>
-<h1 id="rfc.section.5.2.1.3">
-<a href="#rfc.section.5.2.1.3">5.2.1.3.</a> <a href="#configure-reliability-for-individual-content" id="configure-reliability-for-individual-content">Configure reliability for individual Content</a>
-</h1>
-<p id="rfc.section.5.2.1.3.p.1">This boolean property specifies whether an application considers it useful to indicate its reliability requirements on a per-Content basis. This property applies to connections and connection groups. This is not a strict requirement.  The default is to not have this option.</p>
-<h1 id="rfc.section.5.2.1.4">
-<a href="#rfc.section.5.2.1.4">5.2.1.4.</a> <a href="#request-not-to-delay-acknowledgment-sack-of-content" id="request-not-to-delay-acknowledgment-sack-of-content">Request not to delay acknowledgment (SACK) of Content</a>
-</h1>
-<p id="rfc.section.5.2.1.4.p.1">This boolean property specifies whether an application considers it useful to request for Content that its acknowledgment be sent out as early as possible (SACK) instead of potentially being bundled with other acknowledgments. This property applies to connections and connection groups. This is not a strict requirement. The default is to not have this option.</p>
-<h1 id="rfc.section.5.2.1.5">
-<a href="#rfc.section.5.2.1.5">5.2.1.5.</a> <a href="#use-0-rtt-session-establishment-with-idempotent-content" id="use-0-rtt-session-establishment-with-idempotent-content">Use 0-RTT session establishment with idempotent Content</a>
-</h1>
-<p id="rfc.section.5.2.1.5.p.1">This boolean property specifies whether an application would like to supply a Content to the transport protocol before Connection establishment, which will then be reliably transferred to the other side before or during connection establishment, potentially multiple times. See also <a href="#send-idempotent" class="xref">Section 7.1.1.5</a>.  This is a strict requirement. The default is to not have this option.</p>
-<h1 id="rfc.section.5.2.1.6">
-<a href="#rfc.section.5.2.1.6">5.2.1.6.</a> <a href="#use-connection-groups-with-priorities" id="use-connection-groups-with-priorities">Use Connection Groups with priorities</a>
-</h1>
-<p id="rfc.section.5.2.1.6.p.1">This boolean property specifies whether an application considers it useful to create Connection Groups and explicitly prioritize between Connections within a Connection Group.</p>
-<h1 id="rfc.section.5.2.1.7">
-<a href="#rfc.section.5.2.1.7">5.2.1.7.</a> <a href="#suggest-a-timeout-to-the-peer" id="suggest-a-timeout-to-the-peer">Suggest a timeout to the peer</a>
-</h1>
-<p id="rfc.section.5.2.1.7.p.1">This boolean property specifies whether an application considers it useful to propose a timeout until the connection is assumed to be lost. This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</p>
-<h1 id="rfc.section.5.2.1.8">
-<a href="#rfc.section.5.2.1.8">5.2.1.8.</a> <a href="#notification-of-special-errors-excessive-retransmissions-icmp-error-message-arrival" id="notification-of-special-errors-excessive-retransmissions-icmp-error-message-arrival">Notification of special errors (excessive retransmissions, ICMP error message arrival)</a>
-</h1>
-<p id="rfc.section.5.2.1.8.p.1">This boolean property specifies whether an application considers it useful to be informed in case sent data was retransmitted more often than a certain threshold, or when an ICMP error message arrives. This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</p>
-<h1 id="rfc.section.5.2.1.9">
-<a href="#rfc.section.5.2.1.9">5.2.1.9.</a> <a href="#control-checksum-coverage-on-sending-or-receiving" id="control-checksum-coverage-on-sending-or-receiving">Control checksum coverage on sending or receiving</a>
-</h1>
-<p id="rfc.section.5.2.1.9.p.1">This boolean property specifies whether the application considers it useful to enable / disable / configure a checksum when sending Content, or decide whether to require a checksum or not when receiving Content.  This property applies to Connections and Connection Groups. This is not a strict requirement, as it signifies a reduction in reliability. The default is full checksum coverage without being able to change it, and requiring a checksum when receiving.</p>
-<h1 id="rfc.section.5.2.1.10">
-<a href="#rfc.section.5.2.1.10">5.2.1.10.</a> <a href="#interface-type-to-prefer" id="interface-type-to-prefer">Interface Type to prefer</a>
-</h1>
-<p id="rfc.section.5.2.1.10.p.1">This property specifies which kind of access network interface, e.g., WiFi, Ethernet, or LTE, to prefer over others for this connection, in case they are available.  This is not a strict requirement. The default is to use the default interface configured in the system policy.</p>
-<h1 id="rfc.section.5.2.1.11">
-<a href="#rfc.section.5.2.1.11">5.2.1.11.</a> <a href="#interface-type-to-prohibit" id="interface-type-to-prohibit">Interface Type to prohibit</a>
-</h1>
-<p id="rfc.section.5.2.1.11.p.1">This property specifies which kind of access network interface, e.g., WiFi, Ethernet, or LTE, to not use for this connection. This is a strict requirement and connection establishment will fail if no other interface is available. The default is to not prohibit any particular interface.</p>
+<p id="rfc.section.5.2.1.p.1">Transport Preferences drive protocol selection and path selection on connection establishment. Since there could be paths over which some transport protocols are unable to operate, or remote endpoints that support only specific network addresses or transports, transport protocol selection is necessarily tied to path selection. This may involve choosing between multiple local interfaces that are connected to different access networks.</p>
+<p id="rfc.section.5.2.1.p.2">The Transport Preferences form part of the information used to create a Preconnection object. As such, they can be configured during the pre-establishment phase, but cannot be changed once a Connection has been established.</p>
+<p id="rfc.section.5.2.1.p.3">There need to be sensible defaults for the Transport Preferences as well as Protocol Selection Properties. The defaults given in the following section represent a configuration that can be implemented over TCP. An alternate set of default Protocol Selection Properties would represent a configuration that can be implemented over UDP.</p>
+<p id="rfc.section.5.2.1.p.4">The following properties apply to Connections and Connection Groups:</p>
+<p></p>
+
+<ul>
+<li>Reliable Data Transfer: This boolean property specifies whether the application needs the transport protocol to ensure that data is received completely and without corruption on the other side. This also entails being notified when a Connection is closed or aborted. This property applies to connections and connection groups.  This is a strict requirement. The default is to enable Reliable Data Transfer.</li>
+<li>Preservation of data ordering: This boolean property specifies whether the application needs the transport protocol to assure that data is received by the application on the other end in the same order as it was sent. This property applies to connections and connection groups. This is a strict requirement. The default is to preserve data ordering.</li>
+<li>Configure reliability for individual Content: This boolean property specifies whether an application considers it useful to indicate its reliability requirements on a per-Content basis.  This property applies to connections and connection groups. This is not a strict requirement.  The default is to not have this option.</li>
+<li>Request not to delay acknowledgment of Content: This boolean property specifies whether an application considers it useful to request for Content that its acknowledgment be sent out as early as possible instead of potentially being bundled with other acknowledgments. This property applies to connections and connection groups. This is not a strict requirement. The default is to not have this option.</li>
+<li>Use 0-RTT session establishment with idempotent Content: This boolean property specifies whether an application would like to supply a Content to the transport protocol before Connection establishment, which will then be reliably transferred to the other side before or during connection establishment, potentially multiple times.  See also <a href="#send-idempotent" class="xref">Section 7.1.1.5</a>.  This is a strict requirement. The default is to not have this option.</li>
+<li>Use Connection Groups with priorities: This boolean property specifies whether an application considers it useful to create Connection Groups and explicitly prioritize between Connections within a Connection Group.  This is not a strict requirement.  The default is to not have this option.</li>
+<li>Suggest a timeout to the peer: This boolean property specifies whether an application considers it useful to propose a timeout until the connection is assumed to be lost.  This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</li>
+<li>Notification of special errors (excessive retransmissions, ICMP error message arrival): This boolean property specifies whether an application considers it useful to be informed in case sent data was retransmitted more often than a certain threshold, or when an ICMP error message arrives. This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</li>
+<li>Control checksum coverage on sending or receiving: This boolean property specifies whether the application considers it useful to enable / disable / configure a checksum when sending Content, or decide whether to require a checksum or not when receiving Content.  This property applies to Connections and Connection Groups. This is not a strict requirement, as it signifies a reduction in reliability. The default is full checksum coverage without being able to change it, and requiring a checksum when receiving.</li>
+</ul>
 <h1 id="rfc.section.5.2.2">
-<a href="#rfc.section.5.2.2">5.2.2.</a> <a href="#protocol-props" id="protocol-props">Protocol Properties</a>
+<a href="#rfc.section.5.2.2">5.2.2.</a> <a href="#path-selection-props" id="path-selection-props">Path Selection Properties</a>
 </h1>
-<p id="rfc.section.5.2.2.p.1">Protocol Properties represent the configuration of a transport protocols once it has been selected. A transport protocol may not support all Protocol Properties, depending on the available transport features. An application should specify the Protocol Properties as early as possible to help the TAPS system optimize. However, a TAPS system will only actually set those protocol properties that are actually supported by the chosen transport protocol. These property all apply to Connections and Connection groups.  The default settings of these properties depends on the chosen protocol and on the system configuration.</p>
-<h1 id="rfc.section.5.2.2.1">
-<a href="#rfc.section.5.2.2.1">5.2.2.1.</a> <a href="#set-timeout-for-aborting-connection" id="set-timeout-for-aborting-connection">Set timeout for aborting Connection</a>
-</h1>
-<p id="rfc.section.5.2.2.1.p.1">This numeric property specifies how long to wait before aborting a Connection.  It is given in seconds.</p>
-<h1 id="rfc.section.5.2.2.2">
-<a href="#rfc.section.5.2.2.2">5.2.2.2.</a> <a href="#set-timeout-to-suggest-to-the-peer" id="set-timeout-to-suggest-to-the-peer">Set timeout to suggest to the peer</a>
-</h1>
-<p id="rfc.section.5.2.2.2.p.1">This numeric property specifies the timeout to propose to the peer. It is given in seconds.</p>
-<h1 id="rfc.section.5.2.2.3">
-<a href="#rfc.section.5.2.2.3">5.2.2.3.</a> <a href="#set-retransmissions-before-excessive-retransmissions" id="set-retransmissions-before-excessive-retransmissions">Set retransmissions before &#8220;Excessive Retransmissions&#8221;</a>
-</h1>
-<p id="rfc.section.5.2.2.3.p.1">This numeric property specifies after how many retransmissions to inform the application about &#8220;Excessive Retransmissions&#8221;.</p>
-<h1 id="rfc.section.5.2.2.4">
-<a href="#rfc.section.5.2.2.4">5.2.2.4.</a> <a href="#set-required-minimum-coverage-of-the-checksum-for-receiving" id="set-required-minimum-coverage-of-the-checksum-for-receiving">Set required minimum coverage of the checksum for receiving</a>
-</h1>
-<p id="rfc.section.5.2.2.4.p.1">This numeric property specifies the part of the received data that needs to be covered by a checksum. It is given in Bytes. A value of 0 means that no checksum is required, and a special value (e.g., -1) indicates full checksum coverage.</p>
-<h1 id="rfc.section.5.2.2.5">
-<a href="#rfc.section.5.2.2.5">5.2.2.5.</a> <a href="#set-scheduler-for-connections-in-a-group" id="set-scheduler-for-connections-in-a-group">Set scheduler for connections in a group</a>
-</h1>
-<p id="rfc.section.5.2.2.5.p.1">This property specifies which scheduler should be used among Connections within a Connection Group. It applies to connection groups. For now we suggest we the schedulers defined in <a href="#I-D.ietf-tsvwg-sctp-ndata" class="xref">[I-D.ietf-tsvwg-sctp-ndata]</a>.</p>
-<h1 id="rfc.section.5.2.2.6">
-<a href="#rfc.section.5.2.2.6">5.2.2.6.</a> <a href="#maximum-content-size-before-connection-establishment" id="maximum-content-size-before-connection-establishment">Maximum Content Size Before Connection Establishment</a>
-</h1>
-<p id="rfc.section.5.2.2.6.p.1">This numeric property can be queried by the application after creating a Connection. It represents the maximum Content size that can be sent before or during Connection establishment, see also <a href="#send-idempotent" class="xref">Section 7.1.1.5</a>. It is given in Bytes.</p>
+<p></p>
+
+<ul>
+<li>Interface Type: This property specifies which kind of access network interface, e.g., WiFi, Ethernet, or LTE, to require, prefer, avoid, or prohibit for this connection.  Of course this depends on whether they are available. The default is to use the default interface configured in the system policy.</li>
+<li>Path property to optimize for: This Intent specifies whether the application expects the new connection to be bandwidth bound or latency bound.  Values can be one of the following: Optimize for low latency, Optimize for high throughput.  This Intent can help the transport system select one of multiple available paths that best match the intended traffic of the application.  Note that setting this Intents does not imply any guarantees on whether an application&#8217;s requirements can actually be satisfied.  The default is to not assume any particular traffic category or preference.</li>
+<li>Size to be Sent or Received: This Intent specifies what the application expects the size of a transfer to be.  It is a numeric property and given in Bytes.  The application may know this before opening a connection from metadata or after issuing an HTTP HEAD request or an HTTP request with a limited Content-Range.  This property can be specified instead of the Path property to optimize for. The reason is that the application does not always know whether the transfer should be optimized for low latency or high throughput, as the threshold between the two categories relates to the size of the transfer and the current path characteristics. When the size is given, the transport system can calculate based on it whether to optimize for low latency or high throughput.</li>
+<li>Metered or expensive paths: This Intent describes what an application prefers regarding monetary costs, e.g., whether it considers it acceptable to utilize limited data volume.  The default is to prefer paths that are not associated with limits or monetary cost.</li>
+</ul>
 <h1 id="rfc.section.5.2.3">
-<a href="#rfc.section.5.2.3">5.2.3.</a> <a href="#intents" id="intents">Application Intents</a>
+<a href="#rfc.section.5.2.3">5.2.3.</a> <a href="#protocol-props" id="protocol-props">Protocol Properties</a>
 </h1>
-<p id="rfc.section.5.2.3.p.1">Application Intents are a group of properties expressing what an application wants to achieve, knows, assumes or prefers regarding its communication. They are not strict requirements. In particular, they should not be used to express any Quality of Service expectations that an application might have. Instead, an application should express its intentions and its expected traffic characteristics in order to help the transport system make decisions that best match it, but on a best-effort basis. Even though Application Intents do not represent Quality of Service requirements, a transport system may use them to determine a DSCP value, e.g. similar to Table 1 in <a href="#I-D.ietf-tsvwg-rtcweb-qos" class="xref">[I-D.ietf-tsvwg-rtcweb-qos]</a>.</p>
-<p id="rfc.section.5.2.3.p.2">Application Intents can influence protocol selection, protocol configuration, path selection, and endpoint selection. For example, setting the &#8220;Timeliness&#8221; Intent to &#8220;Interactive&#8221; may lead the transport system to disable the Nagle algorithm for a connection, while setting the &#8220;Timeliness&#8221; to &#8220;Background&#8221; may lead it to setting the DSCP value to &#8220;scavenger&#8221;. If the &#8220;Size to be Sent&#8221; Intent is set on individual Content, it may influence path selection, e.g., when the TAPS system schedules big Content over an interface with higher bandwidth, and small Content over an interface with lower latency.</p>
-<p id="rfc.section.5.2.3.p.3">Specifying Application Intents is not mandatory. An application can specify any combination of Application Intents. All Application Intents can be specified for connections and cloning a Connection to form a Connection Group will clone the associated Intents along with the other transport parameters. Some Intents can also be specified for individual Content, similar to the properties in <a href="#send-params" class="xref">Section 7.1</a>.</p>
-<h1 id="rfc.section.5.2.3.1">
-<a href="#rfc.section.5.2.3.1">5.2.3.1.</a> <a href="#traffic-category" id="traffic-category">Traffic Category</a>
-</h1>
-<p id="rfc.section.5.2.3.1.p.1">This Intent specifies what the application expect the dominating traffic pattern to be.</p>
-<p id="rfc.section.5.2.3.1.p.2">Possible Category values are:</p>
+<p id="rfc.section.5.2.3.p.1">Protocol Properties represent the configuration that protocols should use once they have been selected. Some properties apply generically across multiple transport protocols, in which case they may be used by the system to help select candidate protocols. Other properties only apply to specific protocols. As with Transport Preferences (<a href="#protocol-selection-props" class="xref">Section 5.2.1</a>), Protocol Properties are specified on the Preconnection object. The default settings of these properties will vary based on the specific protocols being used and the system&#8217;s configuration.</p>
+<p id="rfc.section.5.2.3.p.2">Generic Protocol Properties include:</p>
 <p></p>
 
-<dl>
-<dt>Query:</dt>
-<dd style="margin-left: 8">Single request / response style workload, latency bound</dd>
-<dt>Control:</dt>
-<dd style="margin-left: 8">Long lasting low bandwidth control channel, not bandwidth bound</dd>
-<dt>Stream:</dt>
-<dd style="margin-left: 8">Stream of bytes/Content with steady data rate</dd>
-<dt>Bulk:</dt>
-<dd style="margin-left: 8">Bulk transfer of large Content, presumably bandwidth bound</dd>
-</dl>
-<p id="rfc.section.5.2.3.1.p.4">The default is to not assume any particular traffic pattern. Most categories suggest the use of other intents to further describe the traffic pattern anticipated, e.g., the bulk category suggesting the use of the Message Size intents or the stream category suggesting the Stream Bitrate and Duration intents.</p>
-<h1 id="rfc.section.5.2.3.2">
-<a href="#rfc.section.5.2.3.2">5.2.3.2.</a> <a href="#size-to-be-sent-received" id="size-to-be-sent-received">Size to be Sent / Received</a>
-</h1>
-<p id="rfc.section.5.2.3.2.p.1">This Intent specifies what the application expects the size of a transfer to be.  It is a numeric property and given in Bytes. This Intent can also apply to individual Content.</p>
-<p id="rfc.section.5.2.3.2.p.2">Duration</p>
-<p id="rfc.section.5.2.3.2.p.3">This Intent specifies what the application expects the lifetime of a transfer to be. It is a numeric property and given in milliseconds.</p>
-<p id="rfc.section.5.2.3.2.p.4">Stream Bitrate Sent / Received</p>
-<p id="rfc.section.5.2.3.2.p.5">This Intent specifies what the application expects the bitrate of a transfer to be. It is a numeric property and given in Bytes per second.</p>
-<h1 id="rfc.section.5.2.3.3">
-<a href="#rfc.section.5.2.3.3">5.2.3.3.</a> <a href="#timeliness" id="timeliness">Timeliness</a>
-</h1>
-<p id="rfc.section.5.2.3.3.p.1">This Intent specifies what delay characteristcs the applications prefers. It provides hints for the transport system whether to optimize for low latency or other criteria. Note that setting this Intents does not imply any guarantees on whether an application&#8217;s requirements can actually be satisfied. This Intent can also apply to individual Content.</p>
+<ul>
+<li>Set timeout for aborting Connection establishment: This numeric property specifies how long to wait before aborting a Connection attempt.  It is given in seconds.</li>
+<li>Set timeout to suggest to the peer: This numeric property specifies the timeout to propose to the peer. It is given in seconds.</li>
+<li>Set retransmissions before &#8220;Excessive Retransmissions&#8221;: This numeric property specifies after how many retransmissions to inform the application about &#8220;Excessive Retransmissions&#8221;.</li>
+<li>Set required minimum coverage of the checksum for receiving: This numeric property specifies the part of the received data that needs to be covered by a checksum. It is given in Bytes. A value of 0 means that no checksum is required, and a special value (e.g., -1) indicates full checksum coverage.</li>
+</ul>
 <p></p>
 
-<dl>
-<dt>Stream:</dt>
-<dd style="margin-left: 8">Delay and packet delay variation should be kept as low as possible</dd>
-<dt>Interactive:</dt>
-<dd style="margin-left: 8">Delay should be kept as low as possible, but some variation is tolerable</dd>
-<dt>Transfer:</dt>
-<dd style="margin-left: 8">Delay and packet delay variation should be reasonable, but are not critical</dd>
-<dt>Background:</dt>
-<dd style="margin-left: 8">Delay and packet delay variation is no concern</dd>
-</dl>
-<p id="rfc.section.5.2.3.3.p.3">The default is &#8220;Transfer&#8221;.</p>
-<h1 id="rfc.section.5.2.3.4">
-<a href="#rfc.section.5.2.3.4">5.2.3.4.</a> <a href="#disruption-resilience" id="disruption-resilience">Disruption Resilience</a>
-</h1>
-<p id="rfc.section.5.2.3.4.p.1">This Intent describes what an application knows about its own ability to deal with disruption of its communication, e.g., connection loss. It provides hints of how well an application assumes it can recover from such disturbances and can have an impact on the tradeoff between providing failover techniques and resource utilization. This Intent can also apply to individual Content.</p>
-<p></p>
-
-<dl>
-<dt>Sensitive:</dt>
-<dd style="margin-left: 8">Disruptions result in application failure, disrupting user experience</dd>
-<dt>Recoverable:</dt>
-<dd style="margin-left: 8">Disruptions are inconvenient for the application, but can be recovered from</dd>
-<dt>Resilient:</dt>
-<dd style="margin-left: 8">Disruptions have minimal impact for the application</dd>
-</dl>
-<p id="rfc.section.5.2.3.4.p.3">The default is &#8220;Sensitive&#8221;.</p>
-<h1 id="rfc.section.5.2.3.5">
-<a href="#rfc.section.5.2.3.5">5.2.3.5.</a> <a href="#cost-preferences" id="cost-preferences">Cost Preferences</a>
-</h1>
-<p id="rfc.section.5.2.3.5.p.1">This Intent describes what an application prefers regarding monetary costs, e.g., whether it considers it acceptable to utilize limited data volume. It provides hints to the transport system on how to handle tradeoffs between cost and performance or reliability. This Intent can also apply to individual Content.</p>
-<p></p>
-
-<dl>
-<dt>No Expense:</dt>
-<dd style="margin-left: 8">Avoid transports associated with monetary cost</dd>
-<dt>Optimize Cost:</dt>
-<dd style="margin-left: 8">Prefer inexpensive transports and accept service degradation</dd>
-<dt>Balance Cost:</dt>
-<dd style="margin-left: 8">Use system policy to balance cost and other criteria</dd>
-<dt>Ignore Cost:</dt>
-<dd style="margin-left: 8">Ignore cost, choose transport solely based on other criteria</dd>
-</dl>
-<p id="rfc.section.5.2.3.5.p.3">The default is &#8220;Balance Cost&#8221;.</p>
+<ul>
+<li>Set scheduler for connections in a group: This property specifies which scheduler should be used among Connections within a Connection Group. It applies to connection groups. For now we suggest we the schedulers defined in <a href="#I-D.ietf-tsvwg-sctp-ndata" class="xref">[I-D.ietf-tsvwg-sctp-ndata]</a>.</li>
+<li>Maximum Content Size Before Connection Establishment: This numeric property represents the maximum Content size that can be sent before or during Connection establishment, see also <a href="#send-idempotent" class="xref">Section 7.1.1.5</a>.  It is given in Bytes.</li>
+<li>Traffic Category: This Intent specifies the intended use of the Connection and corresponds to the priority of the communication for the application.  Possible values are: Data transfer, Interactive video stream, Interactive audio stream, Background traffic. While they may be used to set DSCP code points, Intents do not represent Quality of Service requirements, but rather hints for a transport system what to optimize for on a best-effort basis.</li>
+<li>Send Bit-rate This Intent specifies what the application expects the bit-rate of a transfer to be. It is a numeric property and given in Bytes per second. The transport system may use this Intent to limit the sending rate by placing an upper bound on a congestion window.</li>
+</ul>
+<p id="rfc.section.5.2.3.p.5">In order to specify Specific Protocol Properties, the application can attach a set of options to the Preconnection object, associated with a specific protocol.  For example, the application could specify a set of TCP Options to use if and only if TCP is selected by the system, including options such as the Maximum Segment Size (MSS), and options around Acknowledgement Stretching. Such properties should not be assumed to apply across different protocols, but must be possible to specify if required by the application.</p>
 <h1 id="rfc.section.5.2.4">
 <a href="#rfc.section.5.2.4">5.2.4.</a> <a href="#transport-parameters-object" id="transport-parameters-object">Transport Parameters Object</a>
 </h1>
-<p id="rfc.section.5.2.4.p.1">All transport parameters used in the pre-establishment phase are collected in a <em>TransportParameters</em> object.  For the sake of convenience, we suggests implementing TransportParameters class as sub-class of an existing Dictionary or Set class to allow in-place notion of Transport Parameters.</p>
+<p id="rfc.section.5.2.4.p.1">All transport parameters used in the pre-establishment phase are collected in a TransportParameters object that is passed to the Preconnection object.</p>
 <pre>
 transportParameters := NewTransportParameters()
 </pre>
@@ -825,16 +721,17 @@ transportParameters.add(parameter, value)
 transportParameters.require(preference)
 transportParameters.prefer(preference)
 transportParameters.dontcare(preference)
-transportParameters.avid(preference)
+transportParameters.avoid(preference)
 transportParameters.prohibit(preference)
 </pre>
 <p id="rfc.section.5.2.4.p.3">For an existing connection, the Transport Parameters can be queried any time by using the following call on the Connection object:</p>
 <pre>
 transportParameters := connection.getTransportParameters()
 </pre>
-<p id="rfc.section.5.2.4.p.4">[Note that most properties are only considered for connection establishment and can not be changed later on. <a href="#appendix-specify-query-params" class="xref">Appendix B.2</a> gives an overview of what Transport Parameters can be specified and queried during which phase. ]</p>
-<p id="rfc.section.5.2.4.p.5">Connections can be cloned at any time, before or after establishment.  A cloned connection and its parent are entangled: they share the same TransportParameters object, changing any parameter for one of them also changes the parameter for the other, connecting one of them also connects the other, etc.  Cloning connections during pre-establishment is encouraged, as it informs the transport system about the intent to form Connection Groups.</p>
-<p id="rfc.section.5.2.4.p.6">[Note that priority assignment ((see also <a href="#groups" class="xref">Section 6.4</a> for more details) is not shared among cloned connections. Therefore, the priority assignment MUST NOT be realized using the connection level TransportParameters object.]</p>
+<p id="rfc.section.5.2.4.p.4">Note that most properties are only considered for connection establishment and can not be changed later on. <a href="#appendix-specify-query-params" class="xref">Appendix B.2</a> gives an overview of what Transport Parameters can be specified and queried during which phase.</p>
+<p id="rfc.section.5.2.4.p.5">[Note: We need to more clearly separate out parameters that can be changed once a connection has been established from those that cannot. (csp)]</p>
+<p id="rfc.section.5.2.4.p.6">Connections can be cloned at any time, before or after establishment.  A cloned connection and its parent are entangled: they share the same TransportParameters object, changing any parameter for one of them also changes the parameter for the other, connecting one of them also connects the other, etc.  Cloning connections during pre-establishment is encouraged, as it informs the transport system about the intent to form Connection Groups.</p>
+<p id="rfc.section.5.2.4.p.7">Note that priority assignment ((see also <a href="#groups" class="xref">Section 6.4</a> for more details) is not shared among cloned connections. Therefore, the priority assignment MUST NOT be realized using the connection level TransportParameters object.</p>
 <h1 id="rfc.section.5.3">
 <a href="#rfc.section.5.3">5.3.</a> <a href="#security-parameters" id="security-parameters">Specifying Security Parameters and Callbacks</a>
 </h1>
@@ -899,64 +796,76 @@ securityParameters.SetIdentityChallengeCallback(challengeCallback)
 <a href="#rfc.section.6.1">6.1.</a> <a href="#initiate" id="initiate">Active Open: Initiate</a>
 </h1>
 <p id="rfc.section.6.1.p.1">Active open is the action of establishing a connection to an endpoint presumed to be listening for incoming connection requests, commonly used by clients in client-server interactions. Active open is supported by this interface through the Initiate action:</p>
-<p id="rfc.section.6.1.p.2">Connection.Initiate()</p>
-<p id="rfc.section.6.1.p.3">Before calling Initiate, the caller must have initialized the Connection during the pre-establishment phase with local and remote endpoint specifiers, as well as all parameters necessary for candidate selection. After calling Initiate, no further parameters may be bound to the Connection, and no subsequent establishment call may be made on the Connection.</p>
-<p id="rfc.section.6.1.p.4">Once Initiate is called, the candidate Protocol Stack(s) may cause one or more transport-layer connections to be created to the specified remote endpoint.  The caller may immediately begin sending Content on the Connection (see <a href="#sending" class="xref">Section 7</a>) after calling Initate, though it may wait for one of the following events before doing so.</p>
-<p id="rfc.section.6.1.p.5">Connection -&gt; Ready&lt;&gt;</p>
-<p id="rfc.section.6.1.p.6">The Ready event occurs after Initiate has established a transport-layer connection on at least one usable candidate Protocol Stack over at least one candidate Path. No Receive events (see <a href="#receiving" class="xref">Section 8</a>) will occur until after the Ready event for connections established using Initiate.  [MICHAEL: This is a difficult read. Can we phrase this as &#8220;&#8230;will occur before the Ready event for connections&#8230;&#8221;, or did you have a specific reason to write &#8220;until after the Ready event&#8221;?]</p>
-<p id="rfc.section.6.1.p.7">Connection -&gt; InitiateError&lt;&gt;</p>
-<p id="rfc.section.6.1.p.8">An InitiateError occurs either when the set of local and remote specifiers and transport and cryptographic parameters cannot be fulfilled on a connection for initiation (e.g. the set of available Paths and/or Protocol Stacks meeting the constraints is empty), when the remote specifier cannot be resolved, or when no transport-layer connection can be established to the remote endpoint (e.g.  because the remote endpoint is not accepting connections, or the application is prohibited from opening a connection by the operating system).</p>
+<p id="rfc.section.6.1.p.2">Connection := Preconnection.Initiate()</p>
+<p id="rfc.section.6.1.p.3">Before calling Initiate, the caller must have populated a Preconnection object with local and remote endpoint specifiers, as well as all parameters necessary for candidate selection. After calling Initiate, no further parameters may be bound to the Connection. The Initiate() call consumes the Preconnection and creates a Connection object. A Preconnection can only be initiated once.</p>
+<p id="rfc.section.6.1.p.4">Once Initiate is called, the candidate Protocol Stack(s) may cause one or more candidate transport-layer connections to be created to the specified remote endpoint. The caller may immediately begin sending Content on the Connection (see <a href="#sending" class="xref">Section 7</a>) after calling Initate(); note that any idempotent data sent while the Connection is being established may be sent multiple times or on multiple candidates.</p>
+<p id="rfc.section.6.1.p.5">The following events may be sent by the Connection after Initiate() is called:</p>
+<p id="rfc.section.6.1.p.6">Connection -&gt; Ready&lt;&gt;</p>
+<p id="rfc.section.6.1.p.7">The Ready event occurs after Initiate has established a transport-layer connection on at least one usable candidate Protocol Stack over at least one candidate Path. No Receive events (see <a href="#receiving" class="xref">Section 8</a>) will occur before the Ready event for connections established using Initiate.</p>
+<p id="rfc.section.6.1.p.8">Connection -&gt; InitiateError&lt;&gt;</p>
+<p id="rfc.section.6.1.p.9">An InitiateError occurs either when the set of transport and cryptographic parameters cannot be fulfilled on a connection for initiation (e.g. the set of available Paths and/or Protocol Stacks meeting the constraints is empty) or reconciled with the local and/or remote endpoints; when the remote specifier cannot be resolved; or when no transport-layer connection can be established to the remote endpoint (e.g. because the remote endpoint is not accepting connections, or the application is prohibited from opening a connection by the operating system).</p>
 <h1 id="rfc.section.6.2">
 <a href="#rfc.section.6.2">6.2.</a> <a href="#listen" id="listen">Passive Open: Listen</a>
 </h1>
 <p id="rfc.section.6.2.p.1">Passive open is the action of waiting for connections from remote endpoints, commonly used by servers in client-server interactions. Passive open is supported by this interface through the Listen action:</p>
-<p id="rfc.section.6.2.p.2">Connection.Listen()</p>
-<p id="rfc.section.6.2.p.3">Before calling Listen, the caller must have initialized the Connection during the pre-establishment phase with local endpoint specifiers, as well as all parameters necessary for Protocol Stack selection. After calling Listen, no further parameters may be bound to the Connection, and no subsequent establishment call may be made on the Connection.</p>
-<p id="rfc.section.6.2.p.4">Connection -&gt; ConnectionReceived&lt;Connection&gt;</p>
-<p id="rfc.section.6.2.p.5">The ConnectionReceived event occurs when a remote endpoint has established a transport-layer connection to this Connection or when the remote endpoint has sent its first Content, causing a new Connection to be created. The resulting Connection is contained within the ConnectionReceived event, and is ready to use as soon as it is passed to the application via the event.</p>
-<p id="rfc.section.6.2.p.6">[MICHAEL: JFYI, just to explain why I added &#8220;or when the remote endpoint has sent its first Content&#8221; above: in case the connection is in fact a stream, nothing may happen on the wire when doing Connect, and the first thing the listener gets may already be the first data block.]</p>
-<p id="rfc.section.6.2.p.7">Connection -&gt; ListenError&lt;&gt;</p>
-<p id="rfc.section.6.2.p.8">A ListenError occurs either when the set of local specifier, transport and cryptographic parameters cannot be fulfilled for listening, when the local specifier cannot be resolved, or when the application is prohibited from listening by the operating system.</p>
+<p id="rfc.section.6.2.p.2">Preconnection.Listen()</p>
+<p id="rfc.section.6.2.p.3">Before calling Listen, the caller must have initialized the Preconnection during the pre-establishment phase with local endpoint specifiers, as well as all parameters necessary for Protocol Stack selection.  The Listen() action consumes the Preconnection. Once Listen() has been called, no further parameters may be bound to the Preconnection, and no subsequent establishment call may be made on the Preconnection.</p>
+<p id="rfc.section.6.2.p.4">Preconnection -&gt; ConnectionReceived&lt;Connection&gt;</p>
+<p id="rfc.section.6.2.p.5">The ConnectionReceived event occurs when a RemoteEndpoint has established a transport-layer connection to this Preconnection (for connection-oriented transport protocols), or when the first Content has been received from the remote endpoint (for connectionless protocols), causing a new Connection to be created. The resulting Connection is contained within the ConnectionReceived event, and is ready to use as soon as it is passed to the application via the event.</p>
+<p id="rfc.section.6.2.p.6">PreConnection -&gt; Error&lt;&gt;</p>
+<p id="rfc.section.6.2.p.7">A ListenError occurs either when the Preconnection cannot be fulfilled for listening, when the LocalEndpoint (or RemoteEndpoint, if specified) cannot be resolved, or when the application is prohibited from listening by policy.</p>
 <h1 id="rfc.section.6.3">
-<a href="#rfc.section.6.3">6.3.</a> <a href="#rendezvous" id="rendezvous">Peer to Peer Establishment: Rendezvous</a>
+<a href="#rfc.section.6.3">6.3.</a> <a href="#rendezvous" id="rendezvous">Peer-to-Peer Establishment: Rendezvous</a>
 </h1>
-<p id="rfc.section.6.3.p.1">Connection.Rendezvous()</p>
-<p id="rfc.section.6.3.p.2">Connection -&gt; Ready&lt;&gt;</p>
-<p id="rfc.section.6.3.p.3">Connection -&gt; RendezvousError&lt;&gt;</p>
+<p id="rfc.section.6.3.p.1">Simultaneous peer-to-peer connection establishment is supported by the Rendezvous() action:</p>
+<p id="rfc.section.6.3.p.2">Preconnection.Rendezvous()</p>
+<p id="rfc.section.6.3.p.3">The Preconnection object must be specified with both a LocalEndpoint and a RemoteEndpoint, and also the transport and security parameters needed for protocol stack selection. The Rendezvous() action causes the Preconnection to listen on the LocalEndpoint for an incoming connection from the RemoteEndpoint, while simultaneously trying to establish a connection from the LocalEndpoint to the RemoteEndpoint.  This corresponds to a TCP simultaneous open, for example.</p>
+<p id="rfc.section.6.3.p.4">The Rendezvous() action consumes the Preconnection. Once Rendezvous() has been called, no further parameters may be bound to the Preconnection, and no subsequent establishment call may be made on the Preconnection.</p>
+<p id="rfc.section.6.3.p.5">Preconnection -&gt; RendezvousDone&lt;Connection&gt;</p>
+<p id="rfc.section.6.3.p.6">The RendezvousDone&lt;&gt; event occurs when a connection is established with the RemoteEndpoint. For connection-oriented transports, this occurs when the transport-layer connection is established; for connectionless transports, it occurs when the first Content is received from the RemoteEndpoint. The resulting Connection is contained within the RendezvousDone&lt;&gt; event, and is ready to use as soon as it is passed to the application via the event.</p>
+<p id="rfc.section.6.3.p.7">Preconnection -&gt; RendezvousError&lt;contentRef, error&gt;</p>
+<p id="rfc.section.6.3.p.8">An RendezvousError occurs either when the Preconnection cannot be fulfilled for listening, when the LocalEndpoint or RemoteEndpoint cannot be resolved, when no transport-layer connection can be established to the RemoteEndpoint, or when the application is prohibited from rendezvous by policy.</p>
+<p id="rfc.section.6.3.p.9">When using some NAT traversal protocols, e.g., ICE <a href="#RFC5245" class="xref">[RFC5245]</a>, it is expected that the LocalEndpoint will be configured with some method of discovering NAT bindings, e.g., a STUN server. In this case, the LocalEndpoint may resolve to a mixture of local and server reflexive addresses. The Resolve() method on the Preconnection can be used to discover these bindings:</p>
+<pre>
+PreconnectionBindings := Preconnection.Resolve()
+</pre>
+<p id="rfc.section.6.3.p.10">The Resolve() call returns a list of Preconnection objects, that represent the concrete addresses, local and server reflexive, on which a Rendezvous() for the Preconnection will listen for incoming connections. This list can be passed to a peer via a signalling protocol, such as SIP or WebRTC, to configure the remote.</p>
+<p id="rfc.section.6.3.p.11">[NOTE: This API is sufficient for TCP-style simultaneous open, but should be considered experimental for ICE-like protocols.]</p>
 <h1 id="rfc.section.6.4">
 <a href="#rfc.section.6.4">6.4.</a> <a href="#groups" id="groups">Connection Groups</a>
 </h1>
 <p id="rfc.section.6.4.p.1">Groups of Connections can be created using Clone action:</p>
 <p id="rfc.section.6.4.p.2">Connection := Connection.Clone()</p>
 <p id="rfc.section.6.4.p.3">Calling this once yields a group of two Connections: the parent Connection &#8211; whose Clone action was called &#8211; and the resulting clone. Calling Clone on any of these two Connections adds a third Connection to the group, and so on.  All Connections in a group are entangled. This means that they automatically share all properties: changing a parameter for one of them also changes the parameter for all others, closing one of them also closes all others, etc.</p>
-<p id="rfc.section.6.4.p.4">There is only one Protocol Property that is not entangled, i.e. it is a separate per-Connection Property for individual Connections in the group: a priority.  This priority, which can be represented as a non-negative integer or float, expresses a desired share of the Connection Group&#8217;s available network capacity, such that an ideal transport system implementation would assign the Connection the capacity share P x C/sum_P, where P = priority, C = total available capacity and sum_P = sum of all priority values that are used for the Connections in the same Connection Group.  The priority setting is purely advisory; no guarantees are given.</p>
+<p id="rfc.section.6.4.p.4">There is only one Protocol Property that is not entangled, i.e., it is a separate per-Connection Property for individual Connections in the group: a priority.  This priority, which can be represented as a non-negative integer or float, expresses a desired share of the Connection Group&#8217;s available network capacity, such that an ideal transport system implementation would assign the Connection the capacity share P x C/sum_P, where P = priority, C = total available capacity and sum_P = sum of all priority values that are used for the Connections in the same Connection Group.  The priority setting is purely advisory; no guarantees are given.</p>
 <p id="rfc.section.6.4.p.5">Connection Groups should be created (i.e., the Clone action should be used) as early as possible, ideally already during the Pre-Establishment phase, in order to aid the Transport System in choosing and configuring the right protocols (see also <a href="#transport-params" class="xref">Section 5.2</a>).</p>
+<p id="rfc.section.6.4.p.6">[TASK: If Clone() is a method on Connection, it cannot be called during pre-establishment, since we don&#8217;t have a Connection at that time (csp)]</p>
 <h1 id="rfc.section.7">
 <a href="#rfc.section.7">7.</a> <a href="#sending" id="sending">Sending Data</a>
 </h1>
 <p id="rfc.section.7.p.1">Once a Connection has been established, it can be used for sending data. Data is sent by passing a Content object and additional parameters <a href="#send-params" class="xref">Section 7.1</a> to the Send action on an established connection:</p>
-<p id="rfc.section.7.p.2">Connection.Send(Content, SentParameters)</p>
+<p id="rfc.section.7.p.2">Connection.Send(Content, sendParameters)</p>
 <p id="rfc.section.7.p.3">The type of the Content to be passed is dependent on the implementation, and on the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. It may itself contain an array of octets to be transmitted in the transport protocol payload, or be transformable to an array of octets by a sender-side framer (see <a href="#send-framing" class="xref">Section 7.2</a>).</p>
 <p id="rfc.section.7.p.4">If Send is called on a Connection which has not yet been established, an Initiate action will be implicitly performed simultaneously with the Send.  Used together with the Idempotent property (see <a href="#send-idempotent" class="xref">Section 7.1.1.5</a>), this can be used to send data during establishment for 0-RTT session resumption on Protocol Stacks that support it.</p>
 <p id="rfc.section.7.p.5">Like all Actions in this interface, the Send action is asynchronous.</p>
 <p id="rfc.section.7.p.6">Connection -&gt; Sent&lt;contentRef&gt;</p>
-<p id="rfc.section.7.p.7">The Sent event occurs when a previous Send action has completed, i.e. when the data derived from the Content has been passed down or through the underlying Protocol Stack and is no longer the responsibility of the implementation of this interface. The exact disposition of Content when the Sent event occurs is specific to the implementation and the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. The Sent event contains an implementation-specific reference to the Content to which it applies.</p>
+<p id="rfc.section.7.p.7">The Sent event occurs when a previous Send action has completed, i.e., when the data derived from the Content has been passed down or through the underlying Protocol Stack and is no longer the responsibility of the implementation of this interface. The exact disposition of Content when the Sent event occurs is specific to the implementation and the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. The Sent event contains an implementation-specific reference to the Content to which it applies.</p>
 <p id="rfc.section.7.p.8">Sent events allow an application to obtain an understanding of the amount of buffering it creates. That is, if an application calls the Send action multiple times without waiting for a Sent event, it has created more buffer inside the transport system than an application that only issues a Send after this event fires.</p>
 <p id="rfc.section.7.p.9">Connection -&gt; Expired&lt;contentRef&gt;</p>
 <p id="rfc.section.7.p.10">The Expired event occurs when a previous Send action expired before completion; i.e. when the data derived from the Content was not sent before its Lifetime (see <a href="#send-lifetime" class="xref">Section 7.1.1.1</a>) expired. This is separate from SendError, as it is an expected behavior for partially reliable transports. The Expired event contains an implementation-specific reference to the Content to which it applies.</p>
 <p id="rfc.section.7.p.11">Connection -&gt; SendError&lt;contentRef&gt;</p>
-<p id="rfc.section.7.p.12">A SendError occurs when Content could not be sent due to an error condition: some failure of the underlying Protocol Stack, or a set of send parameters not consistent with the Connection&#8217;s transport parameters.</p>
+<p id="rfc.section.7.p.12">A SendError occurs when Content could not be sent due to an error condition: some failure of the underlying Protocol Stack, or a set of send parameters not consistent with the Connection&#8217;s transport parameters. The SendError contains an implementation-specific reference to the Content to which it applies.</p>
 <h1 id="rfc.section.7.1">
 <a href="#rfc.section.7.1">7.1.</a> <a href="#send-params" id="send-params">Send Parameters</a>
 </h1>
 <p id="rfc.section.7.1.p.1">The Send action takes per-Content send parameters which control how the contents will be sent down to the underlying Protocol Stack and transmitted.</p>
-<p id="rfc.section.7.1.p.2">If Send Parameters should be overridden for a specific content, an empty sent parameter Object can be acquired and all desired Send Parameters can be added to that object. A Send Parameters object can be reused for sending multiple contents with the same properties.</p>
+<p id="rfc.section.7.1.p.2">If Send Parameters should be overridden for a specific content, an empty sent parameter Object can be acquired and all desired Send Parameters can be added to that object. A sendParameters object can be reused for sending multiple contents with the same properties.</p>
 <pre>
-sentParameters := NewSentParameters()
-sentParameters.add(parameter, value)
+sendParameters := NewSendParameters()
+sendParameters.add(parameter, value)
 </pre>
-<p id="rfc.section.7.1.p.3">The Send Parameters are organized in <em>Content Properties</em>, <em>Protocol Properties</em>, and <em>Application Intents</em>.  The Send Parameters share a single namespace with the Transport Parameters (see <a href="#transport-params" class="xref">Section 5.2</a>). This allows to specify Protocol Properties and that can be overridden on a per content basis or Application Intents that apply to a specific content.  See <a href="#appendix-specify-query-params" class="xref">Appendix B.2</a> for an overview.</p>
-<p id="rfc.section.7.1.p.4">[Note that some of these parameters are not compatible with transport parameters; attempting to Send with such an incompatibility yields a SendError.]</p>
+<p id="rfc.section.7.1.p.3">The Send Parameters are organized in <em>Content Properties</em> and <em>Application Intents</em>.  The Send Parameters share a single namespace with the Transport Parameters (see <a href="#transport-params" class="xref">Section 5.2</a>). This allows to specify Protocol Properties and that can be overridden on a per content basis or Application Intents that apply to a specific content.  See <a href="#appendix-specify-query-params" class="xref">Appendix B.2</a> for an overview.</p>
+<p id="rfc.section.7.1.p.4">[NOTE: some of these parameters are not compatible with transport parameters; attempting to Send with such an incompatibility yields a SendError.]</p>
 <h1 id="rfc.section.7.1.1">
 <a href="#rfc.section.7.1.1">7.1.1.</a> <a href="#content-properties" id="content-properties">Content Properties</a>
 </h1>
@@ -981,47 +890,14 @@ sentParameters.add(parameter, value)
 <a href="#rfc.section.7.1.1.5">7.1.1.5.</a> <a href="#send-idempotent" id="send-idempotent">Idempotent</a>
 </h1>
 <p id="rfc.section.7.1.1.5.p.1">Idempotent is a boolean property. If true, the application-layer entity in the Content is safe to send to the remote endpoint more than once for a single Send action. It is used to mark data safe for certain 0-RTT establishment techniques, where retransmission of the 0-RTT data may cause the remote application to receive the Content multiple times.</p>
-<p id="rfc.section.7.1.1.5.p.2">[NOTE: we need some way to signal to the transport that we want to wait for 0RTT data on Initiate. Probably a transport parameter] [MICHAEL: why? As an app programmer, I can just use Send instead of Initiate.]</p>
 <h1 id="rfc.section.7.1.1.6">
-<a href="#rfc.section.7.1.1.6">7.1.1.6.</a> <a href="#send-checksum" id="send-checksum">Checksum</a>
+<a href="#rfc.section.7.1.1.6">7.1.1.6.</a> <a href="#send-checksum" id="send-checksum">Corruption Protection Length</a>
 </h1>
-<p id="rfc.section.7.1.1.6.p.1">This numeric property specifies the length of the checksum to be used on the Content.  A value of 0 means that no checksum is required, and a special value (e.g. -1) can be used to indicate full checksum coverage (which is also the default). Only full coverage is guaranteed, any other requests are advisory.</p>
-<h1 id="rfc.section.7.1.2">
-<a href="#rfc.section.7.1.2">7.1.2.</a> <a href="#protocol-properties" id="protocol-properties">Protocol Properties</a>
+<p id="rfc.section.7.1.1.6.p.1">This numeric property specifies the length of the section of content, starting from byte 0, that the application assumes will be received without corruption due to lower layer errors. It is used to specify options for simple integrity protection via checksums. By default, the entire Content is protected by checksum. A value of 0 means that no checksum is required, and a special value (e.g. -1) can be used to indicate the default. Only full coverage is guaranteed, any other requests are advisory.</p>
+<h1 id="rfc.section.7.1.1.7">
+<a href="#rfc.section.7.1.1.7">7.1.1.7.</a> <a href="#send-ackimmed" id="send-ackimmed">Immediate Acknowledgement</a>
 </h1>
-<p id="rfc.section.7.1.2.p.1">[NOTE: this will be mostly protocol specific stuff as urgent data for TCP - maybe also move Checksum here]</p>
-<h1 id="rfc.section.7.1.3">
-<a href="#rfc.section.7.1.3">7.1.3.</a> <a href="#application-intents" id="application-intents">Application Intents</a>
-</h1>
-<h1 id="rfc.section.7.1.3.1">
-<a href="#rfc.section.7.1.3.1">7.1.3.1.</a> <a href="#size-to-be-received" id="size-to-be-received">Size to be Received</a>
-</h1>
-<p id="rfc.section.7.1.3.1.p.1">On a bi-directional connection, this Intent specifies what amount of data the application expects to receive in reply to the content sent.  It is a numeric property and given in Bytes.</p>
-<h1 id="rfc.section.7.1.3.2">
-<a href="#rfc.section.7.1.3.2">7.1.3.2.</a> <a href="#stream-bitrate-sent" id="stream-bitrate-sent">Stream Bitrate Sent</a>
-</h1>
-<p id="rfc.section.7.1.3.2.p.1">This Intent specifies what bitrate the application wishes the content to be sent with. This is useful as input for any transport that does packet pacing.  It is a numeric property and given in Bytes per second.</p>
-<h1 id="rfc.section.7.1.3.3">
-<a href="#rfc.section.7.1.3.3">7.1.3.3.</a> <a href="#stream-bitrate-received" id="stream-bitrate-received">Stream Bitrate Received</a>
-</h1>
-<p id="rfc.section.7.1.3.3.p.1">On a bi-directional connection, this Intent specifies what bitrate the application expects to receive in reply to the content sent.  It is a numeric property and given in Bytes per second.</p>
-<h1 id="rfc.section.7.1.3.4">
-<a href="#rfc.section.7.1.3.4">7.1.3.4.</a> <a href="#cost-preferences-1" id="cost-preferences-1">Cost Preferences</a>
-</h1>
-<p id="rfc.section.7.1.3.4.p.1">This Intent describes what an application prefers regarding monetary costs, e.g., whether it considers it acceptable to utilize limited data volume. It provides hints to the transport system on how to handle tradeoffs between cost and performance or reliability. This Intent can also apply to individual Content.</p>
-<p></p>
-
-<dl>
-<dt>No Expense:</dt>
-<dd style="margin-left: 8">Avoid transports associated with monetary cost</dd>
-<dt>Optimize Cost:</dt>
-<dd style="margin-left: 8">Prefer inexpensive transports and accept service degradation</dd>
-<dt>Balance Cost:</dt>
-<dd style="margin-left: 8">Use system policy to balance cost and other criteria</dd>
-<dt>Ignore Cost:</dt>
-<dd style="margin-left: 8">Ignore cost, choose transport solely based on other criteria</dd>
-</dl>
-<p id="rfc.section.7.1.3.4.p.3">The default is &#8220;Balance Cost&#8221;.</p>
+<p id="rfc.section.7.1.1.7.p.1">This boolean property specifies, if true, that an application wants this Content to be acknowledged immediately by the receiver. In case of reliable transmission, this informs the transport protocol on the sender side faster that it can remove the Content from its buffer; therefore this property can be useful for latency-critical applications that maintain tight control over the send buffer (see <a href="#sending" class="xref">Section 7</a>).</p>
 <h1 id="rfc.section.7.2">
 <a href="#rfc.section.7.2">7.2.</a> <a href="#send-framing" id="send-framing">Sender-side Framing</a>
 </h1>
@@ -1034,47 +910,53 @@ sentParameters.add(parameter, value)
 </h1>
 <p id="rfc.section.8.p.1">Once a Connection is established, Content may be received on it. The interface notifies the application that content has been received via the Received event:</p>
 <p id="rfc.section.8.p.2">Connection -&gt; Received&lt;Content&gt;</p>
-<p id="rfc.section.8.p.3">As with sending, the type of the Content to be passed is dependent on the implementation, and on the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. The Content may also contain metadata from protocols in the Protocol Stack for logging and debugging purposes. In particular, when this information is available, the value of the Explicit Congestion Notification (ECN) field is contained in such metadata.</p>
+<p id="rfc.section.8.p.3">As with sending, the type of the Content to be passed is dependent on the implementation, and on the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. The Content may also contain metadata from protocols in the Protocol Stack; which metadata is available is Protocol Stack dependent. In particular, when this information is available, the value of the Explicit Congestion Notification (ECN) field is contained in such metadata.  This information can be used for logging and debugging purposes, and for building applications which need access to information about the transport internals for their own operation.</p>
 <p id="rfc.section.8.p.4">The Content object must provide some method to retrieve an octet array containing application data, corresponding to a single message within the underlying Protocol Stack&#8217;s framing.  See <a href="#receive-framing" class="xref">Section 8.2</a> for handling framing in situations where the Protocol Stack provides octet-stream transport only.</p>
 <p id="rfc.section.8.p.5">Connection -&gt; ReceiveError&lt;&gt;</p>
 <p id="rfc.section.8.p.6">A ReceiveError occurs when data is received by the underlying Protocol Stack that cannot be fully retrieved or deframed, or when some other indication is received that reception has failed. Such conditions that irrevocably lead the the termination of the Connection are signaled using ConnectionError instead (see <a href="#termination" class="xref">Section 10</a>).</p>
 <h1 id="rfc.section.8.1">
-<a href="#rfc.section.8.1">8.1.</a> <a href="#receive-backpressure" id="receive-backpressure">Application-Layer Backpressure at the Receiver</a>
+<a href="#rfc.section.8.1">8.1.</a> <a href="#receive-backpressure" id="receive-backpressure">Application-Layer Back-Pressure at the Receiver</a>
 </h1>
 <p id="rfc.section.8.1.p.1">Implementations of this interface must provide some way for the application to indicate that it is temporarily not ready to receive new Content. Since the mechanisms of event handling are implementation-platform specific, this document does not specify the exact nature of this interface.</p>
 <h1 id="rfc.section.8.2">
-<a href="#rfc.section.8.2">8.2.</a> <a href="#receive-framing" id="receive-framing">Receiver-side Deframing over Stream Protocols</a>
+<a href="#rfc.section.8.2">8.2.</a> <a href="#receive-framing" id="receive-framing">Receiver-side De-framing over Stream Protocols</a>
 </h1>
 <p id="rfc.section.8.2.p.1">The Receive event is intended to be fired once per application-layer Content sent by the remote endpoint; i.e., it is a desired property of this interface that a Send at one end of a Connection maps to exactly one Receive on the other end. This is possible with Protocol Stacks that provide message boundary preservation, but is not the case over Protocol Stacks that provide a simple octet stream transport.</p>
-<p id="rfc.section.8.2.p.2">For preserving message boundaries over stream transports, this interface provides receiver-side deframing. This facility is based on the observation that, since many of our current application protocols evolved over TCP, which does not provide message boundary preservation, and since many of these protocols require message boundaries to function, each application layer protocol has defined its own framing. A Deframer allows an application to push this deframing down into the interface, in order to transform an octet stream into a sequence of Content.</p>
-<p id="rfc.section.8.2.p.3">Concretely, receiver-side deframing allows a caller to provide the interface with a function that takes an octet stream, as provided by the underlying Protocol Stack, reads and returns a sigle Content of an appropriate type for the application and platform, and leaves the octet stream at the start of the next Content. It consists of a Deframer object with a single Action, Deframe.  Since the Deframer depends on the protocol used at the application layer, it is bound to the Connection during the pre-establishment phase:</p>
+<p id="rfc.section.8.2.p.2">For preserving message boundaries over stream transports, this interface provides receiver-side de-framing. This facility is based on the observation that, since many of our current application protocols evolved over TCP, which does not provide message boundary preservation, and since many of these protocols require message boundaries to function, each application layer protocol has defined its own framing. A Deframer allows an application to push this de-framing down into the interface, in order to transform an octet stream into a sequence of Content.</p>
+<p id="rfc.section.8.2.p.3">Concretely, receiver-side de-framing allows a caller to provide the interface with a function that takes an octet stream, as provided by the underlying Protocol Stack, reads and returns a sigle Content of an appropriate type for the application and platform, and leaves the octet stream at the start of the next Content. It consists of a Deframer object with a single Action, Deframe.  Since the Deframer depends on the protocol used at the application layer, it is bound to the Connection during the pre-establishment phase:</p>
 <p id="rfc.section.8.2.p.4">Connection.DeframeWith(Deframer)</p>
 <p id="rfc.section.8.2.p.5">Content := Deframer.Deframe(OctetStream, &#8230;)</p>
 <h1 id="rfc.section.9">
-<a href="#rfc.section.9">9.</a> <a href="#maintenance" id="maintenance">Maintenance</a>
+<a href="#rfc.section.9">9.</a> <a href="#introspection" id="introspection">Setting and Querying of Connection Properties</a>
 </h1>
-<p id="rfc.section.9.p.1">The application can access the following properties on an established Connection:</p>
+<p id="rfc.section.9.p.1">At any point, the application can set and query the properties of a Connection. Depending on the phase the connection is in, the connection properties will include different information.</p>
+<pre>
+connectionProperties := Connection.getProperties()
+</pre>
+<pre>
+Connection.setProperties()
+</pre>
+<p id="rfc.section.9.p.2">Connection properties may include:</p>
 <p></p>
 
 <ul>
-<li>Transport Features of the protocols that were selected. These features correspond to the properties given in <a href="#transport-params" class="xref">Section 5.2</a> and can only be queried.</li>
-<li>Protocol Properties of the protocols in use. These properties correspond to the properties given <a href="#protocol-props" class="xref">Section 5.2.2</a> and can be set and queried.</li>
-<li>Path Properties of the path(s) in use. These properties can be derived from the local provisioning domain, measurements by the protocol stack, or other sources. They can only be queried.</li>
+<li>The status of the Connection, which can be one of the following: Establishing, Established, Closed. [TASK: can connections be in a Closing state? (csp)]</li>
+<li>Transport Features of the protocols that conform to the Required and Prohibited Transport Preferences, which might be selected by the transport system during Establishment. These features correspond to the properties given in <a href="#transport-params" class="xref">Section 5.2</a> and can only be queried.</li>
+<li>Transport Features of the protocols that were selected, once the Connection has been established. These features correspond to the properties given in <a href="#transport-params" class="xref">Section 5.2</a> and can only be queried.</li>
+<li>Protocol Properties of the protocols in use, once the Connection has been established. These properties correspond to the properties given <a href="#protocol-props" class="xref">Section 5.2.3</a> and can be set and queried.</li>
+<li>Path Properties of the path(s) in use, once the Connection has been established. These properties can be derived from the local provisioning domain, measurements by the protocol stack, or other sources. They can only be queried.</li>
 </ul>
-<pre>
-Properties := Connection.getProperties()
-</pre>
 <p><a href="#appendix-specify-query-params" class="xref">Appendix B.2</a> gives a more detailed overview of the different types of properties that can be set and queried at different times.</p>
 <h1 id="rfc.section.10">
 <a href="#rfc.section.10">10.</a> <a href="#termination" id="termination">Connection Termination</a>
 </h1>
 <p id="rfc.section.10.p.1">Close terminates a Connection after satisfying all the requirements that were specified regarding the delivery of Content that the application has already given to the transport system. For example, if reliable delivery was requested for Content handed over before calling Close, the transport system will ensure that such Content is indeed delivered. If the peer still has data to send, it cannot be received after this call.</p>
 <p id="rfc.section.10.p.2">Connection.Close()</p>
-<p id="rfc.section.10.p.3">This event can (i.e., this is not guaranteed to happen) inform the application that the peer has closed the Connection:</p>
-<p id="rfc.section.10.p.4">Connection -&gt; Finished&lt;&gt;</p>
+<p id="rfc.section.10.p.3">The Closed event can inform the application that the peer has closed the Connection; however, there is no guarantee that a remote close will be signaled.</p>
+<p id="rfc.section.10.p.4">Connection -&gt; Closed&lt;&gt;</p>
 <p id="rfc.section.10.p.5">Abort terminates a Connection without delivering remaining data:</p>
 <p id="rfc.section.10.p.6">Connection.Abort()</p>
-<p id="rfc.section.10.p.7">This event can (i.e., this is not guaranteed to happen) inform the application that the other side has aborted the Connection:</p>
+<p id="rfc.section.10.p.7">A ConnectionError can inform the application that the other side has aborted the Connection; however, there is no guarantee that an abort will be signaled:</p>
 <p id="rfc.section.10.p.8">Connection -&gt; ConnectionError&lt;&gt;</p>
 <h1 id="rfc.section.11">
 <a href="#rfc.section.11">11.</a> <a href="#event-and-error-handling" id="event-and-error-handling">Event and Error Handling</a>
@@ -1093,16 +975,13 @@ Properties := Connection.getProperties()
 <a href="#rfc.section.14">14.</a> <a href="#acknowledgements" id="acknowledgements">Acknowledgements</a>
 </h1>
 <p id="rfc.section.14.p.1">This work has received funding from the European Union&#8217;s Horizon 2020 research and innovation programme under grant agreements No. 644334 (NEAT) and No. 688421 (MAMI).</p>
+<p id="rfc.section.14.p.2">This work has been supported by Leibniz Prize project funds of DFG - German Research Foundation: Gottfried Wilhelm Leibniz-Preis 2011 (FKZ FE 570/4-1).</p>
+<p id="rfc.section.14.p.3">Thanks to Stuart Cheshire, Josh Graessley, David Schinazi, and Eric Kinnear for their implementation and design efforts, including Happy Eyeballs, that heavily influenced this work.</p>
 <h1 id="rfc.references">
 <a href="#rfc.references">15.</a> References</h1>
 <h1 id="rfc.references.1">
 <a href="#rfc.references.1">15.1.</a> Normative References</h1>
 <table><tbody>
-<tr>
-<td class="reference"><b id="I-D.ietf-tsvwg-rtcweb-qos">[I-D.ietf-tsvwg-rtcweb-qos]</b></td>
-<td class="top">
-<a>Jones, P.</a>, <a>Dhesikan, S.</a>, <a>Jennings, C.</a> and <a>D. Druta</a>, "<a href="https://tools.ietf.org/html/draft-ietf-tsvwg-rtcweb-qos-18">DSCP Packet Markings for WebRTC QoS</a>", Internet-Draft draft-ietf-tsvwg-rtcweb-qos-18, August 2016.</td>
-</tr>
 <tr>
 <td class="reference"><b id="I-D.ietf-tsvwg-sctp-ndata">[I-D.ietf-tsvwg-sctp-ndata]</b></td>
 <td class="top">
@@ -1128,6 +1007,11 @@ Properties := Connection.getProperties()
 <a>Postel, J.</a>, "<a href="https://tools.ietf.org/html/rfc793">Transmission Control Protocol</a>", STD 7, RFC 793, DOI 10.17487/RFC0793, September 1981.</td>
 </tr>
 <tr>
+<td class="reference"><b id="RFC5245">[RFC5245]</b></td>
+<td class="top">
+<a>Rosenberg, J.</a>, "<a href="https://tools.ietf.org/html/rfc5245">Interactive Connectivity Establishment (ICE): A Protocol for Network Address Translator (NAT) Traversal for Offer/Answer Protocols</a>", RFC 5245, DOI 10.17487/RFC5245, April 2010.</td>
+</tr>
+<tr>
 <td class="reference"><b id="RFC8095">[RFC8095]</b></td>
 <td class="top">
 <a>Fairhurst, G.</a>, <a>Trammell, B.</a> and <a>M. Kuehlewind</a>, "<a href="https://tools.ietf.org/html/rfc8095">Services Provided by IETF Transport Protocols and Congestion Control Mechanisms</a>", RFC 8095, DOI 10.17487/RFC8095, March 2017.</td>
@@ -1146,21 +1030,22 @@ Properties := Connection.getProperties()
 package postsocket
 
 import (
-        "crypto/tls"
-        "io"
-        "net"
-        "time"
+  "crypto"
+  "crypto/tls"
+  "io"
+  "net"
+  "time"
 )
 
 type TransportContext interface {
-        NewTransportParameters() TransportParameters
-        NewSecurityParameters() SecurityParameters
-        NewRemote() Remote
-        NewLocal() Local
-        DefaultSendParameters() SendParameters
+  NewTransportParameters() TransportParameters
+  NewSecurityParameters() SecurityParameters
+  NewRemote() Remote
+  NewLocal() Local
+  DefaultSendParameters() SendParameters
 
-        SetEventHandler(evh EventHandler)
-        SetFramingHandler(fh FramingHandler)
+  SetEventHandler(evh EventHandler)
+  SetFramingHandler(fh FramingHandler)
 
   Preconnect(evh EventHandler, fh FramingHandler,
              rem Remote, loc Local,
@@ -1179,93 +1064,117 @@ type TransportContext interface {
 }
 
 type Remote interface {
-        WithHostname(hostname string) Remote
-        WithAddress(address net.IP) Remote
-        WithPort(port uint16) Remote
-        WithServiceName(svc string) Remote
+  WithHostname(hostname string) Remote
+  WithAddress(address net.IP) Remote
+  WithPort(port uint16) Remote
+  WithServiceName(svc string) Remote
 }
 
 type Local interface {
-        WithInterface(iface string) Local
-        WithHostname(hostname string) Local
-        WithAddress(address net.IP) Local
-        WithPort(port uint16) Local
-        WithServiceName(svc string) Local
+  WithInterface(iface string) Local
+  WithHostname(hostname string) Local
+  WithAddress(address net.IP) Local
+  WithPort(port uint16) Local
+  WithServiceName(svc string) Local
 }
 
 type ParameterIdentifier int
 
 const (
-        TransportFullyReliable = iota
-        // ... and so on
+  TransportFullyReliable = iota
+  // ... and so on
 )
 
 type TransportParameters interface {
-        Require(p ParameterIdentifier, v int) TransportParameters
-        Prefer(p ParameterIdentifier, v int) TransportParameters
-        Avoid(p ParameterIdentifier, v int) TransportParameters
-        Prohibit(p ParameterIdentifier, v int) TransportParameters
+  Require(p ParameterIdentifier, v int) TransportParameters
+  Prefer(p ParameterIdentifier, v int) TransportParameters
+  Avoid(p ParameterIdentifier, v int) TransportParameters
+  Prohibit(p ParameterIdentifier, v int) TransportParameters
 }
 
+type SecurityMetadata struct {
+  cert tls.Certificate
+  // ... and so on
+}
+
+const (
+  SecurityCallbackResultSuccess = 0x00
+  SecurityCallbackResultFailure = 0x01
+  SecurityCallbackResultPending = 0x02
+)
+
+type SecurityCallbackResult int
+
 type SecurityParameters interface {
-        AddIdentity(c tls.Certificate) SecurityParameters
-        AddPSK(c tls.Certificate, k []byte) SecurityParameters
-        VerifyTrustWith(func(c tls.Certificate) (bool, error)) SecurityParameters
-        HandleChallengeWith(func() (bool, error)) SecurityParameters
-        Require(p ParameterIdentifier, v interface{} SecurityParameters
-        Prefer(p ParameterIdentifier, v interface{}) SecurityParameters
-        Avoid(p ParameterIdentifier, v interface{}) SecurityParameters
-        Prohibit(p ParameterIdentifier, v interface{}) SecurityParameters
+  AddIdentity(c tls.Certificate) SecurityParameters
+  AddPrivateKey(sk crypto.PrivateKey, pk crypto.PublicKey) SecurityParameters
+  AddPreSharedKey(key []byte, identity string) SecurityParameters
+  AddSupportedGroup(g uint16) SecurityParameters
+  AddCiphersuite(cs uint16) SecurityParameters
+  AddSignatureAlgorithm(cs uint16) SecurityParameters
+  SetSessionCacheCapacity(c int) SecurityParameters
+  SetSessionCacheLifetime(t int) SecurityParameters
+  SetSessionCacheReuse(c int) SecurityParameters
+  VerifyTrustWith(func(m SecurityMetadata) (bool, error)) SecurityCallbackResult
+  HandleChallengeWith(func(m SecurityMetadata) (bool, error)) SecurityCallbackResult
+  Require(p ParameterIdentifier, v interface{} SecurityParameters
+  Prefer(p ParameterIdentifier, v interface{}) SecurityParameters
+  Avoid(p ParameterIdentifier, v interface{}) SecurityParameters
+  Prohibit(p ParameterIdentifier, v interface{}) SecurityParameters
 }
 
 type SendParameters struct {
-        Lifetime time.Duration
-        Niceness uint
-        Ordered bool
-        Immediate bool
-        Idempotent bool
-        CorruptionTolerant bool
+  Lifetime time.Duration
+  Niceness uint
+  Ordered bool
+  Immediate bool
+  Idempotent bool
+  CorruptionProtection int
+  AckImmediate bool
 }
 
 type Preconnection interface {
   AddSpecifier(rem Remote, loc Local,
                tp TransportParameters, sp SecurityParameters)
-        Initiate() (Connection, error)
-        InitialSend(content interface{}, sp SendParameters) (Connection, error)
-        Rendezvous() (Connection, error)
-        Listen() (Connection, error)
+  Initiate() (Connection, error)
+  InitialSend(content interface{}, sp SendParameters) (Connection, error)
+  Rendezvous() (Connection, error)
+  Listen() (Connection, error)
 }
 
 type Connection interface {
-        Send(content interface{}, contentref interface{}, sp SendParameters) error
+  Send(content interface{}, contentref interface{}, sp SendParameters) error
 
-        Clone() (Connection, error)
-        Close() error
+  Clone() (Connection, error)
+  Close() error
 
-        GetEventHandler() EventHandler
-        SetEventHandler(evh EventHandler)
+  GetEventHandler() EventHandler
+  SetEventHandler(evh EventHandler)
 
-        GetFramingHandler() FramingHandler
-        SetFramingHandler(fh FramingHandler)
+  GetFramingHandler() FramingHandler
+  SetFramingHandler(fh FramingHandler)
 }
 
 type Content interface {
-        Bytes() []byte
+  Bytes() []byte
+  GetMetadata(key string) interface{}
 }
 
 // EventHandler defines the interface for connection event handlers.
 type EventHandler interface {
-        Ready(conn Connection, ante Connection)
-        Received(content Content, conn Connection)
-        Sent(conn Connection, contentref interface{})
-        Expired(conn Connection, contentref interface{})
-        Error(conn Connection, contentref interface{}, err error)
-        Closed(conn Connection, err error)
+  Ready(conn Connection, ante Connection)
+  Received(content Content, conn Connection)
+  Sent(conn Connection, contentref interface{})
+  Expired(conn Connection, contentref interface{})
+  Closed(conn Connection, err error)
+  // note that errors are coalesced into a single handler; the err parameter
+  // contains the type of error, and contentref is nil for all but send errors.
+  Error(conn Connection, contentref interface{}, err error)
 }
 
 type FramingHandler interface {
-        Frame(content interface{}) ([]byte, error)
-        Deframe(in io.Reader) (Content, error)
+  Frame(content interface{}) ([]byte, error)
+  Deframe(in io.Reader) (Content, error)
 }
 </pre>
 <h1 id="rfc.appendix.B">
@@ -1313,7 +1222,7 @@ type FramingHandler interface {
 <td class="left">None</td>
 </tr>
 <tr>
-<td class="left">Request SACK</td>
+<td class="left">Request immediate ACK</td>
 <td class="left">Yes</td>
 <td class="left">Yes</td>
 <td class="left">Yes</td>
@@ -1369,16 +1278,15 @@ type FramingHandler interface {
 <td class="left">None</td>
 </tr>
 <tr>
-<td class="left">Application Intents</td>
+<td class="left">Metered or expensive paths</td>
 <td class="left">No</td>
 <td class="left">No</td>
-<td class="left">No</td>
-<td class="left">No</td>
-<td class="left">Intend</td>
+<td class="left">Yes</td>
+<td class="left">Yes</td>
+<td class="left">Avoid</td>
 </tr>
 </tbody>
 </table>
-<p id="rfc.section.B.1.p.4">[List individual Intents? Reformulate some of them as preferences?]</p>
 <h1 id="rfc.appendix.B.2">
 <a href="#rfc.appendix.B.2">B.2.</a> <a href="#appendix-specify-query-params" id="appendix-specify-query-params">Specifying and Querying Parameters</a>
 </h1>
@@ -1485,6 +1393,28 @@ type FramingHandler interface {
 </div><div class="avoidbreak">
   <address class="vcard">
 	<span class="vcardline">
+	  <span class="fn">Theresa Enghardt</span> 
+	  <span class="n hidden">
+		<span class="family-name">Enghardt</span>
+	  </span>
+	</span>
+	<span class="org vcardline">TU Berlin</span>
+	<span class="adr">
+	  <span class="vcardline">Marchstra&#223;e 23</span>
+
+	  <span class="vcardline">
+		<span class="locality">10587 Berlin</span>,  
+		<span class="region"></span>
+		<span class="code"></span>
+	  </span>
+	  <span class="country-name vcardline">Germany</span>
+	</span>
+	<span class="vcardline">EMail: <a href="mailto:theresa@inet.tu-berlin.de">theresa@inet.tu-berlin.de</a></span>
+
+  </address>
+</div><div class="avoidbreak">
+  <address class="vcard">
+	<span class="vcardline">
 	  <span class="fn">Gorry Fairhurst</span> 
 	  <span class="n hidden">
 		<span class="family-name">Fairhurst</span>
@@ -1567,28 +1497,6 @@ type FramingHandler interface {
 	  <span class="country-name vcardline">Germany</span>
 	</span>
 	<span class="vcardline">EMail: <a href="mailto:philipp@inet.tu-berlin.de">philipp@inet.tu-berlin.de</a></span>
-
-  </address>
-</div><div class="avoidbreak">
-  <address class="vcard">
-	<span class="vcardline">
-	  <span class="fn">Theresa Enghardt</span> 
-	  <span class="n hidden">
-		<span class="family-name">Enghardt</span>
-	  </span>
-	</span>
-	<span class="org vcardline">TU Berlin</span>
-	<span class="adr">
-	  <span class="vcardline">Marchstra&#223;e 23</span>
-
-	  <span class="vcardline">
-		<span class="locality">10587 Berlin</span>,  
-		<span class="region"></span>
-		<span class="code"></span>
-	  </span>
-	  <span class="country-name vcardline">Germany</span>
-	</span>
-	<span class="vcardline">EMail: <a href="mailto:theresa@inet.tu-berlin.de">theresa@inet.tu-berlin.de</a></span>
 
   </address>
 </div><div class="avoidbreak">
