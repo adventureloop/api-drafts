@@ -88,7 +88,7 @@ Table of Contents
        4.1.3.  Establishment Actions . . . . . . . . . . . . . . . .  11
        4.1.4.  Data Transfer Objects and Actions . . . . . . . . . .  11
        4.1.5.  Event Handling  . . . . . . . . . . . . . . . . . . .  12
-       4.1.6.  Termination Actions . . . . . . . . . . . . . . . . .  13
+       4.1.6.  Termination Actions . . . . . . . . . . . . . . . . .  12
      4.2.  Transport System Implementation Concepts  . . . . . . . .  13
        4.2.1.  Gathering . . . . . . . . . . . . . . . . . . . . . .  14
        4.2.2.  Racing  . . . . . . . . . . . . . . . . . . . . . . .  14
@@ -487,7 +487,7 @@ Internet-Draft              TAPS Architecture              February 2018
       which that Connection will be established, the Remote Endpoint to
       which it will connect, and Path Selection Properties, Protocol
       Selection Properties, and Specific Protocol Properties that
-      influence the choice of transport that Connection will use.  A
+      influence the choice of transport that a Connection will use.  A
       Preconnection can be fully specified and represent a single
       possible Connection, or it can be partially specified such that it
       represents a family of possible Connections.  The Local Endpoint
@@ -543,7 +543,9 @@ Internet-Draft              TAPS Architecture              February 2018
       influence path selection include the interface type (such as a Wi-
       Fi Ethernet connection, or a Cellular LTE connection),
       characteristics of the path that are locally known like Maximum
-      Transmission Unit (MTU), or expected throughput or latency.
+      Transmission Unit (MTU) or discovered like Path MTU (PMTU), or
+      predicted based on cached information like expected throughput or
+      latency.
 
    o  Protocol Selection Properties: The Protocol Selection Properties
       consist of the options that an application may set on a
@@ -552,8 +554,6 @@ Internet-Draft              TAPS Architecture              February 2018
       These options come in the form of requirements, prohibitions, and
       preferences.  Examples include reliability, service class,
       multipath support, and fast open support.
-
-
 
 
 
@@ -569,8 +569,7 @@ Internet-Draft              TAPS Architecture              February 2018
       necessarily require that a specific protocol must be used when a
       Connection is established from that Preconnection, but that if
       this protocol is employed, a particular set of options should be
-      used.  This is critical to allow compatibility with Protocol
-      Properties on peers.
+      used.
 
 4.1.3.  Establishment Actions
 
@@ -613,6 +612,7 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
+
 Pauly, et al.            Expires August 27, 2018               [Page 11]
 
 Internet-Draft              TAPS Architecture              February 2018
@@ -639,8 +639,8 @@ Internet-Draft              TAPS Architecture              February 2018
 
    o  Connection Finished: A Connection Finished event signals to an
       application that a given Connection is no longer usable for
-      sending or receiving Content.  This should deliver a useful error
-      to the application.
+      sending or receiving Content.  This should deliver an error to the
+      application that describes the nature of the termination.
 
    o  Connection Received: A Connection Received event signals to an
       application that a given Listener has passively received a
@@ -648,31 +648,17 @@ Internet-Draft              TAPS Architecture              February 2018
 
    o  Content Received: A Content Received event delivers received
       content to the application, based on a Receive action.  This may
-      include an error if the action failed.
+      include an error if the Receive action cannot be satisfied due to
+      the Connection being closed.
 
    o  Content Sent: A Content Sent event notifies the application of the
-      status of its Send action.  This may be an error, an indication
-      that Content has been processed by the protocol stack, or
-      potentially [MICHAEL: Why "potentially" - because you're not sure
-      about it?  If it may be such an indication, "potentially" should
-      be removed (this seems like the right thing to do for me).] an
-      indication that Content has been acknowledged by a peer.
+      status of its Send action.  This may be an error if the Content
+      cannot be sent, or an indication that Content has been processed
+      by the protocol stack.
 
    o  Path Properties Changed: A Path Properties Changed event notifies
       the application that some property of the Connection has changed
       that may influence how and where data is sent and/or received.
-
-
-
-
-
-
-
-
-Pauly, et al.            Expires August 27, 2018               [Page 12]
-
-Internet-Draft              TAPS Architecture              February 2018
-
 
 4.1.6.  Termination Actions
 
@@ -680,6 +666,13 @@ Internet-Draft              TAPS Architecture              February 2018
       indicate that it no longer intends to send data, is no longer
       willing to receive data, and that the protocol should signal this
       state to the remote endpoint if applicable.
+
+
+
+Pauly, et al.            Expires August 27, 2018               [Page 12]
+
+Internet-Draft              TAPS Architecture              February 2018
+
 
    o  Abort() is an action the application may take on a Connection to
       indicate a Close, but with the additional indication that the
@@ -722,6 +715,13 @@ Internet-Draft              TAPS Architecture              February 2018
    o  Association Cache: The Association Cache holds the state that the
       implementation keeps for each set of associated endpoints that
       have been used previously.  This can include DNS results, TLS
+      session state, previous success and quality of transport protocols
+      over certain paths.
+
+
+
+
+
 
 
 
@@ -729,9 +729,6 @@ Pauly, et al.            Expires August 27, 2018               [Page 13]
 
 Internet-Draft              TAPS Architecture              February 2018
 
-
-      session state, previous success and quality of transport protocols
-      over certain paths.
 
 4.2.1.  Gathering
 
@@ -778,6 +775,9 @@ Internet-Draft              TAPS Architecture              February 2018
    supported security protocols.  For example, trust verification
    callbacks are common parts of TLS APIs.  TAPS exposes one for similar
    purposes.  Clients must take care to use security APIs appropriately.
+   In cases where clients use said interface to provide sensitive keying
+   material, e.g., access to private keys or copies of pre-shared keys
+   (PSKs), key use must be validated.  For example, clients SHOULD NOT
 
 
 
@@ -786,9 +786,6 @@ Pauly, et al.            Expires August 27, 2018               [Page 14]
 Internet-Draft              TAPS Architecture              February 2018
 
 
-   In cases where clients use said interface to provide sensitive keying
-   material, e.g., access to private keys or copies of pre-shared keys
-   (PSKs), key use must be validated.  For example, clients SHOULD NOT
    use PSK material created for ESP with IETF-QUIC, and clients MUST NOT
    use private keys intended for server authentication as a key for
    client authentication.  Moreover, unlike certain transport features
@@ -832,8 +829,11 @@ Internet-Draft              TAPS Architecture              February 2018
               "An Abstract Application Layer Interface to Transport
               Services", n.d..
 
-
-
+   [RFC8095]  Fairhurst, G., Ed., Trammell, B., Ed., and M. Kuehlewind,
+              Ed., "Services Provided by IETF Transport Protocols and
+              Congestion Control Mechanisms", RFC 8095,
+              DOI 10.17487/RFC8095, March 2017,
+              <https://www.rfc-editor.org/info/rfc8095>.
 
 
 
@@ -841,12 +841,6 @@ Pauly, et al.            Expires August 27, 2018               [Page 15]
 
 Internet-Draft              TAPS Architecture              February 2018
 
-
-   [RFC8095]  Fairhurst, G., Ed., Trammell, B., Ed., and M. Kuehlewind,
-              Ed., "Services Provided by IETF Transport Protocols and
-              Congestion Control Mechanisms", RFC 8095,
-              DOI 10.17487/RFC8095, March 2017,
-              <https://www.rfc-editor.org/info/rfc8095>.
 
 Authors' Addresses
 
@@ -884,7 +878,13 @@ Authors' Addresses
    URI:   http://www.erg.abdn.ac.uk/
 
 
+   Colin Perkins
+   University of Glasgow
+   School of Computing Science
+   Glasgow  G12 8QQ
+   United Kingdom
 
+   Email: csp@csperkins.org
 
 
 
@@ -896,15 +896,6 @@ Authors' Addresses
 Pauly, et al.            Expires August 27, 2018               [Page 16]
 
 Internet-Draft              TAPS Architecture              February 2018
-
-
-   Colin Perkins
-   University of Glasgow
-   School of Computing Science
-   Glasgow  G12 8QQ
-   United Kingdom
-
-   Email: csp@csperkins.org
 
 
    Philipp S. Tiesel
@@ -923,6 +914,15 @@ Internet-Draft              TAPS Architecture              February 2018
    United States of America
 
    Email: cawood@apple.com
+
+
+
+
+
+
+
+
+
 
 
 
