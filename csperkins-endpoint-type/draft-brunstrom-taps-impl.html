@@ -310,7 +310,7 @@ address {
 <link href="#rfc.section.6.2" rel="Chapter" title="6.2 Maintenance Events">
 <link href="#rfc.section.7" rel="Chapter" title="7 Implementing Termination">
 <link href="#rfc.section.8" rel="Chapter" title="8 Cached State">
-<link href="#rfc.section.8.1" rel="Chapter" title="8.1 Protocol caches">
+<link href="#rfc.section.8.1" rel="Chapter" title="8.1 Protocol state caches">
 <link href="#rfc.section.8.2" rel="Chapter" title="8.2 Performance caches">
 <link href="#rfc.section.9" rel="Chapter" title="9 Specific Transport Protocol Considerations">
 <link href="#rfc.section.9.1" rel="Chapter" title="9.1 TCP">
@@ -472,7 +472,7 @@ address {
 </li>
 <li>8.   <a href="#rfc.section.8">Cached State</a>
 </li>
-<ul><li>8.1.   <a href="#rfc.section.8.1">Protocol caches</a>
+<ul><li>8.1.   <a href="#rfc.section.8.1">Protocol state caches</a>
 </li>
 <li>8.2.   <a href="#rfc.section.8.2">Performance caches</a>
 </li>
@@ -566,7 +566,16 @@ address {
 <h1 id="rfc.section.3.2">
 <a href="#rfc.section.3.2">3.2.</a> <a href="#role-of-system-policy" id="role-of-system-policy">Role of system policy</a>
 </h1>
-<p id="rfc.section.3.2.p.1">How do the implementation&#8217;s default policy, a dynamic system policy, and application preferences interact.</p>
+<p id="rfc.section.3.2.p.1">The implementation is responsible for combining and reconciling several different sources of protocol and path selection preferences when establishing Connections. These include, but are not necessarily limited to:</p>
+<p></p>
+
+<ol>
+<li>Application preferences specified during pre-establishment</li>
+<li>Dynamic system policy</li>
+<li>Default implementation policy</li>
+</ol>
+<p id="rfc.section.3.2.p.3">In general, any protocol or path used for a connection must conform to all three sources of constraints. Any violation of any of the layers should cause a protocol or path to be considered ineligble for use. For an example of application preferences leading to constraints, an application may prohibit the use of metered network interfaces for a given Connection to avoid user cost. Similarly, the system policy at a given time may prohibit the use of such a metered network interface from the application&#8217;s process. Lastly, the implementation itself may default to disallowing certain network interfaces unless explicitly requested by the application and allowed by the system.</p>
+<p id="rfc.section.3.2.p.4">It is expected that the database of system policies and the method of looking up these policies will vary across various platforms. An implementation SHOULD attempt to look up the relevant policies for the system in a dynamic way to make sure it is reflecting a fresh version of the system policy, since the system&#8217;s policy regarding the application&#8217;s traffic may change over time due to user or administrative changes.</p>
 <h1 id="rfc.section.4">
 <a href="#rfc.section.4">4.</a> <a href="#implementing-connection-establishment" id="implementing-connection-establishment">Implementing Connection Establishment</a>
 </h1>
@@ -582,7 +591,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 </pre>
 <p id="rfc.section.4.p.5">Any one of these sub-entries on the aggregate connection attempt would satisfy the original application intent. The concern of this document is the algorithm defining which of these options to try, when, and in what order.</p>
 <h1 id="rfc.section.4.1">
-<a href="#rfc.section.4.1">4.1.</a> <a href="#candidate-gathering" id="candidate-gathering">Candidate Gathering</a>
+<a href="#rfc.section.4.1">4.1.</a> <a href="#gathering" id="gathering">Candidate Gathering</a>
 </h1>
 <p id="rfc.section.4.1.p.1">The step of gathering candidates involves identifying which paths, protocols, and endpoints may be used for a given Connection. This list is determined by the requirements, prohibitions, and preferences of the application as specified in the Path Selection Properties and Protocol Selection Properties.</p>
 <h1 id="rfc.section.4.1.1">
@@ -744,7 +753,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <h1 id="rfc.section.4.4.1">
 <a href="#rfc.section.4.4.1">4.4.1.</a> <a href="#determining-successful-establishment" id="determining-successful-establishment">Determining Successful Establishment</a>
 </h1>
-<p id="rfc.section.4.4.1.p.1">Implementations may select the criteria by which a leaf node is considered to be successfully connected differently on a per-protocol basis. If the only protocol being used is a transport protocol with a clear handshake, like TCP, then the obvious choice is to declare that node &#8220;connected&#8221; when the last packet of the three-way handshake has been received. If the only protocol being used is an &#8220;unconnected&#8221; protocol, like UDP, the implementation may consider the node fully &#8220;connected&#8221; the moment it determines a route is present, before sending any packets on the network.</p>
+<p id="rfc.section.4.4.1.p.1">Implementations may select the criteria by which a leaf node is considered to be successfully connected differently on a per-protocol basis. If the only protocol being used is a transport protocol with a clear handshake, like TCP, then the obvious choice is to declare that node &#8220;connected&#8221; when the last packet of the three-way handshake has been received. If the only protocol being used is an &#8220;unconnected&#8221; protocol, like UDP, the implementation may consider the node fully &#8220;connected&#8221; the moment it determines a route is present, before sending any packets on the network <a href="#unconnected-racing" class="xref">Section 4.6</a>.</p>
 <p id="rfc.section.4.4.1.p.2">For protocol stacks with multiple handshakes, the decision becomes more nuanced. If the protocol stack involves both TLS and TCP, an implementation MAY determine that a leaf node is connected after the TCP handshake is complete, or it MAY wait for the TLS handshake to complete as well. The benefit of declaring completion when the TCP handshake finishes, and thus stopping the race for other branches of the tree, is that there will be less burden on the network from other connection attempts. On the other hand, by waiting until the TLS handshake is complete, an implementation avoids the scenario in which a TCP handshake completes quickly, but TLS negotiation is either very slow or fails altogether in particular network conditions or to a particular endpoint.</p>
 <h1 id="rfc.section.4.5">
 <a href="#rfc.section.4.5">4.5.</a> <a href="#establish-mux" id="establish-mux">Establishing multiplexed connections</a>
@@ -752,9 +761,10 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <p id="rfc.section.4.5.p.1">Multiplexing data streams over a connection of a single transport Protocol Instance requires, at minimum, two things: 1) the transport Protocol Instance must be able to know the beginning and the end of messages, in order to know what to assign and multiplex / demultiplex; 2) there must be an identifier that allows to decide which stream a message is assigned to. When a new stream is multiplexed on an already existing connection, there is no need for a connection establishment procedure &#8211; every stream can be assumed to immediately be available.</p>
 <p id="rfc.section.4.5.p.2">When the Connections that are offered to an application by the Transport System are multiplexed, the Transport System may implement the establishment of a new Connection by simply beginning to use a new stream of an already established transport connection. This, then, means that there may not be any &#8220;establishment&#8221; message (like a TCP SYN), but the application can simply start sending or receiving. Therefore, when a Transport System&#8217;s &#8220;Initiate&#8221; Action is called without Content being handed over, it cannot be guaranteed that the other endpoint will have any way to know about this, and hence a passive endpoint&#8217;s ConnectionReceived event may not be called upon an active endpoint&#8217;s Inititate.  Instead, calling the ConnectionReceived event may be delayed until the first Content arrives.</p>
 <h1 id="rfc.section.4.6">
-<a href="#rfc.section.4.6">4.6.</a> <a href="#handling-racing-with-unconnected-protocols" id="handling-racing-with-unconnected-protocols">Handling racing with &#8220;unconnected&#8221; protocols</a>
+<a href="#rfc.section.4.6">4.6.</a> <a href="#unconnected-racing" id="unconnected-racing">Handling racing with &#8220;unconnected&#8221; protocols</a>
 </h1>
-<p id="rfc.section.4.6.p.1">How to handle UDP, and allowing the application or anothe protocol to cause the next option to be tried.</p>
+<p id="rfc.section.4.6.p.1">While protocols that use an explicit handshake to validate a Connection to a peer can be used for racing multiple establishment attempts in parallel, &#8220;unconnected&#8221; protocols such as raw UDP do not offer a way to validate the presence of a peer or the usability of a Connection without application feedback. An implementation SHOULD consider such a protocol stack to be established as soon as a local route to the peer endpoint is confirmed.</p>
+<p id="rfc.section.4.6.p.2">However, if a peer is not reachable over the network using the unconnected protocol, or content cannot be exchanged for any other reason, the application may want to attempt using another candidate Protocol Stack. The implementation SHOULD maintain the list of other candidate Protocol Stacks that were eligible to use. In the case that the application signals that the initial Protocol Stack is failing for some reason and that another option should be attempted, the Connection can be updated to point to the next candidate Protocol Stack. This can be viewed as an application-driven form of Protocol Stack racing.</p>
 <h1 id="rfc.section.4.7">
 <a href="#rfc.section.4.7">4.7.</a> <a href="#implementing-listeners" id="implementing-listeners">Implementing listeners</a>
 </h1>
@@ -830,15 +840,34 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <h1 id="rfc.section.8">
 <a href="#rfc.section.8">8.</a> <a href="#cached-state" id="cached-state">Cached State</a>
 </h1>
-<p id="rfc.section.8.p.1">Beyond a single connection&#8217;s lifetime, it is useful to keep state and history.</p>
+<p id="rfc.section.8.p.1">Beyond a single Connection&#8217;s lifetime, it is useful for an implementation to keep state and history. This cached state can help improve future Connection establishment due to re-using results and credentials, and favoring paths and protocols that performed well in the past.</p>
+<p id="rfc.section.8.p.2">Cached state may be associated with different Endpoints for the same Connection, depending on the protocol generating the cached content. For example, certificates for TLS are generally associated with a hostname, and thus should be cached based on a Connection&#8217;s hostname Endpoint (if applicable). On the other hand, performance characteristics of a path are more likely tied to the IP address and subnet being used.</p>
 <h1 id="rfc.section.8.1">
-<a href="#rfc.section.8.1">8.1.</a> <a href="#protocol-caches" id="protocol-caches">Protocol caches</a>
+<a href="#rfc.section.8.1">8.1.</a> <a href="#protocol-state-caches" id="protocol-state-caches">Protocol state caches</a>
 </h1>
-<p id="rfc.section.8.1.p.1">Caching for DNS, TLS, etc. Associated with sets of endpoints for future use.</p>
+<p id="rfc.section.8.1.p.1">Some protocols will have long-term state to be cached in association with Endpoints. This state often has some time after which it is expired, so the implementation SHOULD allow each protocol to specify an expiration for cached content.</p>
+<p id="rfc.section.8.1.p.2">Examples of cached protocol state include:</p>
+<p></p>
+
+<ul>
+<li>The DNS protocol can cache resolution answers (A and AAAA queries, for example), associated with a Time To Live (TTL) to be used for future hostname resolutions without requiring asking the DNS resolver again.</li>
+<li>TLS caches session state and tickets based on a hostname, which can be used for resuming sessions with a server.</li>
+<li>TCP can cache cookies for use in TCP Fast Open</li>
+</ul>
+<p id="rfc.section.8.1.p.4">Cached state is primarily used during Connection establishment for a single Protocol Stack, but may be used to influence an implementation&#8217;s preference between several candidate Protocol Stacks. For example, if two IP address Endpoints are otherwise equally preferred, an implementation may choose to attempt a connection to an address for which it has a TCP Fast Open cookie.</p>
 <h1 id="rfc.section.8.2">
 <a href="#rfc.section.8.2">8.2.</a> <a href="#performance-caches" id="performance-caches">Performance caches</a>
 </h1>
-<p id="rfc.section.8.2.p.1">Caching of round trip time (RTT), success rate with various protocols and features.</p>
+<p id="rfc.section.8.2.p.1">In addition to protocol state, Protocol Instances SHOULD provide data into a performance-oriented cache to help guide future protocol and path selection. Some performance information can be gathered generically across several protocols to allow predictive comparisons between protocols on given paths:</p>
+<p></p>
+
+<ul>
+<li>Observed Round Trip Time</li>
+<li>Connection Establishment latency</li>
+<li>Connection Establishment success rate</li>
+</ul>
+<p id="rfc.section.8.2.p.3">These items can be cached on a per-address and per-subnet granularity, and averaged between different values. The information SHOULD be cached on a per-network basis, since it is expected that different network attachments will have different performance characteristics.</p>
+<p id="rfc.section.8.2.p.4">An implementation should use this information, when possible, to determine preference between candidate paths, endpoints, and protocol options. Eligible options that historically had significantly better performance than others SHOULD be selected first when gathering candidates <a href="#gathering" class="xref">Section 4.1</a> to ensure better performance for the application.</p>
 <h1 id="rfc.section.9">
 <a href="#rfc.section.9">9.</a> <a href="#specific-transport-protocol-considerations" id="specific-transport-protocol-considerations">Specific Transport Protocol Considerations</a>
 </h1>
@@ -892,6 +921,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <a href="#rfc.section.13">13.</a> <a href="#acknowledgements" id="acknowledgements">Acknowledgements</a>
 </h1>
 <p id="rfc.section.13.p.1">This work has received funding from the European Union&#8217;s Horizon 2020 research and innovation programme under grant agreement No. 644334 (NEAT).</p>
+<p id="rfc.section.13.p.2">Thanks to Stuart Cheshire, Josh Graessley, David Schinazi, and Eric Kinnear for their implementation and design efforts, including Happy Eyeballs, that heavily influenced this work.</p>
 <h1 id="rfc.references">
 <a href="#rfc.references">14.</a> References</h1>
 <h1 id="rfc.references.1">
