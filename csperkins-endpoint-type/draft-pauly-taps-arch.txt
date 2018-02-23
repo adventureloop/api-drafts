@@ -28,8 +28,8 @@ Abstract
    Services, a system for exposing the features of transport protocols
    to applications.  This architecture serves as a basis for Application
    Programming Interfaces (APIs) and implementations that provide
-   flexibile transport networking services.  It defines the common set
-   of terminology and concepts to be used in more detailed discussion of
+   flexible transport networking services.  It defines the common set of
+   terminology and concepts to be used in more detailed discussion of
    transport services.
 
 Status of This Memo
@@ -95,7 +95,7 @@ Table of Contents
    5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  14
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .  14
    7.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  15
-   8.  Normative References  . . . . . . . . . . . . . . . . . . . .  15
+   8.  Informative References  . . . . . . . . . . . . . . . . . . .  15
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
 
 1.  Introduction
@@ -187,12 +187,12 @@ Internet-Draft              TAPS Architecture              February 2018
    There are several degrees in which a Transport Services system can
    offer flexibility to an application: it can provide access to
    multiple sets of protocols and protocol features, it can use these
-   protocols across multiple networks that may have different
-   performance and functional characteristics, and it can communicate
-   with different addresses for a peer to optimize performance.  Beyond
-   these, if the API for the system remains the same over time, new
-   protocols and features may be added to the system's implementation
-   without requiring significant changes in applications for adoption.
+   protocols across multiple paths that may have different performance
+   and functional characteristics, and it can communicate with different
+   Remote Endpoints to optimize performance.  Beyond these, if the API
+   for the system remains the same over time, new protocols and features
+   may be added to the system's implementation without requiring
+   significant changes in applications for adoption.
 
    The following considerations were used in the design of this
    architecture.
@@ -212,11 +212,11 @@ Internet-Draft              TAPS Architecture              February 2018
 3.2.  Access to Specialized Features
 
    Since applications will often need to control fine-grained details of
-   transport protocols in order to optimize their behavior and ensure
+   transport protocols to optimize their behavior and ensure
    compatibility with remote peers, a Transport Services system also
    needs to allow more specialized protocol features to be used.  The
    interface for these specialized options should be treated differently
-   from the common options in order to ensure flexibility.
+   from the common options to ensure flexibility.
 
 
 
@@ -259,21 +259,21 @@ Internet-Draft              TAPS Architecture              February 2018
    at application developers.
 
    Implementations that provide the Transport Services API
-   [I-D.brunstrom-taps-impl], on the other hand, will vary due to
-   system-specific support and the needs of the deployment scenario.  It
-   is expected that all implementations of Transport Services will offer
-   the entire mandatory API, but that some features will not be
-   functional in certain implementations.  All implementations must
-   offer sufficient APIs to use the distilled minimal set of features
-   offered by transport protocols [I-D.ietf-taps-minset], including API
-   support for TCP and UDP transport, but it is possible that some very
-   constrained devices might not have, for example, a full TCP
-   implementation.
+   [I-D.brunstrom-taps-impl] will vary due to system-specific support
+   and the needs of the deployment scenario.  It is expected that all
+   implementations of Transport Services will offer the entire mandatory
+   API, but that some features will not be functional in certain
+   implementations.  All implementations must offer sufficient APIs to
+   use the distilled minimal set of features offered by transport
+   protocols [I-D.ietf-taps-minset], including API support for TCP and
+   UDP transport, but it is possible that some very constrained devices
+   might not have, for example, a full TCP implementation.
 
    In order to preserve flexibility and compatibility with future
    protocols, top-level features in the Transport Services API should
    avoid referencing particular transport protocols.  Mappings of these
    API features in the Implementation document, on the other hand, must
+   explain the ramifications of each feature on existing protocols.  It
 
 
 
@@ -282,16 +282,15 @@ Pauly, et al.            Expires August 27, 2018                [Page 5]
 Internet-Draft              TAPS Architecture              February 2018
 
 
-   explain the ramifications of each feature on existing protocols.  It
    is expected that the Implementation document will be updated and
    supplemented as new protocols and protocol features are developed.
 
    It is important to note that neither the Transport Services API nor
    the Implementation document defines new protocols that require any
-   changes on peers.  The Transport Services system must be deployable
-   on one side only, as a way to allow an application to make better use
-   of available capabilities on a system, and protocols features that
-   may be supported by peers across the network.
+   changes on remote hosts.  The Transport Services system must be
+   deployable on one side only, as a way to allow an application to make
+   better use of available capabilities on a system, and protocols
+   features that may be supported by peers across the network.
 
 4.  Transport Services Architecture and Concepts
 
@@ -333,6 +332,7 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
+
 Pauly, et al.            Expires August 27, 2018                [Page 6]
 
 Internet-Draft              TAPS Architecture              February 2018
@@ -340,14 +340,14 @@ Internet-Draft              TAPS Architecture              February 2018
 
      +------------------------------------------------------+
      |                    Application                       |
-     +-+------------------^----------+----------^-----------+
-       |                  |          |          |
-     pre-               data         |        events
-     establishment    transfer       |          |
-       |                  |      terminate      |
-       |                  |          |          |
-       |             +----v----------v--+       |
-     +-v-------------+      Objects     +-------+----------+
+     +-+----------------+------^-------+--------^-----------+
+       |                |      |       |        |
+     pre-               |     data     |      events
+     establishment      |   transfer   |        |
+       |        establishment  |   terminate    |
+       |                |      |       |        |
+       |             +--v------v-------v+       |
+     +-v-------------+   Basic Objects  +-------+----------+
      |  Transport    +--------+---------+                  |
      |  Services              |                            |
      |  API                   |                            |
@@ -372,20 +372,20 @@ Internet-Draft              TAPS Architecture              February 2018
                  Network Layer Interface
 
       Figure 1: Concepts and Relationships in the Transport Services
-      Architecture \[MICHAEL: I think it's bad that establishment is
-   missing from the figure - but I understand it could get messy.  Maybe
-    writing '(pre-)establishment' could help, to indicate that there is
-                both pre-establishment and establishment ?]
+                               Architecture
 
 4.1.  Transport Services API Concepts
 
    Fundamentally, a Transport Services API needs to provide basic
-   objects that allow applications to establish communication and send
-   and receive data Section 4.1.1.  These may be exposed as handles or
-   referenced objects, depending on the language.
+   objects Section 4.1.1 that allow applications to establish
+   communication and send and receive data Section 4.1.1.  These may be
+   exposed as handles or referenced objects, depending on the language.
 
    Beyond the basic objects, there are several high-level groups of
    actions that any Transport Services API must provide:
+
+   o  Pre-Establishment (Section 4.1.2) encompasses the parameters that
+      an application can pass to describe its intent, requirements,
 
 
 
@@ -394,29 +394,29 @@ Pauly, et al.            Expires August 27, 2018                [Page 7]
 Internet-Draft              TAPS Architecture              February 2018
 
 
-   o  Pre-Establishment (Section 4.1.2) encompasses the parameters that
-      an application can pass to describe its intent, requirements,
       prohibitions, and preferences for its networking operations.  For
       any system that provides generic Transport Services, these
-      properties should primarily offer knobs that apply across multiple
-      transports.  Properties may have a large impact on the rest of the
-      aspects of the interface: they can modify how establishment
-      occurs, they can influence the expectations around data transfer,
-      and they determine the set of events that will be supported.
+      properties should primarily offer knobs that are applicable to
+      multiple transports.  Properties may have a large impact on the
+      rest of the aspects of the interface: they can modify how
+      establishment occurs, they can influence the expectations around
+      data transfer, and they determine the set of events that will be
+      supported.
 
    o  Establishment (Section 4.1.3) focuses on the actions that an
-      application takes [MICHAEL: on? with?] the transport objects to
-      prepare for data transfer.
+      application takes on the transport objects to prepare for data
+      transfer.
 
    o  Data Transfer (Section 4.1.4) consists of how an application
       represents data to be sent and received, the functions required to
       send and receive that data, and how the application is notified of
       the status of its data transfer.
 
-   o  Event Handling (Section 4.1.5) defines the set of properties that
-      an application may be notified of during the lifetime of transport
-      objects.  These may also provide opportunities for the application
-      to interact with the underlying transport.
+   o  Event Handling (Section 4.1.5) defines the set of properties about
+      which an application can receive notifications during the lifetime
+      of transport objects.  Events can also provide opportunities for
+      the application to interact with the underlying transport by
+      querying state or updating maintenance options.
 
    o  Termination (Section 4.1.6) focuses on the methods by which data
       transmission is ceased, and state is torn down in the transport.
@@ -487,7 +487,7 @@ Internet-Draft              TAPS Architecture              February 2018
       which that Connection will be established, the Remote Endpoint to
       which it will connect, and Path Selection Properties, Protocol
       Selection Properties, and Specific Protocol Properties that
-      influence the choice of transport that Connection will use.  A
+      influence the choice of transport that a Connection will use.  A
       Preconnection can be fully specified and represent a single
       possible Connection, or it can be partially specified such that it
       represents a family of possible Connections.  The Local Endpoint
@@ -546,14 +546,14 @@ Internet-Draft              TAPS Architecture              February 2018
       influence path selection include the interface type (such as a Wi-
       Fi Ethernet connection, or a Cellular LTE connection),
       characteristics of the path that are locally known like Maximum
-      Transmission Unit (MTU), or expected throughput or latency.
+      Transmission Unit (MTU) or discovered like Path MTU (PMTU), or
+      predicted based on cached information like expected throughput or
+      latency.
 
    o  Protocol Selection Properties: The Protocol Selection Properties
       consist of the options that an application may set on a
       Preconnection to influence the selection of transport protocol,
       configure the behavior of generic transport protocol features.
-      These options come in the form of requirements, prohibitions, and
-
 
 
 
@@ -562,6 +562,7 @@ Pauly, et al.            Expires August 27, 2018               [Page 10]
 Internet-Draft              TAPS Architecture              February 2018
 
 
+      These options come in the form of requirements, prohibitions, and
       preferences.  Examples include reliability, service class,
       multipath support, and fast open support.
 
@@ -572,8 +573,7 @@ Internet-Draft              TAPS Architecture              February 2018
       necessarily require that a specific protocol must be used when a
       Connection is established from that Preconnection, but that if
       this protocol is employed, a particular set of options should be
-      used.  This is critical to allow compatibility with Protocol
-      Properties on peers.
+      used.
 
 4.1.3.  Establishment Actions
 
@@ -643,8 +643,8 @@ Internet-Draft              TAPS Architecture              February 2018
 
    o  Connection Finished: A Connection Finished event signals to an
       application that a given Connection is no longer usable for
-      sending or receiving Content.  This should deliver a useful error
-      to the application.
+      sending or receiving Content.  This should deliver an error to the
+      application that describes the nature of the termination.
 
    o  Connection Received: A Connection Received event signals to an
       application that a given Listener has passively received a
@@ -652,19 +652,19 @@ Internet-Draft              TAPS Architecture              February 2018
 
    o  Content Received: A Content Received event delivers received
       content to the application, based on a Receive action.  This may
-      include an error if the action failed.
+      include an error if the Receive action cannot be satisfied due to
+      the Connection being closed.
 
    o  Content Sent: A Content Sent event notifies the application of the
-      status of its Send action.  This may be an error, an indication
-      that Content has been processed by the protocol stack, or
-      potentially [MICHAEL: Why "potentially" - because you're not sure
-      about it?  If it may be such an indication, "potentially" should
-      be removed (this seems like the right thing to do for me).] an
-      indication that Content has been acknowledged by a peer.
+      status of its Send action.  This may be an error if the Content
+      cannot be sent, or an indication that Content has been processed
+      by the protocol stack.
 
    o  Path Properties Changed: A Path Properties Changed event notifies
       the application that some property of the Connection has changed
       that may influence how and where data is sent and/or received.
+
+
 
 
 
@@ -805,11 +805,15 @@ Internet-Draft              TAPS Architecture              February 2018
    research and innovation programme under grant agreement No. 644334
    (NEAT).
 
+   This work has been supported by Leibniz Prize project funds of DFG -
+   German Research Foundation: Gottfried Wilhelm Leibniz-Preis 2011 (FKZ
+   FE 570/4-1).
+
    Thanks to Stuart Cheshire, Josh Graessley, David Schinazi, and Eric
    Kinnear for their implementation and design efforts, including Happy
    Eyeballs, that heavily influenced this work.
 
-8.  Normative References
+8.  Informative References
 
    [I-D.brunstrom-taps-impl]
               "Implementing Interfaces to Transport Services", n.d..
@@ -828,11 +832,7 @@ Internet-Draft              TAPS Architecture              February 2018
               "An Abstract Application Layer Interface to Transport
               Services", n.d..
 
-   [RFC8095]  Fairhurst, G., Ed., Trammell, B., Ed., and M. Kuehlewind,
-              Ed., "Services Provided by IETF Transport Protocols and
-              Congestion Control Mechanisms", RFC 8095,
-              DOI 10.17487/RFC8095, March 2017,
-              <https://www.rfc-editor.org/info/rfc8095>.
+
 
 
 
@@ -841,6 +841,12 @@ Pauly, et al.            Expires August 27, 2018               [Page 15]
 
 Internet-Draft              TAPS Architecture              February 2018
 
+
+   [RFC8095]  Fairhurst, G., Ed., Trammell, B., Ed., and M. Kuehlewind,
+              Ed., "Services Provided by IETF Transport Protocols and
+              Congestion Control Mechanisms", RFC 8095,
+              DOI 10.17487/RFC8095, March 2017,
+              <https://www.rfc-editor.org/info/rfc8095>.
 
 Authors' Addresses
 
@@ -868,10 +874,28 @@ Authors' Addresses
    Email: anna.brunstrom@kau.se
 
 
-   Gorry Fairhurst
+   Godred Fairhurst
    University of Aberdeen
+   Fraser Noble Building
+   Aberdeen, AB24 3UE
+   Scotland
 
    Email: gorry@erg.abdn.ac.uk
+   URI:   http://www.erg.abdn.ac.uk/
+
+
+
+
+
+
+
+
+
+
+
+Pauly, et al.            Expires August 27, 2018               [Page 16]
+
+Internet-Draft              TAPS Architecture              February 2018
 
 
    Colin Perkins
@@ -885,17 +909,11 @@ Authors' Addresses
 
    Philipp S. Tiesel
    TU Berlin
+   Marchstrasse 23
+   10587 Berlin
+   Germany
 
    Email: philipp@inet.tu-berlin.de
-
-
-
-
-
-
-Pauly, et al.            Expires August 27, 2018               [Page 16]
-
-Internet-Draft              TAPS Architecture              February 2018
 
 
    Chris Wood
@@ -905,24 +923,6 @@ Internet-Draft              TAPS Architecture              February 2018
    United States of America
 
    Email: cawood@apple.com
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

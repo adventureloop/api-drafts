@@ -335,7 +335,7 @@ address {
   <meta name="generator" content="xml2rfc version 2.9.6 - https://tools.ietf.org/tools/xml2rfc" />
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
-  <meta name="dct.creator" content="Brunstrom, A., Ed., Pauly, T., Ed., Grinnemo, K-J., Jones, T., and C. Perkins" />
+  <meta name="dct.creator" content="Brunstrom, A., Ed., Pauly, T., Ed., Enghardt, T., Grinnemo, K-J., Jones, T., Tiesel, P., and C. Perkins" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-brunstrom-taps-impl-latest" />
   <meta name="dct.issued" scheme="ISO8601" content="2018-02-23" />
   <meta name="dct.abstract" content="The Transport Services architecture " />
@@ -366,6 +366,14 @@ address {
 </tr>
 <tr>
 <td class="left"></td>
+<td class="right">T. Enghardt</td>
+</tr>
+<tr>
+<td class="left"></td>
+<td class="right">TU Berlin</td>
+</tr>
+<tr>
+<td class="left"></td>
 <td class="right">K-J. Grinnemo</td>
 </tr>
 <tr>
@@ -379,6 +387,14 @@ address {
 <tr>
 <td class="left"></td>
 <td class="right">University of Aberdeen</td>
+</tr>
+<tr>
+<td class="left"></td>
+<td class="right">P. Tiesel</td>
+</tr>
+<tr>
+<td class="left"></td>
+<td class="right">TU Berlin</td>
 </tr>
 <tr>
 <td class="left"></td>
@@ -566,16 +582,16 @@ address {
 <h1 id="rfc.section.3.2">
 <a href="#rfc.section.3.2">3.2.</a> <a href="#role-of-system-policy" id="role-of-system-policy">Role of system policy</a>
 </h1>
-<p id="rfc.section.3.2.p.1">The implementation is responsible for combining and reconciling several different sources of protocol and path selection preferences when establishing Connections. These include, but are not necessarily limited to:</p>
+<p id="rfc.section.3.2.p.1">The implementation is responsible for combining and reconciling several different sources of preferences when establishing Connections. These include, but are not limited to:</p>
 <p></p>
 
 <ol>
-<li>Application preferences specified during pre-establishment</li>
-<li>Dynamic system policy</li>
-<li>Default implementation policy</li>
+<li>Application preferences, i.e., preferences specified during the pre-establishment such as Local Endpoint, Remote Endpoint, Path Selection Properties, and Protocol Selection Properties.</li>
+<li>Dynamic system policy, i.e., policy compiled from internally and externally acquired information about available network interfaces, supported transport protocols, and current/previous Connections. Examples of ways to externally retrieve policy-support information are through OS-specific statistics/measurement tools and tools that reside on middleboxes and routers.</li>
+<li>Default implementation policy, i.e., predefined policy by OS or application.</li>
 </ol>
 <p id="rfc.section.3.2.p.3">In general, any protocol or path used for a connection must conform to all three sources of constraints. Any violation of any of the layers should cause a protocol or path to be considered ineligble for use. For an example of application preferences leading to constraints, an application may prohibit the use of metered network interfaces for a given Connection to avoid user cost. Similarly, the system policy at a given time may prohibit the use of such a metered network interface from the application&#8217;s process. Lastly, the implementation itself may default to disallowing certain network interfaces unless explicitly requested by the application and allowed by the system.</p>
-<p id="rfc.section.3.2.p.4">It is expected that the database of system policies and the method of looking up these policies will vary across various platforms. An implementation SHOULD attempt to look up the relevant policies for the system in a dynamic way to make sure it is reflecting a fresh version of the system policy, since the system&#8217;s policy regarding the application&#8217;s traffic may change over time due to user or administrative changes.</p>
+<p id="rfc.section.3.2.p.4">It is expected that the database of system policies and the method of looking up these policies will vary across various platforms. An implementation SHOULD attempt to look up the relevant policies for the system in a dynamic way to make sure it is reflecting an accurate version of the system policy, since the system&#8217;s policy regarding the application&#8217;s traffic may change over time due to user or administrative changes.</p>
 <h1 id="rfc.section.4">
 <a href="#rfc.section.4">4.</a> <a href="#implementing-connection-establishment" id="implementing-connection-establishment">Implementing Connection Establishment</a>
 </h1>
@@ -836,12 +852,11 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <ul><li>How much to tear down for multiplexed protocols, or protocols capable of multiplexing</li></ul>
 <p id="rfc.section.7.p.8">As explained in section <a href="#establish-mux" class="xref">Section 4.5</a>, when a new stream is multiplexed on an already existing connection of a Transport Protocol Instance, there is no need for a connection establishment procedure. Because the Connections that are offered by the Transport System can be implemented as streams that are multiplexed on a transport protocol&#8217;s connection, it can therefore not be guaranteed that one Endpoint&#8217;s Initiate action provokes a ConnectionReceived event at its peer.</p>
 <p id="rfc.section.7.p.9">For Close (provoking a Finished event) and Abort (provoking a ConnectionError event), the same logic applies: while it is desirable to be informed when a peer closes or aborts a Connection, whether this is possible depends on the underlying protocol, and no guarantees can be given. With SCTP, the transport system can use the stream reset procedure to cause a Finish event upon a Close action from the peer <a href="#NEAT-flow-mapping" class="xref">[NEAT-flow-mapping]</a>.</p>
-<p id="rfc.section.7.p.10">How to handle a failure generated by protocols</p>
 <h1 id="rfc.section.8">
 <a href="#rfc.section.8">8.</a> <a href="#cached-state" id="cached-state">Cached State</a>
 </h1>
 <p id="rfc.section.8.p.1">Beyond a single Connection&#8217;s lifetime, it is useful for an implementation to keep state and history. This cached state can help improve future Connection establishment due to re-using results and credentials, and favoring paths and protocols that performed well in the past.</p>
-<p id="rfc.section.8.p.2">Cached state may be associated with different Endpoints for the same Connection, depending on the protocol generating the cached content. For example, certificates for TLS are generally associated with a hostname, and thus should be cached based on a Connection&#8217;s hostname Endpoint (if applicable). On the other hand, performance characteristics of a path are more likely tied to the IP address and subnet being used.</p>
+<p id="rfc.section.8.p.2">Cached state may be associated with different Endpoints for the same Connection, depending on the protocol generating the cached content.  For example, session tickets for TLS are associated with specific endpoints, and thus SHOULD be cached based on a Connection&#8217;s hostname Endpoint (if applicable). On the other hand, performance characteristics of a path are more likely tied to the IP address and subnet being used.</p>
 <h1 id="rfc.section.8.1">
 <a href="#rfc.section.8.1">8.1.</a> <a href="#protocol-state-caches" id="protocol-state-caches">Protocol state caches</a>
 </h1>
@@ -852,9 +867,10 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <ul>
 <li>The DNS protocol can cache resolution answers (A and AAAA queries, for example), associated with a Time To Live (TTL) to be used for future hostname resolutions without requiring asking the DNS resolver again.</li>
 <li>TLS caches session state and tickets based on a hostname, which can be used for resuming sessions with a server.</li>
-<li>TCP can cache cookies for use in TCP Fast Open</li>
+<li>TCP can cache cookies for use in TCP Fast Open.</li>
 </ul>
 <p id="rfc.section.8.1.p.4">Cached state is primarily used during Connection establishment for a single Protocol Stack, but may be used to influence an implementation&#8217;s preference between several candidate Protocol Stacks. For example, if two IP address Endpoints are otherwise equally preferred, an implementation may choose to attempt a connection to an address for which it has a TCP Fast Open cookie.</p>
+<p id="rfc.section.8.1.p.5">Applications must have a way to flush protocol cache state if desired. This may be necessary, for example, if application-layer identifiers rotate and clients wish to avoid linkability via trackable TLS tickets or TFO cookies.</p>
 <h1 id="rfc.section.8.2">
 <a href="#rfc.section.8.2">8.2.</a> <a href="#performance-caches" id="performance-caches">Performance caches</a>
 </h1>
@@ -921,7 +937,8 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <a href="#rfc.section.13">13.</a> <a href="#acknowledgements" id="acknowledgements">Acknowledgements</a>
 </h1>
 <p id="rfc.section.13.p.1">This work has received funding from the European Union&#8217;s Horizon 2020 research and innovation programme under grant agreement No. 644334 (NEAT).</p>
-<p id="rfc.section.13.p.2">Thanks to Stuart Cheshire, Josh Graessley, David Schinazi, and Eric Kinnear for their implementation and design efforts, including Happy Eyeballs, that heavily influenced this work.</p>
+<p id="rfc.section.13.p.2">This work has been supported by Leibniz Prize project funds of DFG - German Research Foundation: Gottfried Wilhelm Leibniz-Preis 2011 (FKZ FE 570/4-1).</p>
+<p id="rfc.section.13.p.3">Thanks to Stuart Cheshire, Josh Graessley, David Schinazi, and Eric Kinnear for their implementation and design efforts, including Happy Eyeballs, that heavily influenced this work.</p>
 <h1 id="rfc.references">
 <a href="#rfc.references">14.</a> References</h1>
 <h1 id="rfc.references.1">
@@ -1041,6 +1058,28 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 </div><div class="avoidbreak">
   <address class="vcard">
 	<span class="vcardline">
+	  <span class="fn">Theresa Enghardt</span> 
+	  <span class="n hidden">
+		<span class="family-name">Enghardt</span>
+	  </span>
+	</span>
+	<span class="org vcardline">TU Berlin</span>
+	<span class="adr">
+	  <span class="vcardline">Marchstra&#223;e 23</span>
+
+	  <span class="vcardline">
+		<span class="locality">10587 Berlin</span>,  
+		<span class="region"></span>
+		<span class="code"></span>
+	  </span>
+	  <span class="country-name vcardline">Germany</span>
+	</span>
+	<span class="vcardline">EMail: <a href="mailto:theresa@inet.tu-berlin.de">theresa@inet.tu-berlin.de</a></span>
+
+  </address>
+</div><div class="avoidbreak">
+  <address class="vcard">
+	<span class="vcardline">
 	  <span class="fn">Karl-Johan Grinnemo</span> 
 	  <span class="n hidden">
 		<span class="family-name">Grinnemo</span>
@@ -1078,6 +1117,28 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 	  <span class="country-name vcardline"></span>
 	</span>
 	<span class="vcardline">EMail: <a href="mailto:tom@erg.abdn.ac.uk">tom@erg.abdn.ac.uk</a></span>
+
+  </address>
+</div><div class="avoidbreak">
+  <address class="vcard">
+	<span class="vcardline">
+	  <span class="fn">Philipp S. Tiesel</span> 
+	  <span class="n hidden">
+		<span class="family-name">Tiesel</span>
+	  </span>
+	</span>
+	<span class="org vcardline">TU Berlin</span>
+	<span class="adr">
+	  <span class="vcardline">Marchstra&#223;e 23</span>
+
+	  <span class="vcardline">
+		<span class="locality">10587 Berlin</span>,  
+		<span class="region"></span>
+		<span class="code"></span>
+	  </span>
+	  <span class="country-name vcardline">Germany</span>
+	</span>
+	<span class="vcardline">EMail: <a href="mailto:philipp@inet.tu-berlin.de">philipp@inet.tu-berlin.de</a></span>
 
   </address>
 </div><div class="avoidbreak">
