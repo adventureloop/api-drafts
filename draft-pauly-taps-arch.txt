@@ -88,7 +88,7 @@ Table of Contents
        4.1.3.  Establishment Actions . . . . . . . . . . . . . . . .  11
        4.1.4.  Data Transfer Objects and Actions . . . . . . . . . .  11
        4.1.5.  Event Handling  . . . . . . . . . . . . . . . . . . .  12
-       4.1.6.  Termination Actions . . . . . . . . . . . . . . . . .  12
+       4.1.6.  Termination Actions . . . . . . . . . . . . . . . . .  13
      4.2.  Transport System Implementation Concepts  . . . . . . . .  13
        4.2.1.  Gathering . . . . . . . . . . . . . . . . . . . . . .  14
        4.2.2.  Racing  . . . . . . . . . . . . . . . . . . . . . . .  14
@@ -522,18 +522,21 @@ Internet-Draft              TAPS Architecture              February 2018
 4.1.2.  Pre-Establishment
 
    o  Endpoint: An Endpoint represents one side of a transport
-      connection.  It is a concept that represents how an application
-      views itself or a peer that may vary in levels of specificity.
-      Examples include "IP address + port", "hostname + port", and "DNS
-      service name".
+      connection.  Endpoints can be Local Endpoints or Remote Endpoints,
+      and respectively represent an identity that the application uses
+      for the source or destination of a connection.  Endpoint can vary
+      in levels of specificity, and can be resolved to more concrete
+      identities.
 
    o  Remote Endpoint: The Remote Endpoint represents the application's
       name for a peer that can participate in a transport connection.
-      For example, a DNS name for the peer.
+      For example, the combination of a DNS name for the peer and a
+      service name/port.
 
    o  Local Endpoint: The Local Endpoint represents the application's
       name for itself that it wants to use for transport connections.
-      For example, a local interface name or address.
+      For example, a local interface name, or a local IP address and
+      port.
 
    o  Path Selection Properties: The Path Selection Properties consist
       of the options that an application may set on a Preconnection to
@@ -551,9 +554,6 @@ Internet-Draft              TAPS Architecture              February 2018
       consist of the options that an application may set on a
       Preconnection to influence the selection of transport protocol,
       configure the behavior of generic transport protocol features.
-      These options come in the form of requirements, prohibitions, and
-      preferences.  Examples include reliability, service class,
-      multipath support, and fast open support.
 
 
 
@@ -561,6 +561,10 @@ Pauly, et al.            Expires August 27, 2018               [Page 10]
 
 Internet-Draft              TAPS Architecture              February 2018
 
+
+      These options come in the form of requirements, prohibitions, and
+      preferences.  Examples include reliability, service class,
+      multipath support, and fast open support.
 
    o  Specific Protocol Properties: The Specific Protocol Properties
       refer to the subset of Protocol Properties options that apply to a
@@ -606,10 +610,6 @@ Internet-Draft              TAPS Architecture              February 2018
 
    o  Send() is the action to transmit Content over a Connection to a
       remote endpoint.  The interface to Send may include options
-      specific to how this Content is to be sent.  Status of the Send
-      operation may be delivered back to the application in an event
-      Section 4.1.5.
-
 
 
 
@@ -617,6 +617,10 @@ Pauly, et al.            Expires August 27, 2018               [Page 11]
 
 Internet-Draft              TAPS Architecture              February 2018
 
+
+      specific to how this Content is to be sent.  Status of the Send
+      operation may be delivered back to the application in an event
+      Section 4.1.5.
 
    o  Receive() is an action that indicates that the application is
       ready to asynchronously accept Content over a Connection from a
@@ -660,12 +664,8 @@ Internet-Draft              TAPS Architecture              February 2018
       the application that some property of the Connection has changed
       that may influence how and where data is sent and/or received.
 
-4.1.6.  Termination Actions
 
-   o  Close() is the action an application may take on a Connection to
-      indicate that it no longer intends to send data, is no longer
-      willing to receive data, and that the protocol should signal this
-      state to the remote endpoint if applicable.
+
 
 
 
@@ -673,6 +673,13 @@ Pauly, et al.            Expires August 27, 2018               [Page 12]
 
 Internet-Draft              TAPS Architecture              February 2018
 
+
+4.1.6.  Termination Actions
+
+   o  Close() is the action an application may take on a Connection to
+      indicate that it no longer intends to send data, is no longer
+      willing to receive data, and that the protocol should signal this
+      state to the remote endpoint if applicable.
 
    o  Abort() is an action the application may take on a Connection to
       indicate a Close, but with the additional indication that the
@@ -715,13 +722,6 @@ Internet-Draft              TAPS Architecture              February 2018
    o  Association Cache: The Association Cache holds the state that the
       implementation keeps for each set of associated endpoints that
       have been used previously.  This can include DNS results, TLS
-      session state, previous success and quality of transport protocols
-      over certain paths.
-
-
-
-
-
 
 
 
@@ -729,6 +729,9 @@ Pauly, et al.            Expires August 27, 2018               [Page 13]
 
 Internet-Draft              TAPS Architecture              February 2018
 
+
+      session state, previous success and quality of transport protocols
+      over certain paths.
 
 4.2.1.  Gathering
 
@@ -757,8 +760,8 @@ Internet-Draft              TAPS Architecture              February 2018
    o  Endpoint Racing: Endpoint Racing is the act of attempting to
       establish, or scheduling attempts to establish, multiple Protocol
       Stacks that differ based on the specific representation of the
-      remote and local endpoints, such as IP addresses resolved from a
-      DNS hostname.
+      Remote Endpoint and the Local Endpoint, such as IP addresses
+      resolved from a DNS hostname.
 
 5.  IANA Considerations
 
@@ -775,9 +778,6 @@ Internet-Draft              TAPS Architecture              February 2018
    supported security protocols.  For example, trust verification
    callbacks are common parts of TLS APIs.  TAPS exposes one for similar
    purposes.  Clients must take care to use security APIs appropriately.
-   In cases where clients use said interface to provide sensitive keying
-   material, e.g., access to private keys or copies of pre-shared keys
-   (PSKs), key use must be validated.  For example, clients SHOULD NOT
 
 
 
@@ -786,6 +786,9 @@ Pauly, et al.            Expires August 27, 2018               [Page 14]
 Internet-Draft              TAPS Architecture              February 2018
 
 
+   In cases where clients use said interface to provide sensitive keying
+   material, e.g., access to private keys or copies of pre-shared keys
+   (PSKs), key use must be validated.  For example, clients SHOULD NOT
    use PSK material created for ESP with IETF-QUIC, and clients MUST NOT
    use private keys intended for server authentication as a key for
    client authentication.  Moreover, unlike certain transport features
@@ -829,11 +832,8 @@ Internet-Draft              TAPS Architecture              February 2018
               "An Abstract Application Layer Interface to Transport
               Services", n.d..
 
-   [RFC8095]  Fairhurst, G., Ed., Trammell, B., Ed., and M. Kuehlewind,
-              Ed., "Services Provided by IETF Transport Protocols and
-              Congestion Control Mechanisms", RFC 8095,
-              DOI 10.17487/RFC8095, March 2017,
-              <https://www.rfc-editor.org/info/rfc8095>.
+
+
 
 
 
@@ -841,6 +841,12 @@ Pauly, et al.            Expires August 27, 2018               [Page 15]
 
 Internet-Draft              TAPS Architecture              February 2018
 
+
+   [RFC8095]  Fairhurst, G., Ed., Trammell, B., Ed., and M. Kuehlewind,
+              Ed., "Services Provided by IETF Transport Protocols and
+              Congestion Control Mechanisms", RFC 8095,
+              DOI 10.17487/RFC8095, March 2017,
+              <https://www.rfc-editor.org/info/rfc8095>.
 
 Authors' Addresses
 
@@ -878,13 +884,7 @@ Authors' Addresses
    URI:   http://www.erg.abdn.ac.uk/
 
 
-   Colin Perkins
-   University of Glasgow
-   School of Computing Science
-   Glasgow  G12 8QQ
-   United Kingdom
 
-   Email: csp@csperkins.org
 
 
 
@@ -896,6 +896,15 @@ Authors' Addresses
 Pauly, et al.            Expires August 27, 2018               [Page 16]
 
 Internet-Draft              TAPS Architecture              February 2018
+
+
+   Colin Perkins
+   University of Glasgow
+   School of Computing Science
+   Glasgow  G12 8QQ
+   United Kingdom
+
+   Email: csp@csperkins.org
 
 
    Philipp S. Tiesel
@@ -914,15 +923,6 @@ Internet-Draft              TAPS Architecture              February 2018
    United States of America
 
    Email: cawood@apple.com
-
-
-
-
-
-
-
-
-
 
 
 

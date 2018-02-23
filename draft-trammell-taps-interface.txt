@@ -255,24 +255,24 @@ Internet-Draft               TAPS Interface                February 2018
 
    A Preconnection object represents a potential connection.  It has
    state that describes parameters of a Connection that might exist in
-   the future.  This state comprises information about the local and
-   remote endpoints (see Section 5.1), the transport parameters (see
-   Section 5.2), and the security parameters (see Section 5.3):
+   the future.  This state comprises LocalEndpoint and RemoteEndpoint
+   objects that denote the endpoints of the potential connection (see
+   Section 5.1), the transport parameters (see Section 5.2), and the
+   security parameters (see Section 5.3):
 
-     localEndpoint   := ...
-     remoteEndpoint  := ...
-     transportParams := ...
-     securityParams  := ...
-
-     preConnection := NewPreconnection(localEndpoint, remoteEndpoint,
-                                       transportParams, securityParams);
+      preConnection := NewPreconnection(LocalEndpoint,
+                                        RemoteEndpoint,
+                                        TransportParams,
+                                        SecurityParams);
 
 
-   The Local Endpoint MUST be specified if the Preconnection is used to
+   The LocalEndpoint MUST be specified if the Preconnection is used to
    Listen() for incoming connections, but is OPTIONAL if it is used to
-   Initiate() connections.  The Remote Endpoint MUST be specified in the
+   Initiate() connections.  The RemoteEndpoint MUST be specified in the
    Preconnection is used to Initiate() connections, but is OPTIONAL if
    it is used to Listen() for incoming connections.
+
+
 
 
 
@@ -288,25 +288,25 @@ Internet-Draft               TAPS Interface                February 2018
 
 5.1.  Specifying Endpoints
 
-   The transport services API uses Endpoint objects to refer to local
-   and remote endpoints.  Endpoint objects can be configured using
-   various representations of endpoint identifiers, including IP
-   addresses, hostnames, or interface names as well as port numbers and
-   service names:
+   The transport services API uses the LocalEndpoint and RemoteEndpoint
+   types to refer to the endpoints of a transport connection.  Subtypes
+   of these represent various different types of endpoint identifiers,
+   such as IP addresses, DNS names, and interface names, as well as port
+   numbers and service names.
 
-   remoteSpecifier := NewEndpoint()
+   remoteSpecifier := NewRemoteEndpoint()
    remoteSpecifier.withHostname("example.com")
    remoteSpecifier.withService("https")
 
-   remoteSpecifier := NewEndpoint()
+   remoteSpecifier := NewRemoteEndpoint()
    remoteSpecifier.withIPv6Address(2001:db8:4920:e29d:a420:7461:7073:0a)
    remoteSpecifier.withPort(443)
 
-   remoteSpecifier := NewEndpoint()
+   remoteSpecifier := NewRemoteEndpoint()
    remoteSpecifier.withIPv4Address(192.0.2.21)
    remoteSpecifier.withPort(443)
 
-   localSpecifier := NewEndpoint()
+   localSpecifier := NewLocalEndpoint()
    localSpecifier.withInterface("en0")
    localSpecifier.withPort(443)
 
@@ -486,11 +486,11 @@ Internet-Draft               TAPS Interface                February 2018
       within a Connection Group.  This is not a strict requirement.  The
       default is to not have this option.
 
-   o  Suggest a timeout to the peer: This boolean property specifies
-      whether an application considers it useful to propose a timeout
-      until the connection is assumed to be lost.  This property applies
-      to Connections and Connection Groups.  This is not a strict
-      requirement.  The default is to have this option.
+   o  Suggest a timeout to the RemoteEndpoint: This boolean property
+      specifies whether an application considers it useful to propose a
+      timeout until the connection is assumed to be lost.  This property
+      applies to Connections and Connection Groups.  This is not a
+      strict requirement.  The default is to have this option.
 
    o  Notification of special errors (excessive retransmissions, ICMP
       error message arrival): This boolean property specifies whether an
@@ -549,9 +549,9 @@ Internet-Draft               TAPS Interface                February 2018
       property specifies how long to wait before aborting a Connection
       attempt.  It is given in seconds.
 
-   o  Set timeout to suggest to the peer: This numeric property
-      specifies the timeout to propose to the peer.  It is given in
-      seconds.
+   o  Set timeout to suggest to the RemoteEndpoint: This numeric
+      property specifies the timeout to propose to the RemoteEndpoint.
+      It is given in seconds.
 
 
 
@@ -809,8 +809,8 @@ Internet-Draft               TAPS Interface                February 2018
    Security configuration parameters and sample usage follow:
 
    o  Local identity and private keys: Used to perform private key
-      operations and prove one's identity to remote peers.  (Note, if
-      private keys are not available, e.g., since they are stored in
+      operations and prove one's identity to the RemoteEndpoint.  (Note,
+      if private keys are not available, e.g., since they are stored in
       HSMs, handshake callbacks MUST be used.  See below for details.)
 
    securityParameters.AddIdentity(identity)
@@ -845,7 +845,7 @@ Internet-Draft               TAPS Interface                February 2018
    o  Pre-shared keying material: Used to install pre-shared keying
       material established out-of-band.  Each pre-shared keying material
       is associated with some identity that typically identifies its use
-      or has some protocol-specific meaning to peers.
+      or has some protocol-specific meaning to the RemoteEndpoint.
 
    securityParameters.AddPreSharedKey(key, identity)
 
@@ -854,8 +854,8 @@ Internet-Draft               TAPS Interface                February 2018
    handshakes.  These are best handled as client-provided callbacks.
    Security handshake callbacks include:
 
-   o  Trust verification callback: Invoked when a peer's trust must be
-      validated before the handshake protocol can proceed.
+   o  Trust verification callback: Invoked when a RemoteEndpoint's trust
+      must be validated before the handshake protocol can proceed.
 
    trustCallback := NewCallback({
      // Handle trust, return the result
@@ -885,11 +885,11 @@ Internet-Draft               TAPS Interface                February 2018
 
 6.1.  Active Open: Initiate
 
-   Active open is the action of establishing a connection to an endpoint
-   presumed to be listening for incoming connection requests, commonly
-   used by clients in client-server interactions.  Active open is
-   supported by this interface through the Initiate action:
-
+   Active open is the action of establishing a connection to a
+   RemoteEndpoint presumed to be listening for incoming connection
+   requests.  Active open is used by clients in client-server
+   interactions.  Active open is supported by this interface through the
+   Initiate action:
 
 
 
@@ -901,12 +901,13 @@ Internet-Draft               TAPS Interface                February 2018
    Connection := Preconnection.Initiate()
 
    Before calling Initiate, the caller must have populated a
-   Preconnection object with local and remote endpoint specifiers, as
-   well as all parameters necessary for candidate selection.  After
-   calling Initiate, no further parameters may be bound to the
-   Connection.  The Initiate() call consumes the Preconnection and
-   creates a Connection object.  A Preconnection can only be initiated
-   once.
+   Preconnection object with a RemoteEndpoint specifier, optionally a
+   LocalEndpoint specifier (if not specified, the system will attempt to
+   determine a suitable LocalEndpoint), as well as all parameters
+   necessary for candidate selection.  After calling Initiate, no
+   further parameters may be bound to the Connection.  The Initiate()
+   call consumes the Preconnection and creates a Connection object.  A
+   Preconnection can only be initiated once.
 
    Once Initiate is called, the candidate Protocol Stack(s) may cause
    one or more candidate transport-layer connections to be created to
@@ -948,7 +949,6 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-
 Trammell, et al.         Expires August 27, 2018               [Page 17]
 
 Internet-Draft               TAPS Interface                February 2018
@@ -957,19 +957,20 @@ Internet-Draft               TAPS Interface                February 2018
    Preconnection.Listen()
 
    Before calling Listen, the caller must have initialized the
-   Preconnection during the pre-establishment phase with local endpoint
-   specifiers, as well as all parameters necessary for Protocol Stack
-   selection.  The Listen() action consumes the Preconnection.  Once
-   Listen() has been called, no further parameters may be bound to the
-   Preconnection, and no subsequent establishment call may be made on
-   the Preconnection.
+   Preconnection during the pre-establishment phase with a LocalEndpoint
+   specifier, as well as all parameters necessary for Protocol Stack
+   selection.  A RemoteEndpoint may optionally be specified, to
+   constrain what connections are accepted.  The Listen() action
+   consumes the Preconnection.  Once Listen() has been called, no
+   further parameters may be bound to the Preconnection, and no
+   subsequent establishment call may be made on the Preconnection.
 
    Preconnection -> ConnectionReceived<Connection>
 
    The ConnectionReceived event occurs when a RemoteEndpoint has
    established a transport-layer connection to this Preconnection (for
    connection-oriented transport protocols), or when the first Content
-   has been received from the remote endpoint (for connectionless
+   has been received from the RemoteEndpoint (for connectionless
    protocols), causing a new Connection to be created.  The resulting
    Connection is contained within the ConnectionReceived event, and is
    ready to use as soon as it is passed to the application via the
@@ -1001,7 +1002,6 @@ Internet-Draft               TAPS Interface                February 2018
    Rendezvous() has been called, no further parameters may be bound to
    the Preconnection, and no subsequent establishment call may be made
    on the Preconnection.
-
 
 
 
@@ -1495,14 +1495,14 @@ Internet-Draft               TAPS Interface                February 2018
    application has already given to the transport system.  For example,
    if reliable delivery was requested for Content handed over before
    calling Close, the transport system will ensure that such Content is
-   indeed delivered.  If the peer still has data to send, it cannot be
-   received after this call.
+   indeed delivered.  If the RemoteEndpoint still has data to send, it
+   cannot be received after this call.
 
    Connection.Close()
 
-   The Closed event can inform the application that the peer has closed
-   the Connection; however, there is no guarantee that a remote close
-   will be signaled.
+   The Closed event can inform the application that the RemoteEndpoint
+   has closed the Connection; however, there is no guarantee that a
+   remote close will be signaled.
 
    Connection -> Closed<>
 
@@ -1831,10 +1831,10 @@ B.1.  Application Preferences
    Not every Transport Parameter can be meaningfully assigned every
    preference level.  For example, if an application explicitly
    prohibits selecting a transport protocol that allows to suggest a
-   timeout to the peer, this restriction will unnecessarily limit
-   transport protocol selection.  Instead, the application could simply
-   not use this feature if it is present in the selected transport
-   protocol.
+   timeout to the RemoteEndpoint, this restriction will unnecessarily
+   limit transport protocol selection.  Instead, the application could
+   simply not use this feature if it is present in the selected
+   transport protocol.
 
    The following table illustrates which Transport Parameter has which
    default preference level and which alternative preference levels an
@@ -1876,7 +1876,7 @@ Internet-Draft               TAPS Interface                February 2018
    | priorities        |         |        |       |          |         |
    |                   |         |        |       |          |         |
    | Suggest timeout   | Yes     | Yes    | No    | No       | None    |
-   | to peer           |         |        |       |          |         |
+   | to RemoteEndpoint |         |        |       |          |         |
    |                   |         |        |       |          |         |
    | Notification of   | Yes     | Yes    | Yes   | Yes      | None    |
    | special errors    |         |        |       |          |         |
