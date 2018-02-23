@@ -95,7 +95,7 @@ Table of Contents
    5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  14
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .  14
    7.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  15
-   8.  Normative References  . . . . . . . . . . . . . . . . . . . .  15
+   8.  Informative References  . . . . . . . . . . . . . . . . . . .  15
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
 
 1.  Introduction
@@ -187,12 +187,12 @@ Internet-Draft              TAPS Architecture              February 2018
    There are several degrees in which a Transport Services system can
    offer flexibility to an application: it can provide access to
    multiple sets of protocols and protocol features, it can use these
-   protocols across multiple networks that may have different
-   performance and functional characteristics, and it can communicate
-   with different addresses for a peer to optimize performance.  Beyond
-   these, if the API for the system remains the same over time, new
-   protocols and features may be added to the system's implementation
-   without requiring significant changes in applications for adoption.
+   protocols across multiple paths that may have different performance
+   and functional characteristics, and it can communicate with different
+   Remote Endpoints to optimize performance.  Beyond these, if the API
+   for the system remains the same over time, new protocols and features
+   may be added to the system's implementation without requiring
+   significant changes in applications for adoption.
 
    The following considerations were used in the design of this
    architecture.
@@ -212,11 +212,11 @@ Internet-Draft              TAPS Architecture              February 2018
 3.2.  Access to Specialized Features
 
    Since applications will often need to control fine-grained details of
-   transport protocols in order to optimize their behavior and ensure
+   transport protocols to optimize their behavior and ensure
    compatibility with remote peers, a Transport Services system also
    needs to allow more specialized protocol features to be used.  The
    interface for these specialized options should be treated differently
-   from the common options in order to ensure flexibility.
+   from the common options to ensure flexibility.
 
 
 
@@ -259,21 +259,21 @@ Internet-Draft              TAPS Architecture              February 2018
    at application developers.
 
    Implementations that provide the Transport Services API
-   [I-D.brunstrom-taps-impl], on the other hand, will vary due to
-   system-specific support and the needs of the deployment scenario.  It
-   is expected that all implementations of Transport Services will offer
-   the entire mandatory API, but that some features will not be
-   functional in certain implementations.  All implementations must
-   offer sufficient APIs to use the distilled minimal set of features
-   offered by transport protocols [I-D.ietf-taps-minset], including API
-   support for TCP and UDP transport, but it is possible that some very
-   constrained devices might not have, for example, a full TCP
-   implementation.
+   [I-D.brunstrom-taps-impl] will vary due to system-specific support
+   and the needs of the deployment scenario.  It is expected that all
+   implementations of Transport Services will offer the entire mandatory
+   API, but that some features will not be functional in certain
+   implementations.  All implementations must offer sufficient APIs to
+   use the distilled minimal set of features offered by transport
+   protocols [I-D.ietf-taps-minset], including API support for TCP and
+   UDP transport, but it is possible that some very constrained devices
+   might not have, for example, a full TCP implementation.
 
    In order to preserve flexibility and compatibility with future
    protocols, top-level features in the Transport Services API should
    avoid referencing particular transport protocols.  Mappings of these
    API features in the Implementation document, on the other hand, must
+   explain the ramifications of each feature on existing protocols.  It
 
 
 
@@ -282,16 +282,15 @@ Pauly, et al.            Expires August 27, 2018                [Page 5]
 Internet-Draft              TAPS Architecture              February 2018
 
 
-   explain the ramifications of each feature on existing protocols.  It
    is expected that the Implementation document will be updated and
    supplemented as new protocols and protocol features are developed.
 
    It is important to note that neither the Transport Services API nor
    the Implementation document defines new protocols that require any
-   changes on peers.  The Transport Services system must be deployable
-   on one side only, as a way to allow an application to make better use
-   of available capabilities on a system, and protocols features that
-   may be supported by peers across the network.
+   changes on remote hosts.  The Transport Services system must be
+   deployable on one side only, as a way to allow an application to make
+   better use of available capabilities on a system, and protocols
+   features that may be supported by peers across the network.
 
 4.  Transport Services Architecture and Concepts
 
@@ -333,6 +332,7 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
+
 Pauly, et al.            Expires August 27, 2018                [Page 6]
 
 Internet-Draft              TAPS Architecture              February 2018
@@ -340,14 +340,14 @@ Internet-Draft              TAPS Architecture              February 2018
 
      +------------------------------------------------------+
      |                    Application                       |
-     +-+------------------^----------+----------^-----------+
-       |                  |          |          |
-     pre-               data         |        events
-     establishment    transfer       |          |
-       |                  |      terminate      |
-       |                  |          |          |
-       |             +----v----------v--+       |
-     +-v-------------+      Objects     +-------+----------+
+     +-+----------------+------^-------+--------^-----------+
+       |                |      |       |        |
+     pre-               |     data     |      events
+     establishment      |   transfer   |        |
+       |        establishment  |   terminate    |
+       |                |      |       |        |
+       |             +--v------v-------v+       |
+     +-v-------------+   Basic Objects  +-------+----------+
      |  Transport    +--------+---------+                  |
      |  Services              |                            |
      |  API                   |                            |
@@ -372,20 +372,20 @@ Internet-Draft              TAPS Architecture              February 2018
                  Network Layer Interface
 
       Figure 1: Concepts and Relationships in the Transport Services
-      Architecture\[MICHAEL: "I think it's bad that establishment is
-   missing from the figure - but I understand it could get messy.  Maybe
-    writing '(pre-)estabilshment' could help, to indicate that there is
-                bot pre-establishment and establishment?"]
+                               Architecture
 
 4.1.  Transport Services API Concepts
 
    Fundamentally, a Transport Services API needs to provide basic
-   objects that allow applications to establish communication and send
-   and receive data Section 4.1.1.  These may be exposed as handles or
-   referenced objects, depending on the language.
+   objects Section 4.1.1 that allow applications to establish
+   communication and send and receive data Section 4.1.1.  These may be
+   exposed as handles or referenced objects, depending on the language.
 
    Beyond the basic objects, there are several high-level groups of
    actions that any Transport Services API must provide:
+
+   o  Pre-Establishment (Section 4.1.2) encompasses the parameters that
+      an application can pass to describe its intent, requirements,
 
 
 
@@ -394,15 +394,14 @@ Pauly, et al.            Expires August 27, 2018                [Page 7]
 Internet-Draft              TAPS Architecture              February 2018
 
 
-   o  Pre-Establishment (Section 4.1.2) encompasses the parameters that
-      an application can pass to describe its intent, requirements,
       prohibitions, and preferences for its networking operations.  For
       any system that provides generic Transport Services, these
-      properties should primarily offer knobs that apply across multiple
-      transports.  Properties may have a large impact on the rest of the
-      aspects of the interface: they can modify how establishment
-      occurs, they can influence the expectations around data transfer,
-      and they determine the set of events that will be supported.
+      properties should primarily offer knobs that are applicable to
+      multiple transports.  Properties may have a large impact on the
+      rest of the aspects of the interface: they can modify how
+      establishment occurs, they can influence the expectations around
+      data transfer, and they determine the set of events that will be
+      supported.
 
    o  Establishment (Section 4.1.3) focuses on the actions that an
       application takes on the transport objects to prepare for data
@@ -413,10 +412,11 @@ Internet-Draft              TAPS Architecture              February 2018
       send and receive that data, and how the application is notified of
       the status of its data transfer.
 
-   o  Event Handling (Section 4.1.5) defines the set of properties that
-      an application may be notified of during the lifetime of transport
-      objects.  These may also provide opportunities for the application
-      to interact with the underlying transport.
+   o  Event Handling (Section 4.1.5) defines the set of properties about
+      which an application can receive notifications during the lifetime
+      of transport objects.  Events can also provide opportunities for
+      the application to interact with the underlying transport by
+      querying state or updating maintenance options.
 
    o  Termination (Section 4.1.6) focuses on the methods by which data
       transmission is ceased, and state is torn down in the transport.
@@ -813,7 +813,7 @@ Internet-Draft              TAPS Architecture              February 2018
    Kinnear for their implementation and design efforts, including Happy
    Eyeballs, that heavily influenced this work.
 
-8.  Normative References
+8.  Informative References
 
    [I-D.brunstrom-taps-impl]
               "Implementing Interfaces to Transport Services", n.d..

@@ -302,7 +302,7 @@ address {
 <link href="#rfc.section.5" rel="Chapter" title="5 IANA Considerations">
 <link href="#rfc.section.6" rel="Chapter" title="6 Security Considerations">
 <link href="#rfc.section.7" rel="Chapter" title="7 Acknowledgements">
-<link href="#rfc.references" rel="Chapter" title="8 Normative References">
+<link href="#rfc.references" rel="Chapter" title="8 Informative References">
 <link href="#rfc.authors" rel="Chapter">
 
 
@@ -446,7 +446,7 @@ address {
 </li>
 <li>7.   <a href="#rfc.section.7">Acknowledgements</a>
 </li>
-<li>8.   <a href="#rfc.references">Normative References</a>
+<li>8.   <a href="#rfc.references">Informative References</a>
 </li>
 <li><a href="#rfc.authors">Authors' Addresses</a>
 </li>
@@ -471,7 +471,7 @@ address {
 <a href="#rfc.section.3">3.</a> <a href="#design-principles" id="design-principles">Design Principles</a>
 </h1>
 <p id="rfc.section.3.p.1">The goal of the Transport Services architecture is to redefine the interface between applications and transports in a way that allows the transport layer to evolve and improve without fundamentally changing the contract with the application. This requires a careful consideration of how to expose the capabilities of protocols.</p>
-<p id="rfc.section.3.p.2">There are several degrees in which a Transport Services system can offer flexibility to an application: it can provide access to multiple sets of protocols and protocol features, it can use these protocols across multiple networks that may have different performance and functional characteristics, and it can communicate with different addresses for a peer to optimize performance. Beyond these, if the API for the system remains the same over time, new protocols and features may be added to the system&#8217;s implementation without requiring significant changes in applications for adoption.</p>
+<p id="rfc.section.3.p.2">There are several degrees in which a Transport Services system can offer flexibility to an application: it can provide access to multiple sets of protocols and protocol features, it can use these protocols across multiple paths that may have different performance and functional characteristics, and it can communicate with different Remote Endpoints to optimize performance. Beyond these, if the API for the system remains the same over time, new protocols and features may be added to the system&#8217;s implementation without requiring significant changes in applications for adoption.</p>
 <p id="rfc.section.3.p.3">The following considerations were used in the design of this architecture.</p>
 <h1 id="rfc.section.3.1">
 <a href="#rfc.section.3.1">3.1.</a> <a href="#common-apis-for-common-features" id="common-apis-for-common-features">Common APIs for Common Features</a>
@@ -481,16 +481,16 @@ address {
 <h1 id="rfc.section.3.2">
 <a href="#rfc.section.3.2">3.2.</a> <a href="#access-to-specialized-features" id="access-to-specialized-features">Access to Specialized Features</a>
 </h1>
-<p id="rfc.section.3.2.p.1">Since applications will often need to control fine-grained details of transport protocols in order to optimize their behavior and ensure compatibility with remote peers, a Transport Services system also needs to allow more specialized protocol features to be used. The interface for these specialized options should be treated differently from the common options in order to ensure flexibility.</p>
+<p id="rfc.section.3.2.p.1">Since applications will often need to control fine-grained details of transport protocols to optimize their behavior and ensure compatibility with remote peers, a Transport Services system also needs to allow more specialized protocol features to be used. The interface for these specialized options should be treated differently from the common options to ensure flexibility.</p>
 <p id="rfc.section.3.2.p.2">A specialized feature may be required by an application only when using a specific protocol, and not when using others. For example, if an application is using UDP, it may require control over the checksum or fragmentation behavior for UDP; if it used a protocol to frame its content over a byte stream like TCP, it would not need these options. In such cases, the API should expose the features in such a way that they take effect when a particular protocol is selected, but do not imply that only that protocol may be used if there are equivalent options.</p>
 <p id="rfc.section.3.2.p.3">Other specialized features, however, may be strictly required by an application and thus constrain the set of protocols that can be used. For example, if an application requires encryption of its transport content, it must be guaranteed that only combinations of protocols that include a transport security protocol.[MICHAEL: &#8220;&#8230;are used?&#8221; - but also the &#8220;combinations that include&#8221; seems strange here. Suggest: &#8220;it must be guaranteed that a chosen transport protocol that can encrypt data.&#8221;] A Transport Services API must allow applications to define such requirements and constrain the system&#8217;s options. Since such options are not part of the core, common features, however, it should be simple for an application to modify its set of constraints and change the set of allowable protocol features without changing the core implementation.</p>
 <h1 id="rfc.section.3.3">
 <a href="#rfc.section.3.3">3.3.</a> <a href="#scope-for-api-and-implementation-definitions" id="scope-for-api-and-implementation-definitions">Scope for API and Implementation Definitions</a>
 </h1>
 <p id="rfc.section.3.3.p.1">The Transport Services API is envisioned as the abstract model for a family of APIs that share a common way to expose transport features and encourage flexibility. The abstract API definition <a href="#I-D.trammell-taps-interface" class="xref">[I-D.trammell-taps-interface]</a> describes this interface and is aimed at application developers.</p>
-<p id="rfc.section.3.3.p.2">Implementations that provide the Transport Services API <a href="#I-D.brunstrom-taps-impl" class="xref">[I-D.brunstrom-taps-impl]</a>, on the other hand, will vary due to system-specific support and the needs of the deployment scenario. It is expected that all implementations of Transport Services will offer the entire mandatory API, but that some features will not be functional in certain implementations. All implementations must offer sufficient APIs to use the distilled minimal set of features offered by transport protocols <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>, including API support for TCP and UDP transport, but it is possible that some very constrained devices might not have, for example, a full TCP implementation.</p>
+<p id="rfc.section.3.3.p.2">Implementations that provide the Transport Services API <a href="#I-D.brunstrom-taps-impl" class="xref">[I-D.brunstrom-taps-impl]</a> will vary due to system-specific support and the needs of the deployment scenario. It is expected that all implementations of Transport Services will offer the entire mandatory API, but that some features will not be functional in certain implementations. All implementations must offer sufficient APIs to use the distilled minimal set of features offered by transport protocols <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>, including API support for TCP and UDP transport, but it is possible that some very constrained devices might not have, for example, a full TCP implementation.</p>
 <p id="rfc.section.3.3.p.3">In order to preserve flexibility and compatibility with future protocols, top-level features in the Transport Services API should avoid referencing particular transport protocols. Mappings of these API features in the Implementation document, on the other hand, must explain the ramifications of each feature on existing protocols. It is expected that the Implementation document will be updated and supplemented as new protocols and protocol features are developed.</p>
-<p id="rfc.section.3.3.p.4">It is important to note that neither the Transport Services API nor the Implementation document defines new protocols that require any changes on peers. The Transport Services system must be deployable on one side only, as a way to allow an application to make better use of available capabilities on a system, and protocols features that may be supported by peers across the network.</p>
+<p id="rfc.section.3.3.p.4">It is important to note that neither the Transport Services API nor the Implementation document defines new protocols that require any changes on remote hosts. The Transport Services system must be deployable on one side only, as a way to allow an application to make better use of available capabilities on a system, and protocols features that may be supported by peers across the network.</p>
 <h1 id="rfc.section.4">
 <a href="#rfc.section.4">4.</a> <a href="#transport-services-architecture-and-concepts" id="transport-services-architecture-and-concepts">Transport Services Architecture and Concepts</a>
 </h1>
@@ -502,14 +502,14 @@ address {
 <pre>
   +------------------------------------------------------+
   |                    Application                       |
-  +-+------------------^----------+----------^-----------+
-    |                  |          |          |
-  pre-               data         |        events
-  establishment    transfer       |          |
-    |                  |      terminate      |
-    |                  |          |          |
-    |             +----v----------v--+       |
-  +-v-------------+      Objects     +-------+----------+
+  +-+----------------+------^-------+--------^-----------+
+    |                |      |       |        |
+  pre-               |     data     |      events
+  establishment      |   transfer   |        |
+    |        establishment  |   terminate    |
+    |                |      |       |        |
+    |             +--v------v-------v+       |
+  +-v-------------+   Basic Objects  +-------+----------+
   |  Transport    +--------+---------+                  |
   |  Services              |                            |
   |  API                   |                            |
@@ -533,19 +533,19 @@ address {
                         V
               Network Layer Interface
 </pre>
-<p class="figure">Figure 1: Concepts and Relationships in the Transport Services Architecture\[MICHAEL: "I think it's bad that establishment is missing from the figure - but I understand it could get messy. Maybe writing '(pre-)estabilshment' could help, to indicate that there is bot pre-establishment and establishment?"]</p>
+<p class="figure">Figure 1: Concepts and Relationships in the Transport Services Architecture</p>
 <h1 id="rfc.section.4.1">
 <a href="#rfc.section.4.1">4.1.</a> <a href="#transport-services-api-concepts" id="transport-services-api-concepts">Transport Services API Concepts</a>
 </h1>
-<p id="rfc.section.4.1.p.1">Fundamentally, a Transport Services API needs to provide basic objects that allow applications to establish communication and send and receive data <a href="#objects" class="xref">Section 4.1.1</a>. These may be exposed as handles or referenced objects, depending on the language.</p>
+<p id="rfc.section.4.1.p.1">Fundamentally, a Transport Services API needs to provide basic objects <a href="#objects" class="xref">Section 4.1.1</a> that allow applications to establish communication and send and receive data <a href="#objects" class="xref">Section 4.1.1</a>. These may be exposed as handles or referenced objects, depending on the language.</p>
 <p id="rfc.section.4.1.p.2">Beyond the basic objects, there are several high-level groups of actions that any Transport Services API must provide:</p>
 <p></p>
 
 <ul>
-<li>Pre-Establishment (<a href="#preestablishment" class="xref">Section 4.1.2</a>) encompasses the parameters that an application can pass to describe its intent, requirements, prohibitions, and preferences for its networking operations. For any system that provides generic Transport Services, these properties should primarily offer knobs that apply across multiple transports. Properties may have a large impact on the rest of the aspects of the interface: they can modify how establishment occurs, they can influence the expectations around data transfer, and they determine the set of events that will be supported.</li>
+<li>Pre-Establishment (<a href="#preestablishment" class="xref">Section 4.1.2</a>) encompasses the parameters that an application can pass to describe its intent, requirements, prohibitions, and preferences for its networking operations. For any system that provides generic Transport Services, these properties should primarily offer knobs that are applicable to multiple transports. Properties may have a large impact on the rest of the aspects of the interface: they can modify how establishment occurs, they can influence the expectations around data transfer, and they determine the set of events that will be supported.</li>
 <li>Establishment (<a href="#establishment" class="xref">Section 4.1.3</a>) focuses on the actions that an application takes on the transport objects to prepare for data transfer.</li>
 <li>Data Transfer (<a href="#datatransfer" class="xref">Section 4.1.4</a>) consists of how an application represents data to be sent and received, the functions required to send and receive that data, and how the application is notified of the status of its data transfer.</li>
-<li>Event Handling (<a href="#events" class="xref">Section 4.1.5</a>) defines the set of properties that an application may be notified of during the lifetime of transport objects. These may also provide opportunities for the application to interact with the underlying transport.</li>
+<li>Event Handling (<a href="#events" class="xref">Section 4.1.5</a>) defines the set of properties about which an application can receive notifications during the lifetime of transport objects. Events can also provide opportunities for the application to interact with the underlying transport by querying state or updating maintenance options.</li>
 <li>Termination (<a href="#termination" class="xref">Section 4.1.6</a>) focuses on the methods by which data transmission is ceased, and state is torn down in the transport.</li>
 </ul>
 <div id="rfc.figure.2"></div>
@@ -693,7 +693,7 @@ address {
 <p id="rfc.section.7.p.2">This work has been supported by Leibniz Prize project funds of DFG - German Research Foundation: Gottfried Wilhelm Leibniz-Preis 2011 (FKZ FE 570/4-1).</p>
 <p id="rfc.section.7.p.3">Thanks to Stuart Cheshire, Josh Graessley, David Schinazi, and Eric Kinnear for their implementation and design efforts, including Happy Eyeballs, that heavily influenced this work.</p>
 <h1 id="rfc.references">
-<a href="#rfc.references">8.</a> Normative References</h1>
+<a href="#rfc.references">8.</a> Informative References</h1>
 <table><tbody>
 <tr>
 <td class="reference"><b id="I-D.brunstrom-taps-impl">[I-D.brunstrom-taps-impl]</b></td>
