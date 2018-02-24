@@ -303,8 +303,8 @@ address {
 <link href="#rfc.section.4.7.1" rel="Chapter" title="4.7.1 Implementing listeners for Unconnected Protocols">
 <link href="#rfc.section.5" rel="Chapter" title="5 Implementing Data Transfer">
 <link href="#rfc.section.5.1" rel="Chapter" title="5.1 Data transfer for streams, datagrams, and frames">
-<link href="#rfc.section.5.1.1" rel="Chapter" title="5.1.1 Sending content">
-<link href="#rfc.section.5.1.2" rel="Chapter" title="5.1.2 Receiving content">
+<link href="#rfc.section.5.1.1" rel="Chapter" title="5.1.1 Sending Messages">
+<link href="#rfc.section.5.1.2" rel="Chapter" title="5.1.2 Receiving Messages">
 <link href="#rfc.section.5.2" rel="Chapter" title="5.2 Handling of data for fast-open protocols">
 <link href="#rfc.section.6" rel="Chapter" title="6 Implementing Maintenance">
 <link href="#rfc.section.6.1" rel="Chapter" title="6.1 Changing Protocol Properties">
@@ -476,9 +476,9 @@ address {
 </li>
 <ul><li>5.1.   <a href="#rfc.section.5.1">Data transfer for streams, datagrams, and frames</a>
 </li>
-<ul><li>5.1.1.   <a href="#rfc.section.5.1.1">Sending content</a>
+<ul><li>5.1.1.   <a href="#rfc.section.5.1.1">Sending Messages</a>
 </li>
-<li>5.1.2.   <a href="#rfc.section.5.1.2">Receiving content</a>
+<li>5.1.2.   <a href="#rfc.section.5.1.2">Receiving Messages</a>
 </li>
 </ul><li>5.2.   <a href="#rfc.section.5.2">Handling of data for fast-open protocols</a>
 </li>
@@ -786,7 +786,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <a href="#rfc.section.4.6">4.6.</a> <a href="#unconnected-racing" id="unconnected-racing">Handling racing with &#8220;unconnected&#8221; protocols</a>
 </h1>
 <p id="rfc.section.4.6.p.1">While protocols that use an explicit handshake to validate a Connection to a peer can be used for racing multiple establishment attempts in parallel, &#8220;unconnected&#8221; protocols such as raw UDP do not offer a way to validate the presence of a peer or the usability of a Connection without application feedback. An implementation SHOULD consider such a protocol stack to be established as soon as a local route to the peer endpoint is confirmed.</p>
-<p id="rfc.section.4.6.p.2">However, if a peer is not reachable over the network using the unconnected protocol, or content cannot be exchanged for any other reason, the application may want to attempt using another candidate Protocol Stack. The implementation SHOULD maintain the list of other candidate Protocol Stacks that were eligible to use. In the case that the application signals that the initial Protocol Stack is failing for some reason and that another option should be attempted, the Connection can be updated to point to the next candidate Protocol Stack. This can be viewed as an application-driven form of Protocol Stack racing.</p>
+<p id="rfc.section.4.6.p.2">However, if a peer is not reachable over the network using the unconnected protocol, or data cannot be exchanged for any other reason, the application may want to attempt using another candidate Protocol Stack. The implementation SHOULD maintain the list of other candidate Protocol Stacks that were eligible to use. In the case that the application signals that the initial Protocol Stack is failing for some reason and that another option should be attempted, the Connection can be updated to point to the next candidate Protocol Stack. This can be viewed as an application-driven form of Protocol Stack racing.</p>
 <h1 id="rfc.section.4.7">
 <a href="#rfc.section.4.7">4.7.</a> <a href="#implementing-listeners" id="implementing-listeners">Implementing listeners</a>
 </h1>
@@ -802,25 +802,26 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <h1 id="rfc.section.5.1">
 <a href="#rfc.section.5.1">5.1.</a> <a href="#data-transfer-for-streams-datagrams-and-frames" id="data-transfer-for-streams-datagrams-and-frames">Data transfer for streams, datagrams, and frames</a>
 </h1>
+<p id="rfc.section.5.1.p.1">The most basic mapping for sending a Message is an abstraction of datagrams, in which the transport protocol naturally deals in discrete packets. Each Message here corresponds to a single datagram. Generally, these will be short enough that sending and receiving will always use a complete Message.</p>
+<p id="rfc.section.5.1.p.2">For protocols that expose byte-streams, the only delineation provided by the protocol is the end of the stream in a given direction. Each Message in this case corresponds to the entire stream of bytes in a direction. These Messages may be quite long, in which case they can be sent in multiple parts.</p>
+<p id="rfc.section.5.1.p.3">Protocols that provide the framing (such as length-value protocols, or protocols that use delimeters) provide data boundaries that may be longer than a traditional packet datagram. Each Message for framing protocols corresponds to a single frame, which may be sent either as a complete Message, or in multiple parts.</p>
 <h1 id="rfc.section.5.1.1">
-<a href="#rfc.section.5.1.1">5.1.1.</a> <a href="#sending-content" id="sending-content">Sending content</a>
+<a href="#rfc.section.5.1.1">5.1.1.</a> <a href="#sending-messages" id="sending-messages">Sending Messages</a>
 </h1>
-<p id="rfc.section.5.1.1.p.1">How to handle sending data onto examples like TCP, UDP, and a basic Length-Value protocol.</p>
-<p id="rfc.section.5.1.1.p.2">How to handle and notify errors when sending.</p>
+<p id="rfc.section.5.1.1.p.1">The effect of the application sending a Message is determined by the top-level protocol in the established Protocol Stack. That is, if the top-level protocol provides an abstraction of framed messages over a connection, the application will be able to send multiple Messages on that connection, even if the framing protocol is built on a byte-stream protocol like TCP.</p>
 <h1 id="rfc.section.5.1.1.1">
 <a href="#rfc.section.5.1.1.1">5.1.1.1.</a> <a href="#send-completion" id="send-completion">Send Completion</a>
 </h1>
-<p id="rfc.section.5.1.1.1.p.1">How to determine when a send is effectively complete</p>
+<p id="rfc.section.5.1.1.1.p.1">The application should be notified whenever a Message or partial Message has been consumed by the Protocol Stack, or has failed to send. This meaning of the Message being consumed by the stack may vary depending on the protocol. For a basic datagram protocol like UDP, this may correspond to the time when the packet is sent into the interface driver. For a protocol that buffers data in queues, like TCP, this may correspond to when the data has entered the send buffer.</p>
 <h1 id="rfc.section.5.1.1.2">
 <a href="#rfc.section.5.1.1.2">5.1.1.2.</a> <a href="#batching-sends" id="batching-sends">Batching Sends</a>
 </h1>
-<p id="rfc.section.5.1.1.2.p.1">Improve efficiency by handling multiple send operations at once for datagram or frame based protocols</p>
+<p id="rfc.section.5.1.1.2.p.1">Since sending a Message may involve a context switch between the application and the transport system, sending patterns that involve multiple small Messages can incur high overhead if each needs to be enqueued separately. To avoid this, the application should have a way to indicate a batch of Send actions, during which time the implementation will hold off on processing Messages until the batch is complete. This can also help context switches when enqueuing data in the interface driver if the operation can be batched.</p>
 <h1 id="rfc.section.5.1.2">
-<a href="#rfc.section.5.1.2">5.1.2.</a> <a href="#receiving-content" id="receiving-content">Receiving content</a>
+<a href="#rfc.section.5.1.2">5.1.2.</a> <a href="#receiving-messages" id="receiving-messages">Receiving Messages</a>
 </h1>
-<p id="rfc.section.5.1.2.p.1">How to handle sending data in examples like TCP, UDP, and a basic Length-Value protocol.</p>
-<p id="rfc.section.5.1.2.p.2">Waiting for frame boundaries when necessary.</p>
-<p id="rfc.section.5.1.2.p.3">How to handle and notify errors when receiving.</p>
+<p id="rfc.section.5.1.2.p.1">Similar to sending, Receiving a Message is determined by the top-level protocol in the established Protocol Stack. The main difference with Receiving is that the size and boundaries of the Message are not known beforehand. The application can communicate in its Receive action the parameters for the Message, which can help the implementation know how much data to deliver and when. For example, if the application only wants to receive a complete Message, the implementation should wait until an entire Message (datagram, stream, or frame) is read before delivering any Message content to the application. Alternatively, the application can specify the minimum number of bytes of Message content it wants to receive (which may be just a single byte) to control the flow of received data.</p>
+<p id="rfc.section.5.1.2.p.2">If a Connection becomes finished before a requested Receive action can be satisfied, the implementation should deliver any partial Message content outstanding, or if none is available, an indication that there will be no more received Messages.</p>
 <h1 id="rfc.section.5.2">
 <a href="#rfc.section.5.2">5.2.</a> <a href="#fastopen" id="fastopen">Handling of data for fast-open protocols</a>
 </h1>

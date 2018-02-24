@@ -96,16 +96,16 @@ Table of Contents
        4.7.1.  Implementing listeners for Unconnected Protocols  . .  16
    5.  Implementing Data Transfer  . . . . . . . . . . . . . . . . .  16
      5.1.  Data transfer for streams, datagrams, and frames  . . . .  16
-       5.1.1.  Sending content . . . . . . . . . . . . . . . . . . .  16
-       5.1.2.  Receiving content . . . . . . . . . . . . . . . . . .  17
-     5.2.  Handling of data for fast-open protocols  . . . . . . . .  17
-   6.  Implementing Maintenance  . . . . . . . . . . . . . . . . . .  18
-     6.1.  Changing Protocol Properties  . . . . . . . . . . . . . .  18
-     6.2.  Maintenance Events  . . . . . . . . . . . . . . . . . . .  18
-   7.  Implementing Termination  . . . . . . . . . . . . . . . . . .  18
-   8.  Cached State  . . . . . . . . . . . . . . . . . . . . . . . .  19
-     8.1.  Protocol state caches . . . . . . . . . . . . . . . . . .  20
-     8.2.  Performance caches  . . . . . . . . . . . . . . . . . . .  20
+       5.1.1.  Sending Messages  . . . . . . . . . . . . . . . . . .  17
+       5.1.2.  Receiving Messages  . . . . . . . . . . . . . . . . .  17
+     5.2.  Handling of data for fast-open protocols  . . . . . . . .  18
+   6.  Implementing Maintenance  . . . . . . . . . . . . . . . . . .  19
+     6.1.  Changing Protocol Properties  . . . . . . . . . . . . . .  19
+     6.2.  Maintenance Events  . . . . . . . . . . . . . . . . . . .  19
+   7.  Implementing Termination  . . . . . . . . . . . . . . . . . .  19
+   8.  Cached State  . . . . . . . . . . . . . . . . . . . . . . . .  20
+     8.1.  Protocol state caches . . . . . . . . . . . . . . . . . .  21
+     8.2.  Performance caches  . . . . . . . . . . . . . . . . . . .  21
 
 
 
@@ -114,25 +114,25 @@ Brunstrom, et al.        Expires August 28, 2018                [Page 2]
 Internet-Draft             TAPS Implementation             February 2018
 
 
-   9.  Specific Transport Protocol Considerations  . . . . . . . . .  21
-     9.1.  TCP . . . . . . . . . . . . . . . . . . . . . . . . . . .  21
+   9.  Specific Transport Protocol Considerations  . . . . . . . . .  22
+     9.1.  TCP . . . . . . . . . . . . . . . . . . . . . . . . . . .  22
      9.2.  UDP . . . . . . . . . . . . . . . . . . . . . . . . . . .  22
-     9.3.  SCTP  . . . . . . . . . . . . . . . . . . . . . . . . . .  22
+     9.3.  SCTP  . . . . . . . . . . . . . . . . . . . . . . . . . .  23
      9.4.  TLS . . . . . . . . . . . . . . . . . . . . . . . . . . .  23
-     9.5.  HTTP  . . . . . . . . . . . . . . . . . . . . . . . . . .  23
-     9.6.  QUIC  . . . . . . . . . . . . . . . . . . . . . . . . . .  23
+     9.5.  HTTP  . . . . . . . . . . . . . . . . . . . . . . . . . .  24
+     9.6.  QUIC  . . . . . . . . . . . . . . . . . . . . . . . . . .  24
      9.7.  HTTP/2 transport  . . . . . . . . . . . . . . . . . . . .  24
-   10. Rendezvous and Environment Discovery  . . . . . . . . . . . .  24
-     10.1.  ICE and STUN . . . . . . . . . . . . . . . . . . . . . .  24
-   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  24
-   12. Security Considerations . . . . . . . . . . . . . . . . . . .  24
-     12.1.  Considerations for Candidate Gathering . . . . . . . . .  24
-     12.2.  Considerations for Candidate Racing  . . . . . . . . . .  24
+   10. Rendezvous and Environment Discovery  . . . . . . . . . . . .  25
+     10.1.  ICE and STUN . . . . . . . . . . . . . . . . . . . . . .  25
+   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  25
+   12. Security Considerations . . . . . . . . . . . . . . . . . . .  25
+     12.1.  Considerations for Candidate Gathering . . . . . . . . .  25
+     12.2.  Considerations for Candidate Racing  . . . . . . . . . .  25
    13. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  25
-   14. References  . . . . . . . . . . . . . . . . . . . . . . . . .  25
-     14.1.  Normative References . . . . . . . . . . . . . . . . . .  25
-     14.2.  Informative References . . . . . . . . . . . . . . . . .  26
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  26
+   14. References  . . . . . . . . . . . . . . . . . . . . . . . . .  26
+     14.1.  Normative References . . . . . . . . . . . . . . . . . .  26
+     14.2.  Informative References . . . . . . . . . . . . . . . . .  27
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  27
 
 1.  Introduction
 
@@ -846,7 +846,7 @@ Internet-Draft             TAPS Implementation             February 2018
    route to the peer endpoint is confirmed.
 
    However, if a peer is not reachable over the network using the
-   unconnected protocol, or content cannot be exchanged for any other
+   unconnected protocol, or data cannot be exchanged for any other
    reason, the application may want to attempt using another candidate
    Protocol Stack.  The implementation SHOULD maintain the list of other
    candidate Protocol Stacks that were eligible to use.  In the case
@@ -879,17 +879,17 @@ Internet-Draft             TAPS Implementation             February 2018
 
 5.1.  Data transfer for streams, datagrams, and frames
 
-5.1.1.  Sending content
+   The most basic mapping for sending a Message is an abstraction of
+   datagrams, in which the transport protocol naturally deals in
+   discrete packets.  Each Message here corresponds to a single
+   datagram.  Generally, these will be short enough that sending and
+   receiving will always use a complete Message.
 
-   How to handle sending data onto examples like TCP, UDP, and a basic
-   Length-Value protocol.
-
-   How to handle and notify errors when sending.
-
-
-
-
-
+   For protocols that expose byte-streams, the only delineation provided
+   by the protocol is the end of the stream in a given direction.  Each
+   Message in this case corresponds to the entire stream of bytes in a
+   direction.  These Messages may be quite long, in which case they can
+   be sent in multiple parts.
 
 
 
@@ -898,23 +898,70 @@ Brunstrom, et al.        Expires August 28, 2018               [Page 16]
 Internet-Draft             TAPS Implementation             February 2018
 
 
+   Protocols that provide the framing (such as length-value protocols,
+   or protocols that use delimeters) provide data boundaries that may be
+   longer than a traditional packet datagram.  Each Message for framing
+   protocols corresponds to a single frame, which may be sent either as
+   a complete Message, or in multiple parts.
+
+5.1.1.  Sending Messages
+
+   The effect of the application sending a Message is determined by the
+   top-level protocol in the established Protocol Stack.  That is, if
+   the top-level protocol provides an abstraction of framed messages
+   over a connection, the application will be able to send multiple
+   Messages on that connection, even if the framing protocol is built on
+   a byte-stream protocol like TCP.
+
 5.1.1.1.  Send Completion
 
-   How to determine when a send is effectively complete
+   The application should be notified whenever a Message or partial
+   Message has been consumed by the Protocol Stack, or has failed to
+   send.  This meaning of the Message being consumed by the stack may
+   vary depending on the protocol.  For a basic datagram protocol like
+   UDP, this may correspond to the time when the packet is sent into the
+   interface driver.  For a protocol that buffers data in queues, like
+   TCP, this may correspond to when the data has entered the send
+   buffer.
 
 5.1.1.2.  Batching Sends
 
-   Improve efficiency by handling multiple send operations at once for
-   datagram or frame based protocols
+   Since sending a Message may involve a context switch between the
+   application and the transport system, sending patterns that involve
+   multiple small Messages can incur high overhead if each needs to be
+   enqueued separately.  To avoid this, the application should have a
+   way to indicate a batch of Send actions, during which time the
+   implementation will hold off on processing Messages until the batch
+   is complete.  This can also help context switches when enqueuing data
+   in the interface driver if the operation can be batched.
 
-5.1.2.  Receiving content
+5.1.2.  Receiving Messages
 
-   How to handle sending data in examples like TCP, UDP, and a basic
-   Length-Value protocol.
+   Similar to sending, Receiving a Message is determined by the top-
+   level protocol in the established Protocol Stack.  The main
+   difference with Receiving is that the size and boundaries of the
+   Message are not known beforehand.  The application can communicate in
+   its Receive action the parameters for the Message, which can help the
+   implementation know how much data to deliver and when.  For example,
+   if the application only wants to receive a complete Message, the
+   implementation should wait until an entire Message (datagram, stream,
+   or frame) is read before delivering any Message content to the
 
-   Waiting for frame boundaries when necessary.
 
-   How to handle and notify errors when receiving.
+
+Brunstrom, et al.        Expires August 28, 2018               [Page 17]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
+   application.  Alternatively, the application can specify the minimum
+   number of bytes of Message content it wants to receive (which may be
+   just a single byte) to control the flow of received data.
+
+   If a Connection becomes finished before a requested Receive action
+   can be satisfied, the implementation should deliver any partial
+   Message content outstanding, or if none is available, an indication
+   that there will be no more received Messages.
 
 5.2.  Handling of data for fast-open protocols
 
@@ -946,14 +993,6 @@ Internet-Draft             TAPS Implementation             February 2018
    For example, TCP Fast Open could use a Client Hello from a TLS as its
    0-RTT data, shortening the cumulative handshake time.
 
-
-
-
-Brunstrom, et al.        Expires August 28, 2018               [Page 17]
-
-Internet-Draft             TAPS Implementation             February 2018
-
-
    0-RTT handshakes often rely on previous state, such as TCP Fast Open
    cookies, previously established TLS tickets, or out-of-band
    distributed pre-shared keys (PSKs).  Implementations should be aware
@@ -962,6 +1001,15 @@ Internet-Draft             TAPS Implementation             February 2018
    or PSK SHOULD only be used on one leaf node.  If implementations have
    multiple tickets available from a previous connection, each leaf node
    attempt MUST use a different ticket.  In effect, each leaf node will
+
+
+
+
+Brunstrom, et al.        Expires August 28, 2018               [Page 18]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
    send the same early application data, yet encoded (encrypted)
    differently on the wire.
 
@@ -1002,14 +1050,6 @@ Internet-Draft             TAPS Implementation             February 2018
 
    o  How gracefully to tear down at various protocol layers
 
-
-
-
-Brunstrom, et al.        Expires August 28, 2018               [Page 18]
-
-Internet-Draft             TAPS Implementation             February 2018
-
-
    With TCP, when an application closes a connection, this means that it
    has no more data to send (but expects all data that has been handed
    over to be reliably delivered).  However, with TCP only, "close" does
@@ -1018,6 +1058,14 @@ Internet-Draft             TAPS Implementation             February 2018
 
    SCTP is an example of a protocol that does not support such half-
    closed connections.  Hence, with SCTP, the meaning of "close" is
+
+
+
+Brunstrom, et al.        Expires August 28, 2018               [Page 19]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
    stricter: an application has no more data to send (but expects all
    data that has been handed over to be reliably delivered), and will
    also not receive any more data.
@@ -1058,14 +1106,6 @@ Internet-Draft             TAPS Implementation             February 2018
    Beyond a single Connection's lifetime, it is useful for an
    implementation to keep state and history.  This cached state can help
    improve future Connection establishment due to re-using results and
-
-
-
-Brunstrom, et al.        Expires August 28, 2018               [Page 19]
-
-Internet-Draft             TAPS Implementation             February 2018
-
-
    credentials, and favoring paths and protocols that performed well in
    the past.
 
@@ -1074,6 +1114,14 @@ Internet-Draft             TAPS Implementation             February 2018
    For example, session tickets for TLS are associated with specific
    endpoints, and thus SHOULD be cached based on a Connection's hostname
    Endpoint (if applicable).  On the other hand, performance
+
+
+
+Brunstrom, et al.        Expires August 28, 2018               [Page 20]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
    characteristics of a path are more likely tied to the IP address and
    subnet being used.
 
@@ -1113,15 +1161,6 @@ Internet-Draft             TAPS Implementation             February 2018
    In addition to protocol state, Protocol Instances SHOULD provide data
    into a performance-oriented cache to help guide future protocol and
    path selection.  Some performance information can be gathered
-
-
-
-
-Brunstrom, et al.        Expires August 28, 2018               [Page 20]
-
-Internet-Draft             TAPS Implementation             February 2018
-
-
    generically across several protocols to allow predictive comparisons
    between protocols on given paths:
 
@@ -1130,6 +1169,14 @@ Internet-Draft             TAPS Implementation             February 2018
    o  Connection Establishment latency
 
    o  Connection Establishment success rate
+
+
+
+
+Brunstrom, et al.        Expires August 28, 2018               [Page 21]
+
+Internet-Draft             TAPS Implementation             February 2018
+
 
    These items can be cached on a per-address and per-subnet
    granularity, and averaged between different values.  The information
@@ -1171,13 +1218,6 @@ Internet-Draft             TAPS Implementation             February 2018
    application receives the final portion of a Message, it knows that
    the receiving stream has been closed.
 
-
-
-Brunstrom, et al.        Expires August 28, 2018               [Page 21]
-
-Internet-Draft             TAPS Implementation             February 2018
-
-
 9.2.  UDP
 
    UDP as a direct transport does not provide any handshake or
@@ -1185,6 +1225,15 @@ Internet-Draft             TAPS Implementation             February 2018
    Ready or established is degenerate.  Once the system has validated
    that there is a route on which to send and receive UDP datagrams, the
    protocol is considered Ready.  Similarly, a Close or Abort has no
+
+
+
+
+Brunstrom, et al.        Expires August 28, 2018               [Page 22]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
    meaning to the on-the-wire protocol, but simply leads to the local
    state being torn down.
 
@@ -1226,20 +1275,21 @@ Internet-Draft             TAPS Implementation             February 2018
    side transport system supporting SCTP should implement this
    mechanism.
 
-
-
-
-Brunstrom, et al.        Expires August 28, 2018               [Page 22]
-
-Internet-Draft             TAPS Implementation             February 2018
-
-
 9.4.  TLS
 
    The mapping of a TLS stream abstraction into the application is
    equivalent to the contract provided by TCP Section 9.1.  The Ready
    state should be determined by the completion of the TLS handshake,
    which involves potentially several more round trips beyond the TCP
+
+
+
+
+Brunstrom, et al.        Expires August 28, 2018               [Page 23]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
    handshake.  The application should not be notified that the
    Connection is Ready until TLS is established.
 
@@ -1278,18 +1328,6 @@ Internet-Draft             TAPS Implementation             February 2018
    the TCP stream Section 9.1 (one Message per direction), unless a
    framing mapping is used on top of QUIC.
 
-
-
-
-
-
-
-
-Brunstrom, et al.        Expires August 28, 2018               [Page 23]
-
-Internet-Draft             TAPS Implementation             February 2018
-
-
 9.7.  HTTP/2 transport
 
    Similar to QUIC Section 9.6, HTTP/2 provides a multi-streaming
@@ -1300,6 +1338,14 @@ Internet-Draft             TAPS Implementation             February 2018
 
    It is possible to treat each HTTP/2 stream as a raw byte-stream
    instead of carrier for HTTP messages, in which case the Messages over
+
+
+
+Brunstrom, et al.        Expires August 28, 2018               [Page 24]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
    the streams can be represented similarly to the TCP stream
    Section 9.1 (one Message per direction).
 
@@ -1338,14 +1384,6 @@ Internet-Draft             TAPS Implementation             February 2018
    tree is built, such as when DNS returns a list of resolved endpoints,
    it is possible for the network to cause an implementation to consume
    significant on-device resources.  Implementations SHOULD limit the
-
-
-
-Brunstrom, et al.        Expires August 28, 2018               [Page 24]
-
-Internet-Draft             TAPS Implementation             February 2018
-
-
    maximum amount of state allowed for any given node, including the
    number of child nodes, especially when the state is based on results
    from the network.
@@ -1355,6 +1393,14 @@ Internet-Draft             TAPS Implementation             February 2018
    This work has received funding from the European Union's Horizon 2020
    research and innovation programme under grant agreement No. 644334
    (NEAT).
+
+
+
+
+Brunstrom, et al.        Expires August 28, 2018               [Page 25]
+
+Internet-Draft             TAPS Implementation             February 2018
+
 
    This work has been supported by Leibniz Prize project funds of DFG -
    German Research Foundation: Gottfried Wilhelm Leibniz-Preis 2011 (FKZ
@@ -1395,18 +1441,22 @@ Internet-Draft             TAPS Implementation             February 2018
               DOI 10.17487/RFC7540, May 2015,
               <https://www.rfc-editor.org/info/rfc7540>.
 
-
-
-Brunstrom, et al.        Expires August 28, 2018               [Page 25]
-
-Internet-Draft             TAPS Implementation             February 2018
-
-
    [RFC8260]  Stewart, R., Tuexen, M., Loreto, S., and R. Seggelmann,
               "Stream Schedulers and User Message Interleaving for the
               Stream Control Transmission Protocol", RFC 8260,
               DOI 10.17487/RFC8260, November 2017,
               <https://www.rfc-editor.org/info/rfc8260>.
+
+
+
+
+
+
+
+Brunstrom, et al.        Expires August 28, 2018               [Page 26]
+
+Internet-Draft             TAPS Implementation             February 2018
+
 
    [RFC8303]  Welzl, M., Tuexen, M., and N. Khademi, "On the Usage of
               Transport Features Provided by IETF Transport Protocols",
@@ -1446,18 +1496,6 @@ Authors' Addresses
    Email: anna.brunstrom@kau.se
 
 
-
-
-
-
-
-
-
-Brunstrom, et al.        Expires August 28, 2018               [Page 26]
-
-Internet-Draft             TAPS Implementation             February 2018
-
-
    Tommy Pauly (editor)
    Apple Inc.
    1 Infinite Loop
@@ -1465,6 +1503,15 @@ Internet-Draft             TAPS Implementation             February 2018
    United States of America
 
    Email: tpauly@apple.com
+
+
+
+
+
+
+Brunstrom, et al.        Expires August 28, 2018               [Page 27]
+
+Internet-Draft             TAPS Implementation             February 2018
 
 
    Theresa Enghardt
@@ -1509,4 +1556,13 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.        Expires August 28, 2018               [Page 27]
+
+
+
+
+
+
+
+
+
+Brunstrom, et al.        Expires August 28, 2018               [Page 28]
