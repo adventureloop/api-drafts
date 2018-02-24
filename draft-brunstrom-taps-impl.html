@@ -317,9 +317,10 @@ address {
 <link href="#rfc.section.9.1" rel="Chapter" title="9.1 TCP">
 <link href="#rfc.section.9.2" rel="Chapter" title="9.2 UDP">
 <link href="#rfc.section.9.3" rel="Chapter" title="9.3 SCTP">
-<link href="#rfc.section.9.4" rel="Chapter" title="9.4 QUIC">
-<link href="#rfc.section.9.5" rel="Chapter" title="9.5 HTTP over TLS as a pseudotransport">
-<link href="#rfc.section.9.6" rel="Chapter" title="9.6 HTTP/2 transport">
+<link href="#rfc.section.9.4" rel="Chapter" title="9.4 TLS">
+<link href="#rfc.section.9.5" rel="Chapter" title="9.5 HTTP">
+<link href="#rfc.section.9.6" rel="Chapter" title="9.6 QUIC">
+<link href="#rfc.section.9.7" rel="Chapter" title="9.7 HTTP/2 transport">
 <link href="#rfc.section.10" rel="Chapter" title="10 Rendezvous and Environment Discovery">
 <link href="#rfc.section.10.1" rel="Chapter" title="10.1 ICE and STUN">
 <link href="#rfc.section.11" rel="Chapter" title="11 IANA Considerations">
@@ -503,11 +504,13 @@ address {
 </li>
 <li>9.3.   <a href="#rfc.section.9.3">SCTP</a>
 </li>
-<li>9.4.   <a href="#rfc.section.9.4">QUIC</a>
+<li>9.4.   <a href="#rfc.section.9.4">TLS</a>
 </li>
-<li>9.5.   <a href="#rfc.section.9.5">HTTP over TLS as a pseudotransport</a>
+<li>9.5.   <a href="#rfc.section.9.5">HTTP</a>
 </li>
-<li>9.6.   <a href="#rfc.section.9.6">HTTP/2 transport</a>
+<li>9.6.   <a href="#rfc.section.9.6">QUIC</a>
+</li>
+<li>9.7.   <a href="#rfc.section.9.7">HTTP/2 transport</a>
 </li>
 </ul><li>10.   <a href="#rfc.section.10">Rendezvous and Environment Discovery</a>
 </li>
@@ -565,8 +568,8 @@ address {
 <p></p>
 
 <ul>
-<li>The application requested Transport Parameters which include requirements or prohibitions that cannot be satisfied by any of the available protocols. For example, if an application requires &#8220;Option to configure reliability for individual Content&#8221;, but no such protocol is available on the host running the transport system, e.g., because SCTP is not supported by the operating system, this should result in an error.</li>
-<li>The application requested Transport Parameters which exclude each other, i.e., the required and prohibited properties cannot be satisfied by the same protocol. For example, if an application prohibits &#8220;Reliable Data Transfer&#8221; but then requires &#8220;Configure Reliability per Content&#8221;, this mismatch should result in an error.</li>
+<li>The application requested Transport Parameters which include requirements or prohibitions that cannot be satisfied by any of the available protocols. For example, if an application requires &#8220;Option to configure reliability for individual Messages&#8221;, but no such protocol is available on the host running the transport system, e.g., because SCTP is not supported by the operating system, this should result in an error.</li>
+<li>The application requested Transport Parameters which exclude each other, i.e., the required and prohibited properties cannot be satisfied by the same protocol. For example, if an application prohibits &#8220;Reliable Data Transfer&#8221; but then requires &#8220;Configure Reliability per Message&#8221;, this mismatch should result in an error.</li>
 </ul>
 <p id="rfc.section.3.1.p.5">It is important to fail as early as possible in such cases in order to avoid allocating resources, e.g., to endpoint resolution, only to find out later that there is no protocol that satisfies the requirements.</p>
 <p id="rfc.section.3.1.p.6">[The following probably belongs in later sections.]</p>
@@ -778,7 +781,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <a href="#rfc.section.4.5">4.5.</a> <a href="#establish-mux" id="establish-mux">Establishing multiplexed connections</a>
 </h1>
 <p id="rfc.section.4.5.p.1">Multiplexing data streams over a connection of a single transport Protocol Instance requires, at minimum, two things: 1) the transport Protocol Instance must be able to know the beginning and the end of messages, in order to know what to assign and multiplex / demultiplex; 2) there must be an identifier that allows to decide which stream a message is assigned to. When a new stream is multiplexed on an already existing connection, there is no need for a connection establishment procedure &#8211; every stream can be assumed to immediately be available.</p>
-<p id="rfc.section.4.5.p.2">When the Connections that are offered to an application by the Transport System are multiplexed, the Transport System may implement the establishment of a new Connection by simply beginning to use a new stream of an already established transport connection. This, then, means that there may not be any &#8220;establishment&#8221; message (like a TCP SYN), but the application can simply start sending or receiving. Therefore, when a Transport System&#8217;s &#8220;Initiate&#8221; Action is called without Content being handed over, it cannot be guaranteed that the other endpoint will have any way to know about this, and hence a passive endpoint&#8217;s ConnectionReceived event may not be called upon an active endpoint&#8217;s Inititate.  Instead, calling the ConnectionReceived event may be delayed until the first Content arrives.</p>
+<p id="rfc.section.4.5.p.2">When the Connections that are offered to an application by the Transport System are multiplexed, the Transport System may implement the establishment of a new Connection by simply beginning to use a new stream of an already established transport connection. This, then, means that there may not be any &#8220;establishment&#8221; message (like a TCP SYN), but the application can simply start sending or receiving. Therefore, when a Transport System&#8217;s &#8220;Initiate&#8221; Action is called without Messages being handed over, it cannot be guaranteed that the other endpoint will have any way to know about this, and hence a passive endpoint&#8217;s ConnectionReceived event may not be called upon an active endpoint&#8217;s Inititate.  Instead, calling the ConnectionReceived event may be delayed until the first Message arrives.</p>
 <h1 id="rfc.section.4.6">
 <a href="#rfc.section.4.6">4.6.</a> <a href="#unconnected-racing" id="unconnected-racing">Handling racing with &#8220;unconnected&#8221; protocols</a>
 </h1>
@@ -898,25 +901,41 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <h1 id="rfc.section.9.1">
 <a href="#rfc.section.9.1">9.1.</a> <a href="#tcp" id="tcp">TCP</a>
 </h1>
+<p id="rfc.section.9.1.p.1">Connection lifetime for TCP translates fairly simply into the the abstraction presented to an application. When the TCP three-way handshake is complete, its layer of the Protocol Stack can be considered Ready (established). This event will cause racing of Protocol Stack options to complete if TCP is the top-level protocol, at which point the application can be notified that the Connection is Ready to send and receive.</p>
+<p id="rfc.section.9.1.p.2">If the application sends a Close, that can translate to a graceful termination of the TCP connection, which is sending a FIN to close the sending stream. If the application sends an Abort, then the TCP state can be closed abruptly, leading to a RST being sent to the peer.</p>
+<p id="rfc.section.9.1.p.3">Without a layer of framing above TCP, the cleanest abstraction for sending and receiving Messages over TCP is to treat each direction of the stream of bytes as a single Message, terminated by a FIN. That means that if the application can send partial Messages on the Connection to continue writing, but marking the Message complete corresponds to closing the sending stream. Similarly, when the application receives the final portion of a Message, it knows that the receiving stream has been closed.</p>
 <h1 id="rfc.section.9.2">
 <a href="#rfc.section.9.2">9.2.</a> <a href="#udp" id="udp">UDP</a>
 </h1>
+<p id="rfc.section.9.2.p.1">UDP as a direct transport does not provide any handshake or connectivity state, so the notion of the transport protocol becoming Ready or established is degenerate. Once the system has validated that there is a route on which to send and receive UDP datagrams, the protocol is considered Ready. Similarly, a Close or Abort has no meaning to the on-the-wire protocol, but simply leads to the local state being torn down.</p>
+<p id="rfc.section.9.2.p.2">When sending and receiving messages over UDP, each Message should correspond to a single UDP datagram. The Message can contain metadata about the packet, such as the ECN bits applied to the packet.</p>
 <h1 id="rfc.section.9.3">
 <a href="#rfc.section.9.3">9.3.</a> <a href="#sctp" id="sctp">SCTP</a>
 </h1>
 <p id="rfc.section.9.3.p.1">To support sender-side stream schedulers (which are implemented on the sender side), a receiver-side Transport System should always support message interleaving <a href="#RFC8260" class="xref">[RFC8260]</a>.</p>
 <p id="rfc.section.9.3.p.2">SCTP messages can be very large. To allow the reception of large messages in pieces, a &#8220;partial flag&#8221; can be used to inform a (native SCTP) receiving application that a message is incomplete. After receiving the &#8220;partial flag&#8221;, this application would know that the next receive calls will only deliver remaining parts of the same message (i.e., no messages or partial messages will arrive on other streams until the message is complete) (see Section 8.1.20 in <a href="#RFC6458" class="xref">[RFC6458]</a>). The &#8220;partial flag&#8221; can therefore facilitate the implementation of the receiver buffer in the receiving application, at the cost of limiting multiplexing and temporarily creating head-of-line blocking delay at the receiver.</p>
-<p id="rfc.section.9.3.p.3">When a Transport System transfers Content, it seems natural to map Content to SCTP messages in order to support properties such as &#8220;Ordered&#8221; or &#8220;Lifetime&#8221; (which maps onto partially reliable delivery with a SCTP_PR_SCTP_TTL policy <a href="#RFC6458" class="xref">[RFC6458]</a>). However, since multiplexing of Connections onto SCTP streams may happen, and would be hidden from the application, the Transport System requires a per-stream receiver buffer anyway, so this potential benefit is lost and the &#8220;partial flag&#8221; becomes unnecessary for the system.</p>
+<p id="rfc.section.9.3.p.3">When a Transport System transfers a Message, it seems natural to map the Message object to SCTP messages in order to support properties such as &#8220;Ordered&#8221; or &#8220;Lifetime&#8221; (which maps onto partially reliable delivery with a SCTP_PR_SCTP_TTL policy <a href="#RFC6458" class="xref">[RFC6458]</a>). However, since multiplexing of Connections onto SCTP streams may happen, and would be hidden from the application, the Transport System requires a per-stream receiver buffer anyway, so this potential benefit is lost and the &#8220;partial flag&#8221; becomes unnecessary for the system.</p>
 <p id="rfc.section.9.3.p.4">The problem of long messages either requiring large receiver-side buffers or getting in the way of multiplexing is addressed by message interleaving <a href="#RFC8260" class="xref">[RFC8260]</a>, which is yet another reason why a receivers-side transport system supporting SCTP should implement this mechanism.</p>
 <h1 id="rfc.section.9.4">
-<a href="#rfc.section.9.4">9.4.</a> <a href="#quic" id="quic">QUIC</a>
+<a href="#rfc.section.9.4">9.4.</a> <a href="#tls" id="tls">TLS</a>
 </h1>
+<p id="rfc.section.9.4.p.1">The mapping of a TLS stream abstraction into the application is equivalent to the contract provided by TCP <a href="#tcp" class="xref">Section 9.1</a>. The Ready state should be determined by the completion of the TLS handshake, which involves potentially several more round trips beyond the TCP handshake. The application should not be notified that the Connection is Ready until TLS is established.</p>
 <h1 id="rfc.section.9.5">
-<a href="#rfc.section.9.5">9.5.</a> <a href="#http-over-tls-as-a-pseudotransport" id="http-over-tls-as-a-pseudotransport">HTTP over TLS as a pseudotransport</a>
+<a href="#rfc.section.9.5">9.5.</a> <a href="#http" id="http">HTTP</a>
 </h1>
+<p id="rfc.section.9.5.p.1">HTTP requests and responses map naturally into Messages, since they are delineated chunks of data with metadata that can be sent over a transport. To that end, HTTP can be seen as the most prevalent framing protocol that runs on top of streams like TCP, TLS, etc.</p>
+<p id="rfc.section.9.5.p.2">In order to use a transport Connection that provides HTTP Message support, the establishment and closing of the connection can be treated as it would without the framing protocol. Sending and receiving of Messages, however, changes to treat each Message as a well-delineated HTTP request or response, with the content of the Message representing the body, and the Headers being provided in Message metadata.</p>
 <h1 id="rfc.section.9.6">
-<a href="#rfc.section.9.6">9.6.</a> <a href="#http2-transport" id="http2-transport">HTTP/2 transport</a>
+<a href="#rfc.section.9.6">9.6.</a> <a href="#quic" id="quic">QUIC</a>
 </h1>
+<p id="rfc.section.9.6.p.1">QUIC provides a multi-streaming interface to an encrypted transport. Each stream can be viewed as equivalent to a TLS stream over TCP, so a natural mapping is to present each QUIC stream as an individual Connection. The protocol for the stream will be considered Ready whenever the underlying QUIC connection is established to the point that this stream&#8217;s data can be sent. For streams after the first stream, this will likely be an immediate operation.</p>
+<p id="rfc.section.9.6.p.2">Closing a single QUIC stream, presented to application as a Connection, does not imply closing the underlying QUIC connection itself. Rather, the implementation may choose to close the QUIC connection once all streams have been closed (possibly after some timeout), or after an individual stream Connection sends an Abort.</p>
+<p id="rfc.section.9.6.p.3">Messages over a direct QUIC stream should be represented similarly to the TCP stream <a href="#tcp" class="xref">Section 9.1</a> (one Message per direction), unless a framing mapping is used on top of QUIC.</p>
+<h1 id="rfc.section.9.7">
+<a href="#rfc.section.9.7">9.7.</a> <a href="#http2-transport" id="http2-transport">HTTP/2 transport</a>
+</h1>
+<p id="rfc.section.9.7.p.1">Similar to QUIC <a href="#quic" class="xref">Section 9.6</a>, HTTP/2 provides a multi-streaming interface. This will generally use HTTP as the unit of Messages over the streams, in which each stream can be represented as a transport Connection. The lifetime of streams and the HTTP/2 connection should be managed as described for QUIC.</p>
+<p id="rfc.section.9.7.p.2">It is possible to treat each HTTP/2 stream as a raw byte-stream instead of carrier for HTTP messages, in which case the Messages over the streams can be represented similarly to the TCP stream <a href="#tcp" class="xref">Section 9.1</a> (one Message per direction).</p>
 <h1 id="rfc.section.10">
 <a href="#rfc.section.10">10.</a> <a href="#rendezvous-and-environment-discovery" id="rendezvous-and-environment-discovery">Rendezvous and Environment Discovery</a>
 </h1>
@@ -965,24 +984,6 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <td class="reference"><b id="I-D.trammell-taps-interface">[I-D.trammell-taps-interface]</b></td>
 <td class="top">"<a>An Abstract Application Layer Interface to Transport Services</a>", n.d..</td>
 </tr>
-</tbody></table>
-<h1 id="rfc.references.2">
-<a href="#rfc.references.2">14.2.</a> Informative References</h1>
-<table><tbody>
-<tr>
-<td class="reference"><b id="I-D.ietf-quic-transport">[I-D.ietf-quic-transport]</b></td>
-<td class="top">
-<a>Iyengar, J.</a> and <a>M. Thomson</a>, "<a href="https://tools.ietf.org/html/draft-ietf-quic-transport-09">QUIC: A UDP-Based Multiplexed and Secure Transport</a>", Internet-Draft draft-ietf-quic-transport-09, January 2018.</td>
-</tr>
-<tr>
-<td class="reference"><b id="I-D.ietf-tls-tls13">[I-D.ietf-tls-tls13]</b></td>
-<td class="top">
-<a>Rescorla, E.</a>, "<a href="https://tools.ietf.org/html/draft-ietf-tls-tls13-24">The Transport Layer Security (TLS) Protocol Version 1.3</a>", Internet-Draft draft-ietf-tls-tls13-24, February 2018.</td>
-</tr>
-<tr>
-<td class="reference"><b id="NEAT-flow-mapping">[NEAT-flow-mapping]</b></td>
-<td class="top">"<a>Transparent Flow Mapping for NEAT (in Workshop on Future of Internet Transport (FIT 2017))</a>", n.d..</td>
-</tr>
 <tr>
 <td class="reference"><b id="RFC6458">[RFC6458]</b></td>
 <td class="top">
@@ -1017,6 +1018,24 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <td class="reference"><b id="RFC8305">[RFC8305]</b></td>
 <td class="top">
 <a>Schinazi, D.</a> and <a>T. Pauly</a>, "<a href="https://tools.ietf.org/html/rfc8305">Happy Eyeballs Version 2: Better Connectivity Using Concurrency</a>", RFC 8305, DOI 10.17487/RFC8305, December 2017.</td>
+</tr>
+</tbody></table>
+<h1 id="rfc.references.2">
+<a href="#rfc.references.2">14.2.</a> Informative References</h1>
+<table><tbody>
+<tr>
+<td class="reference"><b id="I-D.ietf-quic-transport">[I-D.ietf-quic-transport]</b></td>
+<td class="top">
+<a>Iyengar, J.</a> and <a>M. Thomson</a>, "<a href="https://tools.ietf.org/html/draft-ietf-quic-transport-09">QUIC: A UDP-Based Multiplexed and Secure Transport</a>", Internet-Draft draft-ietf-quic-transport-09, January 2018.</td>
+</tr>
+<tr>
+<td class="reference"><b id="I-D.ietf-tls-tls13">[I-D.ietf-tls-tls13]</b></td>
+<td class="top">
+<a>Rescorla, E.</a>, "<a href="https://tools.ietf.org/html/draft-ietf-tls-tls13-24">The Transport Layer Security (TLS) Protocol Version 1.3</a>", Internet-Draft draft-ietf-tls-tls13-24, February 2018.</td>
+</tr>
+<tr>
+<td class="reference"><b id="NEAT-flow-mapping">[NEAT-flow-mapping]</b></td>
+<td class="top">"<a>Transparent Flow Mapping for NEAT (in Workshop on Future of Internet Transport (FIT 2017))</a>", n.d..</td>
 </tr>
 </tbody></table>
 <h1 id="rfc.authors"><a href="#rfc.authors">Authors' Addresses</a></h1>
