@@ -96,7 +96,7 @@ Table of Contents
      6.4.  Connection Groups . . . . . . . . . . . . . . . . . . . .  19
    7.  Sending Data  . . . . . . . . . . . . . . . . . . . . . . . .  20
      7.1.  Send Parameters . . . . . . . . . . . . . . . . . . . . .  21
-       7.1.1.  Content Properties  . . . . . . . . . . . . . . . . .  23
+       7.1.1.  Content Properties  . . . . . . . . . . . . . . . . .  22
      7.2.  Sender-side Framing . . . . . . . . . . . . . . . . . . .  25
    8.  Receiving Data  . . . . . . . . . . . . . . . . . . . . . . .  25
      8.1.  Application-Layer Back-Pressure at the Receiver . . . . .  26
@@ -1057,7 +1057,7 @@ Internet-Draft               TAPS Interface                February 2018
    Calling Clone on any of these two Connections adds a third Connection
    to the group, and so on.  All Connections in a group are entangled.
    This means that they automatically share all properties: changing a
-
+   parameter for one of them also changes the parameter for all others.
 
 
 
@@ -1065,9 +1065,6 @@ Trammell, et al.         Expires August 29, 2018               [Page 19]
 
 Internet-Draft               TAPS Interface                February 2018
 
-
-   parameter for one of them also changes the parameter for all others,
-   closing one of them also closes all others, etc.
 
    There is only one Protocol Property that is not entangled, i.e., it
    is a separate per-Connection Property for individual Connections in
@@ -1115,6 +1112,9 @@ Internet-Draft               TAPS Interface                February 2018
 
    Connection -> Sent<contentRef>
 
+   The Sent event occurs when a previous Send action has completed,
+   i.e., when the data derived from the Content has been passed down or
+
 
 
 Trammell, et al.         Expires August 29, 2018               [Page 20]
@@ -1122,8 +1122,6 @@ Trammell, et al.         Expires August 29, 2018               [Page 20]
 Internet-Draft               TAPS Interface                February 2018
 
 
-   The Sent event occurs when a previous Send action has completed,
-   i.e., when the data derived from the Content has been passed down or
    through the underlying Protocol Stack and is no longer the
    responsibility of the implementation of this interface.  The exact
    disposition of Content when the Sent event occurs is specific to the
@@ -1170,6 +1168,8 @@ Internet-Draft               TAPS Interface                February 2018
    mind where they fit / what they relate to.  Second, whatever will
    remain doesn't need its own "app intents" heading: it will only
    relate to content, genuinely making it a "content property".  I leave
+   the heading in there now just so the app intents stuff stands out a
+   bit more, but when you're done removing things, please remove this
 
 
 
@@ -1178,8 +1178,6 @@ Trammell, et al.         Expires August 29, 2018               [Page 21]
 Internet-Draft               TAPS Interface                February 2018
 
 
-   the heading in there now just so the app intents stuff stands out a
-   bit more, but when you're done removing things, please remove this
    heading and make what's left a part of the Content Properties.]
    [PHILS: Cleanup done.  From my perspective, there are Parameters
    (including Intents), that belong in both categories.  Besides those
@@ -1223,6 +1221,8 @@ Internet-Draft               TAPS Interface                February 2018
    parameters; attempting to Send with such an incompatibility yields a
    SendError.]
 
+7.1.1.  Content Properties
+
 
 
 
@@ -1233,8 +1233,6 @@ Trammell, et al.         Expires August 29, 2018               [Page 22]
 
 Internet-Draft               TAPS Interface                February 2018
 
-
-7.1.1.  Content Properties
 
 7.1.1.1.  Lifetime
 
@@ -1281,6 +1279,8 @@ Internet-Draft               TAPS Interface                February 2018
    certain 0-RTT establishment techniques, where retransmission of the
    0-RTT data may cause the remote application to receive the Content
    multiple times.
+
+
 
 
 
