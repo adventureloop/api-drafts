@@ -327,7 +327,7 @@ address {
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-trammell-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-02-24" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-02-25" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -351,7 +351,7 @@ address {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: August 28, 2018</td>
+<td class="left">Expires: August 29, 2018</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -404,7 +404,7 @@ address {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">February 24, 2018</td>
+<td class="right">February 25, 2018</td>
 </tr>
 
     	
@@ -420,7 +420,7 @@ address {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on August 28, 2018.</p>
+<p>This Internet-Draft will expire on August 29, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -686,7 +686,7 @@ localSpecifier.withStunServer(address, port, credentials)
 <p></p>
 
 <ul>
-<li>Set scheduler for connections in a group: This property specifies which scheduler should be used among Connections within a Connection Group. It applies to connection groups. For now we suggest we the schedulers defined in <a href="#I-D.ietf-tsvwg-sctp-ndata" class="xref">[I-D.ietf-tsvwg-sctp-ndata]</a>.</li>
+<li>Set scheduler for connections in a group: This property specifies which scheduler should be used among Connections within a Connection Group. It applies to connection groups. For now we suggest the schedulers defined in <a href="#I-D.ietf-tsvwg-sctp-ndata" class="xref">[I-D.ietf-tsvwg-sctp-ndata]</a>.</li>
 <li>Maximum Content Size Before Connection Establishment: This numeric property represents the maximum Content size that can be sent before or during Connection establishment, see also <a href="#send-idempotent" class="xref">Section 7.1.1.5</a>.  It is given in Bytes.</li>
 </ul>
 <p id="rfc.section.5.2.2.p.5">In order to specify Specific Protocol Properties, the application can attach a set of options to the Preconnection object, associated with a specific protocol.  For example, the application could specify a set of TCP Options to use if and only if TCP is selected by the system, including options such as the Maximum Segment Size (MSS), and options around Acknowledgement Stretching. Such properties should not be assumed to apply across different protocols, but must be possible to specify if required by the application.</p>
@@ -914,7 +914,7 @@ PreconnectionBindings := Preconnection.Resolve()
 <h1 id="rfc.section.7.1">
 <a href="#rfc.section.7.1">7.1.</a> <a href="#send-params" id="send-params">Send Parameters</a>
 </h1>
-<p id="rfc.section.7.1.p.1">[MICHAEL: Here, things get really messy (even after I cleaned them up a bit).  First, I see no need to have app intents defined both per-connection (in an earlier section) AND per-content. If they really make sense per-content, they should be defined here and not in the other section. However, some of the ones here VERY obviously don&#8217;t fit a single piece of content: stream bitrate sent / stream bitrate received. This is about a number that, by nature, is a longer term average. Sure, an application may want to change it whenever, and it can &#8212; but that doesn&#8217;t make it something that really relates to a single piece of content. These two make so little sense here that I decided to remove them for you. For the others, please make up your mind where they fit / what they relate to. Second, whatever will remain doesn&#8217;t need its own &#8220;app intents&#8221; heading: it will only relate to content, genuinely making it a &#8220;content property&#8221;. I leave the heading in there now just so the app intents stuff stands out a bit more, but when you&#8217;re done removing things, please remove this heading and make what&#8217;s left a part of the Content Properties.] [PHILS: Cleanup done. From my perspective, there are Parameters (including Intents), that belong in both categories. Besides those that are useful for per-connection and per-content path-selection (I removed those for v1), there remain two dual-use properties: &#8220;Send Bitrate&#8221; (path selection in connection / shaping and de-bursting in ) and &#8220;Timeliness&#8221; (path selection and DSCP default in connection / buffering and DSCP per content) &#8212; in both cases, I don&#8217;t see how to achieve the functionality when having them only in one of the places.]</p>
+<p id="rfc.section.7.1.p.1">[MICHAEL: Here, things get really messy (even after I cleaned them up a bit).  First, I see no need to have app intents defined both per-connection (in an earlier section) AND per-content. If they really make sense per-content, they should be defined here and not in the other section. However, some of the ones here VERY obviously don&#8217;t fit a single piece of content: stream bitrate sent / stream bitrate received. This is about a number that, by nature, is a longer term average. Sure, an application may want to change it whenever, and it can &#8212; but that doesn&#8217;t make it something that really relates to a single piece of content. These two make so little sense here that I decided to remove them for you. For the others, please make up your mind where they fit / what they relate to. Second, whatever will remain doesn&#8217;t need its own &#8220;app intents&#8221; heading: it will only relate to content, genuinely making it a &#8220;content property&#8221;. I leave the heading in there now just so the app intents stuff stands out a bit more, but when you&#8217;re done removing things, please remove this heading and make what&#8217;s left a part of the Content Properties.] [PHILS: Cleanup done. From my perspective, there are Parameters (including Intents), that belong in both categories. Besides those that are useful for per-connection and per-content path-selection (I removed those for v1), there remain two dual-use properties: &#8220;Send Bitrate&#8221; (path selection in connection / shaping and de-bursting in ) and &#8220;Timeliness&#8221; (path selection and DSCP default in connection / buffering and DSCP per content) &#8212; in both cases, I don&#8217;t see how to achieve the functionality when having them only in one of the places.] [MICHAEL: Thanks for cleaning. I think whatever makes sense per-content can be placed there and only there. If you then want to make them per-connection, this is a minor implementation detail: an implementation could simply use the same data structure to always hand over upon sending, so if you want to change this once and keep it the same for all subsequent calls, you just change the data structure once. I don&#8217;t think this implementation detail warrants the extra document length of having these in both places for us (and if you want to hint at this possibility, it&#8217;s just one sentence to add).]</p>
 <p id="rfc.section.7.1.p.2">The Send action takes per-Content send parameters which control how the contents will be sent down to the underlying Protocol Stack and transmitted.</p>
 <p id="rfc.section.7.1.p.3">If Send Parameters should be overridden for a specific content, an empty sent parameter Object can be acquired and all desired Send Parameters can be added to that object. A sendParameters object can be reused for sending multiple contents with the same properties.</p>
 <pre>
