@@ -305,13 +305,12 @@ address {
 <link href="#rfc.section.9" rel="Chapter" title="9 Setting and Querying of Connection Properties">
 <link href="#rfc.section.9.1" rel="Chapter" title="9.1 Protocol Properties">
 <link href="#rfc.section.10" rel="Chapter" title="10 Connection Termination">
-<link href="#rfc.section.11" rel="Chapter" title="11 Event and Error Handling">
-<link href="#rfc.section.12" rel="Chapter" title="12 IANA Considerations">
-<link href="#rfc.section.13" rel="Chapter" title="13 Security Considerations">
-<link href="#rfc.section.14" rel="Chapter" title="14 Acknowledgements">
-<link href="#rfc.references" rel="Chapter" title="15 References">
-<link href="#rfc.references.1" rel="Chapter" title="15.1 Normative References">
-<link href="#rfc.references.2" rel="Chapter" title="15.2 Informative References">
+<link href="#rfc.section.11" rel="Chapter" title="11 IANA Considerations">
+<link href="#rfc.section.12" rel="Chapter" title="12 Security Considerations">
+<link href="#rfc.section.13" rel="Chapter" title="13 Acknowledgements">
+<link href="#rfc.references" rel="Chapter" title="14 References">
+<link href="#rfc.references.1" rel="Chapter" title="14.1 Normative References">
+<link href="#rfc.references.2" rel="Chapter" title="14.2 Informative References">
 <link href="#rfc.appendix.A" rel="Chapter" title="A Additional Properties">
 <link href="#rfc.appendix.A.1" rel="Chapter" title="A.1 Protocol and Path Selection Properties">
 <link href="#rfc.appendix.A.1.1" rel="Chapter" title="A.1.1 Application Intents">
@@ -477,19 +476,17 @@ address {
 </li>
 </ul><li>10.   <a href="#rfc.section.10">Connection Termination</a>
 </li>
-<li>11.   <a href="#rfc.section.11">Event and Error Handling</a>
+<li>11.   <a href="#rfc.section.11">IANA Considerations</a>
 </li>
-<li>12.   <a href="#rfc.section.12">IANA Considerations</a>
+<li>12.   <a href="#rfc.section.12">Security Considerations</a>
 </li>
-<li>13.   <a href="#rfc.section.13">Security Considerations</a>
+<li>13.   <a href="#rfc.section.13">Acknowledgements</a>
 </li>
-<li>14.   <a href="#rfc.section.14">Acknowledgements</a>
+<li>14.   <a href="#rfc.references">References</a>
 </li>
-<li>15.   <a href="#rfc.references">References</a>
+<ul><li>14.1.   <a href="#rfc.references.1">Normative References</a>
 </li>
-<ul><li>15.1.   <a href="#rfc.references.1">Normative References</a>
-</li>
-<li>15.2.   <a href="#rfc.references.2">Informative References</a>
+<li>14.2.   <a href="#rfc.references.2">Informative References</a>
 </li>
 </ul><li>Appendix A.   <a href="#rfc.appendix.A">Additional Properties</a>
 </li>
@@ -549,7 +546,8 @@ address {
 
 <ul class="empty"><li><ul class="empty"><li>An Action takes a set of Parameters; an Event contains a set of Parameters.</li></ul></li></ul>
 <p id="rfc.section.2.p.11">Actions associated with no object are Actions on the abstract interface itself; they are equivalent to actions on a per-application global context.</p>
-<p id="rfc.section.2.p.12">How these abstract concepts map into concrete implementations of this API in a given language on a given platform is largely dependent on the features of the language and the platform. Actions could be implemented as functions or method calls, for instance, and Events could be implemented via callback passing or other asynchronous calling conventions.</p>
+<p id="rfc.section.2.p.12">How these abstract concepts map into concrete implementations of this API in a given language on a given platform is largely dependent on the features of the language and the platform. Actions could be implemented as functions or method calls, for instance, and Events could be implemented via callback passing or other asynchronous calling conventions. The method for registering callbacks and handlers is left as an implementation detail, with the caveat that the interface for receiving Messages must require the application to invoke the Connection.Receive() action once per Message to be received (see <a href="#receiving" class="xref">Section 8</a>).</p>
+<p id="rfc.section.2.p.13">This specification treats events and errors similarly, as errors, just as any other events, may occur asynchronously in network applications. However, it is recommended that implementations of this interface also return errors immediately, according to the error handling idioms of the implementation platform, for errors which can be immediately detected, such as inconsistency in transport parameters.</p>
 <h1 id="rfc.section.3">
 <a href="#rfc.section.3">3.</a> <a href="#principles" id="principles">Interface Design Principles</a>
 </h1>
@@ -1007,28 +1005,24 @@ Connection.Abort()
 Connection -&gt; ConnectionError&amp;lt;&gt;
 </pre>
 <h1 id="rfc.section.11">
-<a href="#rfc.section.11">11.</a> <a href="#event-and-error-handling" id="event-and-error-handling">Event and Error Handling</a>
+<a href="#rfc.section.11">11.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a>
 </h1>
-<p id="rfc.section.11.p.1">[EDITOR&#8217;S NOTE: point out that events and errors may be handled differently, although they are the modeled the same in this specification.]</p>
+<p id="rfc.section.11.p.1">RFC-EDITOR: Please remove this section before publication.</p>
+<p id="rfc.section.11.p.2">This document has no actions for IANA.</p>
 <h1 id="rfc.section.12">
-<a href="#rfc.section.12">12.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a>
+<a href="#rfc.section.12">12.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a>
 </h1>
-<p id="rfc.section.12.p.1">RFC-EDITOR: Please remove this section before publication.</p>
-<p id="rfc.section.12.p.2">This document has no actions for IANA.</p>
+<p id="rfc.section.12.p.1">This document describes a generic API for interacting with a transport services (TAPS) system.  Part of this API includes configuration details for transport security protocols, as discussed in Section <a href="#security-parameters" class="xref">Section 5.3</a>. It does not recommend use (or disuse) of specific algorithms or protocols. Any API-compatible transport security protocol should work in a TAPS system.</p>
 <h1 id="rfc.section.13">
-<a href="#rfc.section.13">13.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a>
+<a href="#rfc.section.13">13.</a> <a href="#acknowledgements" id="acknowledgements">Acknowledgements</a>
 </h1>
-<p id="rfc.section.13.p.1">This document describes a generic API for interacting with a transport services (TAPS) system.  Part of this API includes configuration details for transport security protocols, as discussed in Section <a href="#security-parameters" class="xref">Section 5.3</a>. It does not recommend use (or disuse) of specific algorithms or protocols. Any API-compatible transport security protocol should work in a TAPS system.</p>
-<h1 id="rfc.section.14">
-<a href="#rfc.section.14">14.</a> <a href="#acknowledgements" id="acknowledgements">Acknowledgements</a>
-</h1>
-<p id="rfc.section.14.p.1">This work has received funding from the European Union&#8217;s Horizon 2020 research and innovation programme under grant agreements No. 644334 (NEAT) and No. 688421 (MAMI).</p>
-<p id="rfc.section.14.p.2">This work has been supported by Leibniz Prize project funds of DFG - German Research Foundation: Gottfried Wilhelm Leibniz-Preis 2011 (FKZ FE 570/4-1).</p>
-<p id="rfc.section.14.p.3">Thanks to Stuart Cheshire, Josh Graessley, David Schinazi, and Eric Kinnear for their implementation and design efforts, including Happy Eyeballs, that heavily influenced this work. Thanks to Laurent Chuat and Jason Lee for initial work on the Post Sockets interface, from which this work has evolved.</p>
+<p id="rfc.section.13.p.1">This work has received funding from the European Union&#8217;s Horizon 2020 research and innovation programme under grant agreements No. 644334 (NEAT) and No. 688421 (MAMI).</p>
+<p id="rfc.section.13.p.2">This work has been supported by Leibniz Prize project funds of DFG - German Research Foundation: Gottfried Wilhelm Leibniz-Preis 2011 (FKZ FE 570/4-1).</p>
+<p id="rfc.section.13.p.3">Thanks to Stuart Cheshire, Josh Graessley, David Schinazi, and Eric Kinnear for their implementation and design efforts, including Happy Eyeballs, that heavily influenced this work. Thanks to Laurent Chuat and Jason Lee for initial work on the Post Sockets interface, from which this work has evolved.</p>
 <h1 id="rfc.references">
-<a href="#rfc.references">15.</a> References</h1>
+<a href="#rfc.references">14.</a> References</h1>
 <h1 id="rfc.references.1">
-<a href="#rfc.references.1">15.1.</a> Normative References</h1>
+<a href="#rfc.references.1">14.1.</a> Normative References</h1>
 <table><tbody>
 <tr>
 <td class="reference"><b id="I-D.ietf-taps-minset">[I-D.ietf-taps-minset]</b></td>
@@ -1052,7 +1046,7 @@ Connection -&gt; ConnectionError&amp;lt;&gt;
 </tr>
 </tbody></table>
 <h1 id="rfc.references.2">
-<a href="#rfc.references.2">15.2.</a> Informative References</h1>
+<a href="#rfc.references.2">14.2.</a> Informative References</h1>
 <table><tbody>
 <tr>
 <td class="reference"><b id="I-D.pauly-taps-transport-security">[I-D.pauly-taps-transport-security]</b></td>
