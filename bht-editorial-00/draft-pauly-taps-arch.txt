@@ -100,12 +100,12 @@ Table of Contents
 
 1.  Introduction
 
-   This document provides an overview of the architecture of Transport
-   Services, a system for exposing the features of transport protocols
-   to applications.  This architecture serves as a basis for Application
-   Programming Interfaces (APIs) and implementations that provide
-   flexible transport networking services.  It defines the common set of
-
+   Many APIs to perform transport networking have been deployed, perhaps
+   the most widely known and imitated being the BSD socket() interface.
+   The names and functions between these APIs are not consistent, and
+   vary depending on the protocol being used.  For example, sending and
+   receiving on a stream of data is conceptually the same between
+   operating on an unencrypted TCP stream and operating on an encrypted
 
 
 
@@ -114,15 +114,6 @@ Pauly, et al.            Expires August 30, 2018                [Page 2]
 Internet-Draft              TAPS Architecture              February 2018
 
 
-   terminology and concepts to be used in more detailed discussion of
-   transport services.
-
-   Many APIs to perform transport networking have been deployed, perhaps
-   the most widely known and imitated being the BSD socket() interface.
-   The names and functions between these APIs are not consistent, and
-   vary depending on the protocol being used.  For example, sending and
-   receiving on a stream of data is conceptually the same between
-   operating on an unencrypted TCP stream and operating on an encrypted
    TLS stream over TCP, but applications cannot use the same socket
    send() and recv() calls on top of both kinds of connections.
    Similarly, terminology for the implementation of protocols offering
@@ -162,14 +153,6 @@ Internet-Draft              TAPS Architecture              February 2018
    refer to these as Functional Features), or else can be handled
    automatically by a system implementing Transport Services (we refer
    to these as Automatable Features).  Among the Functional Features,
-
-
-
-Pauly, et al.            Expires August 30, 2018                [Page 3]
-
-Internet-Draft              TAPS Architecture              February 2018
-
-
    some were common across all or nearly all transport protocols, while
    others could be seen as features that, if specified, would only be
    useful with a subset of protocols, or perhaps even a single transport
@@ -178,6 +161,14 @@ Internet-Draft              TAPS Architecture              February 2018
    applications that do not require them to arrive in the order in which
    they were sent.  However, this functionality can never be
    automatically provided without the application being involved.
+
+
+
+
+Pauly, et al.            Expires August 30, 2018                [Page 3]
+
+Internet-Draft              TAPS Architecture              February 2018
+
 
 3.  Design Principles
 
@@ -218,14 +209,6 @@ Internet-Draft              TAPS Architecture              February 2018
    Since applications will often need to control fine-grained details of
    transport protocols to optimize their behavior and ensure
    compatibility with remote peers, a Transport Services system also
-
-
-
-Pauly, et al.            Expires August 30, 2018                [Page 4]
-
-Internet-Draft              TAPS Architecture              February 2018
-
-
    needs to allow more specialized protocol features to be used.  The
    interface for these specialized options should be treated differently
    from the common options to ensure flexibility.
@@ -235,6 +218,14 @@ Internet-Draft              TAPS Architecture              February 2018
    if an application is using UDP, it may require control over the
    checksum or fragmentation behavior for UDP; if it used a protocol to
    frame its data over a byte stream like TCP, it would not need these
+
+
+
+Pauly, et al.            Expires August 30, 2018                [Page 4]
+
+Internet-Draft              TAPS Architecture              February 2018
+
+
    options.  In such cases, the API should expose the features in such a
    way that they take effect when a particular protocol is selected, but
    do not imply that only that protocol may be used if there are
@@ -274,14 +265,6 @@ Internet-Draft              TAPS Architecture              February 2018
    protocols, top-level features in the Transport Services API should
    avoid referencing particular transport protocols.  Mappings of these
    API features in the Implementation document, on the other hand, must
-
-
-
-Pauly, et al.            Expires August 30, 2018                [Page 5]
-
-Internet-Draft              TAPS Architecture              February 2018
-
-
    explain the ramifications of each feature on existing protocols.  It
    is expected that the Implementation document will be updated and
    supplemented as new protocols and protocol features are developed.
@@ -290,6 +273,15 @@ Internet-Draft              TAPS Architecture              February 2018
    the Implementation document defines new protocols that require any
    changes on remote hosts.  The Transport Services system must be
    deployable on one side only, as a way to allow an application to make
+
+
+
+
+Pauly, et al.            Expires August 30, 2018                [Page 5]
+
+Internet-Draft              TAPS Architecture              February 2018
+
+
    better use of available capabilities on a system, and protocol
    features that may be supported by peers across the network.
 
@@ -309,6 +301,14 @@ Internet-Draft              TAPS Architecture              February 2018
 
    The following diagram summarizes the top-level concepts in the
    architecture and how they relate to one another.
+
+
+
+
+
+
+
+
 
 
 
@@ -771,13 +771,13 @@ Internet-Draft              TAPS Architecture              February 2018
 
 6.  Security Considerations
 
-   TAPS does not recommend use of specific security protocols or
-   algorithms.  Its goal is to offer ease of use for existing protocols
-   by providing a generic security-related interface.  Each provided
-   interface mimics an existing protocol-specific interface provided by
-   supported security protocols.  For example, trust verification
-   callbacks are common parts of TLS APIs.  TAPS exposes one for similar
-   purposes.  Clients must take care to use security APIs appropriately.
+   The Transport Services architecture does not recommend use of
+   specific security protocols or algorithms.  Its goal is to offer ease
+   of use for existing protocols by providing a generic security-related
+   interface.  Each provided interface mimics an existing protocol-
+   specific interface provided by supported security protocols.  For
+   example, trust verification callbacks are common parts of TLS APIs.
+   Transport Services APIs will expose similar functionality.  Clients
 
 
 
@@ -786,18 +786,19 @@ Pauly, et al.            Expires August 30, 2018               [Page 14]
 Internet-Draft              TAPS Architecture              February 2018
 
 
-   In cases where clients use said interface to provide sensitive keying
-   material, e.g., access to private keys or copies of pre-shared keys
-   (PSKs), key use must be validated.  For example, clients should not
-   use PSK material created for ESP with IETF-QUIC, and clients must not
-   use private keys intended for server authentication as a key for
-   client authentication.  Moreover, unlike certain transport features
-   such as TFO or ECN which can fall back to standard configurations,
-   TAPS systems must not permit fallback for security protocols.  For
-   example, if a client requests TLS, yet TLS or the desired version are
-   not available, its connection must fail.  Clients are responsible for
-   implementing protocol or version fallback using a TAPS API if so
-   desired.
+   must take care to use security APIs appropriately.  In cases where
+   clients use said interface to provide sensitive keying material,
+   e.g., access to private keys or copies of pre-shared keys (PSKs), key
+   use must be validated.  For example, clients should not use PSK
+   material created for ESP with IETF-QUIC, and clients must not use
+   private keys intended for server authentication as a key for client
+   authentication.  Moreover, unlike certain transport features such as
+   TFO or ECN which can fall back to standard configurations, Transport
+   Services systems must not permit fallback for security protocols.
+   For example, if a client requests TLS, yet TLS or the desired version
+   are not available, its connection must fail.  Clients are responsible
+   for implementing protocol or version fallback using a Transport
+   Services API if so desired.
 
 7.  Acknowledgements
 
@@ -831,7 +832,6 @@ Internet-Draft              TAPS Architecture              February 2018
               Pauly, T., Rose, K., and C. Wood, "A Survey of Transport
               Security Protocols", draft-pauly-taps-transport-
               security-01 (work in progress), January 2018.
-
 
 
 
