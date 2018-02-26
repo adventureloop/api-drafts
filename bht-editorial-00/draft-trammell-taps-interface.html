@@ -553,14 +553,14 @@ address {
 <h1 id="rfc.section.3">
 <a href="#rfc.section.3">3.</a> <a href="#principles" id="principles">Interface Design Principles</a>
 </h1>
-<p id="rfc.section.3.p.1">We begin with the architectural design principles defined in <a href="#TAPS-ARCH" class="xref">[TAPS-ARCH]</a>; from these, we derive and elaborate a set of principles on which the design of the interface is based:</p>
+<p id="rfc.section.3.p.1">We begin with the architectural design principles defined in <a href="#TAPS-ARCH" class="xref">[TAPS-ARCH]</a>; from these, we derive and elaborate a set of principles on which the design of the interface is based. The interface defined in this document provides:</p>
 <p></p>
 
 <ul>
-<li>We aim to provide a single interface to a variety of transport protocols to be used in a variety of application design patterns, independent of the properties of the application and the protocol stacks that will be used at runtime. At the same time, all common specialized features of these protocol stacks are made available to the application as necessary in a transport-independent way. This enables applications written to a single API to make use of transport protocols in terms of the features they provide.</li>
-<li>The interface provides explicit support for security properties as first-order transport features, and for long-term caching of cryptographic identities and parameters for associations among endpoints.</li>
-<li>The interface provides asynchronous connection establishment, transmission, and reception, allowing most application interactions with the transport layer to be event-driven, in line with developments in modern platforms and programming languages</li>
-<li>Explicit support for multistreaming and multipath transport protocols, and the grouping of related connections into connection groups through cloning of connections.</li>
+<li>A single interface to a variety of transport protocols to be used in a variety of application design patterns, independent of the properties of the application and the protocol stacks that will be used at runtime, such that  all common specialized features of these protocol stacks are made available to the application as necessary in a transport-independent way, to enable applications written to a single API to make use of transport protocols in terms of the features they provide;</li>
+<li>Explicit support for security properties as first-order transport features, and for long-term caching of cryptographic identities and parameters for associations among endpoints;</li>
+<li>Asynchronous connection establishment, transmission, and reception, allowing most application interactions with the transport layer to be event-driven, in line with developments in modern platforms and programming languages;</li>
+<li>Explicit support for multistreaming and multipath transport protocols, and the grouping of related connections into connection groups through cloning of connections, to allow applications to take full advantage of new transport protocols supporting these features; and</li>
 <li>Atomic transmission of data, using application-assisted framing and deframing where the underlying transport does not provide these.</li>
 </ul>
 <h1 id="rfc.section.4">
@@ -574,9 +574,9 @@ address {
 <p id="rfc.section.5.p.1">The pre-establishment phase allows applications to specify parameters for the connections they&#8217;re about to make, or to query the API about potential connections they could make.</p>
 <p id="rfc.section.5.p.2">A Preconnection object represents a potential connection. It has state that describes parameters of a Connection that might exist in the future.  This state comprises Local Endpoint and Remote Endpoint objects that denote the endpoints of the potential connection (see <a href="#endpointspec" class="xref">Section 5.1</a>), the transport parameters (see <a href="#transport-params" class="xref">Section 5.2</a>), and the security parameters (see <a href="#security-parameters" class="xref">Section 5.3</a>):</p>
 <pre>
-   preConnection := NewPreconnection(LocalEndpoint, 
+   preConnection := NewPreconnection(LocalEndpoint,
                                      RemoteEndpoint,
-                                     TransportParams, 
+                                     TransportParams,
                                      SecurityParams);
 
 </pre>
@@ -618,7 +618,7 @@ localSpecifier.withStunServer(address, port, credentials)
 <a href="#rfc.section.5.2">5.2.</a> <a href="#transport-params" id="transport-params">Specifying Transport Parameters</a>
 </h1>
 <p id="rfc.section.5.2.p.1">A Preconnection object holds parameters reflecting the application&#8217;s requirements and preferences for the transport. These include protocol and path selection parameters, as well as Generic and Specific Protocol Properties for configuration of the detailed operation of the selected Protocol Stacks.</p>
-<p id="rfc.section.5.2.p.2">All Transport Parameters are organized within a single namespace shared with Send Parameters (see <a href="#send-params" class="xref">Section 7.1</a>). All transport parameters take paremeter-specific values. Protocol and path selection properties additionally take one of five preference levels, though not all preference levels make sense with all such properties. Note that it is possible for a set of specified transport parameters to be internally inconsistent, or for preferences to be inconsistent with the later use of the API by the application. Application developers should reduce inconsistency by only using the most stringent preference levels when failure to meet a preference would break the application&#8217;s functionality (e.g.  the Reliable Data Transfer preference, which is a core assumption of many application protocols). Implementations of this interface should also raise errors in configuration as early as possible, to help ensure these inconsistencies are caught early in the development process.</p>
+<p id="rfc.section.5.2.p.2">All Transport Parameters are organized within a single namespace shared with Send Parameters (see <a href="#send-params" class="xref">Section 7.1</a>). All transport parameters take paremeter-specific values. Protocol and Path Selection properties additionally take one of five preference levels, though not all preference levels make sense with all such properties. Note that it is possible for a set of specified transport parameters to be internally inconsistent, or for preferences to be inconsistent with the later use of the API by the application. Application developers should reduce inconsistency by only using the most stringent preference levels when failure to meet a preference would break the application&#8217;s functionality (e.g.  the Reliable Data Transfer preference, which is a core assumption of many application protocols). Implementations of this interface should also raise errors in configuration as early as possible, to help ensure these inconsistencies are caught early in the development process.</p>
 <p id="rfc.section.5.2.p.3">The protocol(s) and path(s) selected as candidates during connection establishment are determined by a set of properties. Since there could be paths over which some transport protocols are unable to operate, or remote endpoints that support only specific network addresses or transports, transport protocol selection is necessarily tied to path selection. This may involve choosing between multiple local interfaces that are connected to different access networks.</p>
 <p id="rfc.section.5.2.p.4">To reflect the needs of an individual connection, they can be specified with five different preference levels:</p>
 <table cellpadding="3" cellspacing="0" class="tt full center">
@@ -865,7 +865,7 @@ sendParameters.add(parameter, value)
 <h1 id="rfc.section.7.1.1.7">
 <a href="#rfc.section.7.1.1.7">7.1.1.7.</a> <a href="#instantaneous-capacity-profile" id="instantaneous-capacity-profile">Instantaneous Capacity Profile</a>
 </h1>
-<p id="rfc.section.7.1.1.7.p.1">This enumerated property specifies the application&#8217;s preferred tradeoffs for sending this Message; it is a per-Message override of the Capacity Profile protocol and path selection property (see <a href="#transport-params" class="xref">Section 5.2</a>). Th</p>
+<p id="rfc.section.7.1.1.7.p.1">This enumerated property specifies the application&#8217;s preferred tradeoffs for sending this Message; it is a per-Message override of the Capacity Profile protocol and path selection property (see <a href="#transport-params" class="xref">Section 5.2</a>).</p>
 <p id="rfc.section.7.1.1.7.p.2">The following values are valid for Instantaneous Capacity Profile:</p>
 <p></p>
 
