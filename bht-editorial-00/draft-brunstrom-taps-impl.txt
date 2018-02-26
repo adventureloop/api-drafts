@@ -132,7 +132,7 @@ Internet-Draft             TAPS Implementation             February 2018
    14. References  . . . . . . . . . . . . . . . . . . . . . . . . .  27
      14.1.  Normative References . . . . . . . . . . . . . . . . . .  27
      14.2.  Informative References . . . . . . . . . . . . . . . . .  28
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  29
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  28
 
 1.  Introduction
 
@@ -1260,14 +1260,6 @@ Internet-Draft             TAPS Implementation             February 2018
    candidates Section 4.1 to ensure better performance for the
    application.
 
-   It is recognized that consistency in caching becomes a major issue
-   for performance caches, since if a cached value is not valid the
-   whole optimization might be lost.  Still, recommendations on cache
-   lifetimes are difficult to offer since it largely depends on the
-   variability of the cached performance information.  For example, the
-   round-trip times experienced by TCP segments within a connection can
-   be quite large
-
 9.  Specific Transport Protocol Considerations
 
 9.1.  TCP
@@ -1282,14 +1274,6 @@ Internet-Draft             TAPS Implementation             February 2018
 
    If the application sends a Close, that can translate to a graceful
    termination of the TCP connection, which is performed by sending a
-
-
-
-Brunstrom, et al.        Expires August 30, 2018               [Page 23]
-
-Internet-Draft             TAPS Implementation             February 2018
-
-
    FIN to the remote endpoint.  If the application sends an Abort, then
    the TCP state can be closed abruptly, leading to a RST being sent to
    the peer.
@@ -1298,6 +1282,14 @@ Internet-Draft             TAPS Implementation             February 2018
    sending and receiving Messages over TCP is to treat each direction of
    the stream of bytes as a single Message, terminated by a FIN.  That
    means that if the application can make several Send calls to enqueue
+
+
+
+Brunstrom, et al.        Expires August 30, 2018               [Page 23]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
    subsequent data chunks for the same Message to continue writing, but
    marking the Message complete corresponds to closing the sending
    stream.  Similarly, when the application receives the final portion
@@ -1338,6 +1330,14 @@ Internet-Draft             TAPS Implementation             February 2018
 
    When a Transport System transfers a Message, it seems natural to map
    the Message object to SCTP messages in order to support properties
+   such as "Ordered" or "Lifetime" (which maps onto partially reliable
+   delivery with a SCTP_PR_SCTP_TTL policy [RFC6458]).  However, since
+   multiplexing of Connections onto SCTP streams may happen, and would
+   be hidden from the application, the Transport System requires a per-
+   stream receiver buffer anyway, so this potential benefit is lost and
+   the "partial flag" becomes unnecessary for the system.
+
+
 
 
 
@@ -1345,13 +1345,6 @@ Brunstrom, et al.        Expires August 30, 2018               [Page 24]
 
 Internet-Draft             TAPS Implementation             February 2018
 
-
-   such as "Ordered" or "Lifetime" (which maps onto partially reliable
-   delivery with a SCTP_PR_SCTP_TTL policy [RFC6458]).  However, since
-   multiplexing of Connections onto SCTP streams may happen, and would
-   be hidden from the application, the Transport System requires a per-
-   stream receiver buffer anyway, so this potential benefit is lost and
-   the "partial flag" becomes unnecessary for the system.
 
    The problem of long messages either requiring large receiver-side
    buffers or getting in the way of multiplexing is addressed by message
@@ -1393,6 +1386,13 @@ Internet-Draft             TAPS Implementation             February 2018
    that this stream's data can be sent.  For streams after the first
    stream, this will likely be an immediate operation.
 
+   Closing a single QUIC stream, presented to application as a
+   Connection, does not imply closing the underlying QUIC connection
+   itself.  Rather, the implementation may choose to close the QUIC
+   connection once all streams have been closed (possibly after some
+   timeout), or after an individual stream Connection sends an Abort.
+
+
 
 
 
@@ -1401,12 +1401,6 @@ Brunstrom, et al.        Expires August 30, 2018               [Page 25]
 
 Internet-Draft             TAPS Implementation             February 2018
 
-
-   Closing a single QUIC stream, presented to application as a
-   Connection, does not imply closing the underlying QUIC connection
-   itself.  Rather, the implementation may choose to close the QUIC
-   connection once all streams have been closed (possibly after some
-   timeout), or after an individual stream Connection sends an Abort.
 
    Messages over a direct QUIC stream should be represented similarly to
    the TCP stream Section 9.1 (one Message per direction), unless a
@@ -1450,6 +1444,12 @@ Internet-Draft             TAPS Implementation             February 2018
 
    An attacker that knows a particular device is racing several options
    during connection establishment may be able to block packets for the
+   first connection attempt, thus inducing the device to fall back to a
+   secondary attempt.  This is a problem if the secondary attempts have
+   worse security properties that enable further attacks.
+   Implementations should ensure that all options have equivalent
+   security properties to avoid incentivizing attacks.
+
 
 
 
@@ -1457,12 +1457,6 @@ Brunstrom, et al.        Expires August 30, 2018               [Page 26]
 
 Internet-Draft             TAPS Implementation             February 2018
 
-
-   first connection attempt, thus inducing the device to fall back to a
-   secondary attempt.  This is a problem if the secondary attempts have
-   worse security properties that enable further attacks.
-   Implementations should ensure that all options have equivalent
-   security properties to avoid incentivizing attacks.
 
    Since results from the network can determine how a connection attempt
    tree is built, such as when DNS returns a list of resolved endpoints,
@@ -1502,18 +1496,6 @@ Internet-Draft             TAPS Implementation             February 2018
               Services for TAPS Systems", draft-ietf-taps-minset-01
               (work in progress), February 2018.
 
-
-
-
-
-
-
-
-Brunstrom, et al.        Expires August 30, 2018               [Page 27]
-
-Internet-Draft             TAPS Implementation             February 2018
-
-
    [RFC6458]  Stewart, R., Tuexen, M., Poon, K., Lei, P., and V.
               Yasevich, "Sockets API Extensions for the Stream Control
               Transmission Protocol (SCTP)", RFC 6458,
@@ -1523,6 +1505,14 @@ Internet-Draft             TAPS Implementation             February 2018
    [RFC7413]  Cheng, Y., Chu, J., Radhakrishnan, S., and A. Jain, "TCP
               Fast Open", RFC 7413, DOI 10.17487/RFC7413, December 2014,
               <https://www.rfc-editor.org/info/rfc7413>.
+
+
+
+
+Brunstrom, et al.        Expires August 30, 2018               [Page 27]
+
+Internet-Draft             TAPS Implementation             February 2018
+
 
    [RFC7540]  Belshe, M., Peon, R., and M. Thomson, Ed., "Hypertext
               Transfer Protocol Version 2 (HTTP/2)", RFC 7540,
@@ -1562,14 +1552,6 @@ Internet-Draft             TAPS Implementation             February 2018
               Version 1.3", draft-ietf-tls-tls13-24 (work in progress),
               February 2018.
 
-
-
-
-Brunstrom, et al.        Expires August 30, 2018               [Page 28]
-
-Internet-Draft             TAPS Implementation             February 2018
-
-
    [NEAT-flow-mapping]
               "Transparent Flow Mapping for NEAT (in Workshop on Future
               of Internet Transport (FIT 2017))", n.d..
@@ -1579,6 +1561,13 @@ Authors' Addresses
    Anna Brunstrom (editor)
 
    Email: anna.brunstrom@kau.se
+
+
+
+
+Brunstrom, et al.        Expires August 30, 2018               [Page 28]
+
+Internet-Draft             TAPS Implementation             February 2018
 
 
    Tommy Pauly (editor)
@@ -1620,12 +1609,6 @@ Authors' Addresses
    Email: philipp@inet.tu-berlin.de
 
 
-
-Brunstrom, et al.        Expires August 30, 2018               [Page 29]
-
-Internet-Draft             TAPS Implementation             February 2018
-
-
    Colin Perkins
    University of Glasgow
    School of Computing Science
@@ -1635,6 +1618,14 @@ Internet-Draft             TAPS Implementation             February 2018
    Email: csp@csperkins.org
 
 
+
+
+
+Brunstrom, et al.        Expires August 30, 2018               [Page 29]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
    Michael Welzl
    University of Oslo
    PO Box 1080 Blindern
@@ -1642,6 +1633,15 @@ Internet-Draft             TAPS Implementation             February 2018
    Norway
 
    Email: michawe@ifi.uio.no
+
+
+
+
+
+
+
+
+
 
 
 
