@@ -311,7 +311,7 @@ address {
 
   <meta name="dct.creator" content="Pauly, T., Ed., Trammell, B., Ed., Brunstrom, A., Fairhurst, G., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-pauly-taps-arch-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-02-25" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-02-26" />
   <meta name="dct.abstract" content="This document provides an overview of the architecture of Transport Services, a system for exposing the features of transport protocols to applications. This architecture serves as a basis for Application Programming Interfaces (APIs) and implementations that provide flexible transport networking services. It defines the common set of terminology and concepts to be used in more detailed discussion of transport services." />
   <meta name="description" content="This document provides an overview of the architecture of Transport Services, a system for exposing the features of transport protocols to applications. This architecture serves as a basis for Application Programming Interfaces (APIs) and implementations that provide flexible transport networking services. It defines the common set of terminology and concepts to be used in more detailed discussion of transport services." />
 
@@ -335,7 +335,7 @@ address {
 <td class="right">B. Trammell, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: August 29, 2018</td>
+<td class="left">Expires: August 30, 2018</td>
 <td class="right">ETH Zurich</td>
 </tr>
 <tr>
@@ -380,7 +380,7 @@ address {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">February 25, 2018</td>
+<td class="right">February 26, 2018</td>
 </tr>
 
     	
@@ -396,7 +396,7 @@ address {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on August 29, 2018.</p>
+<p>This Internet-Draft will expire on August 30, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -477,7 +477,7 @@ address {
 <a href="#rfc.section.3.1">3.1.</a> <a href="#common-apis-for-common-features" id="common-apis-for-common-features">Common APIs for Common Features</a>
 </h1>
 <p id="rfc.section.3.1.p.1">Functionality that is common across multiple transport protocols should be accessible through a unified set of API calls. An application should be able to implement logic for its basic use of transport networking (establishing the transport, and sending and receiving data) once, and expect that implementation to continue to function as the transports change.</p>
-<p id="rfc.section.3.1.p.2">Any Transport Services API must expose the distilled minimal set of features offered by transport protocols <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>.</p>
+<p id="rfc.section.3.1.p.2">Any Transport Services API must allow access to the distilled minimal set of features offered by transport protocols <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>.</p>
 <h1 id="rfc.section.3.2">
 <a href="#rfc.section.3.2">3.2.</a> <a href="#access-to-specialized-features" id="access-to-specialized-features">Access to Specialized Features</a>
 </h1>
@@ -536,7 +536,7 @@ address {
 <h1 id="rfc.section.4.1">
 <a href="#rfc.section.4.1">4.1.</a> <a href="#transport-services-api-concepts" id="transport-services-api-concepts">Transport Services API Concepts</a>
 </h1>
-<p id="rfc.section.4.1.p.1">Fundamentally, a Transport Services API needs to provide basic objects <a href="#objects" class="xref">Section 4.1.1</a> that allow applications to establish communication and send and receive data <a href="#objects" class="xref">Section 4.1.1</a>. These may be exposed as handles or referenced objects, depending on the language.</p>
+<p id="rfc.section.4.1.p.1">Fundamentally, a Transport Services API needs to provide basic objects that allow applications to establish communication and send and receive data (<a href="#objects" class="xref">Section 4.1.1</a>). These may be exposed as handles or referenced objects, depending on the language.</p>
 <p id="rfc.section.4.1.p.2">Beyond the basic objects, there are several high-level groups of actions that any Transport Services API must provide:</p>
 <p></p>
 
@@ -617,8 +617,8 @@ address {
 
 <ul>
 <li>Message: A Message object is a unit of data that can be represented as bytes that can be transferred between two endpoints over a transport connection. The bytes within a Message are assumed to be ordered within the unit itself. That is, if an application does not care about the order in which a peer receives two distinct spans of bytes, those spans of bytes are considered independent Messages. Messages may or may not be usable if incomplete or corrupted. Boundaries of a Message may or may not be understood or transmitted by transport protocols. That is, what one application considers to be two Messages sent on a stream-based transport may be treated as a single Message by the application on the other side.</li>
-<li>Send() is the action to transmit a Message or partial Message over a Connection to a Remote Endpoint. The interface to Send may include options specific to how the Message&#8217;s content is to be sent. Status of the Send operation may be delivered back to the application in an event <a href="#events" class="xref">Section 4.1.5</a>.</li>
-<li>Receive() is an action that indicates that the application is ready to asynchronously accept a Message over a Connection from a Remote Endpoint, while the Message content itself will be delivered in an event <a href="#events" class="xref">Section 4.1.5</a>. The interface to Receive may include options specific to the Message that is to be delivered to the application.</li>
+<li>Send() is the action to transmit a Message or partial Message over a Connection to a Remote Endpoint. The interface to Send may include options specific to how the Message&#8217;s content is to be sent. Status of the Send operation may be delivered back to the application in an event (<a href="#events" class="xref">Section 4.1.5</a>).</li>
+<li>Receive() is an action that indicates that the application is ready to asynchronously accept a Message over a Connection from a Remote Endpoint, while the Message content itself will be delivered in an event (<a href="#events" class="xref">Section 4.1.5</a>). The interface to Receive may include options specific to the Message that is to be delivered to the application.</li>
 </ul>
 <h1 id="rfc.section.4.1.5">
 <a href="#rfc.section.4.1.5">4.1.5.</a> <a href="#events" id="events">Event Handling</a>
@@ -654,7 +654,7 @@ address {
 <li>Path: A Path represents an available set of properties of a network route on which packets may be sent or received.</li>
 <li>Protocol Instance: A Protocol Instance is a single instance of one protocol, including any state it has necessary to establish connectivity or send and receive Messages.</li>
 <li>Protocol Stack: A Protocol Stack is a set of Protocol Instances (including relevant application, security, transport, or Internet protocols) that are used together to establish connectivity or send and receive Messages. A single stack may be simple (a single transport protocol instance over IP), or complex (multiple application protocol streams going through a single security and transport protocol, over IP; or, a multi-path transport protocol over multiple transport sub-flows).</li>
-<li>System Policy: A Transport Service System Policy defines the algorithm it uses to take connection properties from the application, and determine how it will gather candidate paths and protocols <a href="#gathering" class="xref">Section 4.2.1</a> and race the candidates during establishment <a href="#racing" class="xref">Section 4.2.2</a>.</li>
+<li>System Policy: A Transport Service System Policy defines the algorithm it uses to take connection properties from the application, and determine how it will gather candidate paths and protocols (<a href="#gathering" class="xref">Section 4.2.1</a>) and race the candidates during establishment (<a href="#racing" class="xref">Section 4.2.2</a>).</li>
 <li>Cached State: Cached State is the state and history that the implementation keeps for each set of associated endpoints that have been used previously. This can include DNS results, TLS session state, previous success and quality of transport protocols over certain paths.</li>
 </ul>
 <h1 id="rfc.section.4.2.1">
@@ -684,7 +684,7 @@ address {
 <h1 id="rfc.section.6">
 <a href="#rfc.section.6">6.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a>
 </h1>
-<p id="rfc.section.6.p.1">TAPS does not recommend use of specific security protocols or algorithms. Its goal is to offer ease of use for existing protocols by providing a generic security-related interface. Each provided interface mimics an existing protocol-specific interface provided by supported security protocols. For example, trust verification callbacks are common parts of TLS APIs. TAPS exposes one for similar purposes. Clients must take care to use security APIs appropriately. In cases where clients use said interface to provide sensitive keying material, e.g., access to private keys or copies of pre-shared keys (PSKs), key use must be validated. For example, clients should not use PSK material created for ESP with IETF-QUIC, and clients must not use private keys intended for server authentication as a key for client authentication. Moreover, unlike certain transport features such as TFO or ECN which can fall back to standard configurations, TAPS systems must not permit fallback for security protocols. For example, if a clients requests TLS, yet TLS or the desired version are not available, its connection must fail. Clients are responsible for implementing protocol or version fallback using a TAPS API if so desired.</p>
+<p id="rfc.section.6.p.1">TAPS does not recommend use of specific security protocols or algorithms. Its goal is to offer ease of use for existing protocols by providing a generic security-related interface. Each provided interface mimics an existing protocol-specific interface provided by supported security protocols. For example, trust verification callbacks are common parts of TLS APIs. TAPS exposes one for similar purposes. Clients must take care to use security APIs appropriately. In cases where clients use said interface to provide sensitive keying material, e.g., access to private keys or copies of pre-shared keys (PSKs), key use must be validated. For example, clients should not use PSK material created for ESP with IETF-QUIC, and clients must not use private keys intended for server authentication as a key for client authentication. Moreover, unlike certain transport features such as TFO or ECN which can fall back to standard configurations, TAPS systems must not permit fallback for security protocols. For example, if a client requests TLS, yet TLS or the desired version are not available, its connection must fail. Clients are responsible for implementing protocol or version fallback using a TAPS API if so desired.</p>
 <h1 id="rfc.section.7">
 <a href="#rfc.section.7">7.</a> <a href="#acknowledgements" id="acknowledgements">Acknowledgements</a>
 </h1>
