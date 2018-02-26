@@ -289,10 +289,9 @@ address {
 <link href="#rfc.section.5" rel="Chapter" title="5 Pre-Establishment Phase">
 <link href="#rfc.section.5.1" rel="Chapter" title="5.1 Specifying Endpoints">
 <link href="#rfc.section.5.2" rel="Chapter" title="5.2 Specifying Transport Parameters">
-<link href="#rfc.section.5.2.1" rel="Chapter" title="5.2.1 Protocol Selection Properties">
-<link href="#rfc.section.5.2.2" rel="Chapter" title="5.2.2 Path Selection Properties">
-<link href="#rfc.section.5.2.3" rel="Chapter" title="5.2.3 Protocol Properties">
-<link href="#rfc.section.5.2.4" rel="Chapter" title="5.2.4 Transport Parameters Object">
+<link href="#rfc.section.5.2.1" rel="Chapter" title="5.2.1 Transport Preferences">
+<link href="#rfc.section.5.2.2" rel="Chapter" title="5.2.2 Protocol Properties">
+<link href="#rfc.section.5.2.3" rel="Chapter" title="5.2.3 Transport Parameters Object">
 <link href="#rfc.section.5.3" rel="Chapter" title="5.3 Specifying Security Parameters and Callbacks">
 <link href="#rfc.section.6" rel="Chapter" title="6 Establishing Connections">
 <link href="#rfc.section.6.1" rel="Chapter" title="6.1 Active Open: Initiate">
@@ -444,13 +443,11 @@ address {
 </li>
 <li>5.2.   <a href="#rfc.section.5.2">Specifying Transport Parameters</a>
 </li>
-<ul><li>5.2.1.   <a href="#rfc.section.5.2.1">Protocol Selection Properties</a>
+<ul><li>5.2.1.   <a href="#rfc.section.5.2.1">Transport Preferences</a>
 </li>
-<li>5.2.2.   <a href="#rfc.section.5.2.2">Path Selection Properties</a>
+<li>5.2.2.   <a href="#rfc.section.5.2.2">Protocol Properties</a>
 </li>
-<li>5.2.3.   <a href="#rfc.section.5.2.3">Protocol Properties</a>
-</li>
-<li>5.2.4.   <a href="#rfc.section.5.2.4">Transport Parameters Object</a>
+<li>5.2.3.   <a href="#rfc.section.5.2.3">Transport Parameters Object</a>
 </li>
 </ul><li>5.3.   <a href="#rfc.section.5.3">Specifying Security Parameters and Callbacks</a>
 </li>
@@ -615,11 +612,17 @@ localSpecifier.withStunServer(address, port, credentials)
 <h1 id="rfc.section.5.2">
 <a href="#rfc.section.5.2">5.2.</a> <a href="#transport-params" id="transport-params">Specifying Transport Parameters</a>
 </h1>
-<p id="rfc.section.5.2.p.1">A Preconnection object holds parameters reflecting the application&#8217;s requirements and preferences for the transport.  These include Protocol Selection and Path Selection Properties and Protocol Properties (to configure transport protocols).</p>
+<p id="rfc.section.5.2.p.1">A Preconnection object holds parameters reflecting the application&#8217;s requirements and preferences for the transport.  These include Transport Preferences (towards protocol selection and path selection) as well as Application Intents (hints to the transport system what to optimize for) and Protocol Properties (to configure transport protocols).</p>
 <p id="rfc.section.5.2.p.2">Some parameters express strict requirements that the application relies on, while others are hints of what transport features would be helpful for the application. For example, if an application asks for reliable data transfer, choosing a transport protocol such as UDP, which does not have this feature, will break the application&#8217;s functionality. On the other hand, the option to not require checksums when receiving an individual Content can help optimize for low latency, but if not present, it will most likely not break the fundamental assumptions of the application.</p>
 <p id="rfc.section.5.2.p.3">Some Transport Parameters do not relate to requirements regarding the capabilities of a protocol or to protocol configuration, but are Application Intents. Intents reflect what the application wants to achieve, knows, assumes, or prefers regarding its own communication. They provide hints to the transport system what to optimize for, e.g., an application might want to optimize the new connection for low latency or high throughput. Intents can influence path selection or be generic connection properties.</p>
 <p id="rfc.section.5.2.p.4">Note that there can be conflicts between parameters set by the application: If multiple features are requested which are offered by different protocols, it may not be possible to satisfy all requirements.  Consequently, a transport system must prioritize Transport Parameters and consider the relevant trade-offs, see also <a href="#TAPS-MINSET" class="xref">[TAPS-MINSET]</a>.</p>
-<p id="rfc.section.5.2.p.5">To reflect the needs of an individual connection, they can be specified with different preference levels from the following table , whereby the preference is one of the following levels:</p>
+<p id="rfc.section.5.2.p.5">Default preference levels and possible combinations of Transport Parameters and preference levels are specified in <a href="#appendix-preferences" class="xref">Appendix B.1</a>.</p>
+<h1 id="rfc.section.5.2.1">
+<a href="#rfc.section.5.2.1">5.2.1.</a> <a href="#transport-prefs" id="transport-prefs">Transport Preferences</a>
+</h1>
+<p id="rfc.section.5.2.1.p.1">Transport Preferences drive protocol selection and path selection on connection establishment. Since there could be paths over which some transport protocols are unable to operate, or remote endpoints that support only specific network addresses or transports, transport protocol selection is necessarily tied to path selection. This may involve choosing between multiple local interfaces that are connected to different access networks.</p>
+<p id="rfc.section.5.2.1.p.2">The Transport Preferences form part of the information used to create a Preconnection object. As such, they can be configured during the pre-establishment phase, but cannot be changed once a Connection has been established.</p>
+<p id="rfc.section.5.2.1.p.3">To reflect the needs of an individual connection, they can be specified with different preference levels from the following table , whereby the preference is one of the following levels:</p>
 <table cellpadding="3" cellspacing="0" class="tt full center">
 <thead><tr>
 <th class="left">Preference</th>
@@ -648,14 +651,8 @@ localSpecifier.withStunServer(address, port, credentials)
 </tr>
 </tbody>
 </table>
-<p id="rfc.section.5.2.p.6">Default preference levels and possible combinations of Transport Parameters and preference levels are specified in <a href="#appendix-preferences" class="xref">Appendix B.1</a>.</p>
-<h1 id="rfc.section.5.2.1">
-<a href="#rfc.section.5.2.1">5.2.1.</a> <a href="#protocol-selection-props" id="protocol-selection-props">Protocol Selection Properties</a>
-</h1>
-<p id="rfc.section.5.2.1.p.1">Transport Preferences drive protocol selection and path selection on connection establishment. Since there could be paths over which some transport protocols are unable to operate, or remote endpoints that support only specific network addresses or transports, transport protocol selection is necessarily tied to path selection. This may involve choosing between multiple local interfaces that are connected to different access networks.</p>
-<p id="rfc.section.5.2.1.p.2">The Transport Preferences form part of the information used to create a Preconnection object. As such, they can be configured during the pre-establishment phase, but cannot be changed once a Connection has been established.</p>
-<p id="rfc.section.5.2.1.p.3">There need to be sensible defaults for the Transport Preferences as well as Protocol Selection Properties. The defaults given in the following section represent a configuration that can be implemented over TCP. An alternate set of default Protocol Selection Properties would represent a configuration that can be implemented over UDP.</p>
-<p id="rfc.section.5.2.1.p.4">The following properties apply to Connections and Connection Groups:</p>
+<p id="rfc.section.5.2.1.p.4">There need to be sensible defaults for the Transport Preferences as well as Protocol Selection Properties. The defaults given in the following section represent a configuration that can be implemented over TCP. An alternate set of default Protocol Selection Properties would represent a configuration that can be implemented over UDP.</p>
+<p id="rfc.section.5.2.1.p.5">The following properties apply to Connections and Connection Groups:</p>
 <p></p>
 
 <ul>
@@ -668,23 +665,16 @@ localSpecifier.withStunServer(address, port, credentials)
 <li>Suggest a timeout to the RemoteEndpoint: This boolean property specifies whether an application considers it useful to propose a timeout until the connection is assumed to be lost.  This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</li>
 <li>Notification of special errors (excessive retransmissions, ICMP error message arrival): This boolean property specifies whether an application considers it useful to be informed in case sent data was retransmitted more often than a certain threshold, or when an ICMP error message arrives. This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</li>
 <li>Control checksum coverage on sending or receiving: This boolean property specifies whether the application considers it useful to enable / disable / configure a checksum when sending Content, or decide whether to require a checksum or not when receiving Content.  This property applies to Connections and Connection Groups. This is not a strict requirement, as it signifies a reduction in reliability. The default is full checksum coverage without being able to change it, and requiring a checksum when receiving.</li>
-</ul>
-<h1 id="rfc.section.5.2.2">
-<a href="#rfc.section.5.2.2">5.2.2.</a> <a href="#path-selection-props" id="path-selection-props">Path Selection Properties</a>
-</h1>
-<p></p>
-
-<ul>
 <li>Interface Type: This property specifies which kind of access network interface, e.g., WiFi, Ethernet, or LTE, to require, prefer, avoid, or prohibit for this connection.  Of course this depends on whether they are available. The default is to use the default interface configured in the system policy.</li>
-<li>Traffic Category: This Intent specifies the dominating traffic pattern that the application expects for this Connection. Possible values are: Query (latency bound), Bulk (bandwidth bound), Stream (steady data rate), or Background traffic (non-interactive traffic with low priority). This Intent provides a hint to the transport system of how the application would like to use its available capacity. Therefore it can help the transport system select one of multiple available paths that best match the preferences of the application. Note that while this Intent may also be used to set DSCP code points, it does not represent any Quality of Service requirements, but rather hints for a transport system what to optimize for on a best-effort basis. The transport system does not provide any guarantee whether the application&#8217;s requirements can actually be satisfied. The default is to not assume any particular traffic category or preference.</li>
+<li>Capacity Profile This Intent specifies the dominating traffic pattern that the application expects for this Connection. Possible values are: Query (latency bound), Bulk (bandwidth bound), Stream (steady data rate), or Background traffic (non-interactive traffic with low priority). This Intent provides a hint to the transport system of how the application would like to use its available capacity. Therefore it can help the transport system select one of multiple available paths that best match the preferences of the application. Note that while this Intent may also be used to set DSCP code points, it does not represent any Quality of Service requirements, but rather hints for a transport system what to optimize for on a best-effort basis. The transport system does not provide any guarantee whether the application&#8217;s requirements can actually be satisfied. The default is to not assume any particular traffic category or preference.</li>
 <li>Size to be Sent or Received: This Intent specifies what the application expects the size of a transfer to be. It is a numeric property and given in Bytes. In cases in which the application knows this, e.g., from metadata in adaptive HTTP streaming (MPEG-DASH), this Intent can be a useful input to path selection. As the application does not necessarily know about current performance characteristics such as RTT or bandwidth on the available paths, it does not always know whether the transfer will be latency or bandwidth bound, and thus what Traffic Category to optimize for. Therefore it makes sense for the application to specify the estimated size of the transfer, so the transport system can optimize path selection accordingly.</li>
 <li>Metered or expensive paths: This Intent describes what an application prefers regarding monetary costs, e.g., whether it considers it acceptable to utilize limited data volume. The default is to prefer paths that are not associated with limits or monetary cost.</li>
 </ul>
-<h1 id="rfc.section.5.2.3">
-<a href="#rfc.section.5.2.3">5.2.3.</a> <a href="#protocol-props" id="protocol-props">Protocol Properties</a>
+<h1 id="rfc.section.5.2.2">
+<a href="#rfc.section.5.2.2">5.2.2.</a> <a href="#protocol-props" id="protocol-props">Protocol Properties</a>
 </h1>
-<p id="rfc.section.5.2.3.p.1">Protocol Properties represent the configuration that protocols should use once they have been selected. Some properties apply generically across multiple transport protocols, in which case they may be used by the system to help select candidate protocols. Other properties only apply to specific protocols. As with Transport Preferences (<a href="#protocol-selection-props" class="xref">Section 5.2.1</a>), Protocol Properties are specified on the Preconnection object. The default settings of these properties will vary based on the specific protocols being used and the system&#8217;s configuration.</p>
-<p id="rfc.section.5.2.3.p.2">Generic Protocol Properties include:</p>
+<p id="rfc.section.5.2.2.p.1">Protocol Properties represent the configuration that protocols should use once they have been selected. Some properties apply generically across multiple transport protocols, in which case they may be used by the system to help select candidate protocols. Other properties only apply to specific protocols. As with Transport Preferences (<a href="#transport-prefs" class="xref">Section 5.2.1</a>), Protocol Properties are specified on the Preconnection object. The default settings of these properties will vary based on the specific protocols being used and the system&#8217;s configuration.</p>
+<p id="rfc.section.5.2.2.p.2">Generic Protocol Properties include:</p>
 <p></p>
 
 <ul>
@@ -700,15 +690,15 @@ localSpecifier.withStunServer(address, port, credentials)
 <li>Maximum Content Size Before Connection Establishment: This numeric property represents the maximum Content size that can be sent before or during Connection establishment, see also <a href="#send-idempotent" class="xref">Section 7.1.1.5</a>.  It is given in Bytes.</li>
 <li>Send Bit-rate This Intent specifies what the application expects the bit-rate of a transfer to be. It is a numeric property and given in Bytes per second. The transport system may use this Intent to limit the sending rate by placing an upper bound on a congestion window in order to avoid bursty traffic patterns in streaming.</li>
 </ul>
-<p id="rfc.section.5.2.3.p.5">In order to specify Specific Protocol Properties, the application can attach a set of options to the Preconnection object, associated with a specific protocol.  For example, the application could specify a set of TCP Options to use if and only if TCP is selected by the system, including options such as the Maximum Segment Size (MSS), and options around Acknowledgement Stretching. Such properties should not be assumed to apply across different protocols, but must be possible to specify if required by the application.</p>
-<h1 id="rfc.section.5.2.4">
-<a href="#rfc.section.5.2.4">5.2.4.</a> <a href="#transport-parameters-object" id="transport-parameters-object">Transport Parameters Object</a>
+<p id="rfc.section.5.2.2.p.5">In order to specify Specific Protocol Properties, the application can attach a set of options to the Preconnection object, associated with a specific protocol.  For example, the application could specify a set of TCP Options to use if and only if TCP is selected by the system, including options such as the Maximum Segment Size (MSS), and options around Acknowledgement Stretching. Such properties should not be assumed to apply across different protocols, but must be possible to specify if required by the application.</p>
+<h1 id="rfc.section.5.2.3">
+<a href="#rfc.section.5.2.3">5.2.3.</a> <a href="#transport-parameters-object" id="transport-parameters-object">Transport Parameters Object</a>
 </h1>
-<p id="rfc.section.5.2.4.p.1">All transport parameters used in the pre-establishment phase are collected in a TransportParameters object that is passed to the Preconnection object.</p>
+<p id="rfc.section.5.2.3.p.1">All transport parameters used in the pre-establishment phase are collected in a TransportParameters object that is passed to the Preconnection object.</p>
 <pre>
 transportParameters := NewTransportParameters()
 </pre>
-<p id="rfc.section.5.2.4.p.2">The Individual parameters are then added to the TransportParameters object.  While Protocol Properties and Application Intents use the <samp>add</samp> call, Transport Preferences use special calls for the levels defined in <a href="#transport-params" class="xref">Section 5.2</a>.</p>
+<p id="rfc.section.5.2.3.p.2">The Individual parameters are then added to the TransportParameters object.  While Protocol Properties and Application Intents use the <samp>add</samp> call, Transport Preferences use special calls for the levels defined in <a href="#transport-params" class="xref">Section 5.2</a>.</p>
 <pre>
 transportParameters.add(intent, value)
 
@@ -720,14 +710,14 @@ transportParameters.dontcare(preference)
 transportParameters.avoid(preference)
 transportParameters.prohibit(preference)
 </pre>
-<p id="rfc.section.5.2.4.p.3">For an existing connection, the Transport Parameters can be queried any time by using the following call on the Connection object:</p>
+<p id="rfc.section.5.2.3.p.3">For an existing connection, the Transport Parameters can be queried any time by using the following call on the Connection object:</p>
 <pre>
 transportParameters := connection.getTransportParameters()
 </pre>
-<p id="rfc.section.5.2.4.p.4">Note that most properties are only considered for connection establishment and can not be changed later on. <a href="#appendix-specify-query-params" class="xref">Appendix B.2</a> gives an overview of what Transport Parameters can be specified and queried during which phase.</p>
-<p id="rfc.section.5.2.4.p.5">[Note: We need to more clearly separate out parameters that can be changed once a connection has been established from those that cannot. (csp)]</p>
-<p id="rfc.section.5.2.4.p.6">Connections can be cloned at any time, before or after establishment.  A cloned connection and its parent are entangled: they share the same TransportParameters object, changing any parameter for one of them also changes the parameter for the other, connecting one of them also connects the other, etc.  Cloning connections during pre-establishment is encouraged, as it informs the transport system about the intent to form Connection Groups.</p>
-<p id="rfc.section.5.2.4.p.7">Note that priority assignment ((see also <a href="#groups" class="xref">Section 6.4</a> for more details) is not shared among cloned connections. Therefore, the priority assignment MUST NOT be realized using the connection level TransportParameters object.</p>
+<p id="rfc.section.5.2.3.p.4">Note that most properties are only considered for connection establishment and can not be changed later on. <a href="#appendix-specify-query-params" class="xref">Appendix B.2</a> gives an overview of what Transport Parameters can be specified and queried during which phase.</p>
+<p id="rfc.section.5.2.3.p.5">[Note: We need to more clearly separate out parameters that can be changed once a connection has been established from those that cannot. (csp)]</p>
+<p id="rfc.section.5.2.3.p.6">Connections can be cloned at any time, before or after establishment.  A cloned connection and its parent are entangled: they share the same TransportParameters object, changing any parameter for one of them also changes the parameter for the other, connecting one of them also connects the other, etc.  Cloning connections during pre-establishment is encouraged, as it informs the transport system about the intent to form Connection Groups.</p>
+<p id="rfc.section.5.2.3.p.7">Note that priority assignment ((see also <a href="#groups" class="xref">Section 6.4</a> for more details) is not shared among cloned connections. Therefore, the priority assignment MUST NOT be realized using the connection level TransportParameters object.</p>
 <h1 id="rfc.section.5.3">
 <a href="#rfc.section.5.3">5.3.</a> <a href="#security-parameters" id="security-parameters">Specifying Security Parameters and Callbacks</a>
 </h1>
@@ -939,7 +929,7 @@ Connection.setProperties()
 <li>The status of the Connection, which can be one of the following: Establishing, Established, Closed. [TASK: can connections be in a Closing state? (csp)]</li>
 <li>Transport Features of the protocols that conform to the Required and Prohibited Transport Preferences, which might be selected by the transport system during Establishment. These features correspond to the properties given in <a href="#transport-params" class="xref">Section 5.2</a> and can only be queried.</li>
 <li>Transport Features of the protocols that were selected, once the Connection has been established. These features correspond to the properties given in <a href="#transport-params" class="xref">Section 5.2</a> and can only be queried.</li>
-<li>Protocol Properties of the protocols in use, once the Connection has been established. These properties correspond to the properties given <a href="#protocol-props" class="xref">Section 5.2.3</a> and can be set and queried.</li>
+<li>Protocol Properties of the protocols in use, once the Connection has been established. These properties correspond to the properties given <a href="#protocol-props" class="xref">Section 5.2.2</a> and can be set and queried.</li>
 <li>Path Properties of the path(s) in use, once the Connection has been established. These properties can be derived from the local provisioning domain, measurements by the protocol stack, or other sources. They can only be queried.</li>
 </ul>
 <p><a href="#appendix-specify-query-params" class="xref">Appendix B.2</a> gives a more detailed overview of the different types of properties that can be set and queried at different times.</p>

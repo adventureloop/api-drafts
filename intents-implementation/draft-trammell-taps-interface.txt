@@ -84,10 +84,9 @@ Table of Contents
    5.  Pre-Establishment Phase . . . . . . . . . . . . . . . . . . .   5
      5.1.  Specifying Endpoints  . . . . . . . . . . . . . . . . . .   6
      5.2.  Specifying Transport Parameters . . . . . . . . . . . . .   7
-       5.2.1.  Protocol Selection Properties . . . . . . . . . . . .   8
-       5.2.2.  Path Selection Properties . . . . . . . . . . . . . .  10
-       5.2.3.  Protocol Properties . . . . . . . . . . . . . . . . .  11
-       5.2.4.  Transport Parameters Object . . . . . . . . . . . . .  12
+       5.2.1.  Transport Preferences . . . . . . . . . . . . . . . .   8
+       5.2.2.  Protocol Properties . . . . . . . . . . . . . . . . .  11
+       5.2.3.  Transport Parameters Object . . . . . . . . . . . . .  12
      5.3.  Specifying Security Parameters and Callbacks  . . . . . .  13
    6.  Establishing Connections  . . . . . . . . . . . . . . . . . .  14
      6.1.  Active Open: Initiate . . . . . . . . . . . . . . . . . .  15
@@ -106,6 +105,7 @@ Table of Contents
    11. Event and Error Handling  . . . . . . . . . . . . . . . . . .  25
    12. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  25
    13. Security Considerations . . . . . . . . . . . . . . . . . . .  25
+   14. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  25
 
 
 
@@ -114,7 +114,6 @@ Trammell, et al.         Expires August 30, 2018                [Page 2]
 Internet-Draft               TAPS Interface                February 2018
 
 
-   14. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  25
    15. References  . . . . . . . . . . . . . . . . . . . . . . . . .  26
      15.1.  Normative References . . . . . . . . . . . . . . . . . .  26
      15.2.  Informative References . . . . . . . . . . . . . . . . .  26
@@ -162,6 +161,7 @@ Internet-Draft               TAPS Interface                February 2018
    document:
 
    o  Object := Action()
+
 
 
 
@@ -351,8 +351,10 @@ Internet-Draft               TAPS Interface                February 2018
 
    A Preconnection object holds parameters reflecting the application's
    requirements and preferences for the transport.  These include
-   Protocol Selection and Path Selection Properties and Protocol
-   Properties (to configure transport protocols).
+   Transport Preferences (towards protocol selection and path selection)
+   as well as Application Intents (hints to the transport system what to
+   optimize for) and Protocol Properties (to configure transport
+   protocols).
 
    Some parameters express strict requirements that the application
    relies on, while others are hints of what transport features would be
@@ -380,10 +382,8 @@ Internet-Draft               TAPS Interface                February 2018
    Transport Parameters and consider the relevant trade-offs, see also
    [TAPS-MINSET].
 
-   To reflect the needs of an individual connection, they can be
-   specified with different preference levels from the following table ,
-   whereby the preference is one of the following levels:
-
+   Default preference levels and possible combinations of Transport
+   Parameters and preference levels are specified in Appendix B.1.
 
 
 
@@ -393,6 +393,25 @@ Trammell, et al.         Expires August 30, 2018                [Page 7]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+5.2.1.  Transport Preferences
+
+   Transport Preferences drive protocol selection and path selection on
+   connection establishment.  Since there could be paths over which some
+   transport protocols are unable to operate, or remote endpoints that
+   support only specific network addresses or transports, transport
+   protocol selection is necessarily tied to path selection.  This may
+   involve choosing between multiple local interfaces that are connected
+   to different access networks.
+
+   The Transport Preferences form part of the information used to create
+   a Preconnection object.  As such, they can be configured during the
+   pre-establishment phase, but cannot be changed once a Connection has
+   been established.
+
+   To reflect the needs of an individual connection, they can be
+   specified with different preference levels from the following table ,
+   whereby the preference is one of the following levels:
 
    +-------------+-----------------------------------------------------+
    | Preference  | Effect                                              |
@@ -412,24 +431,6 @@ Internet-Draft               TAPS Interface                February 2018
    |             | avoided                                             |
    +-------------+-----------------------------------------------------+
 
-   Default preference levels and possible combinations of Transport
-   Parameters and preference levels are specified in Appendix B.1.
-
-5.2.1.  Protocol Selection Properties
-
-   Transport Preferences drive protocol selection and path selection on
-   connection establishment.  Since there could be paths over which some
-   transport protocols are unable to operate, or remote endpoints that
-   support only specific network addresses or transports, transport
-   protocol selection is necessarily tied to path selection.  This may
-   involve choosing between multiple local interfaces that are connected
-   to different access networks.
-
-   The Transport Preferences form part of the information used to create
-   a Preconnection object.  As such, they can be configured during the
-   pre-establishment phase, but cannot be changed once a Connection has
-   been established.
-
    There need to be sensible defaults for the Transport Preferences as
    well as Protocol Selection Properties.  The defaults given in the
    following section represent a configuration that can be implemented
@@ -441,7 +442,6 @@ Internet-Draft               TAPS Interface                February 2018
    o  Reliable Data Transfer: This boolean property specifies whether
       the application needs the transport protocol to ensure that data
       is received completely and without corruption on the other side.
-      This also entails being notified when a Connection is closed or
 
 
 
@@ -450,6 +450,7 @@ Trammell, et al.         Expires August 30, 2018                [Page 8]
 Internet-Draft               TAPS Interface                February 2018
 
 
+      This also entails being notified when a Connection is closed or
       aborted.  This property applies to connections and connection
       groups.  This is a strict requirement.  The default is to enable
       Reliable Data Transfer.
@@ -496,8 +497,7 @@ Internet-Draft               TAPS Interface                February 2018
       applies to Connections and Connection Groups.  This is not a
       strict requirement.  The default is to have this option.
 
-   o  Notification of special errors (excessive retransmissions, ICMP
-      error message arrival): This boolean property specifies whether an
+
 
 
 
@@ -506,6 +506,8 @@ Trammell, et al.         Expires August 30, 2018                [Page 9]
 Internet-Draft               TAPS Interface                February 2018
 
 
+   o  Notification of special errors (excessive retransmissions, ICMP
+      error message arrival): This boolean property specifies whether an
       application considers it useful to be informed in case sent data
       was retransmitted more often than a certain threshold, or when an
       ICMP error message arrives.  This property applies to Connections
@@ -522,15 +524,13 @@ Internet-Draft               TAPS Interface                February 2018
       without being able to change it, and requiring a checksum when
       receiving.
 
-5.2.2.  Path Selection Properties
-
    o  Interface Type: This property specifies which kind of access
       network interface, e.g., WiFi, Ethernet, or LTE, to require,
       prefer, avoid, or prohibit for this connection.  Of course this
       depends on whether they are available.  The default is to use the
       default interface configured in the system policy.
 
-   o  Traffic Category: This Intent specifies the dominating traffic
+   o  Capacity Profile This Intent specifies the dominating traffic
       pattern that the application expects for this Connection.
       Possible values are: Query (latency bound), Bulk (bandwidth
       bound), Stream (steady data rate), or Background traffic (non-
@@ -573,7 +573,7 @@ Internet-Draft               TAPS Interface                February 2018
       default is to prefer paths that are not associated with limits or
       monetary cost.
 
-5.2.3.  Protocol Properties
+5.2.2.  Protocol Properties
 
    Protocol Properties represent the configuration that protocols should
    use once they have been selected.  Some properties apply generically
@@ -639,7 +639,7 @@ Internet-Draft               TAPS Interface                February 2018
    not be assumed to apply across different protocols, but must be
    possible to specify if required by the application.
 
-5.2.4.  Transport Parameters Object
+5.2.3.  Transport Parameters Object
 
    All transport parameters used in the pre-establishment phase are
    collected in a TransportParameters object that is passed to the
@@ -1318,7 +1318,7 @@ Internet-Draft               TAPS Interface                February 2018
 
    o  Protocol Properties of the protocols in use, once the Connection
       has been established.  These properties correspond to the
-      properties given Section 5.2.3 and can be set and queried.
+      properties given Section 5.2.2 and can be set and queried.
 
    o  Path Properties of the path(s) in use, once the Connection has
       been established.  These properties can be derived from the local
