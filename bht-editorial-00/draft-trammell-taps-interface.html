@@ -284,7 +284,7 @@ address {
   <link href="#rfc.toc" rel="Contents">
 <link href="#rfc.section.1" rel="Chapter" title="1 Introduction">
 <link href="#rfc.section.2" rel="Chapter" title="2 Terminology and Notation">
-<link href="#rfc.section.3" rel="Chapter" title="3 Design Principles">
+<link href="#rfc.section.3" rel="Chapter" title="3 Interface Design Principles">
 <link href="#rfc.section.4" rel="Chapter" title="4 API Summary">
 <link href="#rfc.section.5" rel="Chapter" title="5 Pre-Establishment Phase">
 <link href="#rfc.section.5.1" rel="Chapter" title="5.1 Specifying Endpoints">
@@ -435,7 +435,7 @@ address {
 </li>
 <li>2.   <a href="#rfc.section.2">Terminology and Notation</a>
 </li>
-<li>3.   <a href="#rfc.section.3">Design Principles</a>
+<li>3.   <a href="#rfc.section.3">Interface Design Principles</a>
 </li>
 <li>4.   <a href="#rfc.section.4">API Summary</a>
 </li>
@@ -551,22 +551,22 @@ address {
 <p id="rfc.section.2.p.11">Actions associated with no object are Actions on the abstract interface itself; they are equivalent to actions on a per-application global context.</p>
 <p id="rfc.section.2.p.12">How these abstract concepts map into concrete implementations of this API in a given language on a given platform is largely dependent on the features of the language and the platform. Actions could be implemented as functions or method calls, for instance, and Events could be implemented via callback passing or other asynchronous calling conventions.</p>
 <h1 id="rfc.section.3">
-<a href="#rfc.section.3">3.</a> <a href="#principles" id="principles">Design Principles</a>
+<a href="#rfc.section.3">3.</a> <a href="#principles" id="principles">Interface Design Principles</a>
 </h1>
-<p id="rfc.section.3.p.1">We begin with a set of initial design principles for the abstract interface to realize.</p>
+<p id="rfc.section.3.p.1">We begin with the architectural design principles defined in <a href="#TAPS-ARCH" class="xref">[TAPS-ARCH]</a>; from these, we derive and elaborate a set of principles on which the design of the interface is based:</p>
 <p></p>
 
 <ul>
-<li>Transport protocol stack independence in line with the Transport Services Architecture <a href="#TAPS-ARCH" class="xref">[TAPS-ARCH]</a>, allowing applications to be written in terms of the semantics best for the application&#8217;s own design, separate from the protocol(s) used on the wire to achieve them. This enables applications written to a single API to make use of transport protocols in terms of the features they provide.</li>
-<li>Explicit support for multistreaming and multipath transport protocols.</li>
-<li>Explicit support for security properties as first-order transport features, and for long-term caching of cryptographic identities and parameters for associations among endpoints.</li>
+<li>We aim to provide a single interface to a variety of transport protocols to be used in a variety of application design patterns, independent of the properties of the application and the protocol stacks that will be used at runtime. At the same time, all common specialized features of these protocol stacks are made available to the application as necessary in a transport-independent way. This enables applications written to a single API to make use of transport protocols in terms of the features they provide.</li>
+<li>The interface provides explicit support for security properties as first-order transport features, and for long-term caching of cryptographic identities and parameters for associations among endpoints.</li>
+<li>The interface provides asynchronous connection establishment, transmission, and reception, allowing most application interactions with the transport layer to be event-driven, in line with developments in modern platforms and programming languages</li>
+<li>Explicit support for multistreaming and multipath transport protocols, and the grouping of related connections into connection groups through cloning of connections.</li>
 <li>Atomic transmission of data, using application-assisted framing and deframing where the underlying transport does not provide these.</li>
-<li>Asynchronous connection establishment, transmission, and reception, allowing most application interactions with the transport layer to be event-driven.</li>
 </ul>
 <h1 id="rfc.section.4">
 <a href="#rfc.section.4">4.</a> <a href="#api-summary" id="api-summary">API Summary</a>
 </h1>
-<p id="rfc.section.4.p.1">[TASK: write three paragraph summary here, should state how all this works for common cases from the application&#8217;s PoV.]</p>
+<p id="rfc.section.4.p.1">[EDITOR&#8217;S NOTE: write three paragraph summary here; see https://github.com/taps-api/drafts/issues/93]</p>
 <p id="rfc.section.4.p.2">In the following sections, we describe the details of application interaction with Objects through Actions and Events in each phase of a connection, following the phases described in <a href="#TAPS-ARCH" class="xref">[TAPS-ARCH]</a>.</p>
 <h1 id="rfc.section.5">
 <a href="#rfc.section.5">5.</a> <a href="#pre-establishment-phase" id="pre-establishment-phase">Pre-Establishment Phase</a>
@@ -581,7 +581,7 @@ address {
 
 </pre>
 <p id="rfc.section.5.p.3">The Local Endpoint MUST be specified if the Preconnection is used to Listen() for incoming connections, but is OPTIONAL if it is used to Initiate() connections. The Remote Endpoint MUST be specified in the Preconnection is used to Initiate() connections, but is OPTIONAL if it is used to Listen() for incoming connections.</p>
-<p id="rfc.section.5.p.4">[NOTE: note also that framers and de-framers should be bound to the Preconnection object during pre-establishment, forward-reference <a href="#send-framing" class="xref">Section 7.2</a> and <a href="#receive-framing" class="xref">Section 8.1</a>]</p>
+<p id="rfc.section.5.p.4">Framers (see <a href="#send-framing" class="xref">Section 7.2</a>) and deframers (see <a href="#receive-framing" class="xref">Section 8.1</a>), if necessary, should be bound to the Preconnection during pre-establishment.</p>
 <h1 id="rfc.section.5.1">
 <a href="#rfc.section.5.1">5.1.</a> <a href="#endpointspec" id="endpointspec">Specifying Endpoints</a>
 </h1>
@@ -611,10 +611,9 @@ localSpecifier := NewLocalEndpoint()
 localSpecifier.withStunServer(address, port, credentials)
 </pre>
 <p id="rfc.section.5.1.p.2">Implementations may also support additional endpoint representations and provide a single NewEndpoint() call that takes different endpoint representations.</p>
-<p id="rfc.section.5.1.p.3">[TASK: match with #initiate / #listen / #rendezvous and make sure the transport stack used is communicated ]</p>
-<p id="rfc.section.5.1.p.4">Multiple endpoint identifiers can be specified for each Local Endpoint and RemoteEndoint.  For example, a Local Endpoint could be configured with two interface names, or a Remote Endpoint could be specified via both IPv4 and IPv6 addresses.  The multiple identifiers refer to the same endpoint.</p>
-<p id="rfc.section.5.1.p.5">The transport services API will resolve names internally, when the Initiate(), Listen(), or Rendezvous() method is called establish a connection.  The API does not need the application to resolve names, and premature name resolution can damage performance by limiting the scope for alternate path discovery during connection establishment.  The Resolve() method is, however, provided to resolve a Local Endpoint or a Remote Endpoint in cases where this is required, for example with some NAT traversal protocols (see <a href="#rendezvous" class="xref">Section 6.3</a>).</p>
-<p id="rfc.section.5.1.p.6">[NOTE: the API needs MUST be explicit about when name resolution occurs, since the act of resolving a name leaks information, and there may be security implications if this happens unexpectedly.]</p>
+<p id="rfc.section.5.1.p.3">Multiple endpoint identifiers can be specified for each Local Endpoint and RemoteEndoint.  For example, a Local Endpoint could be configured with two interface names, or a Remote Endpoint could be specified via both IPv4 and IPv6 addresses.  The multiple identifiers refer to the same endpoint.</p>
+<p id="rfc.section.5.1.p.4">The transport services API will resolve names internally, when the Initiate(), Listen(), or Rendezvous() method is called establish a connection.  The API does not need the application to resolve names, and premature name resolution can damage performance by limiting the scope for alternate path discovery during connection establishment.  The Resolve() method is, however, provided to resolve a Local Endpoint or a Remote Endpoint in cases where this is required, for example with some NAT traversal protocols (see <a href="#rendezvous" class="xref">Section 6.3</a>).</p>
+<p id="rfc.section.5.1.p.5">[NOTE: the API needs MUST be explicit about when name resolution occurs, since the act of resolving a name leaks information, and there may be security implications if this happens unexpectedly.]</p>
 <h1 id="rfc.section.5.2">
 <a href="#rfc.section.5.2">5.2.</a> <a href="#transport-params" id="transport-params">Specifying Transport Parameters</a>
 </h1>
@@ -883,8 +882,8 @@ sendParameters.add(parameter, value)
 <h1 id="rfc.section.7.2">
 <a href="#rfc.section.7.2">7.2.</a> <a href="#send-framing" id="send-framing">Sender-side Framing</a>
 </h1>
-<p id="rfc.section.7.2.p.1">Sender-side framing allows a caller to provide the interface with a function that takes a Message of an appropriate application-layer type and returns an array of octets, the on-the-wire representation of the Message to be handed down to the Protocol Stack. It consists of a Framer object with a single Action, Frame. Since the Framer depends on the protocol used at the application layer, it is bound to the Connection during the pre-establishment phase:</p>
-<p id="rfc.section.7.2.p.2">Connection.FrameWith(Framer)</p>
+<p id="rfc.section.7.2.p.1">Sender-side framing allows a caller to provide the interface with a function that takes a Message of an appropriate application-layer type and returns an array of octets, the on-the-wire representation of the Message to be handed down to the Protocol Stack. It consists of a Framer object with a single Action, Frame. Since the Framer depends on the protocol used at the application layer, it is bound to the Preconnection during the pre-establishment phase:</p>
+<p id="rfc.section.7.2.p.2">Preconnection.FrameWith(Framer)</p>
 <p id="rfc.section.7.2.p.3">OctetArray := Framer.Frame(Message)</p>
 <p id="rfc.section.7.2.p.4">Sender-side framing is a convenience feature of the interface, for parity with receiver-side framing (see <a href="#receive-framing" class="xref">Section 8.1</a>).</p>
 <h1 id="rfc.section.8">
@@ -904,8 +903,8 @@ sendParameters.add(parameter, value)
 </h1>
 <p id="rfc.section.8.1.p.1">The Receive event is intended to be fired once per application-layer Message sent by the remote endpoint; i.e., it is a desired property of this interface that a Send at one end of a Connection maps to exactly one Receive on the other end. This is possible with Protocol Stacks that provide message boundary preservation, but is not the case over Protocol Stacks that provide a simple octet stream transport.</p>
 <p id="rfc.section.8.1.p.2">For preserving message boundaries over stream transports, this interface provides receiver-side de-framing. This facility is based on the observation that, since many of our current application protocols evolved over TCP, which does not provide message boundary preservation, and since many of these protocols require message boundaries to function, each application layer protocol has defined its own framing. A Deframer allows an application to push this de-framing down into the interface, in order to transform an octet stream into a sequence of Messages.</p>
-<p id="rfc.section.8.1.p.3">Concretely, receiver-side de-framing allows a caller to provide the interface with a function that takes an octet stream, as provided by the underlying Protocol Stack, reads and returns a single Message of an appropriate type for the application and platform, and leaves the octet stream at the start of the next Message to deframe. It consists of a Deframer object with a single Action, Deframe. Since the Deframer depends on the protocol used at the application layer, it is bound to the Connection during the pre-establishment phase:</p>
-<p id="rfc.section.8.1.p.4">Connection.DeframeWith(Deframer)</p>
+<p id="rfc.section.8.1.p.3">Concretely, receiver-side de-framing allows a caller to provide the interface with a function that takes an octet stream, as provided by the underlying Protocol Stack, reads and returns a single Message of an appropriate type for the application and platform, and leaves the octet stream at the start of the next Message to deframe. It consists of a Deframer object with a single Action, Deframe. Since the Deframer depends on the protocol used at the application layer, it is bound to the Preconnection during the pre-establishment phase:</p>
+<p id="rfc.section.8.1.p.4">Preconnection.DeframeWith(Deframer)</p>
 <p id="rfc.section.8.1.p.5">Message := Deframer.Deframe(OctetStream, &#8230;)</p>
 <h1 id="rfc.section.9">
 <a href="#rfc.section.9">9.</a> <a href="#introspection" id="introspection">Setting and Querying of Connection Properties</a>
