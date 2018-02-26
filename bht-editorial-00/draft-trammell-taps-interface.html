@@ -928,11 +928,20 @@ Connection -&gt; Received&lt;Message&gt;
 </pre>
 <p id="rfc.section.8.p.3">As with sending, the type of the Message to be passed is dependent on the implementation, and on the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. The Message may also contain metadata from protocols in the Protocol Stack; which metadata is available is Protocol Stack dependent. In particular, when this information is available, the value of the Explicit Congestion Notification (ECN) field is contained in such metadata.  This information can be used for logging and debugging purposes, and for building applications which need access to information about the transport internals for their own operation.</p>
 <p id="rfc.section.8.p.4">The Message object must provide some method to retrieve an octet array containing application data, corresponding to a single message within the underlying Protocol Stack&#8217;s framing.  See <a href="#receive-framing" class="xref">Section 8.1</a> for handling framing in situations where the Protocol Stack provides octet-stream transport only.</p>
-<p id="rfc.section.8.p.5">Note that as with sending, the Message object passed to Received may represent a partial message, larger than the maximum message size than can be received atomically. In this case, the Message object passed contains an indication that the object received is partial, a reference to the full Message it belongs to, as well as the byte range of the data content within the partial Message.</p>
+<p id="rfc.section.8.p.5">The Message object passed to Received is complete and atomic, unless one of the following conditions holds:</p>
+<p></p>
+
+<ul>
+<li>the underlying protocol stack supports message boundary preservation, and the size of the Message is larger than the buffers available for a single message;</li>
+<li>the underlying protocol stack does not support message boundary preservation, and the deframer (see <a href="#receive-framing" class="xref">Section 8.1</a>) cannot determine the end of the message using the buffer space it has available; or</li>
+<li>the underlying protocol stack does not support message boundary preservation, and no deframer was supplied by the application</li>
+</ul>
+<p id="rfc.section.8.p.7">In this case, the Message object passed to Received contains an indication that the object received is partial, a reference to the full Message it belongs to, the byte offset of the data in the partial Message within the full Message, and an indication whether this is the last (highest-offset) partial Message in the full Message.</p>
+<p id="rfc.section.8.p.8">Note that in the degenerate case &#8211; no message boundary preservation and no deframing &#8211; the entire connection is represented as one large message of indeterminate length.</p>
 <pre>
 Connection -&gt; ReceiveError&lt;&gt;
 </pre>
-<p id="rfc.section.8.p.6">A ReceiveError occurs when data is received by the underlying Protocol Stack that cannot be fully retrieved or deframed, or when some other indication is received that reception has failed. Such conditions that irrevocably lead the the termination of the Connection are signaled using ConnectionError instead (see <a href="#termination" class="xref">Section 10</a>).</p>
+<p id="rfc.section.8.p.9">A ReceiveError occurs when data is received by the underlying Protocol Stack that cannot be fully retrieved or deframed, or when some other indication is received that reception has failed. Such conditions that irrevocably lead the the termination of the Connection are signaled using ConnectionError instead (see <a href="#termination" class="xref">Section 10</a>).</p>
 <h1 id="rfc.section.8.1">
 <a href="#rfc.section.8.1">8.1.</a> <a href="#receive-framing" id="receive-framing">Receiver-side De-framing over Stream Protocols</a>
 </h1>
