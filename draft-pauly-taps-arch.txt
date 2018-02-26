@@ -90,7 +90,7 @@ Table of Contents
        4.1.5.  Event Handling  . . . . . . . . . . . . . . . . . . .  12
        4.1.6.  Termination Actions . . . . . . . . . . . . . . . . .  12
      4.2.  Transport System Implementation Concepts  . . . . . . . .  13
-       4.2.1.  Gathering . . . . . . . . . . . . . . . . . . . . . .  13
+       4.2.1.  Gathering . . . . . . . . . . . . . . . . . . . . . .  14
        4.2.2.  Racing  . . . . . . . . . . . . . . . . . . . . . . .  14
    5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  14
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .  14
@@ -705,11 +705,13 @@ Internet-Draft              TAPS Architecture              February 2018
       transport protocol, over IP; or, a multi-path transport protocol
       over multiple transport sub-flows).
 
-   o  System Policy: A Transport Service System Policy defines the
-      algorithm it uses to take connection properties from the
-      application, and determine how it will gather candidate paths and
+   o  System Policy: System Policy represents the input from an
+      operating system or other global preferences that can constrain or
+      influence how an implementation will gather candidate paths and
       protocols (Section 4.2.1) and race the candidates during
-      establishment (Section 4.2.2).
+      establishment (Section 4.2.2).  Specific aspects of the System
+      Policy may apply to all Connections, or only certain ones
+      depending on the runtime context and properties of the Connection.
 
    o  Cached State: Cached State is the state and history that the
       implementation keeps for each set of associated endpoints that
@@ -717,10 +719,8 @@ Internet-Draft              TAPS Architecture              February 2018
       session state, previous success and quality of transport protocols
       over certain paths.
 
-4.2.1.  Gathering
 
-   o  Path Selection: Path Selection represents the act of choosing one
-      or more paths that are available to use based on the Path
+
 
 
 
@@ -730,6 +730,10 @@ Pauly, et al.            Expires August 30, 2018               [Page 13]
 Internet-Draft              TAPS Architecture              February 2018
 
 
+4.2.1.  Gathering
+
+   o  Path Selection: Path Selection represents the act of choosing one
+      or more paths that are available to use based on the Path
       Selection Properties provided by the application, and a Transport
       Services system's policies and heuristics.
 
@@ -774,10 +778,6 @@ Internet-Draft              TAPS Architecture              February 2018
    must take care to use security APIs appropriately.  In cases where
    clients use said interface to provide sensitive keying material,
    e.g., access to private keys or copies of pre-shared keys (PSKs), key
-   use must be validated.  For example, clients should not use PSK
-   material created for ESP with IETF-QUIC, and clients must not use
-   private keys intended for server authentication as a key for client
-   authentication.  Moreover, unlike certain transport features such as
 
 
 
@@ -786,6 +786,10 @@ Pauly, et al.            Expires August 30, 2018               [Page 14]
 Internet-Draft              TAPS Architecture              February 2018
 
 
+   use must be validated.  For example, clients should not use PSK
+   material created for ESP with IETF-QUIC, and clients must not use
+   private keys intended for server authentication as a key for client
+   authentication.  Moreover, unlike certain transport features such as
    TFO or ECN which can fall back to standard configurations, Transport
    Services systems must not permit fallback for security protocols.
    For example, if a client requests TLS, yet TLS or the desired version
@@ -826,11 +830,7 @@ Internet-Draft              TAPS Architecture              February 2018
               "An Abstract Application Layer Interface to Transport
               Services", n.d..
 
-   [RFC8095]  Fairhurst, G., Ed., Trammell, B., Ed., and M. Kuehlewind,
-              Ed., "Services Provided by IETF Transport Protocols and
-              Congestion Control Mechanisms", RFC 8095,
-              DOI 10.17487/RFC8095, March 2017,
-              <https://www.rfc-editor.org/info/rfc8095>.
+
 
 
 
@@ -841,6 +841,12 @@ Pauly, et al.            Expires August 30, 2018               [Page 15]
 
 Internet-Draft              TAPS Architecture              February 2018
 
+
+   [RFC8095]  Fairhurst, G., Ed., Trammell, B., Ed., and M. Kuehlewind,
+              Ed., "Services Provided by IETF Transport Protocols and
+              Congestion Control Mechanisms", RFC 8095,
+              DOI 10.17487/RFC8095, March 2017,
+              <https://www.rfc-editor.org/info/rfc8095>.
 
 Authors' Addresses
 
@@ -878,13 +884,7 @@ Authors' Addresses
    URI:   http://www.erg.abdn.ac.uk/
 
 
-   Colin Perkins
-   University of Glasgow
-   School of Computing Science
-   Glasgow  G12 8QQ
-   United Kingdom
 
-   Email: csp@csperkins.org
 
 
 
@@ -896,6 +896,15 @@ Authors' Addresses
 Pauly, et al.            Expires August 30, 2018               [Page 16]
 
 Internet-Draft              TAPS Architecture              February 2018
+
+
+   Colin Perkins
+   University of Glasgow
+   School of Computing Science
+   Glasgow  G12 8QQ
+   United Kingdom
+
+   Email: csp@csperkins.org
 
 
    Philipp S. Tiesel
@@ -914,15 +923,6 @@ Internet-Draft              TAPS Architecture              February 2018
    United States of America
 
    Email: cawood@apple.com
-
-
-
-
-
-
-
-
-
 
 
 
