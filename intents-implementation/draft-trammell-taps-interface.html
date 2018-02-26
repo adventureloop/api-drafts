@@ -327,7 +327,7 @@ address {
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-trammell-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-02-23" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-02-26" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -351,7 +351,7 @@ address {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: August 27, 2018</td>
+<td class="left">Expires: August 30, 2018</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -404,7 +404,7 @@ address {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">February 23, 2018</td>
+<td class="right">February 26, 2018</td>
 </tr>
 
     	
@@ -420,7 +420,7 @@ address {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on August 27, 2018.</p>
+<p>This Internet-Draft will expire on August 30, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -569,40 +569,37 @@ address {
 <a href="#rfc.section.5">5.</a> <a href="#pre-establishment-phase" id="pre-establishment-phase">Pre-Establishment Phase</a>
 </h1>
 <p id="rfc.section.5.p.1">The pre-establishment phase allows applications to specify parameters for the connections they&#8217;re about to make, or to query the API about potential connections they could make.</p>
-<p id="rfc.section.5.p.2">A Preconnection object represents a potential connection. It has state that describes parameters of a Connection that might exist in the future.  This state comprises information about the local and remote endpoints (see <a href="#endpointspec" class="xref">Section 5.1</a>), the transport parameters (see <a href="#transport-params" class="xref">Section 5.2</a>), and the security parameters (see <a href="#security-parameters" class="xref">Section 5.3</a>):</p>
+<p id="rfc.section.5.p.2">A Preconnection object represents a potential connection. It has state that describes parameters of a Connection that might exist in the future.  This state comprises LocalEndpoint and RemoteEndpoint objects that denote the endpoints of the potential connection (see <a href="#endpointspec" class="xref">Section 5.1</a>), the transport parameters (see <a href="#transport-params" class="xref">Section 5.2</a>), and the security parameters (see <a href="#security-parameters" class="xref">Section 5.3</a>):</p>
 <pre>
-   localEndpoint   := ...
-   remoteEndpoint  := ...
-   transportParams := ...
-   securityParams  := ...
-
-   preConnection := NewPreconnection(localEndpoint, remoteEndpoint,
-                                     transportParams, securityParams);
+   preConnection := NewPreconnection(LocalEndpoint, 
+                                     RemoteEndpoint,
+                                     TransportParams, 
+                                     SecurityParams);
 
 </pre>
-<p id="rfc.section.5.p.3">The Local Endpoint MUST be specified if the Preconnection is used to Listen() for incoming connections, but is OPTIONAL if it is used to Initiate() connections. The Remote Endpoint MUST be specified in the Preconnection is used to Initiate() connections, but is OPTIONAL if it is used to Listen() for incoming connections.</p>
+<p id="rfc.section.5.p.3">The LocalEndpoint MUST be specified if the Preconnection is used to Listen() for incoming connections, but is OPTIONAL if it is used to Initiate() connections. The RemoteEndpoint MUST be specified in the Preconnection is used to Initiate() connections, but is OPTIONAL if it is used to Listen() for incoming connections.</p>
 <p id="rfc.section.5.p.4">[NOTE: note also that framers and de-framers should be bound to the Preconnection object during pre-establishment, forward-reference <a href="#send-framing" class="xref">Section 7.2</a> and <a href="#receive-framing" class="xref">Section 8.2</a>]</p>
 <h1 id="rfc.section.5.1">
 <a href="#rfc.section.5.1">5.1.</a> <a href="#endpointspec" id="endpointspec">Specifying Endpoints</a>
 </h1>
-<p id="rfc.section.5.1.p.1">The transport services API uses Endpoint objects to refer to local and remote endpoints.  Endpoint objects can be configured using various representations of endpoint identifiers, including IP addresses, hostnames, or interface names as well as port numbers and service names:</p>
+<p id="rfc.section.5.1.p.1">The transport services API uses the LocalEndpoint and RemoteEndpoint types to refer to the endpoints of a transport connection.  Subtypes of these represent various different types of endpoint identifiers, such as IP addresses, DNS names, and interface names, as well as port numbers and service names.</p>
 <pre>
-remoteSpecifier := NewEndpoint()
+remoteSpecifier := NewRemoteEndpoint()
 remoteSpecifier.withHostname("example.com")
 remoteSpecifier.withService("https")
 </pre>
 <pre>
-remoteSpecifier := NewEndpoint()
+remoteSpecifier := NewRemoteEndpoint()
 remoteSpecifier.withIPv6Address(2001:db8:4920:e29d:a420:7461:7073:0a)
 remoteSpecifier.withPort(443)
 </pre>
 <pre>
-remoteSpecifier := NewEndpoint()
+remoteSpecifier := NewRemoteEndpoint()
 remoteSpecifier.withIPv4Address(192.0.2.21)
 remoteSpecifier.withPort(443)
 </pre>
 <pre>
-localSpecifier := NewEndpoint()
+localSpecifier := NewLocalEndpoint()
 localSpecifier.withInterface("en0")
 localSpecifier.withPort(443)
 </pre>
@@ -668,7 +665,7 @@ localSpecifier.withStunServer(address, port, credentials)
 <li>Request not to delay acknowledgment of Content: This boolean property specifies whether an application considers it useful to request for Content that its acknowledgment be sent out as early as possible instead of potentially being bundled with other acknowledgments. This property applies to connections and connection groups. This is not a strict requirement. The default is to not have this option.</li>
 <li>Use 0-RTT session establishment with idempotent Content: This boolean property specifies whether an application would like to supply a Content to the transport protocol before Connection establishment, which will then be reliably transferred to the other side before or during connection establishment, potentially multiple times.  See also <a href="#send-idempotent" class="xref">Section 7.1.1.5</a>.  This is a strict requirement. The default is to not have this option.</li>
 <li>Use Connection Groups with priorities: This boolean property specifies whether an application considers it useful to create Connection Groups and explicitly prioritize between Connections within a Connection Group.  This is not a strict requirement.  The default is to not have this option.</li>
-<li>Suggest a timeout to the peer: This boolean property specifies whether an application considers it useful to propose a timeout until the connection is assumed to be lost.  This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</li>
+<li>Suggest a timeout to the RemoteEndpoint: This boolean property specifies whether an application considers it useful to propose a timeout until the connection is assumed to be lost.  This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</li>
 <li>Notification of special errors (excessive retransmissions, ICMP error message arrival): This boolean property specifies whether an application considers it useful to be informed in case sent data was retransmitted more often than a certain threshold, or when an ICMP error message arrives. This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</li>
 <li>Control checksum coverage on sending or receiving: This boolean property specifies whether the application considers it useful to enable / disable / configure a checksum when sending Content, or decide whether to require a checksum or not when receiving Content.  This property applies to Connections and Connection Groups. This is not a strict requirement, as it signifies a reduction in reliability. The default is full checksum coverage without being able to change it, and requiring a checksum when receiving.</li>
 </ul>
@@ -679,9 +676,9 @@ localSpecifier.withStunServer(address, port, credentials)
 
 <ul>
 <li>Interface Type: This property specifies which kind of access network interface, e.g., WiFi, Ethernet, or LTE, to require, prefer, avoid, or prohibit for this connection.  Of course this depends on whether they are available. The default is to use the default interface configured in the system policy.</li>
-<li>Path property to optimize for: This Intent specifies whether the application expects the new connection to be bandwidth bound or latency bound.  Values can be one of the following: Optimize for low latency, Optimize for high throughput.  This Intent can help the transport system select one of multiple available paths that best match the intended traffic of the application.  Note that setting this Intents does not imply any guarantees on whether an application&#8217;s requirements can actually be satisfied.  The default is to not assume any particular traffic category or preference.</li>
-<li>Size to be Sent or Received: This Intent specifies what the application expects the size of a transfer to be.  It is a numeric property and given in Bytes.  The application may know this before opening a connection from metadata or after issuing an HTTP HEAD request or an HTTP request with a limited Content-Range.  This property can be specified instead of the Path property to optimize for. The reason is that the application does not always know whether the transfer should be optimized for low latency or high throughput, as the threshold between the two categories relates to the size of the transfer and the current path characteristics. When the size is given, the transport system can calculate based on it whether to optimize for low latency or high throughput.</li>
-<li>Metered or expensive paths: This Intent describes what an application prefers regarding monetary costs, e.g., whether it considers it acceptable to utilize limited data volume.  The default is to prefer paths that are not associated with limits or monetary cost.</li>
+<li>Traffic Category: This Intent specifies the dominating traffic pattern that the application expects for this Connection. Possible values are: Query (latency bound), Bulk (bandwidth bound), Stream (steady data rate), or Background traffic (non-interactive traffic with low priority). This Intent provides a hint to the transport system of how the application would like to use its available capacity. Therefore it can help the transport system select one of multiple available paths that best match the preferences of the application. Note that while this Intent may also be used to set DSCP code points, it does not represent any Quality of Service requirements, but rather hints for a transport system what to optimize for on a best-effort basis. The transport system does not provide any guarantee whether the application&#8217;s requirements can actually be satisfied. The default is to not assume any particular traffic category or preference.</li>
+<li>Size to be Sent or Received: This Intent specifies what the application expects the size of a transfer to be. It is a numeric property and given in Bytes. In cases in which the application knows this, e.g., from metadata in adaptive HTTP streaming (MPEG-DASH), this Intent can be a useful input to path selection. As the application does not necessarily know about current performance characteristics such as RTT or bandwidth on the available paths, it does not always know whether the transfer will be latency or bandwidth bound, and thus what Traffic Category to optimize for. Therefore it makes sense for the application to specify the estimated size of the transfer, so the transport system can optimize path selection accordingly.</li>
+<li>Metered or expensive paths: This Intent describes what an application prefers regarding monetary costs, e.g., whether it considers it acceptable to utilize limited data volume. The default is to prefer paths that are not associated with limits or monetary cost.</li>
 </ul>
 <h1 id="rfc.section.5.2.3">
 <a href="#rfc.section.5.2.3">5.2.3.</a> <a href="#protocol-props" id="protocol-props">Protocol Properties</a>
@@ -692,17 +689,16 @@ localSpecifier.withStunServer(address, port, credentials)
 
 <ul>
 <li>Set timeout for aborting Connection establishment: This numeric property specifies how long to wait before aborting a Connection attempt.  It is given in seconds.</li>
-<li>Set timeout to suggest to the peer: This numeric property specifies the timeout to propose to the peer. It is given in seconds.</li>
+<li>Set timeout to suggest to the RemoteEndpoint: This numeric property specifies the timeout to propose to the RemoteEndpoint. It is given in seconds.</li>
 <li>Set retransmissions before &#8220;Excessive Retransmissions&#8221;: This numeric property specifies after how many retransmissions to inform the application about &#8220;Excessive Retransmissions&#8221;.</li>
 <li>Set required minimum coverage of the checksum for receiving: This numeric property specifies the part of the received data that needs to be covered by a checksum. It is given in Bytes. A value of 0 means that no checksum is required, and a special value (e.g., -1) indicates full checksum coverage.</li>
 </ul>
 <p></p>
 
 <ul>
-<li>Set scheduler for connections in a group: This property specifies which scheduler should be used among Connections within a Connection Group. It applies to connection groups. For now we suggest we the schedulers defined in <a href="#I-D.ietf-tsvwg-sctp-ndata" class="xref">[I-D.ietf-tsvwg-sctp-ndata]</a>.</li>
+<li>Set scheduler for connections in a group: This property specifies which scheduler should be used among Connections within a Connection Group. It applies to connection groups. For now we suggest the schedulers defined in <a href="#I-D.ietf-tsvwg-sctp-ndata" class="xref">[I-D.ietf-tsvwg-sctp-ndata]</a>.</li>
 <li>Maximum Content Size Before Connection Establishment: This numeric property represents the maximum Content size that can be sent before or during Connection establishment, see also <a href="#send-idempotent" class="xref">Section 7.1.1.5</a>.  It is given in Bytes.</li>
-<li>Traffic Category: This Intent specifies the intended use of the Connection and corresponds to the priority of the communication for the application.  Possible values are: Data transfer, Interactive video stream, Interactive audio stream, Background traffic. While they may be used to set DSCP code points, Intents do not represent Quality of Service requirements, but rather hints for a transport system what to optimize for on a best-effort basis.</li>
-<li>Send Bit-rate This Intent specifies what the application expects the bit-rate of a transfer to be. It is a numeric property and given in Bytes per second. The transport system may use this Intent to limit the sending rate by placing an upper bound on a congestion window.</li>
+<li>Send Bit-rate This Intent specifies what the application expects the bit-rate of a transfer to be. It is a numeric property and given in Bytes per second. The transport system may use this Intent to limit the sending rate by placing an upper bound on a congestion window in order to avoid bursty traffic patterns in streaming.</li>
 </ul>
 <p id="rfc.section.5.2.3.p.5">In order to specify Specific Protocol Properties, the application can attach a set of options to the Preconnection object, associated with a specific protocol.  For example, the application could specify a set of TCP Options to use if and only if TCP is selected by the system, including options such as the Maximum Segment Size (MSS), and options around Acknowledgement Stretching. Such properties should not be assumed to apply across different protocols, but must be possible to specify if required by the application.</p>
 <h1 id="rfc.section.5.2.4">
@@ -742,7 +738,7 @@ securityParameters := NewSecurityParameters()
 <p id="rfc.section.5.3.p.2">Security configuration parameters and sample usage follow:</p>
 <p></p>
 
-<ul><li>Local identity and private keys: Used to perform private key operations and prove one&#8217;s identity to remote peers. (Note, if private keys are not available, e.g., since they are stored in HSMs, handshake callbacks MUST be used. See below for details.)</li></ul>
+<ul><li>Local identity and private keys: Used to perform private key operations and prove one&#8217;s identity to the RemoteEndpoint. (Note, if private keys are not available, e.g., since they are stored in HSMs, handshake callbacks MUST be used. See below for details.)</li></ul>
 <pre>
 securityParameters.AddIdentity(identity)
 securityParameters.AddPrivateKey(privateKey, publicKey)
@@ -765,14 +761,14 @@ securityParameters.SetSessionCacheReuse(1)           // One-time use
 </pre>
 <p></p>
 
-<ul><li>Pre-shared keying material: Used to install pre-shared keying material established out-of-band. Each pre-shared keying material is associated with some identity that typically identifies its use or has some protocol-specific meaning to peers.</li></ul>
+<ul><li>Pre-shared keying material: Used to install pre-shared keying material established out-of-band. Each pre-shared keying material is associated with some identity that typically identifies its use or has some protocol-specific meaning to the RemoteEndpoint.</li></ul>
 <pre>
 securityParameters.AddPreSharedKey(key, identity)
 </pre>
 <p id="rfc.section.5.3.p.7">Security decisions, especially pertaining to trust, are not static. Thus, once configured, parameters must also be supplied during live handshakes. These are best handled as client-provided callbacks. Security handshake callbacks include:</p>
 <p></p>
 
-<ul><li>Trust verification callback: Invoked when a peer&#8217;s trust must be validated before the handshake protocol can proceed.</li></ul>
+<ul><li>Trust verification callback: Invoked when a RemoteEndpoint&#8217;s trust must be validated before the handshake protocol can proceed.</li></ul>
 <pre>
 trustCallback := NewCallback({
   // Handle trust, return the result
@@ -795,9 +791,9 @@ securityParameters.SetIdentityChallengeCallback(challengeCallback)
 <h1 id="rfc.section.6.1">
 <a href="#rfc.section.6.1">6.1.</a> <a href="#initiate" id="initiate">Active Open: Initiate</a>
 </h1>
-<p id="rfc.section.6.1.p.1">Active open is the action of establishing a connection to an endpoint presumed to be listening for incoming connection requests, commonly used by clients in client-server interactions. Active open is supported by this interface through the Initiate action:</p>
+<p id="rfc.section.6.1.p.1">Active open is the action of establishing a connection to a RemoteEndpoint presumed to be listening for incoming connection requests. Active open is used by clients in client-server interactions. Active open is supported by this interface through the Initiate action:</p>
 <p id="rfc.section.6.1.p.2">Connection := Preconnection.Initiate()</p>
-<p id="rfc.section.6.1.p.3">Before calling Initiate, the caller must have populated a Preconnection object with local and remote endpoint specifiers, as well as all parameters necessary for candidate selection. After calling Initiate, no further parameters may be bound to the Connection. The Initiate() call consumes the Preconnection and creates a Connection object. A Preconnection can only be initiated once.</p>
+<p id="rfc.section.6.1.p.3">Before calling Initiate, the caller must have populated a Preconnection object with a RemoteEndpoint specifier, optionally a LocalEndpoint specifier (if not specified, the system will attempt to determine a suitable LocalEndpoint), as well as all parameters necessary for candidate selection. After calling Initiate, no further parameters may be bound to the Connection. The Initiate() call consumes the Preconnection and creates a Connection object. A Preconnection can only be initiated once.</p>
 <p id="rfc.section.6.1.p.4">Once Initiate is called, the candidate Protocol Stack(s) may cause one or more candidate transport-layer connections to be created to the specified remote endpoint. The caller may immediately begin sending Content on the Connection (see <a href="#sending" class="xref">Section 7</a>) after calling Initate(); note that any idempotent data sent while the Connection is being established may be sent multiple times or on multiple candidates.</p>
 <p id="rfc.section.6.1.p.5">The following events may be sent by the Connection after Initiate() is called:</p>
 <p id="rfc.section.6.1.p.6">Connection -&gt; Ready&lt;&gt;</p>
@@ -809,9 +805,9 @@ securityParameters.SetIdentityChallengeCallback(challengeCallback)
 </h1>
 <p id="rfc.section.6.2.p.1">Passive open is the action of waiting for connections from remote endpoints, commonly used by servers in client-server interactions. Passive open is supported by this interface through the Listen action:</p>
 <p id="rfc.section.6.2.p.2">Preconnection.Listen()</p>
-<p id="rfc.section.6.2.p.3">Before calling Listen, the caller must have initialized the Preconnection during the pre-establishment phase with local endpoint specifiers, as well as all parameters necessary for Protocol Stack selection.  The Listen() action consumes the Preconnection. Once Listen() has been called, no further parameters may be bound to the Preconnection, and no subsequent establishment call may be made on the Preconnection.</p>
+<p id="rfc.section.6.2.p.3">Before calling Listen, the caller must have initialized the Preconnection during the pre-establishment phase with a LocalEndpoint specifier, as well as all parameters necessary for Protocol Stack selection. A RemoteEndpoint may optionally be specified, to constrain what connections are accepted.  The Listen() action consumes the Preconnection. Once Listen() has been called, no further parameters may be bound to the Preconnection, and no subsequent establishment call may be made on the Preconnection.</p>
 <p id="rfc.section.6.2.p.4">Preconnection -&gt; ConnectionReceived&lt;Connection&gt;</p>
-<p id="rfc.section.6.2.p.5">The ConnectionReceived event occurs when a RemoteEndpoint has established a transport-layer connection to this Preconnection (for connection-oriented transport protocols), or when the first Content has been received from the remote endpoint (for connectionless protocols), causing a new Connection to be created. The resulting Connection is contained within the ConnectionReceived event, and is ready to use as soon as it is passed to the application via the event.</p>
+<p id="rfc.section.6.2.p.5">The ConnectionReceived event occurs when a RemoteEndpoint has established a transport-layer connection to this Preconnection (for connection-oriented transport protocols), or when the first Content has been received from the RemoteEndpoint (for connectionless protocols), causing a new Connection to be created. The resulting Connection is contained within the ConnectionReceived event, and is ready to use as soon as it is passed to the application via the event.</p>
 <p id="rfc.section.6.2.p.6">PreConnection -&gt; Error&lt;&gt;</p>
 <p id="rfc.section.6.2.p.7">A ListenError occurs either when the Preconnection cannot be fulfilled for listening, when the LocalEndpoint (or RemoteEndpoint, if specified) cannot be resolved, or when the application is prohibited from listening by policy.</p>
 <h1 id="rfc.section.6.3">
@@ -836,7 +832,7 @@ PreconnectionBindings := Preconnection.Resolve()
 </h1>
 <p id="rfc.section.6.4.p.1">Groups of Connections can be created using Clone action:</p>
 <p id="rfc.section.6.4.p.2">Connection := Connection.Clone()</p>
-<p id="rfc.section.6.4.p.3">Calling this once yields a group of two Connections: the parent Connection &#8211; whose Clone action was called &#8211; and the resulting clone. Calling Clone on any of these two Connections adds a third Connection to the group, and so on.  All Connections in a group are entangled. This means that they automatically share all properties: changing a parameter for one of them also changes the parameter for all others, closing one of them also closes all others, etc.</p>
+<p id="rfc.section.6.4.p.3">Calling this once yields a group of two Connections: the parent Connection &#8211; whose Clone action was called &#8211; and the resulting clone. Calling Clone on any of these two Connections adds a third Connection to the group, and so on.  All Connections in a group are entangled. This means that they automatically share all properties: changing a parameter for one of them also changes the parameter for all others.</p>
 <p id="rfc.section.6.4.p.4">There is only one Protocol Property that is not entangled, i.e., it is a separate per-Connection Property for individual Connections in the group: a priority.  This priority, which can be represented as a non-negative integer or float, expresses a desired share of the Connection Group&#8217;s available network capacity, such that an ideal transport system implementation would assign the Connection the capacity share P x C/sum_P, where P = priority, C = total available capacity and sum_P = sum of all priority values that are used for the Connections in the same Connection Group.  The priority setting is purely advisory; no guarantees are given.</p>
 <p id="rfc.section.6.4.p.5">Connection Groups should be created (i.e., the Clone action should be used) as early as possible, ideally already during the Pre-Establishment phase, in order to aid the Transport System in choosing and configuring the right protocols (see also <a href="#transport-params" class="xref">Section 5.2</a>).</p>
 <p id="rfc.section.6.4.p.6">[TASK: If Clone() is a method on Connection, it cannot be called during pre-establishment, since we don&#8217;t have a Connection at that time (csp)]</p>
@@ -950,9 +946,9 @@ Connection.setProperties()
 <h1 id="rfc.section.10">
 <a href="#rfc.section.10">10.</a> <a href="#termination" id="termination">Connection Termination</a>
 </h1>
-<p id="rfc.section.10.p.1">Close terminates a Connection after satisfying all the requirements that were specified regarding the delivery of Content that the application has already given to the transport system. For example, if reliable delivery was requested for Content handed over before calling Close, the transport system will ensure that such Content is indeed delivered. If the peer still has data to send, it cannot be received after this call.</p>
+<p id="rfc.section.10.p.1">Close terminates a Connection after satisfying all the requirements that were specified regarding the delivery of Content that the application has already given to the transport system. For example, if reliable delivery was requested for Content handed over before calling Close, the transport system will ensure that such Content is indeed delivered. If the RemoteEndpoint still has data to send, it cannot be received after this call.</p>
 <p id="rfc.section.10.p.2">Connection.Close()</p>
-<p id="rfc.section.10.p.3">The Closed event can inform the application that the peer has closed the Connection; however, there is no guarantee that a remote close will be signaled.</p>
+<p id="rfc.section.10.p.3">The Closed event can inform the application that the RemoteEndpoint has closed the Connection; however, there is no guarantee that a remote close will be signaled.</p>
 <p id="rfc.section.10.p.4">Connection -&gt; Closed&lt;&gt;</p>
 <p id="rfc.section.10.p.5">Abort terminates a Connection without delivering remaining data:</p>
 <p id="rfc.section.10.p.6">Connection.Abort()</p>
@@ -1185,7 +1181,7 @@ type FramingHandler interface {
 <a href="#rfc.appendix.B.1">B.1.</a> <a href="#appendix-preferences" id="appendix-preferences">Application Preferences</a>
 </h1>
 <p id="rfc.section.B.1.p.1">As described in <a href="#transport-params" class="xref">Section 5.2</a>, an application can specify its preference regarding a Transport Parameter, i.e., whether a certain property is required, preferred, to be avoided, prohibited, or an intention. If an application does not set its preference regarding a Transport Parameter, default preference levels apply as specified in the following table. A default preference of &#8220;None&#8221; means that the transport system assumes that an application does not have any preference regarding the corresponding Transport Parameter and may not take this parameter into account for protocol and path selection.</p>
-<p id="rfc.section.B.1.p.2">Not every Transport Parameter can be meaningfully assigned every preference level. For example, if an application explicitly prohibits selecting a transport protocol that allows to suggest a timeout to the peer, this restriction will unnecessarily limit transport protocol selection. Instead, the application could simply not use this feature if it is present in the selected transport protocol.</p>
+<p id="rfc.section.B.1.p.2">Not every Transport Parameter can be meaningfully assigned every preference level. For example, if an application explicitly prohibits selecting a transport protocol that allows to suggest a timeout to the RemoteEndpoint, this restriction will unnecessarily limit transport protocol selection. Instead, the application could simply not use this feature if it is present in the selected transport protocol.</p>
 <p id="rfc.section.B.1.p.3">The following table illustrates which Transport Parameter has which default preference level and which alternative preference levels an application may set.</p>
 <table cellpadding="3" cellspacing="0" class="tt full center">
 <thead><tr>
@@ -1246,7 +1242,7 @@ type FramingHandler interface {
 <td class="left">None</td>
 </tr>
 <tr>
-<td class="left">Suggest timeout to peer</td>
+<td class="left">Suggest timeout to RemoteEndpoint</td>
 <td class="left">Yes</td>
 <td class="left">Yes</td>
 <td class="left">No</td>
@@ -1415,22 +1411,25 @@ type FramingHandler interface {
 </div><div class="avoidbreak">
   <address class="vcard">
 	<span class="vcardline">
-	  <span class="fn">Gorry Fairhurst</span> 
+	  <span class="fn">Godred Fairhurst</span> 
 	  <span class="n hidden">
 		<span class="family-name">Fairhurst</span>
 	  </span>
 	</span>
 	<span class="org vcardline">University of Aberdeen</span>
 	<span class="adr">
-	  
+	  <span class="vcardline">Fraser Noble Building</span>
+
 	  <span class="vcardline">
-		<span class="locality"></span> 
+		<span class="locality">Aberdeen, AB24 3UE</span>,  
 		<span class="region"></span>
 		<span class="code"></span>
 	  </span>
-	  <span class="country-name vcardline"></span>
+	  <span class="country-name vcardline">Scotland</span>
 	</span>
 	<span class="vcardline">EMail: <a href="mailto:gorry@erg.abdn.ac.uk">gorry@erg.abdn.ac.uk</a></span>
+
+<span class="vcardline">URI: <a href="http://www.erg.abdn.ac.uk/">http://www.erg.abdn.ac.uk/</a></span>
 
   </address>
 </div><div class="avoidbreak">
