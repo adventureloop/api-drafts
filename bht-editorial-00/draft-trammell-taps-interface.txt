@@ -736,7 +736,7 @@ Internet-Draft               TAPS Interface                February 2018
    The following events may be sent by the Connection after Initiate()
    is called:
 
-   Connection -> Ready<>
+   Connection -> Ready&lt;>
 
    The Ready event occurs after Initiate has established a transport-
    layer connection on at least one usable candidate Protocol Stack over
@@ -744,7 +744,7 @@ Internet-Draft               TAPS Interface                February 2018
    occur before the Ready event for connections established using
    Initiate.
 
-   Connection -> InitiateError<>
+   Connection -> InitiateError&lt;>
 
    An InitiateError occurs either when the set of transport and
    cryptographic parameters cannot be fulfilled on a connection for
@@ -774,7 +774,7 @@ Internet-Draft               TAPS Interface                February 2018
    further parameters may be bound to the Preconnection, and no
    subsequent establishment call may be made on the Preconnection.
 
-   Preconnection -> ConnectionReceived<Connection>
+   Preconnection -> ConnectionReceived&lt;Connection>
 
    The ConnectionReceived event occurs when a Remote Endpoint has
    established a transport-layer connection to this Preconnection (for
@@ -793,7 +793,7 @@ Internet-Draft               TAPS Interface                February 2018
    ready to use as soon as it is passed to the application via the
    event.
 
-   PreConnection -> Error<>
+   Preconnection -> ListenError&lt;>
 
    A ListenError occurs either when the Preconnection cannot be
    fulfilled for listening, when the Local Endpoint (or Remote Endpoint,
@@ -820,7 +820,7 @@ Internet-Draft               TAPS Interface                February 2018
    the Preconnection, and no subsequent establishment call may be made
    on the Preconnection.
 
-   Preconnection -> RendezvousDone<Connection>
+   Preconnection -> RendezvousDone&lt;Connection>
 
    The RendezvousDone<> event occurs when a connection is established
    with the Remote Endpoint.  For connection-oriented transports, this
@@ -830,7 +830,7 @@ Internet-Draft               TAPS Interface                February 2018
    contained within the RendezvousDone<> event, and is ready to use as
    soon as it is passed to the application via the event.
 
-   Preconnection -> RendezvousError<msgRef, error>
+   Preconnection -> RendezvousError&lt;msgRef, error>
 
    An RendezvousError occurs either when the Preconnection cannot be
    fulfilled for listening, when the Local Endpoint or Remote Endpoint
@@ -935,7 +935,7 @@ Internet-Draft               TAPS Interface                February 2018
 
    Like all Actions in this interface, the Send action is asynchronous.
 
-   Connection -> Sent<msgRef>
+   Connection -> Sent&lt;msgRef>
 
    The Sent event occurs when a previous Send action has completed,
    i.e., when the data derived from the Message has been passed down or
@@ -960,7 +960,7 @@ Internet-Draft               TAPS Interface                February 2018
    created more buffer inside the transport system than an application
    that only issues a Send after this event fires.
 
-   Connection -> Expired<msgRef>
+   Connection -> Expired&lt;msgRef>
 
    The Expired event occurs when a previous Send action expired before
    completion; i.e. when the Message was not sent before its Lifetime
@@ -969,7 +969,7 @@ Internet-Draft               TAPS Interface                February 2018
    Expired event contains an implementation-specific reference to the
    Message to which it applies.
 
-   Connection -> SendError<msgRef>
+   Connection -> SendError&lt;msgRef>
 
    A SendError occurs when a Message could not be sent due to an error
    condition: an attempt to send a non-partial Message which is too
@@ -1156,7 +1156,7 @@ Internet-Draft               TAPS Interface                February 2018
    the transport stack when it is temporarily not ready to receive
    messages.
 
-   Connection -> Received<Message>
+   Connection -> Received&lt;Message>
 
    As with sending, the type of the Message to be passed is dependent on
    the implementation, and on the constraints on the Protocol Stacks
@@ -1184,13 +1184,14 @@ Internet-Draft               TAPS Interface                February 2018
    handling framing in situations where the Protocol Stack provides
    octet-stream transport only.
 
-   Note that as with sending, the Message object may represent a partial
-   message, larger than the maximum message size than can be received
-   atomically.  In this case, the Message object passed contains some
+   Note that as with sending, the Message object passed to Received may
+   represent a partial message, larger than the maximum message size
+   than can be received atomically.  In this case, the Message object
+   passed contains an indication that the object received is partial, a
    reference to the full Message it belongs to, as well as the byte
    range of the data content within the partial Message.
 
-   Connection -> ReceiveError<>
+   Connection -> ReceiveError&lt;>
 
    A ReceiveError occurs when data is received by the underlying
    Protocol Stack that cannot be fully retrieved or deframed, or when
@@ -1225,7 +1226,6 @@ Internet-Draft               TAPS Interface                February 2018
    an appropriate type for the application and platform, and leaves the
    octet stream at the start of the next Message to deframe.  It
    consists of a Deframer object with a single Action, Deframe.  Since
-
 
 
 
@@ -1352,21 +1352,20 @@ Internet-Draft               TAPS Interface                February 2018
 
    o  Maximum non-partial Message size on send: This numeric property
       represents the maximum Message size that can be sent as a non-
-      partial Message.  This property may be read-only.
+      partial Message.  This property is read-only.
 
    o  Maximum non-partial Message size on receive: This numeric property
       represents the maximum Message size that can be received as a non-
-      partial Message.  This property may be read-only.
+      partial Message.  This property is read-only.
 
-   Specific Protocol Properties can additionally be associated with a
-   specific protocol.  For example, the application can specify a set of
-   TCP Options to use if and only if TCP is selected by the system,
-   including options such as the Maximum Segment Size (MSS), and options
-   around Acknowledgement Stretching.  Such properties should not be
-   assumed to apply across different protocols, but must be possible to
-   specify if required by the application.  Attempts to set specific
-   protocol properties on a protocol stack not containing that specific
-   protocol are simply ignored, and do not raise an error.
+   In order to specify Specific Protocol Properties, Transport System
+   implementations may offer applications to attach a set of options to
+   the Preconnection object, associated with a specific protocol.  For
+   example, an application could specify a set of TCP Options to use if
+   and only if TCP is selected by the system.  Such properties must not
+   be assumed to apply across different protocols.  Attempts to set
+   specific protocol properties on a protocol stack not containing that
+   specific protocol are simply ignored, and do not raise an error..
 
 10.  Connection Termination
 
@@ -1384,7 +1383,7 @@ Internet-Draft               TAPS Interface                February 2018
    has closed the Connection; however, there is no guarantee that a
    remote close will be signaled.
 
-   Connection -> Closed<>
+   Connection -> Closed&lt;>
 
    Abort terminates a Connection without delivering remaining data:
 
@@ -1394,6 +1393,7 @@ Internet-Draft               TAPS Interface                February 2018
    aborted the Connection; however, there is no guarantee that an abort
    will be signaled:
 
+   Connection -> ConnectionError&lt;>
 
 
 
@@ -1401,8 +1401,6 @@ Trammell, et al.         Expires August 30, 2018               [Page 25]
 
 Internet-Draft               TAPS Interface                February 2018
 
-
-   Connection -> ConnectionError<>
 
 11.  Event and Error Handling
 
@@ -1449,6 +1447,8 @@ Internet-Draft               TAPS Interface                February 2018
               Welzl, M. and S. Gjessing, "A Minimal Set of Transport
               Services for TAPS Systems", draft-ietf-taps-minset-01
               (work in progress), February 2018.
+
+
 
 
 

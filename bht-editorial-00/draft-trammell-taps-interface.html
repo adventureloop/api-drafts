@@ -764,65 +764,93 @@ securityParameters.SetIdentityChallengeCallback(challengeCallback)
 <a href="#rfc.section.6.1">6.1.</a> <a href="#initiate" id="initiate">Active Open: Initiate</a>
 </h1>
 <p id="rfc.section.6.1.p.1">Active open is the action of establishing a connection to a Remote Endpoint presumed to be listening for incoming connection requests. Active open is used by clients in client-server interactions. Active open is supported by this interface through the Initiate action:</p>
-<p id="rfc.section.6.1.p.2">Connection := Preconnection.Initiate()</p>
-<p id="rfc.section.6.1.p.3">Before calling Initiate, the caller must have populated a Preconnection object with a Remote Endpoint specifier, optionally a Local Endpoint specifier (if not specified, the system will attempt to determine a suitable Local Endpoint), as well as all parameters necessary for candidate selection. After calling Initiate, no further parameters may be bound to the Connection. The Initiate() call consumes the Preconnection and creates a Connection object. A Preconnection can only be initiated once.</p>
-<p id="rfc.section.6.1.p.4">Once Initiate is called, the candidate Protocol Stack(s) may cause one or more candidate transport-layer connections to be created to the specified remote endpoint. The caller may immediately begin sending Messages on the Connection (see <a href="#sending" class="xref">Section 7</a>) after calling Initate(); note that any idempotent data sent while the Connection is being established may be sent multiple times or on multiple candidates.</p>
-<p id="rfc.section.6.1.p.5">The following events may be sent by the Connection after Initiate() is called:</p>
-<p id="rfc.section.6.1.p.6">Connection -&gt; Ready&lt;&gt;</p>
-<p id="rfc.section.6.1.p.7">The Ready event occurs after Initiate has established a transport-layer connection on at least one usable candidate Protocol Stack over at least one candidate Path. No Receive events (see <a href="#receiving" class="xref">Section 8</a>) will occur before the Ready event for connections established using Initiate.</p>
-<p id="rfc.section.6.1.p.8">Connection -&gt; InitiateError&lt;&gt;</p>
-<p id="rfc.section.6.1.p.9">An InitiateError occurs either when the set of transport and cryptographic parameters cannot be fulfilled on a connection for initiation (e.g. the set of available Paths and/or Protocol Stacks meeting the constraints is empty) or reconciled with the local and/or remote endpoints; when the remote specifier cannot be resolved; or when no transport-layer connection can be established to the remote endpoint (e.g. because the remote endpoint is not accepting connections, or the application is prohibited from opening a connection by the operating system).</p>
+<pre>
+Connection := Preconnection.Initiate()
+</pre>
+<p id="rfc.section.6.1.p.2">Before calling Initiate, the caller must have populated a Preconnection object with a Remote Endpoint specifier, optionally a Local Endpoint specifier (if not specified, the system will attempt to determine a suitable Local Endpoint), as well as all parameters necessary for candidate selection. After calling Initiate, no further parameters may be bound to the Connection. The Initiate() call consumes the Preconnection and creates a Connection object. A Preconnection can only be initiated once.</p>
+<p id="rfc.section.6.1.p.3">Once Initiate is called, the candidate Protocol Stack(s) may cause one or more candidate transport-layer connections to be created to the specified remote endpoint. The caller may immediately begin sending Messages on the Connection (see <a href="#sending" class="xref">Section 7</a>) after calling Initate(); note that any idempotent data sent while the Connection is being established may be sent multiple times or on multiple candidates.</p>
+<p id="rfc.section.6.1.p.4">The following events may be sent by the Connection after Initiate() is called:</p>
+<pre>
+Connection -&gt; Ready&amp;lt;&gt;
+</pre>
+<p id="rfc.section.6.1.p.5">The Ready event occurs after Initiate has established a transport-layer connection on at least one usable candidate Protocol Stack over at least one candidate Path. No Receive events (see <a href="#receiving" class="xref">Section 8</a>) will occur before the Ready event for connections established using Initiate.</p>
+<pre>
+Connection -&gt; InitiateError&amp;lt;&gt;
+</pre>
+<p id="rfc.section.6.1.p.6">An InitiateError occurs either when the set of transport and cryptographic parameters cannot be fulfilled on a connection for initiation (e.g. the set of available Paths and/or Protocol Stacks meeting the constraints is empty) or reconciled with the local and/or remote endpoints; when the remote specifier cannot be resolved; or when no transport-layer connection can be established to the remote endpoint (e.g. because the remote endpoint is not accepting connections, or the application is prohibited from opening a connection by the operating system).</p>
 <h1 id="rfc.section.6.2">
 <a href="#rfc.section.6.2">6.2.</a> <a href="#listen" id="listen">Passive Open: Listen</a>
 </h1>
 <p id="rfc.section.6.2.p.1">Passive open is the action of waiting for connections from remote endpoints, commonly used by servers in client-server interactions. Passive open is supported by this interface through the Listen action:</p>
-<p id="rfc.section.6.2.p.2">Preconnection.Listen()</p>
-<p id="rfc.section.6.2.p.3">Before calling Listen, the caller must have initialized the Preconnection during the pre-establishment phase with a Local Endpoint specifier, as well as all parameters necessary for Protocol Stack selection. A Remote Endpoint may optionally be specified, to constrain what connections are accepted.  The Listen() action consumes the Preconnection. Once Listen() has been called, no further parameters may be bound to the Preconnection, and no subsequent establishment call may be made on the Preconnection.</p>
-<p id="rfc.section.6.2.p.4">Preconnection -&gt; ConnectionReceived&lt;Connection&gt;</p>
-<p id="rfc.section.6.2.p.5">The ConnectionReceived event occurs when a Remote Endpoint has established a transport-layer connection to this Preconnection (for connection-oriented transport protocols), or when the first Message has been received from the Remote Endpoint (for connectionless protocols), causing a new Connection to be created. The resulting Connection is contained within the ConnectionReceived event, and is ready to use as soon as it is passed to the application via the event.</p>
-<p id="rfc.section.6.2.p.6">PreConnection -&gt; Error&lt;&gt;</p>
-<p id="rfc.section.6.2.p.7">A ListenError occurs either when the Preconnection cannot be fulfilled for listening, when the Local Endpoint (or Remote Endpoint, if specified) cannot be resolved, or when the application is prohibited from listening by policy.</p>
+<pre>
+Preconnection.Listen()
+</pre>
+<p id="rfc.section.6.2.p.2">Before calling Listen, the caller must have initialized the Preconnection during the pre-establishment phase with a Local Endpoint specifier, as well as all parameters necessary for Protocol Stack selection. A Remote Endpoint may optionally be specified, to constrain what connections are accepted.  The Listen() action consumes the Preconnection. Once Listen() has been called, no further parameters may be bound to the Preconnection, and no subsequent establishment call may be made on the Preconnection.</p>
+<pre>
+Preconnection -&gt; ConnectionReceived&amp;lt;Connection&gt;
+</pre>
+<p id="rfc.section.6.2.p.3">The ConnectionReceived event occurs when a Remote Endpoint has established a transport-layer connection to this Preconnection (for connection-oriented transport protocols), or when the first Message has been received from the Remote Endpoint (for connectionless protocols), causing a new Connection to be created. The resulting Connection is contained within the ConnectionReceived event, and is ready to use as soon as it is passed to the application via the event.</p>
+<pre>
+Preconnection -&gt; ListenError&amp;lt;&gt;
+</pre>
+<p id="rfc.section.6.2.p.4">A ListenError occurs either when the Preconnection cannot be fulfilled for listening, when the Local Endpoint (or Remote Endpoint, if specified) cannot be resolved, or when the application is prohibited from listening by policy.</p>
 <h1 id="rfc.section.6.3">
 <a href="#rfc.section.6.3">6.3.</a> <a href="#rendezvous" id="rendezvous">Peer-to-Peer Establishment: Rendezvous</a>
 </h1>
 <p id="rfc.section.6.3.p.1">Simultaneous peer-to-peer connection establishment is supported by the Rendezvous() action:</p>
-<p id="rfc.section.6.3.p.2">Preconnection.Rendezvous()</p>
-<p id="rfc.section.6.3.p.3">The Preconnection object must be specified with both a Local Endpoint and a Remote Endpoint, and also the transport and security parameters needed for protocol stack selection. The Rendezvous() action causes the Preconnection to listen on the Local Endpoint for an incoming connection from the Remote Endpoint, while simultaneously trying to establish a connection from the Local Endpoint to the Remote Endpoint.  This corresponds to a TCP simultaneous open, for example.</p>
-<p id="rfc.section.6.3.p.4">The Rendezvous() action consumes the Preconnection. Once Rendezvous() has been called, no further parameters may be bound to the Preconnection, and no subsequent establishment call may be made on the Preconnection.</p>
-<p id="rfc.section.6.3.p.5">Preconnection -&gt; RendezvousDone&lt;Connection&gt;</p>
-<p id="rfc.section.6.3.p.6">The RendezvousDone&lt;&gt; event occurs when a connection is established with the Remote Endpoint. For connection-oriented transports, this occurs when the transport-layer connection is established; for connectionless transports, it occurs when the first Message is received from the Remote Endpoint. The resulting Connection is contained within the RendezvousDone&lt;&gt; event, and is ready to use as soon as it is passed to the application via the event.</p>
-<p id="rfc.section.6.3.p.7">Preconnection -&gt; RendezvousError&lt;msgRef, error&gt;</p>
-<p id="rfc.section.6.3.p.8">An RendezvousError occurs either when the Preconnection cannot be fulfilled for listening, when the Local Endpoint or Remote Endpoint cannot be resolved, when no transport-layer connection can be established to the Remote Endpoint, or when the application is prohibited from rendezvous by policy.</p>
-<p id="rfc.section.6.3.p.9">When using some NAT traversal protocols, e.g., ICE <a href="#RFC5245" class="xref">[RFC5245]</a>, it is expected that the Local Endpoint will be configured with some method of discovering NAT bindings, e.g., a STUN server. In this case, the Local Endpoint may resolve to a mixture of local and server reflexive addresses. The Resolve() method on the Preconnection can be used to discover these bindings:</p>
+<pre>
+Preconnection.Rendezvous()
+</pre>
+<p id="rfc.section.6.3.p.2">The Preconnection object must be specified with both a Local Endpoint and a Remote Endpoint, and also the transport and security parameters needed for protocol stack selection. The Rendezvous() action causes the Preconnection to listen on the Local Endpoint for an incoming connection from the Remote Endpoint, while simultaneously trying to establish a connection from the Local Endpoint to the Remote Endpoint.  This corresponds to a TCP simultaneous open, for example.</p>
+<p id="rfc.section.6.3.p.3">The Rendezvous() action consumes the Preconnection. Once Rendezvous() has been called, no further parameters may be bound to the Preconnection, and no subsequent establishment call may be made on the Preconnection.</p>
+<pre>
+Preconnection -&gt; RendezvousDone&amp;lt;Connection&gt;
+</pre>
+<p id="rfc.section.6.3.p.4">The RendezvousDone&lt;&gt; event occurs when a connection is established with the Remote Endpoint. For connection-oriented transports, this occurs when the transport-layer connection is established; for connectionless transports, it occurs when the first Message is received from the Remote Endpoint. The resulting Connection is contained within the RendezvousDone&lt;&gt; event, and is ready to use as soon as it is passed to the application via the event.</p>
+<pre>
+Preconnection -&gt; RendezvousError&amp;lt;msgRef, error&gt;
+</pre>
+<p id="rfc.section.6.3.p.5">An RendezvousError occurs either when the Preconnection cannot be fulfilled for listening, when the Local Endpoint or Remote Endpoint cannot be resolved, when no transport-layer connection can be established to the Remote Endpoint, or when the application is prohibited from rendezvous by policy.</p>
+<p id="rfc.section.6.3.p.6">When using some NAT traversal protocols, e.g., ICE <a href="#RFC5245" class="xref">[RFC5245]</a>, it is expected that the Local Endpoint will be configured with some method of discovering NAT bindings, e.g., a STUN server. In this case, the Local Endpoint may resolve to a mixture of local and server reflexive addresses. The Resolve() method on the Preconnection can be used to discover these bindings:</p>
 <pre>
 PreconnectionBindings := Preconnection.Resolve()
 </pre>
-<p id="rfc.section.6.3.p.10">The Resolve() call returns a list of Preconnection objects, that represent the concrete addresses, local and server reflexive, on which a Rendezvous() for the Preconnection will listen for incoming connections. This list can be passed to a peer via a signalling protocol, such as SIP or WebRTC, to configure the remote.</p>
-<p id="rfc.section.6.3.p.11">[NOTE: This API is sufficient for TCP-style simultaneous open, but should be considered experimental for ICE-like protocols.]</p>
+<p id="rfc.section.6.3.p.7">The Resolve() call returns a list of Preconnection objects, that represent the concrete addresses, local and server reflexive, on which a Rendezvous() for the Preconnection will listen for incoming connections. This list can be passed to a peer via a signalling protocol, such as SIP or WebRTC, to configure the remote.</p>
+<p id="rfc.section.6.3.p.8">[NOTE: This API is sufficient for TCP-style simultaneous open, but should be considered experimental for ICE-like protocols.]</p>
 <h1 id="rfc.section.6.4">
 <a href="#rfc.section.6.4">6.4.</a> <a href="#groups" id="groups">Connection Groups</a>
 </h1>
 <p id="rfc.section.6.4.p.1">Groups of Connections can be created using Clone action:</p>
-<p id="rfc.section.6.4.p.2">Connection := Connection.Clone()</p>
-<p id="rfc.section.6.4.p.3">Calling this once yields a group of two Connections: the parent Connection &#8211; whose Clone action was called &#8211; and the resulting clone. Calling Clone on any of these two Connections adds a third Connection to the group, and so on.  All Connections in a group are entangled. This means that they automatically share all properties: changing a parameter for one of them also changes the parameter for all others.</p>
-<p id="rfc.section.6.4.p.4">There is only one Protocol Property that is not entangled, i.e., it is a separate per-Connection Property for individual Connections in the group: a priority.  This priority, which can be represented as a non-negative integer or float, expresses a desired share of the Connection Group&#8217;s available network capacity, such that an ideal transport system implementation would assign the Connection the capacity share P x C/sum_P, where P = priority, C = total available capacity and sum_P = sum of all priority values that are used for the Connections in the same Connection Group.  The priority setting is purely advisory; no guarantees are given.</p>
-<p id="rfc.section.6.4.p.5">Connection Groups should be created by cloning as as early as possible in order to aid the Transport System in choosing and configuring the right protocols (see also <a href="#transport-params" class="xref">Section 5.2</a>).</p>
+<pre>
+Connection := Connection.Clone()
+</pre>
+<p id="rfc.section.6.4.p.2">Calling this once yields a group of two Connections: the parent Connection &#8211; whose Clone action was called &#8211; and the resulting clone. Calling Clone on any of these two Connections adds a third Connection to the group, and so on.  All Connections in a group are entangled. This means that they automatically share all properties: changing a parameter for one of them also changes the parameter for all others.</p>
+<p id="rfc.section.6.4.p.3">There is only one Protocol Property that is not entangled, i.e., it is a separate per-Connection Property for individual Connections in the group: a priority.  This priority, which can be represented as a non-negative integer or float, expresses a desired share of the Connection Group&#8217;s available network capacity, such that an ideal transport system implementation would assign the Connection the capacity share P x C/sum_P, where P = priority, C = total available capacity and sum_P = sum of all priority values that are used for the Connections in the same Connection Group.  The priority setting is purely advisory; no guarantees are given.</p>
+<p id="rfc.section.6.4.p.4">Connection Groups should be created by cloning as as early as possible in order to aid the Transport System in choosing and configuring the right protocols (see also <a href="#transport-params" class="xref">Section 5.2</a>).</p>
 <h1 id="rfc.section.7">
 <a href="#rfc.section.7">7.</a> <a href="#sending" id="sending">Sending Data</a>
 </h1>
 <p id="rfc.section.7.p.1">Once a Connection has been established, it can be used for sending data. Data is sent by passing a Message object and additional parameters <a href="#send-params" class="xref">Section 7.1</a> to the Send action on an established connection:</p>
-<p id="rfc.section.7.p.2">Connection.Send(Message, sendParameters)</p>
-<p id="rfc.section.7.p.3">The type of the Message to be passed is dependent on the implementation, and on the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. It may itself contain an array of octets to be transmitted in the transport protocol payload, or be transformable to an array of octets by a sender-side framer (see <a href="#send-framing" class="xref">Section 7.2</a>).</p>
-<p id="rfc.section.7.p.4">Messages may be arbitrarily large; however, there may be system and Protocol Stack dependent limits on the size of a data object which can be transmitted atomically. For that reason, the Message object passed to the Send action may also be a partial Message, either representing the whole data object and information about the range of bytes to send from it, or an object referring back to the larger whole Message. The details of partial Message sending are implementation-dependent.</p>
-<p id="rfc.section.7.p.5">If Send is called on a Connection which has not yet been established, an Initiate action will be implicitly performed simultaneously with the Send.  Used together with the Idempotent property (see <a href="#send-idempotent" class="xref">Section 7.1.1.4</a>), this can be used to send data during establishment for 0-RTT session resumption on Protocol Stacks that support it.</p>
-<p id="rfc.section.7.p.6">Like all Actions in this interface, the Send action is asynchronous.</p>
-<p id="rfc.section.7.p.7">Connection -&gt; Sent&lt;msgRef&gt;</p>
-<p id="rfc.section.7.p.8">The Sent event occurs when a previous Send action has completed, i.e., when the data derived from the Message has been passed down or through the underlying Protocol Stack and is no longer the responsibility of the implementation of this interface. The exact disposition of the Message when the Sent event occurs is specific to the implementation and the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. The Sent event contains an implementation-specific reference to the Message to which it applies.</p>
-<p id="rfc.section.7.p.9">Sent events allow an application to obtain an understanding of the amount of buffering it creates. That is, if an application calls the Send action multiple times without waiting for a Sent event, it has created more buffer inside the transport system than an application that only issues a Send after this event fires.</p>
-<p id="rfc.section.7.p.10">Connection -&gt; Expired&lt;msgRef&gt;</p>
-<p id="rfc.section.7.p.11">The Expired event occurs when a previous Send action expired before completion; i.e. when the Message was not sent before its Lifetime (see <a href="#send-lifetime" class="xref">Section 7.1.1.1</a>) expired. This is separate from SendError, as it is an expected behavior for partially reliable transports. The Expired event contains an implementation-specific reference to the Message to which it applies.</p>
-<p id="rfc.section.7.p.12">Connection -&gt; SendError&lt;msgRef&gt;</p>
-<p id="rfc.section.7.p.13">A SendError occurs when a Message could not be sent due to an error condition: an attempt to send a non-partial Message which is too large for the system and Protocol Stack to handle, some failure of the underlying Protocol Stack, or a set of send parameters not consistent with the Connection&#8217;s transport parameters. The SendError contains an implementation-specific reference to the Message to which it applies.</p>
+<pre>
+Connection.Send(Message, sendParameters)
+</pre>
+<p id="rfc.section.7.p.2">The type of the Message to be passed is dependent on the implementation, and on the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. It may itself contain an array of octets to be transmitted in the transport protocol payload, or be transformable to an array of octets by a sender-side framer (see <a href="#send-framing" class="xref">Section 7.2</a>).</p>
+<p id="rfc.section.7.p.3">Messages may be arbitrarily large; however, there may be system and Protocol Stack dependent limits on the size of a data object which can be transmitted atomically. For that reason, the Message object passed to the Send action may also be a partial Message, either representing the whole data object and information about the range of bytes to send from it, or an object referring back to the larger whole Message. The details of partial Message sending are implementation-dependent.</p>
+<p id="rfc.section.7.p.4">If Send is called on a Connection which has not yet been established, an Initiate action will be implicitly performed simultaneously with the Send.  Used together with the Idempotent property (see <a href="#send-idempotent" class="xref">Section 7.1.1.4</a>), this can be used to send data during establishment for 0-RTT session resumption on Protocol Stacks that support it.</p>
+<p id="rfc.section.7.p.5">Like all Actions in this interface, the Send action is asynchronous.</p>
+<pre>
+Connection -&gt; Sent&amp;lt;msgRef&gt;
+</pre>
+<p id="rfc.section.7.p.6">The Sent event occurs when a previous Send action has completed, i.e., when the data derived from the Message has been passed down or through the underlying Protocol Stack and is no longer the responsibility of the implementation of this interface. The exact disposition of the Message when the Sent event occurs is specific to the implementation and the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. The Sent event contains an implementation-specific reference to the Message to which it applies.</p>
+<p id="rfc.section.7.p.7">Sent events allow an application to obtain an understanding of the amount of buffering it creates. That is, if an application calls the Send action multiple times without waiting for a Sent event, it has created more buffer inside the transport system than an application that only issues a Send after this event fires.</p>
+<pre>
+Connection -&gt; Expired&amp;lt;msgRef&gt;
+</pre>
+<p id="rfc.section.7.p.8">The Expired event occurs when a previous Send action expired before completion; i.e. when the Message was not sent before its Lifetime (see <a href="#send-lifetime" class="xref">Section 7.1.1.1</a>) expired. This is separate from SendError, as it is an expected behavior for partially reliable transports. The Expired event contains an implementation-specific reference to the Message to which it applies.</p>
+<pre>
+Connection -&gt; SendError&amp;lt;msgRef&gt;
+</pre>
+<p id="rfc.section.7.p.9">A SendError occurs when a Message could not be sent due to an error condition: an attempt to send a non-partial Message which is too large for the system and Protocol Stack to handle, some failure of the underlying Protocol Stack, or a set of send parameters not consistent with the Connection&#8217;s transport parameters. The SendError contains an implementation-specific reference to the Message to which it applies.</p>
 <h1 id="rfc.section.7.1">
 <a href="#rfc.section.7.1">7.1.</a> <a href="#send-params" id="send-params">Send Parameters</a>
 </h1>
@@ -883,29 +911,41 @@ sendParameters.add(parameter, value)
 <a href="#rfc.section.7.2">7.2.</a> <a href="#send-framing" id="send-framing">Sender-side Framing</a>
 </h1>
 <p id="rfc.section.7.2.p.1">Sender-side framing allows a caller to provide the interface with a function that takes a Message of an appropriate application-layer type and returns an array of octets, the on-the-wire representation of the Message to be handed down to the Protocol Stack. It consists of a Framer object with a single Action, Frame. Since the Framer depends on the protocol used at the application layer, it is bound to the Preconnection during the pre-establishment phase:</p>
-<p id="rfc.section.7.2.p.2">Preconnection.FrameWith(Framer)</p>
-<p id="rfc.section.7.2.p.3">OctetArray := Framer.Frame(Message)</p>
-<p id="rfc.section.7.2.p.4">Sender-side framing is a convenience feature of the interface, for parity with receiver-side framing (see <a href="#receive-framing" class="xref">Section 8.1</a>).</p>
+<pre>
+Preconnection.FrameWith(Framer)
+
+OctetArray := Framer.Frame(Message)
+</pre>
+<p id="rfc.section.7.2.p.2">Sender-side framing is a convenience feature of the interface, for parity with receiver-side framing (see <a href="#receive-framing" class="xref">Section 8.1</a>).</p>
 <h1 id="rfc.section.8">
 <a href="#rfc.section.8">8.</a> <a href="#receiving" id="receiving">Receiving Data</a>
 </h1>
 <p id="rfc.section.8.p.1">Once a Connection is established, Messages may be received on it. The application can indicate that it is ready to receive Messages by calling Receive() on the connection.</p>
-<p id="rfc.section.8.p.2">Connection.Receive(ReceiveHandler)</p>
-<p id="rfc.section.8.p.3">Receive takes a single object, a ReceiveHandler which can handle the Received event and the ReceiveError error. Each call to Receive will result in at most one Received event being sent to the handler, though implementations may provide convenience functions to indicate readiness to receive a larger but finite number of Messages with a single call. This allows an application to provide backpressure to the transport stack when it is temporarily not ready to receive messages.</p>
-<p id="rfc.section.8.p.4">Connection -&gt; Received&lt;Message&gt;</p>
-<p id="rfc.section.8.p.5">As with sending, the type of the Message to be passed is dependent on the implementation, and on the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. The Message may also contain metadata from protocols in the Protocol Stack; which metadata is available is Protocol Stack dependent. In particular, when this information is available, the value of the Explicit Congestion Notification (ECN) field is contained in such metadata.  This information can be used for logging and debugging purposes, and for building applications which need access to information about the transport internals for their own operation.</p>
-<p id="rfc.section.8.p.6">The Message object must provide some method to retrieve an octet array containing application data, corresponding to a single message within the underlying Protocol Stack&#8217;s framing.  See <a href="#receive-framing" class="xref">Section 8.1</a> for handling framing in situations where the Protocol Stack provides octet-stream transport only.</p>
-<p id="rfc.section.8.p.7">Note that as with sending, the Message object may represent a partial message, larger than the maximum message size than can be received atomically. In this case, the Message object passed contains some reference to the full Message it belongs to, as well as the byte range of the data content within the partial Message.</p>
-<p id="rfc.section.8.p.8">Connection -&gt; ReceiveError&lt;&gt;</p>
-<p id="rfc.section.8.p.9">A ReceiveError occurs when data is received by the underlying Protocol Stack that cannot be fully retrieved or deframed, or when some other indication is received that reception has failed. Such conditions that irrevocably lead the the termination of the Connection are signaled using ConnectionError instead (see <a href="#termination" class="xref">Section 10</a>).</p>
+<pre>
+Connection.Receive(ReceiveHandler)
+</pre>
+<p id="rfc.section.8.p.2">Receive takes a single object, a ReceiveHandler which can handle the Received event and the ReceiveError error. Each call to Receive will result in at most one Received event being sent to the handler, though implementations may provide convenience functions to indicate readiness to receive a larger but finite number of Messages with a single call. This allows an application to provide backpressure to the transport stack when it is temporarily not ready to receive messages.</p>
+<pre>
+Connection -&gt; Received&amp;lt;Message&gt;
+</pre>
+<p id="rfc.section.8.p.3">As with sending, the type of the Message to be passed is dependent on the implementation, and on the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. The Message may also contain metadata from protocols in the Protocol Stack; which metadata is available is Protocol Stack dependent. In particular, when this information is available, the value of the Explicit Congestion Notification (ECN) field is contained in such metadata.  This information can be used for logging and debugging purposes, and for building applications which need access to information about the transport internals for their own operation.</p>
+<p id="rfc.section.8.p.4">The Message object must provide some method to retrieve an octet array containing application data, corresponding to a single message within the underlying Protocol Stack&#8217;s framing.  See <a href="#receive-framing" class="xref">Section 8.1</a> for handling framing in situations where the Protocol Stack provides octet-stream transport only.</p>
+<p id="rfc.section.8.p.5">Note that as with sending, the Message object passed to Received may represent a partial message, larger than the maximum message size than can be received atomically. In this case, the Message object passed contains an indication that the object received is partial, a reference to the full Message it belongs to, as well as the byte range of the data content within the partial Message.</p>
+<pre>
+Connection -&gt; ReceiveError&amp;lt;&gt;
+</pre>
+<p id="rfc.section.8.p.6">A ReceiveError occurs when data is received by the underlying Protocol Stack that cannot be fully retrieved or deframed, or when some other indication is received that reception has failed. Such conditions that irrevocably lead the the termination of the Connection are signaled using ConnectionError instead (see <a href="#termination" class="xref">Section 10</a>).</p>
 <h1 id="rfc.section.8.1">
 <a href="#rfc.section.8.1">8.1.</a> <a href="#receive-framing" id="receive-framing">Receiver-side De-framing over Stream Protocols</a>
 </h1>
 <p id="rfc.section.8.1.p.1">The Receive event is intended to be fired once per application-layer Message sent by the remote endpoint; i.e., it is a desired property of this interface that a Send at one end of a Connection maps to exactly one Receive on the other end. This is possible with Protocol Stacks that provide message boundary preservation, but is not the case over Protocol Stacks that provide a simple octet stream transport.</p>
 <p id="rfc.section.8.1.p.2">For preserving message boundaries over stream transports, this interface provides receiver-side de-framing. This facility is based on the observation that, since many of our current application protocols evolved over TCP, which does not provide message boundary preservation, and since many of these protocols require message boundaries to function, each application layer protocol has defined its own framing. A Deframer allows an application to push this de-framing down into the interface, in order to transform an octet stream into a sequence of Messages.</p>
 <p id="rfc.section.8.1.p.3">Concretely, receiver-side de-framing allows a caller to provide the interface with a function that takes an octet stream, as provided by the underlying Protocol Stack, reads and returns a single Message of an appropriate type for the application and platform, and leaves the octet stream at the start of the next Message to deframe. It consists of a Deframer object with a single Action, Deframe. Since the Deframer depends on the protocol used at the application layer, it is bound to the Preconnection during the pre-establishment phase:</p>
-<p id="rfc.section.8.1.p.4">Preconnection.DeframeWith(Deframer)</p>
-<p id="rfc.section.8.1.p.5">Message := Deframer.Deframe(OctetStream, &#8230;)</p>
+<pre>
+Preconnection.DeframeWith(Deframer)
+
+Message := Deframer.Deframe(OctetStream, ...)
+</pre>
 <h1 id="rfc.section.9">
 <a href="#rfc.section.9">9.</a> <a href="#introspection" id="introspection">Setting and Querying of Connection Properties</a>
 </h1>
@@ -943,21 +983,29 @@ Connection.setProperties()
 <li>Connection group transmission scheduler: This enumerated property specifies which scheduler should be used among Connections within a Connection Group. It applies to connection groups; the set of schedulers can be taken from <a href="#I-D.ietf-tsvwg-sctp-ndata" class="xref">[I-D.ietf-tsvwg-sctp-ndata]</a>.</li>
 <li>Maximum message size concurrent with connection establishment: This numeric property represents the maximum Message size that can be sent before or during Connection establishment, see also <a href="#send-idempotent" class="xref">Section 7.1.1.4</a>.  It is given in Bytes. This property is read-only.</li>
 <li>Maximum Message size before fragmentation or segmentation: This numeric property, if applicable, represents the maximum Message size that can be sent without incurring network-layer fragmentation and/or transport layer segmentation at the sender. This property is read-only.</li>
-<li>Maximum non-partial Message size on send: This numeric property represents the maximum Message size that can be sent as a non-partial Message. This property may be read-only.</li>
-<li>Maximum non-partial Message size on receive: This numeric property represents the maximum Message size that can be received as a non-partial Message. This property may be read-only.</li>
+<li>Maximum non-partial Message size on send: This numeric property represents the maximum Message size that can be sent as a non-partial Message. This property is read-only.</li>
+<li>Maximum non-partial Message size on receive: This numeric property represents the maximum Message size that can be received as a non-partial Message. This property is read-only.</li>
 </ul>
-<p id="rfc.section.9.1.p.5">Specific Protocol Properties can additionally be associated with a specific protocol. For example, the application can specify a set of TCP Options to use if and only if TCP is selected by the system, including options such as the Maximum Segment Size (MSS), and options around Acknowledgement Stretching. Such properties should not be assumed to apply across different protocols, but must be possible to specify if required by the application. Attempts to set specific protocol properties on a protocol stack not containing that specific protocol are simply ignored, and do not raise an error.</p>
+<p id="rfc.section.9.1.p.5">In order to specify Specific Protocol Properties, Transport System implementations may offer applications to attach a set of options to the Preconnection object, associated with a specific protocol. For example, an application could specify a set of TCP Options to use if and only if TCP is selected by the system. Such properties must not be assumed to apply across different protocols. Attempts to set specific protocol properties on a protocol stack not containing that specific protocol are simply ignored, and do not raise an error..</p>
 <h1 id="rfc.section.10">
 <a href="#rfc.section.10">10.</a> <a href="#termination" id="termination">Connection Termination</a>
 </h1>
 <p id="rfc.section.10.p.1">Close terminates a Connection after satisfying all the requirements that were specified regarding the delivery of Messages that the application has already given to the transport system. For example, if reliable delivery was requested for a Message handed over before calling Close, the transport system will ensure that this Message is indeed delivered. If the Remote Endpoint still has data to send, it cannot be received after this call.</p>
-<p id="rfc.section.10.p.2">Connection.Close()</p>
-<p id="rfc.section.10.p.3">The Closed event can inform the application that the Remote Endpoint has closed the Connection; however, there is no guarantee that a remote close will be signaled.</p>
-<p id="rfc.section.10.p.4">Connection -&gt; Closed&lt;&gt;</p>
-<p id="rfc.section.10.p.5">Abort terminates a Connection without delivering remaining data:</p>
-<p id="rfc.section.10.p.6">Connection.Abort()</p>
-<p id="rfc.section.10.p.7">A ConnectionError can inform the application that the other side has aborted the Connection; however, there is no guarantee that an abort will be signaled:</p>
-<p id="rfc.section.10.p.8">Connection -&gt; ConnectionError&lt;&gt;</p>
+<pre>
+Connection.Close()
+</pre>
+<p id="rfc.section.10.p.2">The Closed event can inform the application that the Remote Endpoint has closed the Connection; however, there is no guarantee that a remote close will be signaled.</p>
+<pre>
+Connection -&gt; Closed&amp;lt;&gt;
+</pre>
+<p id="rfc.section.10.p.3">Abort terminates a Connection without delivering remaining data:</p>
+<pre>
+Connection.Abort()
+</pre>
+<p id="rfc.section.10.p.4">A ConnectionError can inform the application that the other side has aborted the Connection; however, there is no guarantee that an abort will be signaled:</p>
+<pre>
+Connection -&gt; ConnectionError&amp;lt;&gt;
+</pre>
 <h1 id="rfc.section.11">
 <a href="#rfc.section.11">11.</a> <a href="#event-and-error-handling" id="event-and-error-handling">Event and Error Handling</a>
 </h1>
