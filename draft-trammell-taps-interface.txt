@@ -305,7 +305,9 @@ Internet-Draft               TAPS Interface                February 2018
    Listen() for incoming connections, but is OPTIONAL if it is used to
    Initiate() connections.  The Remote Endpoint MUST be specified in the
    Preconnection is used to Initiate() connections, but is OPTIONAL if
-   it is used to Listen() for incoming connections.
+   it is used to Listen() for incoming connections.  The Local Endpoint
+   and the Remote Endpoint MUST both be specified if a peer-to-peer
+   Rendezvous is to occur based on the Preconnection.
 
    Framers (see Section 7.2) and deframers (see Section 8.1), if
    necessary, should be bound to the Preconnection during pre-
@@ -327,9 +329,7 @@ Internet-Draft               TAPS Interface                February 2018
    remoteSpecifier.withIPv6Address(2001:db8:4920:e29d:a420:7461:7073:0a)
    remoteSpecifier.withPort(443)
 
-   remoteSpecifier := NewRemoteEndpoint()
-   remoteSpecifier.withIPv4Address(192.0.2.21)
-   remoteSpecifier.withPort(443)
+
 
 
 
@@ -337,6 +337,10 @@ Trammell, et al.         Expires August 31, 2018                [Page 6]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+   remoteSpecifier := NewRemoteEndpoint()
+   remoteSpecifier.withIPv4Address(192.0.2.21)
+   remoteSpecifier.withPort(443)
 
    localSpecifier := NewLocalEndpoint()
    localSpecifier.withInterface("en0")
@@ -382,10 +386,6 @@ Internet-Draft               TAPS Interface                February 2018
    Selection properties additionally take one of five preference levels,
    though not all preference levels make sense with all such properties.
    Note that it is possible for a set of specified transport parameters
-   to be internally inconsistent, or for preferences to be inconsistent
-   with the later use of the API by the application.  Application
-   developers should reduce inconsistency by only using the most
-   stringent preference levels when failure to meet a preference would
 
 
 
@@ -394,6 +394,10 @@ Trammell, et al.         Expires August 31, 2018                [Page 7]
 Internet-Draft               TAPS Interface                February 2018
 
 
+   to be internally inconsistent, or for preferences to be inconsistent
+   with the later use of the API by the application.  Application
+   developers should reduce inconsistency by only using the most
+   stringent preference levels when failure to meet a preference would
    break the application's functionality (e.g.  the Reliable Data
    Transfer preference, which is a core assumption of many application
    protocols).  Implementations of this interface should also raise
@@ -438,10 +442,6 @@ Internet-Draft               TAPS Interface                February 2018
    The following properties can be used during Protocol and Path
    selection:
 
-   o  Reliable Data Transfer: This boolean property specifies whether
-      the application needs the transport protocol to ensure that data
-      is received completely and without corruption on the other side.
-      This also entails being notified when a Connection is closed or
 
 
 
@@ -450,6 +450,10 @@ Trammell, et al.         Expires August 31, 2018                [Page 8]
 Internet-Draft               TAPS Interface                February 2018
 
 
+   o  Reliable Data Transfer: This boolean property specifies whether
+      the application needs the transport protocol to ensure that data
+      is received completely and without corruption on the other side.
+      This also entails being notified when a Connection is closed or
       aborted.  This property applies to connections and connection
       groups.  This is a strict requirement.  The default is to enable
       Reliable Data Transfer.
@@ -494,10 +498,6 @@ Internet-Draft               TAPS Interface                February 2018
       error message arrival): This boolean property specifies whether an
       application considers it useful to be informed in case sent data
       was retransmitted more often than a certain threshold, or when an
-      ICMP error message arrives.  This property applies to Connections
-      and Connection Groups.  This is not a strict requirement.  The
-      default is to have this option.
-
 
 
 
@@ -505,6 +505,10 @@ Trammell, et al.         Expires August 31, 2018                [Page 9]
 
 Internet-Draft               TAPS Interface                February 2018
 
+
+      ICMP error message arrives.  This property applies to Connections
+      and Connection Groups.  This is not a strict requirement.  The
+      default is to have this option.
 
    o  Control checksum coverage on sending or receiving: This boolean
       property specifies whether the application considers it useful to
@@ -550,10 +554,6 @@ Internet-Draft               TAPS Interface                February 2018
          variation should be optimized at the expense of bandwidth
          efficiency.
 
-      Scavenger/Bulk:  The application is not interactive.  It expects
-         to send/receive a large amount of data, without any urgency.
-         This can be used to select protocol stacks with scavenger
-
 
 
 
@@ -562,6 +562,9 @@ Trammell, et al.         Expires August 31, 2018               [Page 10]
 Internet-Draft               TAPS Interface                February 2018
 
 
+      Scavenger/Bulk:  The application is not interactive.  It expects
+         to send/receive a large amount of data, without any urgency.
+         This can be used to select protocol stacks with scavenger
          transmission control, to signal a preference for less-than-
          best-effort treatment, and so on.
 
@@ -605,9 +608,6 @@ Internet-Draft               TAPS Interface                February 2018
    A Connection gets its Transport Parameters either by being explicitly
    configured via a Preconnection, or by inheriting them from an
    antecedent via cloning; see Section 6.4 for more.
-
-
-
 
 
 
