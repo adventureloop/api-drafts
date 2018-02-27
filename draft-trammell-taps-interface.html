@@ -564,8 +564,9 @@ Action(parameter, parameter, ...) / Event&lt;parameter, parameter, ...&gt;
 <h1 id="rfc.section.4">
 <a href="#rfc.section.4">4.</a> <a href="#api-summary" id="api-summary">API Summary</a>
 </h1>
-<p id="rfc.section.4.p.1">[EDITOR&#8217;S NOTE: write three paragraph summary here; see https://github.com/taps-api/drafts/issues/93]</p>
-<p id="rfc.section.4.p.2">In the following sections, we describe the details of application interaction with Objects through Actions and Events in each phase of a connection, following the phases described in <a href="#TAPS-ARCH" class="xref">[TAPS-ARCH]</a>.</p>
+<p id="rfc.section.4.p.1">The Transport Services Interface is the basic common abstract application programming interface to the Transport Services Architecture defined in <a href="#TAPS-ARCH" class="xref">[TAPS-ARCH]</a>. An application primarily interacts with this interface through two objects, Preconnections and Connections. A Preconnection represents a set of parameters and constraints on the selection and configuration of paths and protocols to establish a connection with a remote endpoint. A Connection represents a transport protocol stack on which data can be sent to and received from a remote endpoint. Connections can be created from Preconnections in three ways: by initiating the Preconnection (i.e., actively opening, as in a client), through listening on the Preconnection (i.e., passively opening, as in a server), or rendezvousing on the Preconnection (i.e. peer to peer establishment).</p>
+<p id="rfc.section.4.p.2">Once a Connection is established, data can be sent on it in the form of Messages. The interface supports the preservation of message boundaries both via explicit protocol stack support, and via application support through a deframing callback which finds message boundaries in a stream. Messages are received asynchronously through a callback registered by the application. Error and other notifications also happen asynchronously on the Connection.</p>
+<p id="rfc.section.4.p.3">In the following sections, we describe the details of application interaction with Objects through Actions and Events in each phase of a connection, following the phases described in <a href="#TAPS-ARCH" class="xref">[TAPS-ARCH]</a>. An example interface sketch in Go is shown in <a href="#appendix-api-sketch" class="xref">Appendix B</a>.</p>
 <h1 id="rfc.section.5">
 <a href="#rfc.section.5">5.</a> <a href="#pre-establishment-phase" id="pre-establishment-phase">Pre-Establishment Phase</a>
 </h1>
@@ -580,6 +581,7 @@ Action(parameter, parameter, ...) / Event&lt;parameter, parameter, ...&gt;
 </pre>
 <p id="rfc.section.5.p.3">The Local Endpoint MUST be specified if the Preconnection is used to Listen() for incoming connections, but is OPTIONAL if it is used to Initiate() connections. The Remote Endpoint MUST be specified in the Preconnection is used to Initiate() connections, but is OPTIONAL if it is used to Listen() for incoming connections.  The Local Endpoint and the Remote Endpoint MUST both be specified if a peer-to-peer Rendezvous is to occur based on the Preconnection.</p>
 <p id="rfc.section.5.p.4">Framers (see <a href="#send-framing" class="xref">Section 7.2</a>) and deframers (see <a href="#receive-framing" class="xref">Section 8.1</a>), if necessary, should be bound to the Preconnection during pre-establishment.</p>
+<p id="rfc.section.5.p.5">Preconnections, as connections, can be cloned, in order to establish connection groups before connection initiation; see <a href="#groups" class="xref">Section 6.4</a> for details.</p>
 <h1 id="rfc.section.5.1">
 <a href="#rfc.section.5.1">5.1.</a> <a href="#endpointspec" id="endpointspec">Specifying Endpoints</a>
 </h1>
@@ -611,7 +613,6 @@ localSpecifier.withStunServer(address, port, credentials)
 <p id="rfc.section.5.1.p.2">Implementations may also support additional endpoint representations and provide a single NewEndpoint() call that takes different endpoint representations.</p>
 <p id="rfc.section.5.1.p.3">Multiple endpoint identifiers can be specified for each Local Endpoint and RemoteEndoint.  For example, a Local Endpoint could be configured with two interface names, or a Remote Endpoint could be specified via both IPv4 and IPv6 addresses.  The multiple identifiers refer to the same endpoint.</p>
 <p id="rfc.section.5.1.p.4">The transport services API will resolve names internally, when the Initiate(), Listen(), or Rendezvous() method is called establish a connection.  The API does not need the application to resolve names, and premature name resolution can damage performance by limiting the scope for alternate path discovery during connection establishment.  The Resolve() method is, however, provided to resolve a Local Endpoint or a Remote Endpoint in cases where this is required, for example with some NAT traversal protocols (see <a href="#rendezvous" class="xref">Section 6.3</a>).</p>
-<p id="rfc.section.5.1.p.5">[NOTE: the API needs MUST be explicit about when name resolution occurs, since the act of resolving a name leaks information, and there may be security implications if this happens unexpectedly.]</p>
 <h1 id="rfc.section.5.2">
 <a href="#rfc.section.5.2">5.2.</a> <a href="#transport-params" id="transport-params">Specifying Transport Parameters</a>
 </h1>
@@ -814,17 +815,19 @@ Preconnection -&gt; RendezvousError&lt;msgRef, error&gt;
 PreconnectionBindings := Preconnection.Resolve()
 </pre>
 <p id="rfc.section.6.3.p.7">The Resolve() call returns a list of Preconnection objects, that represent the concrete addresses, local and server reflexive, on which a Rendezvous() for the Preconnection will listen for incoming connections. This list can be passed to a peer via a signalling protocol, such as SIP or WebRTC, to configure the remote.</p>
-<p id="rfc.section.6.3.p.8">[NOTE: This API is sufficient for TCP-style simultaneous open, but should be considered experimental for ICE-like protocols.]</p>
 <h1 id="rfc.section.6.4">
 <a href="#rfc.section.6.4">6.4.</a> <a href="#groups" id="groups">Connection Groups</a>
 </h1>
-<p id="rfc.section.6.4.p.1">Groups of Connections can be created using Clone action:</p>
+<p id="rfc.section.6.4.p.1">Groups of Preconnections or Connections can be created using the Clone action:</p>
 <pre>
+Preconnection := Preconnection.Clone()
+
 Connection := Connection.Clone()
 </pre>
-<p id="rfc.section.6.4.p.2">Calling this once yields a group of two Connections: the parent Connection &#8211; whose Clone action was called &#8211; and the resulting clone. Calling Clone on any of these two Connections adds a third Connection to the group, and so on.  All Connections in a group are entangled. This means that they automatically share all properties: changing a parameter for one of them also changes the parameter for all others.</p>
-<p id="rfc.section.6.4.p.3">There is only one Protocol Property that is not entangled, i.e., it is a separate per-Connection Property for individual Connections in the group: a priority.  This priority, which can be represented as a non-negative integer or float, expresses a desired share of the Connection Group&#8217;s available network capacity, such that an ideal transport system implementation would assign the Connection the capacity share P x C/sum_P, where P = priority, C = total available capacity and sum_P = sum of all priority values that are used for the Connections in the same Connection Group.  The priority setting is purely advisory; no guarantees are given.</p>
-<p id="rfc.section.6.4.p.4">Connection Groups should be created by cloning as as early as possible in order to aid the Transport System in choosing and configuring the right protocols (see also <a href="#transport-params" class="xref">Section 5.2</a>).</p>
+<p id="rfc.section.6.4.p.2">Calling Clone on a Connection yields a group of two Connections: the parent Connection on which Clone was called, and the resulting clone Connection. These connections are &#8220;entangled&#8221; with each other, and become part of a connection group. Calling Clone on any of these two connections adds a third Connection to the group, and so on. Connections in a connection group share all their properties, and changing the properties on one Connection in the group changes the property for all others.</p>
+<p id="rfc.section.6.4.p.3">Calling Clone on a Preconnection yields a Preconnection with the same parameters, which is entangled with the parent Preconnection: all the Connections created from entangled Preconnections will be entangled as if they had been cloned, and will belong to the same connection group.</p>
+<p id="rfc.section.6.4.p.4">Establishing a Connection from a cloned Preconnection will not cause Connections for other entangled Preconnections to be established; each such Connection must be established separately. Changes to the parameters of a Preconnection entangled with a Preconnection from which a Connection has already been established will fail. Calling Clone on a Preconnection may be taken by the system an implicit sign that protocol stacks supporting efficient connection group usage are preferred by the application.</p>
+<p id="rfc.section.6.4.p.5">There is only one Protocol Property that is not entangled, i.e., it is a separate per-Connection Property for individual Connections in the group: niceness. Niceness works as in <a href="#send-niceness" class="xref">Section 7.1.1.2</a>: when allocating available network capacity among Connections in a connection group, sends on connections with higher Niceness values will be prioritized over sends on connections with lower Niceness values. An ideal transport system implementation would assign the Connection the capacity share (M-N) x C / M, where N is the Connection&#8217;s Niceness value, M is the maximum Niceness value used by all Connections in the group and C is the total available capacity. However, the niceness setting is purely advisory, and no guarantees are given about capacity allocation and each implementation is free to implement exact capacity allocation as it sees fit.</p>
 <h1 id="rfc.section.7">
 <a href="#rfc.section.7">7.</a> <a href="#sending" id="sending">Sending Data</a>
 </h1>
@@ -983,6 +986,7 @@ Connection.setProperties()
 <p></p>
 
 <ul>
+<li>Relative niceness: This numeric property is similar to the Niceness send property (see <a href="#send-niceness" class="xref">Section 7.1.1.2</a>), a non-negative integer representing the relative inverse priority of this Connection relative to other Connections in the same connection group. It has no effect on Connections not part of a connection group. As noted in <a href="#groups" class="xref">Section 6.4</a>, this property is not entangled when connections are cloned.</li>
 <li>Timeout for aborting Connection: This numeric property specifies how long to wait before aborting a Connection during establishment, or before deciding that a connection has failed after establishment. It is given in seconds.</li>
 <li>Abort timeout to suggest to the Remote Endpoint: This numeric property specifies the timeout to propose to the Remote Endpoint. It is given in seconds.</li>
 <li>Retransmission threshold before excessive retransmission notification: This numeric property specifies after how many retransmissions to inform the application about &#8220;Excessive Retransmissions&#8221;.</li>
@@ -1158,25 +1162,8 @@ Connection -&gt; ConnectionError&lt;&gt;
 <h1 id="rfc.appendix.B">
 <a href="#rfc.appendix.B">Appendix B.</a> <a href="#appendix-api-sketch" id="appendix-api-sketch">Sample API definition in Go</a>
 </h1>
-<p id="rfc.section.B.p.1">[EDITOR&#8217;S NOTE: rewrite following discussion and copy back here; see https://github.com/taps-api/drafts/issues/39]</p>
-<p id="rfc.section.B.p.2">This document defines an abstract interface. To illustrate how this would map concretely into a programming language, this appendix contains an API interface definition in Go, using callbacks for event handling. The documentation for the API sketch is available online at https://godoc.org/github.com/mami-project/postsocket.</p>
+<p id="rfc.section.B.p.1">This document defines an abstract interface. To illustrate how this would map concretely into a programming language, this appendix contains an API interface definition in Go, using callbacks for event handling. The documentation for the API sketch is available online at https://godoc.org/github.com/mami-project/postsocket.</p>
 <pre>
-// Package postsocket specifies a Go interface for the TAPS API. This abstract
-// interface to transport-layer service is described in
-// https://taps-api.github.io/drafts/draft-trammell-taps-interface.html. For
-// now, read that document to understand what's going on in this package.
-// Eventually, this package will grow to contain a demonstration
-// implementation of the API.
-//
-// A Note on Error Handling
-//
-// This API provides two ways for its client to learn of errors: through the
-// Error event passed to a connection's EventHandler, and through error
-// returns on various calls. In general, errors in networking are
-// asynchronous, so almost every error involving the network will be passed
-// through the Error event. The error returns on calls are therefore only used
-// for immediately detectable errors, such as inconsistent arguments or
-// states.
 package postsocket
 
 import (
@@ -1655,8 +1642,7 @@ type FramingHandler interface {
 <h1 id="rfc.appendix.C">
 <a href="#rfc.appendix.C">Appendix C.</a> <a href="#appendix-transport-params" id="appendix-transport-params">Transport Parameters</a>
 </h1>
-<p id="rfc.section.C.p.1">[EDITOR&#8217;S NOTE: move into main document as necessary; find a way to move the rest into Appendix A or cut it; see https://github.com/taps-api/drafts/issues/69]</p>
-<p id="rfc.section.C.p.2">This appendix provides details about the usage of the Transport Parameters specified in <a href="#transport-params" class="xref">Section 5.2</a>. It clarifies what preference levels an application can set for which Transport Parameter, and during which phase an application can specify and query what kinds of Transport Parameters.</p>
+<p id="rfc.section.C.p.1">This appendix provides details about the usage of the Transport Parameters specified in <a href="#transport-params" class="xref">Section 5.2</a>. It clarifies what preference levels an application can set for which Transport Parameter, and during which phase an application can specify and query what kinds of Transport Parameters.</p>
 <h1 id="rfc.appendix.C.1">
 <a href="#rfc.appendix.C.1">C.1.</a> <a href="#appendix-preferences" id="appendix-preferences">Application Preferences</a>
 </h1>
@@ -1763,7 +1749,6 @@ type FramingHandler interface {
 </tr>
 </tbody>
 </table>
-<p id="rfc.section.C.1.p.4">[List individual Intents? Reformulate some of them as preferences?]</p>
 <h1 id="rfc.appendix.C.2">
 <a href="#rfc.appendix.C.2">C.2.</a> <a href="#appendix-specify-query-params" id="appendix-specify-query-params">Specifying and Querying Parameters</a>
 </h1>
