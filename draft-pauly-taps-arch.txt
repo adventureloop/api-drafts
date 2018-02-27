@@ -88,7 +88,7 @@ Table of Contents
        4.1.3.  Establishment Actions . . . . . . . . . . . . . . . .  11
        4.1.4.  Data Transfer Objects and Actions . . . . . . . . . .  11
        4.1.5.  Event Handling  . . . . . . . . . . . . . . . . . . .  12
-       4.1.6.  Termination Actions . . . . . . . . . . . . . . . . .  12
+       4.1.6.  Termination Actions . . . . . . . . . . . . . . . . .  13
      4.2.  Transport System Implementation Concepts  . . . . . . . .  13
        4.2.1.  Gathering . . . . . . . . . . . . . . . . . . . . . .  14
        4.2.2.  Racing  . . . . . . . . . . . . . . . . . . . . . . .  14
@@ -578,16 +578,25 @@ Internet-Draft              TAPS Architecture              February 2018
    o  Initiate is the primary action that an application can take to
       create a Connection to a remote endpoint, and prepare any required
       local or remote state to be able to send and/or receive Messages.
-      For some protocols, this may initiate a server-to-client style
+      For some protocols, this may initiate a client-to-server style
       handshake; for other protocols, this may just establish local
-      state; and for peer-to-peer protocols, this may begin the process
-      of a simultaneous open.  The process of identifying options for
-      connecting, such as resolution of the Remote Endpoint, occurs in
-      response the Initiate call.
+      state.  The process of identifying options for connecting, such as
+      resolution of the Remote Endpoint, occurs in response the Initiate
+      call.
 
    o  Listen is the action of marking a Listener as willing to accept
       incoming Connections.  The Listener will then create Connection
       objects as incoming connections are accepted (Section 4.1.5).
+
+   o  Rendezvous is the action of establishing a peer-to-peer connection
+      with a remote endpoint.  It simultaneously attempts to initiate a
+      connection to a remote endpoint whilst listening for an incoming
+      connection from that endpoint.  This corresponds, for example, to
+      a TCP simultaneous open.  The process of identifying options for
+      the connection, such as resolution of the Remote Endpoint, occurs
+      during the Rendezvous call.  If successful, the rendezvous call
+      returns a Connection object to represent the established peer-to-
+      peer connection.
 
 4.1.4.  Data Transfer Objects and Actions
 
@@ -601,6 +610,14 @@ Internet-Draft              TAPS Architecture              February 2018
       corrupted.  Boundaries of a Message may or may not be understood
       or transmitted by transport protocols.  Specifically, what one
       application considers to be two Messages sent on a stream-based
+
+
+
+Pauly, et al.            Expires August 31, 2018               [Page 11]
+
+Internet-Draft              TAPS Architecture              February 2018
+
+
       transport may be treated as a single Message by the application on
       the other side.
 
@@ -609,14 +626,6 @@ Internet-Draft              TAPS Architecture              February 2018
       include options specific to how the Message's content is to be
       sent.  Status of the Send operation may be delivered back to the
       application in an event (Section 4.1.5).
-
-
-
-
-Pauly, et al.            Expires August 31, 2018               [Page 11]
-
-Internet-Draft              TAPS Architecture              February 2018
-
 
    o  Receive is an action that indicates that the application is ready
       to asynchronously accept a Message over a Connection from a Remote
@@ -657,6 +666,14 @@ Internet-Draft              TAPS Architecture              February 2018
       property of the Connection has changed that may influence how and
       where data is sent and/or received.
 
+
+
+
+Pauly, et al.            Expires August 31, 2018               [Page 12]
+
+Internet-Draft              TAPS Architecture              February 2018
+
+
 4.1.6.  Termination Actions
 
    o  Close is the action an application may take on a Connection to
@@ -666,14 +683,6 @@ Internet-Draft              TAPS Architecture              February 2018
 
    o  Abort is an action the application may take on a Connection to
       indicate a Close, but with the additional indication that the
-
-
-
-Pauly, et al.            Expires August 31, 2018               [Page 12]
-
-Internet-Draft              TAPS Architecture              February 2018
-
-
       transport system should not attempt to deliver any outstanding
       data.
 
@@ -713,15 +722,6 @@ Internet-Draft              TAPS Architecture              February 2018
       Policy may apply to all Connections, or only certain ones
       depending on the runtime context and properties of the Connection.
 
-   o  Cached State: Cached State is the state and history that the
-      implementation keeps for each set of associated endpoints that
-      have been used previously.  This can include DNS results, TLS
-      session state, previous success and quality of transport protocols
-      over certain paths.
-
-
-
-
 
 
 
@@ -729,6 +729,12 @@ Pauly, et al.            Expires August 31, 2018               [Page 13]
 
 Internet-Draft              TAPS Architecture              February 2018
 
+
+   o  Cached State: Cached State is the state and history that the
+      implementation keeps for each set of associated endpoints that
+      have been used previously.  This can include DNS results, TLS
+      session state, previous success and quality of transport protocols
+      over certain paths.
 
 4.2.1.  Gathering
 
@@ -772,12 +778,6 @@ Internet-Draft              TAPS Architecture              February 2018
    specific security protocols or algorithms.  Its goal is to offer ease
    of use for existing protocols by providing a generic security-related
    interface.  Each provided interface mimics an existing protocol-
-   specific interface provided by supported security protocols.  For
-   example, trust verification callbacks are common parts of TLS APIs.
-   Transport Services APIs will expose similar functionality.  Clients
-   must take care to use security APIs appropriately.  In cases where
-   clients use said interface to provide sensitive keying material,
-   e.g., access to private keys or copies of pre-shared keys (PSKs), key
 
 
 
@@ -786,6 +786,12 @@ Pauly, et al.            Expires August 31, 2018               [Page 14]
 Internet-Draft              TAPS Architecture              February 2018
 
 
+   specific interface provided by supported security protocols.  For
+   example, trust verification callbacks are common parts of TLS APIs.
+   Transport Services APIs will expose similar functionality.  Clients
+   must take care to use security APIs appropriately.  In cases where
+   clients use said interface to provide sensitive keying material,
+   e.g., access to private keys or copies of pre-shared keys (PSKs), key
    use must be validated.  For example, clients should not use PSK
    material created for ESP with IETF-QUIC, and clients must not use
    private keys intended for server authentication as a key for client
@@ -825,12 +831,6 @@ Internet-Draft              TAPS Architecture              February 2018
               Services for TAPS Systems", draft-ietf-taps-minset-01
               (work in progress), February 2018.
 
-   [I-D.pauly-taps-transport-security]
-              Pauly, T., Rose, K., and C. Wood, "A Survey of Transport
-              Security Protocols", draft-pauly-taps-transport-
-              security-01 (work in progress), January 2018.
-
-
 
 
 
@@ -841,6 +841,11 @@ Pauly, et al.            Expires August 31, 2018               [Page 15]
 
 Internet-Draft              TAPS Architecture              February 2018
 
+
+   [I-D.pauly-taps-transport-security]
+              Pauly, T., Rose, K., and C. Wood, "A Survey of Transport
+              Security Protocols", draft-pauly-taps-transport-
+              security-01 (work in progress), January 2018.
 
    [RFC8095]  Fairhurst, G., Ed., Trammell, B., Ed., and M. Kuehlewind,
               Ed., "Services Provided by IETF Transport Protocols and
@@ -882,11 +887,6 @@ Authors' Addresses
 
    Email: gorry@erg.abdn.ac.uk
    URI:   http://www.erg.abdn.ac.uk/
-
-
-
-
-
 
 
 
