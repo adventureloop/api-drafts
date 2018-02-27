@@ -1275,13 +1275,13 @@ Internet-Draft             TAPS Implementation             February 2018
    candidates Section 4.1 to ensure better performance for the
    application.
 
-   It is recognized that consistency in caching becomes a major issue
-   for performance caches, since if a cached value is not valid the
-   whole optimization might be lost.  Still, recommendations on cache
-   lifetimes are difficult to offer since it largely depends on the
-   variability of the cached performance information.  For example, the
-   round-trip times experienced by TCP segments over a particular
-   network path might vary a lot over quite short time intervals.  Thus,
+   The reasonable lifetime for cached performance values will vary
+   depending on the nature of the value.  Certain information, like the
+   connection establishment success rate to a Remote Endpoint using a
+   given protocol stack, can be stored for a long period of time (hours
+   or longer), since it is expected that the capabilities of the Remote
+   Endpoint are not changing very quickly.  On the other hand, Round
+   Trip Time observed by TCP over a particular network path may vary
 
 
 
@@ -1290,10 +1290,9 @@ Brunstrom, et al.        Expires August 31, 2018               [Page 23]
 Internet-Draft             TAPS Implementation             February 2018
 
 
-   for this kind of performance information the cache lifetime should be
-   kept short, e.g., a fixed number of RTTs.  In contrast, performance
-   information such as the connection establishment success rate, could
-   probably have a cache lifetime that spans hours.
+   over a relatively short time interval.  For such values, the
+   implementation should remove them from the cache more quickly, or
+   treat older values with less confidence/weight.
 
 9.  Specific Transport Protocol Considerations
 
@@ -1336,6 +1335,7 @@ Internet-Draft             TAPS Implementation             February 2018
    correspond to a single UDP datagram.  The Message can contain
    metadata about the packet, such as the ECN bits applied to the
    packet.
+
 
 
 
