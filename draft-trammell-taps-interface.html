@@ -314,7 +314,8 @@ address {
 <link href="#rfc.appendix.A" rel="Chapter" title="A Additional Properties">
 <link href="#rfc.appendix.A.1" rel="Chapter" title="A.1 Protocol and Path Selection Properties">
 <link href="#rfc.appendix.A.1.1" rel="Chapter" title="A.1.1 Application Intents">
-<link href="#rfc.appendix.A.2" rel="Chapter" title="A.2 Send Parameters">
+<link href="#rfc.appendix.A.2" rel="Chapter" title="A.2 Protocol Properties">
+<link href="#rfc.appendix.A.3" rel="Chapter" title="A.3 Send Parameters">
 <link href="#rfc.appendix.B" rel="Chapter" title="B Sample API definition in Go">
 <link href="#rfc.authors" rel="Chapter">
 
@@ -491,7 +492,9 @@ address {
 </li>
 <ul><li>A.1.1.   <a href="#rfc.appendix.A.1.1">Application Intents</a>
 </li>
-</ul><li>A.2.   <a href="#rfc.appendix.A.2">Send Parameters</a>
+</ul><li>A.2.   <a href="#rfc.appendix.A.2">Protocol Properties</a>
+</li>
+<li>A.3.   <a href="#rfc.appendix.A.3">Send Parameters</a>
 </li>
 </ul><li>Appendix B.   <a href="#rfc.appendix.B">Sample API definition in Go</a>
 </li>
@@ -648,8 +651,7 @@ localSpecifier.withStunServer(address, port, credentials)
 <li>Preservation of data ordering: This boolean property specifies whether the application needs the transport protocol to assure that data is received by the application on the other end in the same order as it was sent. This property applies to connections and connection groups. This is a strict requirement. The default is to preserve data ordering.</li>
 <li>Configure reliability on a per-Message basis: This boolean property specifies whether an application considers it useful to indicate its reliability requirements on a per-Message basis.  This property applies to connections and connection groups. This is not a strict requirement.  The default is to not have this option.</li>
 <li>Use 0-RTT session establishment with an idempotent Message: This boolean property specifies whether an application would like to supply a Message to the transport protocol before Connection establishment, which will then be reliably transferred to the other side before or during connection establishment, potentially multiple times.  See also <a href="#send-idempotent" class="xref">Section 7.1.1.4</a>.  This is a strict requirement. The default is to not have this option.</li>
-<li>Efficient use of Connection Groups: This boolean property specifies whether an application considers it useful to create Connection Groups, e.g. to explicitly prioritize between Connections within a Connection Group. This property will tend to select multistreaming transport protocols, which can multiplex Connections into a Connection Group over a single flow. This is not a strict requirement. The default is to not have this option.</li>
-<li>Suggest a timeout to the Remote Endpoint: This boolean property specifies whether an application considers it useful to propose a timeout until the connection is assumed to be lost.  This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</li>
+<li>Multiplex connections: This boolean property specifies that the application would prefer multiple Connections between the same endpoints within a Connection Group to be multiplexed onto a single underlying transport connection where possible, for reasons of efficiency. This is not a strict requirement. The default is to not have this option.</li>
 <li>Notification of special errors (excessive retransmissions, ICMP error message arrival): This boolean property specifies whether an application considers it useful to be informed in case sent data was retransmitted more often than a certain threshold, or when an ICMP error message arrives. This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</li>
 <li>Control checksum coverage on sending or receiving: This boolean property specifies whether the application considers it useful to enable / disable / configure a checksum when sending data, or decide whether to require a checksum or not when receiving data.  This property applies to Connections and Connection Groups. This is not a strict requirement, as it signifies a reduction in reliability. The default is full checksum coverage without being able to change it, and requiring a checksum when receiving.</li>
 <li>Interface Type: This enumerated property specifies which kind of access network interface, e.g., WiFi, Ethernet, or LTE, to prefer over others for this connection, in case they are available. In general, Interface Types should be used only with the <samp>prefer</samp> and <samp>prohibit</samp> preference level. Specifically, using the <samp>require</samp> preference level for Interface Type may limit path selection in a way that is detrimental to connectivity. The default is to use the default interface configured in the system policy.</li>
@@ -817,7 +819,7 @@ Connection := Connection.Clone()
 </pre>
 <p id="rfc.section.6.4.p.2">Calling Clone on a Connection yields a group of two Connections: the parent Connection on which Clone was called, and the resulting clone Connection. These connections are &#8220;entangled&#8221; with each other, and become part of a connection group. Calling Clone on any of these two connections adds a third Connection to the group, and so on. Connections in a connection group share all their properties, and changing the properties on one Connection in the group changes the property for all others.</p>
 <p id="rfc.section.6.4.p.3">Calling Clone on a Preconnection yields a Preconnection with the same parameters, which is entangled with the parent Preconnection: all the Connections created from entangled Preconnections will be entangled as if they had been cloned, and will belong to the same connection group.</p>
-<p id="rfc.section.6.4.p.4">Establishing a Connection from a cloned Preconnection will not cause Connections for other entangled Preconnections to be established; each such Connection must be established separately. Changes to the parameters of a Preconnection entangled with a Preconnection from which a Connection has already been established will fail. Calling Clone on a Preconnection may be taken by the system an implicit sign that protocol stacks supporting efficient connection group usage are preferred by the application.</p>
+<p id="rfc.section.6.4.p.4">Establishing a Connection from a cloned Preconnection will not cause Connections for other entangled Preconnections to be established; each such Connection must be established separately. Changes to the parameters of a Preconnection entangled with a Preconnection from which a Connection has already been established will fail. Calling Clone on a Preconnection may be taken by the system an implicit signal that protocol stacks supporting multiplexed connections for efficient connection grouping are preferred by the application.</p>
 <p id="rfc.section.6.4.p.5">There is only one Protocol Property that is not entangled, i.e., it is a separate per-Connection Property for individual Connections in the group: niceness. Niceness works as in <a href="#send-niceness" class="xref">Section 7.1.1.2</a>: when allocating available network capacity among Connections in a connection group, sends on connections with higher Niceness values will be prioritized over sends on connections with lower Niceness values. An ideal transport system implementation would assign the Connection the capacity share (M-N) x C / M, where N is the Connection&#8217;s Niceness value, M is the maximum Niceness value used by all Connections in the group and C is the total available capacity. However, the niceness setting is purely advisory, and no guarantees are given about capacity allocation and each implementation is free to implement exact capacity allocation as it sees fit.</p>
 <h1 id="rfc.section.7">
 <a href="#rfc.section.7">7.</a> <a href="#sending" id="sending">Sending Data</a>
@@ -978,7 +980,6 @@ Connection.setProperties()
 <ul>
 <li>Relative niceness: This numeric property is similar to the Niceness send property (see <a href="#send-niceness" class="xref">Section 7.1.1.2</a>), a non-negative integer representing the relative inverse priority of this Connection relative to other Connections in the same connection group. It has no effect on Connections not part of a connection group. As noted in <a href="#groups" class="xref">Section 6.4</a>, this property is not entangled when connections are cloned.</li>
 <li>Timeout for aborting Connection: This numeric property specifies how long to wait before aborting a Connection during establishment, or before deciding that a connection has failed after establishment. It is given in seconds.</li>
-<li>Abort timeout to suggest to the Remote Endpoint: This numeric property specifies the timeout to propose to the Remote Endpoint. It is given in seconds.</li>
 <li>Retransmission threshold before excessive retransmission notification: This numeric property specifies after how many retransmissions to inform the application about &#8220;Excessive Retransmissions&#8221;.</li>
 <li>Required minimum coverage of the checksum for receiving: This numeric property specifies the part of the received data that needs to be covered by a checksum. It is given in Bytes. A value of 0 means that no checksum is required, and a special value (e.g., -1) indicates full checksum coverage.</li>
 <li>Connection group transmission scheduler: This enumerated property specifies which scheduler should be used among Connections within a Connection Group. It applies to connection groups; the set of schedulers can be taken from <a href="#I-D.ietf-tsvwg-sctp-ndata" class="xref">[I-D.ietf-tsvwg-sctp-ndata]</a>.</li>
@@ -1084,7 +1085,10 @@ Connection -&gt; ConnectionError&lt;&gt;
 <p id="rfc.section.A.1.p.1">The following protocol and path selection properties might be made available in addition to those specified in <a href="#transport-params" class="xref">Section 5.2</a>:</p>
 <p></p>
 
-<ul><li>Request not to delay acknowledgment of Message: This boolean property specifies whether an application considers it useful to request for Message that its acknowledgment be sent out as early as possible instead of potentially being bundled with other acknowledgments. This property applies to connections and connection groups. This is not a strict requirement. The default is to not have this option.</li></ul>
+<ul>
+<li>Suggest a timeout to the Remote Endpoint: This boolean property specifies whether an application considers it useful to propose a timeout until the connection is assumed to be lost. This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option. [EDITOR&#8217;S NOTE: For discussion of this option, see https://github.com/taps-api/drafts/issues/109]</li>
+<li>Request not to delay acknowledgment of Message: This boolean property specifies whether an application considers it useful to request for Message that its acknowledgment be sent out as early as possible instead of potentially being bundled with other acknowledgments. This property applies to connections and connection groups. This is not a strict requirement. The default is to not have this option.</li>
+</ul>
 <h1 id="rfc.appendix.A.1.1">
 <a href="#rfc.appendix.A.1.1">A.1.1.</a> <a href="#intents" id="intents">Application Intents</a>
 </h1>
@@ -1140,9 +1144,16 @@ Connection -&gt; ConnectionError&lt;&gt;
 </dl>
 <p id="rfc.section.A.1.1.5.p.3">The default is &#8220;Balance Cost&#8221;.</p>
 <h1 id="rfc.appendix.A.2">
-<a href="#rfc.appendix.A.2">A.2.</a> <a href="#send-parameters" id="send-parameters">Send Parameters</a>
+<a href="#rfc.appendix.A.2">A.2.</a> <a href="#protocol-properties" id="protocol-properties">Protocol Properties</a>
 </h1>
-<p id="rfc.section.A.2.p.1">The following send parameters might be made available in addition to those specified in <a href="#send-params" class="xref">Section 7.1</a>:</p>
+<p id="rfc.section.A.2.p.1">The following protocol properties might be made available in addition to those in <a href="#protocol-props" class="xref">Section 9.1</a>:</p>
+<p></p>
+
+<ul><li>Abort timeout to suggest to the Remote Endpoint: This numeric property specifies the timeout to propose to the Remote Endpoint. It is given in seconds. [EDITOR&#8217;S NOTE: For discussion of this property, see https://github.com/taps-api/drafts/issues/109]</li></ul>
+<h1 id="rfc.appendix.A.3">
+<a href="#rfc.appendix.A.3">A.3.</a> <a href="#send-parameters" id="send-parameters">Send Parameters</a>
+</h1>
+<p id="rfc.section.A.3.p.1">The following send parameters might be made available in addition to those specified in <a href="#send-params" class="xref">Section 7.1</a>:</p>
 <p></p>
 
 <ul>
