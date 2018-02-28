@@ -3,7 +3,7 @@
 
 
 TAPS Working Group                                     A. Brunstrom, Ed.
-Internet-Draft
+Internet-Draft                                       Karlstad University
 Intended status: Informational                             T. Pauly, Ed.
 Expires: September 1, 2018                                    Apple Inc.
                                                              T. Enghardt
@@ -1000,7 +1000,7 @@ Internet-Draft             TAPS Implementation             February 2018
    The effect of the application sending a Message is determined by the
    top-level protocol in the established Protocol Stack.  That is, if
    the top-level protocol provides an abstraction of framed messages
-   over a connection, the application will be able to send multiple
+   over a connection, the receiving application will be able to obtain
 
 
 
@@ -1010,8 +1010,8 @@ Brunstrom, et al.       Expires September 1, 2018              [Page 18]
 Internet-Draft             TAPS Implementation             February 2018
 
 
-   Messages on that connection, even if the framing protocol is built on
-   a byte-stream protocol like TCP.
+   multiple Messages on that connection, even if the framing protocol is
+   built on a byte-stream protocol like TCP.
 
 5.1.1.1.  Send Parameters
 
@@ -1108,12 +1108,12 @@ Internet-Draft             TAPS Implementation             February 2018
    if the application only wants to receive a complete Message, the
    implementation should wait until an entire Message (datagram, stream,
    or frame) is read before delivering any Message content to the
-   application.  Alternatively, the application can specify the minimum
-   number of bytes of Message content it wants to receive (which may be
-   just a single byte) to control the flow of received data.
-
-   If a Connection becomes finished before a requested Receive action
-   can be satisfied, the implementation should deliver any partial
+   application.  This requires the implementation to understand where
+   messages end, either via a supplied deframer or because the top-level
+   protocol in the established Protocol Stack preserves message
+   boundaries; if, on the other hand, the top-level protocol only
+   supports a byte-stream and no deframers were supported, the
+   application must specify the minimum number of bytes of Message
 
 
 
@@ -1122,6 +1122,11 @@ Brunstrom, et al.       Expires September 1, 2018              [Page 20]
 Internet-Draft             TAPS Implementation             February 2018
 
 
+   content it wants to receive (which may be just a single byte) to
+   control the flow of received data.
+
+   If a Connection becomes finished before a requested Receive action
+   can be satisfied, the implementation should deliver any partial
    Message content outstanding, or if none is available, an indication
    that there will be no more received Messages.
 
@@ -1165,11 +1170,6 @@ Internet-Draft             TAPS Implementation             February 2018
    attempt MUST use a different ticket.  In effect, each leaf node will
    send the same early application data, yet encoded (encrypted)
    differently on the wire.
-
-
-
-
-
 
 
 
@@ -1377,19 +1377,19 @@ Internet-Draft             TAPS Implementation             February 2018
    candidates Section 4.1 to ensure better performance for the
    application.
 
-   It is recognized that consistency in caching becomes a major issue
-   for performance caches, since if a cached value is not valid the
-   whole optimization might be lost.  Still, recommendations on cache
-   lifetimes are difficult to offer since it largely depends on the
-   variability of the cached performance information.  For example, the
-   round-trip times experienced by TCP segments over a particular
-   network path might vary a lot over quite short time intervals.  Thus,
-   for this kind of performance information the cache lifetime should be
-   kept short, e.g., a fixed number of RTTs.  In contrast, performance
-   information such as the connection establishment success rate, could
-   probably have a cache lifetime that spans hours.
+   The reasonable lifetime for cached performance values will vary
+   depending on the nature of the value.  Certain information, like the
+   connection establishment success rate to a Remote Endpoint using a
+   given protocol stack, can be stored for a long period of time (hours
+   or longer), since it is expected that the capabilities of the Remote
+   Endpoint are not changing very quickly.  On the other hand, Round
+   Trip Time observed by TCP over a particular network path may vary
+   over a relatively short time interval.  For such values, the
+   implementation should remove them from the cache more quickly, or
+   treat older values with less confidence/weight.
 
 9.  Specific Transport Protocol Considerations
+
 
 
 
@@ -1418,14 +1418,12 @@ Internet-Draft             TAPS Implementation             February 2018
    the TCP state can be closed abruptly, leading to a RST being sent to
    the peer.
 
-   Without a layer of framing above TCP, the cleanest abstraction for
-   sending and receiving Messages over TCP is to treat each direction of
-   the stream of bytes as a single Message, terminated by a FIN.  That
-   means that if the application can make several Send calls to enqueue
-   subsequent data chunks for the same Message to continue writing, but
-   marking the Message complete corresponds to closing the sending
-   stream.  Similarly, when the application receives the final portion
-   of a Message, it knows that the receiving stream has been closed.
+   Without a layer of framing (a top-level protocol in the established
+   Protocol Stack that preserves message boundaries, or an application-
+   supplied deframer) on top of TCP, the receiver side of the transport
+   system implementation can only treat the incoming stream of bytes as
+   a single Message, terminated by a FIN when the Remote Endpoint closes
+   the Connection.
 
 9.2.  UDP
 
@@ -1450,6 +1448,8 @@ Internet-Draft             TAPS Implementation             February 2018
 
    SCTP messages can be very large.  To allow the reception of large
    messages in pieces, a "partial flag" can be used to inform a (native
+   SCTP) receiving application that a message is incomplete.  After
+   receiving the "partial flag", this application would know that the
 
 
 
@@ -1458,8 +1458,6 @@ Brunstrom, et al.       Expires September 1, 2018              [Page 26]
 Internet-Draft             TAPS Implementation             February 2018
 
 
-   SCTP) receiving application that a message is incomplete.  After
-   receiving the "partial flag", this application would know that the
    next receive calls will only deliver remaining parts of the same
    message (i.e., no messages or partial messages will arrive on other
    streams until the message is complete) (see Section 8.1.20 in
@@ -1506,6 +1504,8 @@ Internet-Draft             TAPS Implementation             February 2018
    well-delineated HTTP request or response, with the content of the
    Message representing the body, and the Headers being provided in
    Message metadata.
+
+
 
 
 
@@ -1714,6 +1714,10 @@ Internet-Draft             TAPS Implementation             February 2018
 Authors' Addresses
 
    Anna Brunstrom (editor)
+   Karlstad University
+   Universitetsgatan 2
+   651 88 Karlstad
+   Sweden
 
    Email: anna.brunstrom@kau.se
 
@@ -1725,10 +1729,6 @@ Authors' Addresses
    United States of America
 
    Email: tpauly@apple.com
-
-
-
-
 
 
 
@@ -1749,12 +1749,18 @@ Internet-Draft             TAPS Implementation             February 2018
 
    Karl-Johan Grinnemo
    Karlstad University
+   Universitetsgatan 2
+   651 88 Karlstad
+   Sweden
 
    Email: karl-johan.grinnemo@kau.se
 
 
    Tom Jones
    University of Aberdeen
+   Fraser Noble Building
+   Aberdeen, AB24 3UE
+   UK
 
    Email: tom@erg.abdn.ac.uk
 
@@ -1777,6 +1783,17 @@ Internet-Draft             TAPS Implementation             February 2018
    Email: csp@csperkins.org
 
 
+
+
+
+
+
+
+Brunstrom, et al.       Expires September 1, 2018              [Page 32]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
    Michael Welzl
    University of Oslo
    PO Box 1080 Blindern
@@ -1789,4 +1806,43 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.       Expires September 1, 2018              [Page 32]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Brunstrom, et al.       Expires September 1, 2018              [Page 33]
