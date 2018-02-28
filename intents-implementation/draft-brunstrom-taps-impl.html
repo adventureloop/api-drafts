@@ -746,10 +746,11 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <a href="#rfc.section.4.3">4.3.</a> <a href="#ranking-branches" id="ranking-branches">Ranking Branches</a>
 </h1>
 <p id="rfc.section.4.3.p.1">Implementations SHOULD rank the branches of the tree of connection options in order to prioritize them for candidate racing. Leaf nodes on branches with higher rankings represent connection attempts that will be raced first. Implementations SHOULD order the branches to reflect the preferences expressed by the application for its new connection, including Protocol and Path Selection Properties as well as Application Intents, which are specified in <a href="#draft-trammell-taps-interface" class="xref">[draft-trammell-taps-interface]</a>. In addition to the properties provided by the application, an implementation MAY include additional criteria such as cached performance estimates, see <a href="#performance-caches" class="xref">Section 8.2</a>, or system policy, see <a href="#role-of-system-policy" class="xref">Section 3.2</a>, in the ranking.</p>
-<p id="rfc.section.4.3.p.2">The Application Intents specified in <a href="#draft-trammell-taps-interface" class="xref">[draft-trammell-taps-interface]</a> may be used to rank branches in the following ways:</p>
+<p id="rfc.section.4.3.p.2">The Transport Parameters specified in <a href="#draft-trammell-taps-interface" class="xref">[draft-trammell-taps-interface]</a> may be used to rank branches in the following ways:</p>
 <p></p>
 
 <ul>
+<li>Interface Type: If the application specifies an interface type to be required, an implementation MUST purge all branches that correspond to paths over interfaces that do not match this type. Similarly, it MUST purge paths that correspond to interface types that the application prohibits. If the application specifies an interface type to be preferred or avoided, implementations SHOULD rank paths accordingly.</li>
 <li>Capacity Profile: An implementation may use the Capacity Profile to prefer paths optimized for the application&#8217;s expected traffic pattern according to cached performance estimates, see <a href="#performance-caches" class="xref">Section 8.2</a>: <ul>
 <li>Interactive/Low Latency: Prefer paths with the lowest expected Round Trip Time</li>
 <li>Constant Rate: Prefer paths that can satisfy the requested Stream Send or Stream Receive Bitrate, based on observed maximum throughput</li>
