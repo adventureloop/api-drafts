@@ -429,7 +429,7 @@ address {
   <span class="filename">draft-brunstrom-taps-impl-latest</span></p>
   
   <h1 id="rfc.abstract"><a href="#rfc.abstract">Abstract</a></h1>
-<p>The Transport Services architecture <a href="#draft-pauly-taps-arch" class="xref">[draft-pauly-taps-arch]</a> defines a system that allows applications to use transport networking protocols flexibly. This document serves as a guide to implementation on how to build a system that provides such an interface.</p>
+<p>The Transport Services architecture <a href="#I-D.pauly-taps-arch" class="xref">[I-D.pauly-taps-arch]</a> defines a system that allows applications to use transport networking protocols flexibly. This document serves as a guide to implementation on how to build a system that provides such an interface.</p>
 <h1 id="rfc.status"><a href="#rfc.status">Status of This Memo</a></h1>
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
@@ -555,8 +555,8 @@ address {
   <h1 id="rfc.section.1">
 <a href="#rfc.section.1">1.</a> <a href="#introduction" id="introduction">Introduction</a>
 </h1>
-<p id="rfc.section.1.p.1">The Transport Services architecture <a href="#draft-pauly-taps-arch" class="xref">[draft-pauly-taps-arch]</a> defines a system that allows applications to use transport networking protocols flexibly. This document serves as a guide to implementation on how to build a system that provides such an interface. The terminology used in this document is based on the Architecture.</p>
-<p id="rfc.section.1.p.2">The interface exposed to applications is defined as the Transport Services API <a href="#draft-trammell-taps-interface" class="xref">[draft-trammell-taps-interface]</a>. This API is designed to be generic across multiple transport protocols and sets of protocols features. It is the job of an implementation of a Transport Services system to turn the requests of an application into decisions on how to establish connections, and how to transfer data over those connections once established.</p>
+<p id="rfc.section.1.p.1">The Transport Services architecture <a href="#I-D.pauly-taps-arch" class="xref">[I-D.pauly-taps-arch]</a> defines a system that allows applications to use transport networking protocols flexibly. This document serves as a guide to implementation on how to build a system that provides such an interface. The terminology used in this document is based on the Architecture.</p>
+<p id="rfc.section.1.p.2">The interface exposed to applications is defined as the Transport Services API <a href="#I-D.trammell-taps-interface" class="xref">[I-D.trammell-taps-interface]</a>. This API is designed to be generic across multiple transport protocols and sets of protocols features. It is the job of an implementation of a Transport Services system to turn the requests of an application into decisions on how to establish connections, and how to transfer data over those connections once established.</p>
 <h1 id="rfc.section.2">
 <a href="#rfc.section.2">2.</a> <a href="#implementing-transport-objects" id="implementing-transport-objects">Implementing Transport Objects</a>
 </h1>
@@ -748,15 +748,15 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <h1 id="rfc.section.4.3">
 <a href="#rfc.section.4.3">4.3.</a> <a href="#ranking-branches" id="ranking-branches">Ranking Branches</a>
 </h1>
-<p id="rfc.section.4.3.p.1">The transport system ranks branches in order to prioritize them for candidate racing, so branches with higher ranking will be raced first.  While <a href="#draft-trammell-taps-interface" class="xref">[draft-trammell-taps-interface]</a> allows the application to express its preferences for a new connection using Protocol and Path Selection Properties as well as Application Intents, applying these preferences is implemented by ranking of branches.  In addition to the properties provided by the application, performance estimates, system policy, or other criteria also influence this ranking.</p>
-<p id="rfc.section.4.3.p.2">The Application Intents specified in <a href="#draft-trammell-taps-interface" class="xref">[draft-trammell-taps-interface]</a> are used to rank branches in the following ways:</p>
+<p id="rfc.section.4.3.p.1">The transport system ranks branches in order to prioritize candidate racing.  While <a href="#I-D.trammell-taps-interface" class="xref">[I-D.trammell-taps-interface]</a> allows the application to express their preferences for a new connection using Protocol and Path Selection Properties as well as Application Intents, applying these these preferences is implemented by ranking of branches.  In addition to the application provided properties, performance estimates, system policy, or other criteria also influence this ranking.</p>
+<p id="rfc.section.4.3.p.2">The Application Intents specified in <a href="#I-D.trammell-taps-interface" class="xref">[I-D.trammell-taps-interface]</a> are used to rank branches in the following ways:</p>
 <p></p>
 
 <ul>
-<li>Capacity Profile: The Capacity Profile is used to prefer paths optimized for the application&#8217;s expected traffic pattern: <ul>
+<li>Capacity Profile: The Capacity Profile is used to prefer paths that match the applications capacity profile: <ul>
 <li>Interactive/Low Latency: Prefer paths with the lowest available latency</li>
 <li>Constant Rate: Prefer paths that can satisfy the requested Stream Send or Stream Receive Bitrate</li>
-<li>Scavenger/Bulk: Prefer paths with the highest available bandwidth</li>
+<li>Scavenger/Bulk: Prefer Paths with the highest available bandwidth</li>
 </ul>
 </li>
 <li>Size to be Sent / Received: If the application indicates the size of the Content it expects to receive, the transport system can predict the completion time of the transfer on each of the available paths based on current performance estimates.  It can then rank the path with the lower expected completion time higher, so for small Content where the download is latency-bound, the path with the lower latency estimate is tried first, while for larger Content which is bandwidth-bound, the path with the higher observed bitrate is tried first.  This addresses the issue that the application does not necessarily know whether it is best to optimize for low latency or high throughput at the time the application is written.  A related paper is currently under submission.</li>
@@ -817,7 +817,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 
 <ul>
 <li>Traffic Category: Can be mapped to DSCP code point value, e.g., see <a href="#I-D.ietf-tsvwg-rtcweb-qos" class="xref">[I-D.ietf-tsvwg-rtcweb-qos]</a>. Furthermore, if an application indicates a preference for low latency, the transport system may disable the Nagle algorithm on a TCP connection.</li>
-<li>Send Bitrate: If an application indicates a certain bitrate it wants to send on the connection, the transport system may limit the bitrate of the outgoing communication to that rate, for example by setting an upper bound for the TCP congestion window of a connection calculated from the Send Bitrate and the Round Trip Time. This helps to avoid bursty traffic patterns on video streaming servers, see <a href="#Trickle" class="xref">[Trickle]</a>.</li>
+<li>Bitrate to be Sent: If an application indicates a certain bitrate it wants to send on the connection, the transport system may limit the bitrate of the outgoing communication to that rate, for example by setting an upper bound for the TCP congestion window of a connection calculated from the Send Bitrate and the Round Trip Time. This helps to avoid bursty traffic patterns on video streaming servers, see <a href="#Trickle" class="xref">[Trickle]</a>.</li>
 </ul>
 <h1 id="rfc.section.4.6">
 <a href="#rfc.section.4.6">4.6.</a> <a href="#establish-mux" id="establish-mux">Establishing multiplexed connections</a>
@@ -860,10 +860,11 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <li>Lifetime should be implemented by removing the Message from its queue of pending Messages after the Lifetime has expired. A queue of pending Messages within the transport system implementation that have yet to be handed to the Protocol Stack can always support this property, but once a Message has been sent into the send buffer of a protocol, only certain protocols may support de-queueing a message. For example, TCP cannot remove bytes from its send buffer, while in case of SCTP, such control over the SCTP send buffer can be exercised using the partial reliability extension <a href="#RFC8303" class="xref">[RFC8303]</a>. When there is no standing queue of Messages within the system, and the Protocol Stack does not support removing a Message from its buffer, this property may be ignored.</li>
 <li>Niceness represents the ability to de-prioritize a Message in favor of other Messages. This can be implemented by the system re-ordering Messages that have yet to be handed to the Protocol Stack, or by giving relative priority hints to protocols that support priorities per Message. For example, an implementation of HTTP/2 could choose to send Messages of different niceness on streams of different priority.</li>
 <li>Ordered: when this is false, it disables the requirement of in-order-delivery for protocols that support configurable ordering.</li>
+<li>Immediate: when this is true, the Message should be sent immediately, even when this comes at the cost of using the network capacity less efficiently. For example, small messages can sometimes be bundled to fit into a single data packet for the sake of reducing header overhead; such bundling SHOULD not be used in case this parameter is true. For example, in case of TCP, the Nagle algorithm SHOULD be disabled when Immediate=true.</li>
 <li>Idempotent: when this is true, it means that the Message can be used by mechanisms that might transfer it multiple times &#8211; e.g., as a result of racing multiple transports or as part of TCP Fast Open.</li>
 <li>Corruption Protection Length: when this is set to any value other than -1, it limits the required checksum in protocols that allow limiting the checksum length (e.g. UDP-Lite).</li>
-<li>Immediate Acknowledgement: this informs the implementation that the sender intends to execute tight control over the send buffer, and therefore wants to avoid delayed acknowledgements. In case of SCTP, a request to immediately send acknowledgements can be implemented using the &#8220;sack-immediately flag&#8221; described in Section 4.2 of <a href="#RFC8303" class="xref">[RFC8303]</a> for the SEND.SCTP primitive.</li>
-<li>Instantaneous Capacity Profile: when this is&#160;set to &#8220;Interactive/Low Latency&#8221;, the Message should be sent immediately, even when this comes at the cost of using the network capacity less efficiently. For example, small messages can sometimes be bundled to fit into a single data packet for the sake of reducing header overhead; such bundling SHOULD not be used in case this parameter is true. For example, in case of TCP, the Nagle algorithm SHOULD be disabled when Immediate=true. Scavenger/Bulk can translate into usage of a congestion control mechanism such as LEDBAT, and/or the capacity profile can lead to a choice of a DSCP value as described in <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>).</li>
+<li>Immediate Acknowledgement: TBD</li>
+<li>Timeliness: TODO</li>
 </ul>
 <h1 id="rfc.section.5.1.1.2">
 <a href="#rfc.section.5.1.1.2">5.1.1.2.</a> <a href="#send-completion" id="send-completion">Send Completion</a>
@@ -896,12 +897,12 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <p></p>
 
 <ul>
-<li>Relative niceness: for SCTP, this can be done using the primitive CONFIGURE_STREAM_SCHEDULER.SCTP described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.</li>
-<li>Timeout for aborting Connection: for SCTP, this can be done using the primitive CHANGE_TIMEOUT.SCTP described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.</li>
-<li>Abort timeout to suggest to the Remote Endpoint: for TCP, this can be done using the primitive CHANGE_TIMEOUT.TCP described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.</li>
-<li>Retransmission threshold before excessive retransmission notification: for TCP, this can be done using ERROR.TCP described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.</li>
-<li>Required minimum coverage of the checksum for receiving: for UDP-Lite, this can be done using the primitive SET_MIN_CHECKSUM_COVERAGE.UDP-Lite described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.</li>
-<li>Connection group transmission scheduler: for SCTP, this can be done using the primitive SET_STREAM_SCHEDULER.SCTP described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.</li>
+<li>Set timeout for aborting Connection: for SCTP, this can be done using the primitive CHANGE_TIMEOUT.SCTP described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.</li>
+<li>Set timeout to suggest to the peer</li>
+<li>Set retransmissions before &#8220;Excessive Retransmissions&#8221;</li>
+<li>Set required minimum coverage of the checksum for receiving: for UDP-Lite, this can be done using the primitive SET_MIN_CHECKSUM_COVERAGE.UDP-Lite described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.</li>
+<li>Set scheduler for connections in a group: for SCTP, this can be done using the primitive SET_STREAM_SCHEDULER.SCTP described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.</li>
+<li>Set priority for a connection in a group: for SCTP, this can be done using the primitive CONFIGURE_STREAM_SCHEDULER.SCTP described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.</li>
 </ul>
 <h1 id="rfc.section.6.2">
 <a href="#rfc.section.6.2">6.2.</a> <a href="#maintenance-events" id="maintenance-events">Maintenance Events</a>
@@ -962,7 +963,6 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 </ul>
 <p id="rfc.section.8.2.p.3">These items can be cached on a per-address and per-subnet granularity, and averaged between different values. The information SHOULD be cached on a per-network basis, since it is expected that different network attachments will have different performance characteristics. Besides Protocol Instances, other system entities may also provide data into performance-oriented caches. This could for instance be signal strength information reported by radio modems like Wi-Fi and mobile broadband or information about the battery-level of the device.</p>
 <p id="rfc.section.8.2.p.4">An implementation should use this information, when possible, to determine preference between candidate paths, endpoints, and protocol options. Eligible options that historically had significantly better performance than others SHOULD be selected first when gathering candidates <a href="#gathering" class="xref">Section 4.1</a> to ensure better performance for the application.</p>
-<p id="rfc.section.8.2.p.5">It is recognized that consistency in caching becomes a major issue for performance caches, since if a cached value is not valid the whole optimization might be lost. Still, recommendations on cache lifetimes are difficult to offer since it largely depends on the variability of the cached performance information. For example, the round-trip times experienced by TCP segments over a particular network path might vary a lot over quite short time intervals. Thus, for this kind of performance information the cache lifetime should be kept short, e.g., a fixed number of RTTs. In contrast, performance information such as the connection establishment success rate, could probably have a cache lifetime that spans hours.</p>
 <h1 id="rfc.section.9">
 <a href="#rfc.section.9">9.</a> <a href="#specific-transport-protocol-considerations" id="specific-transport-protocol-considerations">Specific Transport Protocol Considerations</a>
 </h1>
@@ -1033,21 +1033,12 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 </h1>
 <p id="rfc.section.13.p.1">This work has received funding from the European Union&#8217;s Horizon 2020 research and innovation programme under grant agreement No. 644334 (NEAT).</p>
 <p id="rfc.section.13.p.2">This work has been supported by Leibniz Prize project funds of DFG - German Research Foundation: Gottfried Wilhelm Leibniz-Preis 2011 (FKZ FE 570/4-1).</p>
-<p id="rfc.section.13.p.3">This work has been supported by the UK Engineering and Physical Sciences Research Council under grant EP/R04144X/1.</p>
-<p id="rfc.section.13.p.4">Thanks to Stuart Cheshire, Josh Graessley, David Schinazi, and Eric Kinnear for their implementation and design efforts, including Happy Eyeballs, that heavily influenced this work.</p>
+<p id="rfc.section.13.p.3">Thanks to Stuart Cheshire, Josh Graessley, David Schinazi, and Eric Kinnear for their implementation and design efforts, including Happy Eyeballs, that heavily influenced this work.</p>
 <h1 id="rfc.references">
 <a href="#rfc.references">14.</a> References</h1>
 <h1 id="rfc.references.1">
 <a href="#rfc.references.1">14.1.</a> Normative References</h1>
 <table><tbody>
-<tr>
-<td class="reference"><b id="draft-pauly-taps-arch">[draft-pauly-taps-arch]</b></td>
-<td class="top">"<a>An Architecture for Transport Services</a>", n.d..</td>
-</tr>
-<tr>
-<td class="reference"><b id="draft-trammell-taps-interface">[draft-trammell-taps-interface]</b></td>
-<td class="top">"<a>An Abstract Application Layer Interface to Transport Services</a>", n.d..</td>
-</tr>
 <tr>
 <td class="reference"><b id="I-D.ietf-taps-minset">[I-D.ietf-taps-minset]</b></td>
 <td class="top">
@@ -1057,6 +1048,14 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <td class="reference"><b id="I-D.ietf-tsvwg-rtcweb-qos">[I-D.ietf-tsvwg-rtcweb-qos]</b></td>
 <td class="top">
 <a>Jones, P.</a>, <a>Dhesikan, S.</a>, <a>Jennings, C.</a> and <a>D. Druta</a>, "<a href="https://tools.ietf.org/html/draft-ietf-tsvwg-rtcweb-qos-18">DSCP Packet Markings for WebRTC QoS</a>", Internet-Draft draft-ietf-tsvwg-rtcweb-qos-18, August 2016.</td>
+</tr>
+<tr>
+<td class="reference"><b id="I-D.pauly-taps-arch">[I-D.pauly-taps-arch]</b></td>
+<td class="top">"<a>An Architecture for Transport Services</a>", n.d..</td>
+</tr>
+<tr>
+<td class="reference"><b id="I-D.trammell-taps-interface">[I-D.trammell-taps-interface]</b></td>
+<td class="top">"<a>An Abstract Application Layer Interface to Transport Services</a>", n.d..</td>
 </tr>
 <tr>
 <td class="reference"><b id="RFC6458">[RFC6458]</b></td>
