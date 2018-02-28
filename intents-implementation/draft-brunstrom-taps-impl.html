@@ -358,7 +358,7 @@ address {
 </tr>
 <tr>
 <td class="left">Internet-Draft</td>
-<td class="right">Karlstad University</td>
+<td class="right"></td>
 </tr>
 <tr>
 <td class="left">Intended status: Informational</td>
@@ -753,14 +753,14 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <p></p>
 
 <ul>
-<li>Capacity Profile: An implementation may use the Capacity Profile to prefer paths optimized for the application&#8217;s expected traffic pattern: <ul>
-<li>Interactive/Low Latency: Prefer paths with the lowest expected latency</li>
-<li>Constant Rate: Prefer paths that can satisfy the requested Stream Send or Stream Receive Bitrate</li>
-<li>Scavenger/Bulk: Prefer paths with the highest expected available bandwidth</li>
+<li>Capacity Profile: An implementation may use the Capacity Profile to prefer paths optimized for the application&#8217;s expected traffic pattern according to cached performance estimates, see <a href="#performance-caches" class="xref">Section 8.2</a>: <ul>
+<li>Interactive/Low Latency: Prefer paths with the lowest expected Round Trip Time</li>
+<li>Constant Rate: Prefer paths that can satisfy the requested Stream Send or Stream Receive Bitrate, based on observed maximum throughput</li>
+<li>Scavenger/Bulk: Prefer paths with the highest expected available bandwidth, based on observed maximum throughput</li>
 </ul>
 </li>
-<li>Size to be Sent or Received: An implementation may use the Size to be Sent or Received to compute an estimate of the completion time of a transfer over different available paths and then prefer the path with the shorter expected completion time. This Intent may be used instead of the Capacity profile, as the application does not always know whether its transfer will be latency-bound or bandwidth-bound, and thus may not be able to specify a Capacity Profile. A related paper is currently under submission.</li>
-<li>Send / Receive Bitrate: If the application indicates an expected send or receive bitrate, an implementation may prefer a path that can likely provide the desired bandwidth.</li>
+<li>Size to be Sent or Received: An implementation may use the Size to be Sent or Received in combination with cached performance estimates, see <a href="#performance-caches" class="xref">Section 8.2</a>, e.g. the observed Round Trip Time and the observed maximum throughput, to compute an estimate of the completion time of a transfer over different available paths. It may then prefer the path with the shorter expected completion time. This Intent may be used instead of the Capacity profile, as the application does not always know whether its transfer will be latency-bound or bandwidth-bound, and thus may not be able to specify a Capacity Profile. However, the application may know the Size to be Sent or Received from metadata, e.g., in adaptive HTTP streaming such as MPEG-DASH, or in operating system upgrades. A related paper is currently under submission.</li>
+<li>Send / Receive Bitrate: If the application indicates an expected send or receive bitrate, an implementation may prefer a path that can likely provide the desired bandwidth, based on cached maximum throughput, see <a href="#performance-caches" class="xref">Section 8.2</a>. The application may know the Send or Receive Bitrate from metadata in adaptive HTTP streaming, such as MPEG-DASH.</li>
 <li>Cost Preferences: If the application indicates a preference to avoid expensive paths, and some paths are associated with a monetary cost, an implementation SHOULD decrease the ranking of such paths. If the application indicates that it prohibits using expensive paths, paths that are associated with a cost should be purged from the decision tree.</li>
 </ul>
 <h1 id="rfc.section.4.4">
@@ -851,7 +851,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <h1 id="rfc.section.5.1.1">
 <a href="#rfc.section.5.1.1">5.1.1.</a> <a href="#sending-messages" id="sending-messages">Sending Messages</a>
 </h1>
-<p id="rfc.section.5.1.1.p.1">The effect of the application sending a Message is determined by the top-level protocol in the established Protocol Stack. That is, if the top-level protocol provides an abstraction of framed messages over a connection, the receiving application will be able to obtain multiple Messages on that connection, even if the framing protocol is built on a byte-stream protocol like TCP.</p>
+<p id="rfc.section.5.1.1.p.1">The effect of the application sending a Message is determined by the top-level protocol in the established Protocol Stack. That is, if the top-level protocol provides an abstraction of framed messages over a connection, the application will be able to send multiple Messages on that connection, even if the framing protocol is built on a byte-stream protocol like TCP.</p>
 <h1 id="rfc.section.5.1.1.1">
 <a href="#rfc.section.5.1.1.1">5.1.1.1.</a> <a href="#send-parameters" id="send-parameters">Send Parameters</a>
 </h1>
@@ -877,7 +877,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <h1 id="rfc.section.5.1.2">
 <a href="#rfc.section.5.1.2">5.1.2.</a> <a href="#receiving-messages" id="receiving-messages">Receiving Messages</a>
 </h1>
-<p id="rfc.section.5.1.2.p.1">Similar to sending, Receiving a Message is determined by the top-level protocol in the established Protocol Stack. The main difference with Receiving is that the size and boundaries of the Message are not known beforehand. The application can communicate in its Receive action the parameters for the Message, which can help the implementation know how much data to deliver and when. For example, if the application only wants to receive a complete Message, the implementation should wait until an entire Message (datagram, stream, or frame) is read before delivering any Message content to the application. This requires the implementation to understand where messages end, either via a supplied deframer or because the top-level protocol in the established Protocol Stack preserves message boundaries; if, on the other hand, the top-level protocol only supports a byte-stream and no deframers were supported, the application must specify the minimum number of bytes of Message content it wants to receive (which may be just a single byte) to control the flow of received data.</p>
+<p id="rfc.section.5.1.2.p.1">Similar to sending, Receiving a Message is determined by the top-level protocol in the established Protocol Stack. The main difference with Receiving is that the size and boundaries of the Message are not known beforehand. The application can communicate in its Receive action the parameters for the Message, which can help the implementation know how much data to deliver and when. For example, if the application only wants to receive a complete Message, the implementation should wait until an entire Message (datagram, stream, or frame) is read before delivering any Message content to the application. Alternatively, the application can specify the minimum number of bytes of Message content it wants to receive (which may be just a single byte) to control the flow of received data.</p>
 <p id="rfc.section.5.1.2.p.2">If a Connection becomes finished before a requested Receive action can be satisfied, the implementation should deliver any partial Message content outstanding, or if none is available, an indication that there will be no more received Messages.</p>
 <h1 id="rfc.section.5.2">
 <a href="#rfc.section.5.2">5.2.</a> <a href="#fastopen" id="fastopen">Handling of data for fast-open protocols</a>
@@ -961,9 +961,9 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <li>Connection Establishment latency</li>
 <li>Connection Establishment success rate</li>
 </ul>
-<p id="rfc.section.8.2.p.3">These items can be cached on a per-address and per-subnet granularity, and averaged between different values. The information SHOULD be cached on a per-network basis, since it is expected that different network attachments will have different performance characteristics. Besides Protocol Instances, other system entities may also provide data into performance-oriented caches. This could for instance be signal strength information reported by radio modems like Wi-Fi and mobile broadband or information about the battery-level of the device.</p>
+<p id="rfc.section.8.2.p.3">These items can be cached on a per-address and per-subnet granularity, and averaged between different values. The information SHOULD be cached on a per-network basis, since it is expected that different network attachments will have different performance characteristics. Besides Protocol Instances, other system entities may also provide data into performance-oriented caches. This could for instance be signal strength information reported by radio modems like Wi-Fi and mobile broadband or information about the battery-level of the device. Furthermore, the system may cache the observed maximum throughput on a path as an estimate of the available bandwidth.</p>
 <p id="rfc.section.8.2.p.4">An implementation should use this information, when possible, to determine preference between candidate paths, endpoints, and protocol options. Eligible options that historically had significantly better performance than others SHOULD be selected first when gathering candidates <a href="#gathering" class="xref">Section 4.1</a> to ensure better performance for the application.</p>
-<p id="rfc.section.8.2.p.5">The reasonable lifetime for cached performance values will vary depending on the nature of the value. Certain information, like the connection establishment success rate to a Remote Endpoint using a given protocol stack, can be stored for a long period of time (hours or longer), since it is expected that the capabilities of the Remote Endpoint are not changing very quickly. On the other hand, Round Trip Time observed by TCP over a particular network path may vary over a relatively short time interval. For such values, the implementation should remove them from the cache more quickly, or treat older values with less confidence/weight.</p>
+<p id="rfc.section.8.2.p.5">It is recognized that consistency in caching becomes a major issue for performance caches, since if a cached value is not valid the whole optimization might be lost. Still, recommendations on cache lifetimes are difficult to offer since it largely depends on the variability of the cached performance information. For example, the round-trip times experienced by TCP segments over a particular network path might vary a lot over quite short time intervals. Thus, for this kind of performance information the cache lifetime should be kept short, e.g., a fixed number of RTTs. In contrast, performance information such as the connection establishment success rate, could probably have a cache lifetime that spans hours.</p>
 <h1 id="rfc.section.9">
 <a href="#rfc.section.9">9.</a> <a href="#specific-transport-protocol-considerations" id="specific-transport-protocol-considerations">Specific Transport Protocol Considerations</a>
 </h1>
@@ -972,7 +972,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 </h1>
 <p id="rfc.section.9.1.p.1">Connection lifetime for TCP translates fairly simply into the the abstraction presented to an application. When the TCP three-way handshake is complete, its layer of the Protocol Stack can be considered Ready (established). This event will cause racing of Protocol Stack options to complete if TCP is the top-level protocol, at which point the application can be notified that the Connection is Ready to send and receive.</p>
 <p id="rfc.section.9.1.p.2">If the application sends a Close, that can translate to a graceful termination of the TCP connection, which is performed by sending a FIN to the remote endpoint. If the application sends an Abort, then the TCP state can be closed abruptly, leading to a RST being sent to the peer.</p>
-<p id="rfc.section.9.1.p.3">Without a layer of framing (a top-level protocol in the established Protocol Stack that preserves message boundaries, or an application-supplied deframer) on top of TCP, the receiver side of the transport system implementation can only treat the incoming stream of bytes as a single Message, terminated by a FIN when the Remote Endpoint closes the Connection.</p>
+<p id="rfc.section.9.1.p.3">Without a layer of framing above TCP, the cleanest abstraction for sending and receiving Messages over TCP is to treat each direction of the stream of bytes as a single Message, terminated by a FIN. That means that if the application can make several Send calls to enqueue subsequent data chunks for the same Message to continue writing, but marking the Message complete corresponds to closing the sending stream. Similarly, when the application receives the final portion of a Message, it knows that the receiving stream has been closed.</p>
 <h1 id="rfc.section.9.2">
 <a href="#rfc.section.9.2">9.2.</a> <a href="#udp" id="udp">UDP</a>
 </h1>
@@ -1052,7 +1052,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <tr>
 <td class="reference"><b id="I-D.ietf-taps-minset">[I-D.ietf-taps-minset]</b></td>
 <td class="top">
-<a>Welzl, M.</a> and <a>S. Gjessing</a>, "<a href="https://tools.ietf.org/html/draft-ietf-taps-minset-01">A Minimal Set of Transport Services for TAPS Systems</a>", Internet-Draft draft-ietf-taps-minset-01, February 2018.</td>
+<a>Welzl, M.</a> and <a>S. Gjessing</a>, "<a href="https://tools.ietf.org/html/draft-ietf-taps-minset-02">A Minimal Set of Transport Services for TAPS Systems</a>", Internet-Draft draft-ietf-taps-minset-02, February 2018.</td>
 </tr>
 <tr>
 <td class="reference"><b id="I-D.ietf-tsvwg-rtcweb-qos">[I-D.ietf-tsvwg-rtcweb-qos]</b></td>
@@ -1126,16 +1126,15 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 		<span class="family-name">Brunstrom</span>
 	  </span>
 	</span>
-	<span class="org vcardline">Karlstad University</span>
+	<span class="org vcardline"></span>
 	<span class="adr">
-	  <span class="vcardline">Universitetsgatan 2</span>
-
+	  
 	  <span class="vcardline">
-		<span class="locality">651 88 Karlstad</span>,  
+		<span class="locality"></span> 
 		<span class="region"></span>
 		<span class="code"></span>
 	  </span>
-	  <span class="country-name vcardline">Sweden</span>
+	  <span class="country-name vcardline"></span>
 	</span>
 	<span class="vcardline">EMail: <a href="mailto:anna.brunstrom@kau.se">anna.brunstrom@kau.se</a></span>
 
@@ -1194,14 +1193,13 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 	</span>
 	<span class="org vcardline">Karlstad University</span>
 	<span class="adr">
-	  <span class="vcardline">Universitetsgatan 2</span>
-
+	  
 	  <span class="vcardline">
-		<span class="locality">651 88 Karlstad</span>,  
+		<span class="locality"></span> 
 		<span class="region"></span>
 		<span class="code"></span>
 	  </span>
-	  <span class="country-name vcardline">Sweden</span>
+	  <span class="country-name vcardline"></span>
 	</span>
 	<span class="vcardline">EMail: <a href="mailto:karl-johan.grinnemo@kau.se">karl-johan.grinnemo@kau.se</a></span>
 
@@ -1216,14 +1214,13 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 	</span>
 	<span class="org vcardline">University of Aberdeen</span>
 	<span class="adr">
-	  <span class="vcardline">Fraser Noble Building</span>
-
+	  
 	  <span class="vcardline">
-		<span class="locality">Aberdeen, AB24 3UE</span>,  
+		<span class="locality"></span> 
 		<span class="region"></span>
 		<span class="code"></span>
 	  </span>
-	  <span class="country-name vcardline">UK</span>
+	  <span class="country-name vcardline"></span>
 	</span>
 	<span class="vcardline">EMail: <a href="mailto:tom@erg.abdn.ac.uk">tom@erg.abdn.ac.uk</a></span>
 
