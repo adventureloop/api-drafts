@@ -3,7 +3,7 @@
 
 
 TAPS Working Group                                     A. Brunstrom, Ed.
-Internet-Draft
+Internet-Draft                                       Karlstad University
 Intended status: Informational                             T. Pauly, Ed.
 Expires: September 1, 2018                                    Apple Inc.
                                                              T. Enghardt
@@ -127,7 +127,7 @@ Internet-Draft             TAPS Implementation             February 2018
    10. Rendezvous and Environment Discovery  . . . . . . . . . . . .  28
      10.1.  ICE and STUN . . . . . . . . . . . . . . . . . . . . . .  28
    11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  28
-   12. Security Considerations . . . . . . . . . . . . . . . . . . .  29
+   12. Security Considerations . . . . . . . . . . . . . . . . . . .  28
      12.1.  Considerations for Candidate Gathering . . . . . . . . .  29
      12.2.  Considerations for Candidate Racing  . . . . . . . . . .  29
    13. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  29
@@ -1015,9 +1015,9 @@ Internet-Draft             TAPS Implementation             February 2018
    The effect of the application sending a Message is determined by the
    top-level protocol in the established Protocol Stack.  That is, if
    the top-level protocol provides an abstraction of framed messages
-   over a connection, the application will be able to send multiple
-   Messages on that connection, even if the framing protocol is built on
-   a byte-stream protocol like TCP.
+   over a connection, the receiving application will be able to obtain
+   multiple Messages on that connection, even if the framing protocol is
+   built on a byte-stream protocol like TCP.
 
 5.1.1.1.  Send Parameters
 
@@ -1122,9 +1122,14 @@ Brunstrom, et al.       Expires September 1, 2018              [Page 20]
 Internet-Draft             TAPS Implementation             February 2018
 
 
-   application.  Alternatively, the application can specify the minimum
-   number of bytes of Message content it wants to receive (which may be
-   just a single byte) to control the flow of received data.
+   application.  This requires the implementation to understand where
+   messages end, either via a supplied deframer or because the top-level
+   protocol in the established Protocol Stack preserves message
+   boundaries; if, on the other hand, the top-level protocol only
+   supports a byte-stream and no deframers were supported, the
+   application must specify the minimum number of bytes of Message
+   content it wants to receive (which may be just a single byte) to
+   control the flow of received data.
 
    If a Connection becomes finished before a requested Receive action
    can be satisfied, the implementation should deliver any partial
@@ -1165,11 +1170,6 @@ Internet-Draft             TAPS Implementation             February 2018
    cookies, previously established TLS tickets, or out-of-band
    distributed pre-shared keys (PSKs).  Implementations should be aware
    of security concerns around using these tokens across multiple
-   addresses or paths when racing.  In the case of TLS, any given ticket
-   or PSK SHOULD only be used on one leaf node.  If implementations have
-   multiple tickets available from a previous connection, each leaf node
-   attempt MUST use a different ticket.  In effect, each leaf node will
-
 
 
 
@@ -1178,6 +1178,10 @@ Brunstrom, et al.       Expires September 1, 2018              [Page 21]
 Internet-Draft             TAPS Implementation             February 2018
 
 
+   addresses or paths when racing.  In the case of TLS, any given ticket
+   or PSK SHOULD only be used on one leaf node.  If implementations have
+   multiple tickets available from a previous connection, each leaf node
+   attempt MUST use a different ticket.  In effect, each leaf node will
    send the same early application data, yet encoded (encrypted)
    differently on the wire.
 
@@ -1222,10 +1226,6 @@ Internet-Draft             TAPS Implementation             February 2018
 
    o  Multipath or migratable protocols
 
-   o  Single-path protocols
-
-   Quality changes
-
 
 
 
@@ -1233,6 +1233,10 @@ Brunstrom, et al.       Expires September 1, 2018              [Page 22]
 
 Internet-Draft             TAPS Implementation             February 2018
 
+
+   o  Single-path protocols
+
+   Quality changes
 
 7.  Implementing Termination
 
@@ -1278,10 +1282,6 @@ Internet-Draft             TAPS Implementation             February 2018
    For Close (provoking a Finished event) and Abort (provoking a
    ConnectionError event), the same logic applies: while it is desirable
    to be informed when a peer closes or aborts a Connection, whether
-   this is possible depends on the underlying protocol, and no
-   guarantees can be given.  With SCTP, the transport system can use the
-   stream reset procedure to cause a Finish event upon a Close action
-   from the peer [NEAT-flow-mapping].
 
 
 
@@ -1289,6 +1289,11 @@ Brunstrom, et al.       Expires September 1, 2018              [Page 23]
 
 Internet-Draft             TAPS Implementation             February 2018
 
+
+   this is possible depends on the underlying protocol, and no
+   guarantees can be given.  With SCTP, the transport system can use the
+   stream reset procedure to cause a Finish event upon a Close action
+   from the peer [NEAT-flow-mapping].
 
 8.  Cached State
 
@@ -1332,11 +1337,6 @@ Internet-Draft             TAPS Implementation             February 2018
    otherwise equally preferred, an implementation may choose to attempt
    a connection to an address for which it has a TCP Fast Open cookie.
 
-   Applications must have a way to flush protocol cache state if
-   desired.  This may be necessary, for example, if application-layer
-   identifiers rotate and clients wish to avoid linkability via
-   trackable TLS tickets or TFO cookies.
-
 
 
 
@@ -1345,6 +1345,11 @@ Brunstrom, et al.       Expires September 1, 2018              [Page 24]
 
 Internet-Draft             TAPS Implementation             February 2018
 
+
+   Applications must have a way to flush protocol cache state if
+   desired.  This may be necessary, for example, if application-layer
+   identifiers rotate and clients wish to avoid linkability via
+   trackable TLS tickets or TFO cookies.
 
 8.2.  Performance caches
 
@@ -1379,21 +1384,16 @@ Internet-Draft             TAPS Implementation             February 2018
    candidates Section 4.1 to ensure better performance for the
    application.
 
-   It is recognized that consistency in caching becomes a major issue
-   for performance caches, since if a cached value is not valid the
-   whole optimization might be lost.  Still, recommendations on cache
-   lifetimes are difficult to offer since it largely depends on the
-   variability of the cached performance information.  For example, the
-   round-trip times experienced by TCP segments over a particular
-   network path might vary a lot over quite short time intervals.  Thus,
-   for this kind of performance information the cache lifetime should be
-   kept short, e.g., a fixed number of RTTs.  In contrast, performance
-   information such as the connection establishment success rate, could
-   probably have a cache lifetime that spans hours.
-
-
-
-
+   The reasonable lifetime for cached performance values will vary
+   depending on the nature of the value.  Certain information, like the
+   connection establishment success rate to a Remote Endpoint using a
+   given protocol stack, can be stored for a long period of time (hours
+   or longer), since it is expected that the capabilities of the Remote
+   Endpoint are not changing very quickly.  On the other hand, Round
+   Trip Time observed by TCP over a particular network path may vary
+   over a relatively short time interval.  For such values, the
+   implementation should remove them from the cache more quickly, or
+   treat older values with less confidence/weight.
 
 
 
@@ -1420,14 +1420,12 @@ Internet-Draft             TAPS Implementation             February 2018
    the TCP state can be closed abruptly, leading to a RST being sent to
    the peer.
 
-   Without a layer of framing above TCP, the cleanest abstraction for
-   sending and receiving Messages over TCP is to treat each direction of
-   the stream of bytes as a single Message, terminated by a FIN.  That
-   means that if the application can make several Send calls to enqueue
-   subsequent data chunks for the same Message to continue writing, but
-   marking the Message complete corresponds to closing the sending
-   stream.  Similarly, when the application receives the final portion
-   of a Message, it knows that the receiving stream has been closed.
+   Without a layer of framing (a top-level protocol in the established
+   Protocol Stack that preserves message boundaries, or an application-
+   supplied deframer) on top of TCP, the receiver side of the transport
+   system implementation can only treat the incoming stream of bytes as
+   a single Message, terminated by a FIN when the Remote Endpoint closes
+   the Connection.
 
 9.2.  UDP
 
@@ -1450,6 +1448,8 @@ Internet-Draft             TAPS Implementation             February 2018
    the sender side), a receiver-side Transport System should always
    support message interleaving [RFC8260].
 
+   SCTP messages can be very large.  To allow the reception of large
+   messages in pieces, a "partial flag" can be used to inform a (native
 
 
 
@@ -1458,8 +1458,6 @@ Brunstrom, et al.       Expires September 1, 2018              [Page 26]
 Internet-Draft             TAPS Implementation             February 2018
 
 
-   SCTP messages can be very large.  To allow the reception of large
-   messages in pieces, a "partial flag" can be used to inform a (native
    SCTP) receiving application that a message is incomplete.  After
    receiving the "partial flag", this application would know that the
    next receive calls will only deliver remaining parts of the same
@@ -1506,6 +1504,8 @@ Internet-Draft             TAPS Implementation             February 2018
    treated as it would without the framing protocol.  Sending and
    receiving of Messages, however, changes to treat each Message as a
    well-delineated HTTP request or response, with the content of the
+   Message representing the body, and the Headers being provided in
+   Message metadata.
 
 
 
@@ -1513,9 +1513,6 @@ Brunstrom, et al.       Expires September 1, 2018              [Page 27]
 
 Internet-Draft             TAPS Implementation             February 2018
 
-
-   Message representing the body, and the Headers being provided in
-   Message metadata.
 
 9.6.  QUIC
 
@@ -1560,6 +1557,9 @@ Internet-Draft             TAPS Implementation             February 2018
 
    This document has no actions for IANA.
 
+12.  Security Considerations
+
+
 
 
 
@@ -1569,8 +1569,6 @@ Brunstrom, et al.       Expires September 1, 2018              [Page 28]
 
 Internet-Draft             TAPS Implementation             February 2018
 
-
-12.  Security Considerations
 
 12.1.  Considerations for Candidate Gathering
 
@@ -1615,6 +1613,8 @@ Internet-Draft             TAPS Implementation             February 2018
    Thanks to Stuart Cheshire, Josh Graessley, David Schinazi, and Eric
    Kinnear for their implementation and design efforts, including Happy
    Eyeballs, that heavily influenced this work.
+
+
 
 
 
@@ -1714,6 +1714,10 @@ Internet-Draft             TAPS Implementation             February 2018
 Authors' Addresses
 
    Anna Brunstrom (editor)
+   Karlstad University
+   Universitetsgatan 2
+   651 88 Karlstad
+   Sweden
 
    Email: anna.brunstrom@kau.se
 
@@ -1725,10 +1729,6 @@ Authors' Addresses
    United States of America
 
    Email: tpauly@apple.com
-
-
-
-
 
 
 
@@ -1749,12 +1749,18 @@ Internet-Draft             TAPS Implementation             February 2018
 
    Karl-Johan Grinnemo
    Karlstad University
+   Universitetsgatan 2
+   651 88 Karlstad
+   Sweden
 
    Email: karl-johan.grinnemo@kau.se
 
 
    Tom Jones
    University of Aberdeen
+   Fraser Noble Building
+   Aberdeen, AB24 3UE
+   UK
 
    Email: tom@erg.abdn.ac.uk
 
@@ -1777,6 +1783,17 @@ Internet-Draft             TAPS Implementation             February 2018
    Email: csp@csperkins.org
 
 
+
+
+
+
+
+
+Brunstrom, et al.       Expires September 1, 2018              [Page 32]
+
+Internet-Draft             TAPS Implementation             February 2018
+
+
    Michael Welzl
    University of Oslo
    PO Box 1080 Blindern
@@ -1789,4 +1806,43 @@ Internet-Draft             TAPS Implementation             February 2018
 
 
 
-Brunstrom, et al.       Expires September 1, 2018              [Page 32]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Brunstrom, et al.       Expires September 1, 2018              [Page 33]
