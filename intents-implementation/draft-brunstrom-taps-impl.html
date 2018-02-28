@@ -298,7 +298,6 @@ address {
 <link href="#rfc.section.4.4.2" rel="Chapter" title="4.4.2 Failover">
 <link href="#rfc.section.4.5" rel="Chapter" title="4.5 Completing Establishment">
 <link href="#rfc.section.4.5.1" rel="Chapter" title="4.5.1 Determining Successful Establishment">
-<link href="#rfc.section.4.5.2" rel="Chapter" title="4.5.2 Protocol Configuration">
 <link href="#rfc.section.4.6" rel="Chapter" title="4.6 Establishing multiplexed connections">
 <link href="#rfc.section.4.7" rel="Chapter" title="4.7 Handling racing with &#8220;unconnected&#8221; protocols">
 <link href="#rfc.section.4.8" rel="Chapter" title="4.8 Implementing listeners">
@@ -475,8 +474,6 @@ address {
 </ul><li>4.5.   <a href="#rfc.section.4.5">Completing Establishment</a>
 </li>
 <ul><li>4.5.1.   <a href="#rfc.section.4.5.1">Determining Successful Establishment</a>
-</li>
-<li>4.5.2.   <a href="#rfc.section.4.5.2">Protocol Configuration</a>
 </li>
 </ul><li>4.6.   <a href="#rfc.section.4.6">Establishing multiplexed connections</a>
 </li>
@@ -809,17 +806,6 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 </h1>
 <p id="rfc.section.4.5.1.p.1">Implementations may select the criteria by which a leaf node is considered to be successfully connected differently on a per-protocol basis. If the only protocol being used is a transport protocol with a clear handshake, like TCP, then the obvious choice is to declare that node &#8220;connected&#8221; when the last packet of the three-way handshake has been received. If the only protocol being used is an &#8220;unconnected&#8221; protocol, like UDP, the implementation may consider the node fully &#8220;connected&#8221; the moment it determines a route is present, before sending any packets on the network <a href="#unconnected-racing" class="xref">Section 4.7</a>.</p>
 <p id="rfc.section.4.5.1.p.2">For protocol stacks with multiple handshakes, the decision becomes more nuanced. If the protocol stack involves both TLS and TCP, an implementation MAY determine that a leaf node is connected after the TCP handshake is complete, or it MAY wait for the TLS handshake to complete as well. The benefit of declaring completion when the TCP handshake finishes, and thus stopping the race for other branches of the tree, is that there will be less burden on the network from other connection attempts. On the other hand, by waiting until the TLS handshake is complete, an implementation avoids the scenario in which a TCP handshake completes quickly, but TLS negotiation is either very slow or fails altogether in particular network conditions or to a particular endpoint.</p>
-<h1 id="rfc.section.4.5.2">
-<a href="#rfc.section.4.5.2">4.5.2.</a> <a href="#protocol-configuration" id="protocol-configuration">Protocol Configuration</a>
-</h1>
-<p id="rfc.section.4.5.2.p.1">Once a connection is established and a protocol stack has been chosen, an implementation SHOULD configure any Protocol Properties given by the application which apply to the chosen protocol stack.</p>
-<p id="rfc.section.4.5.2.p.2">Additionally, an implementation MAY configure a transport protocol according to following Application Intents:</p>
-<p></p>
-
-<ul>
-<li>Traffic Category, Capacity Profile: The implementation may map information about the anticipated traffic pattern or priority to a DSCP code point value, e.g., see <a href="#I-D.ietf-tsvwg-rtcweb-qos" class="xref">[I-D.ietf-tsvwg-rtcweb-qos]</a>. Furthermore, if an application indicates a preference for low latency, the implementation may disable the Nagle algorithm on a TCP connection.</li>
-<li>Send Bitrate: If an application indicates a certain bitrate it wants to send on the connection, the implementation may limit the bitrate of the outgoing communication to that rate, for example by setting an upper bound for the TCP congestion window of a connection calculated from the Send Bitrate and the Round Trip Time. This helps to avoid bursty traffic patterns on video streaming servers, see <a href="#Trickle" class="xref">[Trickle]</a>.</li>
-</ul>
 <h1 id="rfc.section.4.6">
 <a href="#rfc.section.4.6">4.6.</a> <a href="#establish-mux" id="establish-mux">Establishing multiplexed connections</a>
 </h1>
@@ -865,6 +851,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <li>Corruption Protection Length: when this is set to any value other than -1, it limits the required checksum in protocols that allow limiting the checksum length (e.g. UDP-Lite).</li>
 <li>Immediate Acknowledgement: this informs the implementation that the sender intends to execute tight control over the send buffer, and therefore wants to avoid delayed acknowledgements. In case of SCTP, a request to immediately send acknowledgements can be implemented using the &#8220;sack-immediately flag&#8221; described in Section 4.2 of <a href="#RFC8303" class="xref">[RFC8303]</a> for the SEND.SCTP primitive.</li>
 <li>Instantaneous Capacity Profile: when this is&#160;set to &#8220;Interactive/Low Latency&#8221;, the Message should be sent immediately, even when this comes at the cost of using the network capacity less efficiently. For example, small messages can sometimes be bundled to fit into a single data packet for the sake of reducing header overhead; such bundling SHOULD not be used in case this parameter is true. For example, in case of TCP, the Nagle algorithm SHOULD be disabled when Immediate=true. Scavenger/Bulk can translate into usage of a congestion control mechanism such as LEDBAT, and/or the capacity profile can lead to a choice of a DSCP value as described in <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>).</li>
+<li>Send Bitrate: If an application indicates a certain bitrate it wants to send on the connection, the implementation may limit the bitrate of the outgoing communication to that rate, for example by setting an upper bound for the TCP congestion window of a connection calculated from the Send Bitrate and the Round Trip Time. This helps to avoid bursty traffic patterns on video streaming servers, see <a href="#Trickle" class="xref">[Trickle]</a>.</li>
 </ul>
 <h1 id="rfc.section.5.1.1.2">
 <a href="#rfc.section.5.1.1.2">5.1.1.2.</a> <a href="#send-completion" id="send-completion">Send Completion</a>
