@@ -298,13 +298,7 @@ address {
 <link href="#rfc.section.6.4" rel="Chapter" title="6.4 Connection Groups">
 <link href="#rfc.section.7" rel="Chapter" title="7 Sending Data">
 <link href="#rfc.section.7.1" rel="Chapter" title="7.1 Send Parameters">
-<link href="#rfc.section.7.1.1" rel="Chapter" title="7.1.1 Lifetime">
-<link href="#rfc.section.7.1.2" rel="Chapter" title="7.1.2 Niceness">
-<link href="#rfc.section.7.1.3" rel="Chapter" title="7.1.3 Ordered">
-<link href="#rfc.section.7.1.4" rel="Chapter" title="7.1.4 Idempotent">
-<link href="#rfc.section.7.1.5" rel="Chapter" title="7.1.5 Corruption Protection Length">
-<link href="#rfc.section.7.1.6" rel="Chapter" title="7.1.6 Immediate Acknowledgement">
-<link href="#rfc.section.7.1.7" rel="Chapter" title="7.1.7 Instantaneous Capacity Profile">
+<link href="#rfc.section.7.1.1" rel="Chapter" title="7.1.1 Message Properties">
 <link href="#rfc.section.7.2" rel="Chapter" title="7.2 Sender-side Framing">
 <link href="#rfc.section.8" rel="Chapter" title="8 Receiving Data">
 <link href="#rfc.section.8.1" rel="Chapter" title="8.1 Receiver-side De-framing over Stream Protocols">
@@ -466,19 +460,7 @@ address {
 </li>
 <ul><li>7.1.   <a href="#rfc.section.7.1">Send Parameters</a>
 </li>
-<ul><li>7.1.1.   <a href="#rfc.section.7.1.1">Lifetime</a>
-</li>
-<li>7.1.2.   <a href="#rfc.section.7.1.2">Niceness</a>
-</li>
-<li>7.1.3.   <a href="#rfc.section.7.1.3">Ordered</a>
-</li>
-<li>7.1.4.   <a href="#rfc.section.7.1.4">Idempotent</a>
-</li>
-<li>7.1.5.   <a href="#rfc.section.7.1.5">Corruption Protection Length</a>
-</li>
-<li>7.1.6.   <a href="#rfc.section.7.1.6">Immediate Acknowledgement</a>
-</li>
-<li>7.1.7.   <a href="#rfc.section.7.1.7">Instantaneous Capacity Profile</a>
+<ul><li>7.1.1.   <a href="#rfc.section.7.1.1">Message Properties</a>
 </li>
 </ul><li>7.2.   <a href="#rfc.section.7.2">Sender-side Framing</a>
 </li>
@@ -533,17 +515,33 @@ address {
 </h1>
 <p id="rfc.section.2.p.1">This API is described in terms of Objects, which an application can interact with; Actions the application can perform on these Objects; Events, which an Object can send to an application asynchronously; and Parameters associated with these Actions and Events.</p>
 <p id="rfc.section.2.p.2">The following notations, which can be combined, are used in this document:</p>
+<pre>
+Object := Action()
+</pre>
 <p></p>
 
-<ul>
-<li>An Action creates an Object: ~~~ Object := Action() ~~~</li>
-<li>An Action is performed on an Object: ~~~ Object.Action() ~~~</li>
-<li>An Object sends an Event: ~~~ Object -&gt; Event&lt;&gt; ~~~</li>
-<li>An Action takes a set of Parameters; an Event contains a set of Parameters: ~~~ Action(parameter, parameter, &#8230;) / Event&lt;parameter, parameter, &#8230;&gt; ~~~</li>
-</ul>
-<p id="rfc.section.2.p.4">Actions associated with no Object are Actions on the abstract interface itself; they are equivalent to Actions on a per-application global context.</p>
-<p id="rfc.section.2.p.5">How these abstract concepts map into concrete implementations of this API in a given language on a given platform is largely dependent on the features of the language and the platform. Actions could be implemented as functions or method calls, for instance, and Events could be implemented via callback passing or other asynchronous calling conventions. The method for registering callbacks and handlers is left as an implementation detail, with the caveat that the interface for receiving Messages must require the application to invoke the Connection.Receive() Action once per Message to be received (see <a href="#receiving" class="xref">Section 8</a>).</p>
-<p id="rfc.section.2.p.6">This specification treats Events and errors similarly, as errors, just as any other Events, may occur asynchronously in network applications. However, it is recommended that implementations of this interface also return errors immediately, according to the error handling idioms of the implementation platform, for errors which can be immediately detected, such as inconsistency in transport parameters.</p>
+<ul class="empty"><li><ul class="empty"><li>An Action creates an Object.</li></ul></li></ul>
+<pre>
+Object.Action()
+</pre>
+<p></p>
+
+<ul class="empty"><li><ul class="empty"><li>An Action is performed on an Object.</li></ul></li></ul>
+<pre>
+Object -&gt; Event&lt;&gt;
+</pre>
+<p></p>
+
+<ul class="empty"><li><ul class="empty"><li>An Object sends an Event.</li></ul></li></ul>
+<pre>
+Action(parameter, parameter, ...) / Event&lt;parameter, parameter, ...&gt;
+</pre>
+<p></p>
+
+<ul class="empty"><li><ul class="empty"><li>An Action takes a set of Parameters; an Event contains a set of Parameters.</li></ul></li></ul>
+<p id="rfc.section.2.p.7">Actions associated with no Object are Actions on the abstract interface itself; they are equivalent to Actions on a per-application global context.</p>
+<p id="rfc.section.2.p.8">How these abstract concepts map into concrete implementations of this API in a given language on a given platform is largely dependent on the features of the language and the platform. Actions could be implemented as functions or method calls, for instance, and Events could be implemented via callback passing or other asynchronous calling conventions. The method for registering callbacks and handlers is left as an implementation detail, with the caveat that the interface for receiving Messages must require the application to invoke the Connection.Receive() Action once per Message to be received (see <a href="#receiving" class="xref">Section 8</a>).</p>
+<p id="rfc.section.2.p.9">This specification treats Events and errors similarly, as errors, just as any other Events, may occur asynchronously in network applications. However, it is recommended that implementations of this interface also return errors immediately, according to the error handling idioms of the implementation platform, for errors which can be immediately detected, such as inconsistency in transport parameters.</p>
 <h1 id="rfc.section.3">
 <a href="#rfc.section.3">3.</a> <a href="#principles" id="principles">Interface Design Principles</a>
 </h1>
@@ -622,23 +620,23 @@ LocalSpecifier.WithStunServer(address, port, credentials)
 </tr></thead>
 <tbody>
 <tr>
-<td class="left">Require</td>
+<td class="left"><samp>Require </samp></td>
 <td class="left">Select only protocols/paths providing the property, fail otherwise</td>
 </tr>
 <tr>
-<td class="left">Prefer</td>
+<td class="left"><samp>Prefer  </samp></td>
 <td class="left">Prefer protocols/paths providing the property, proceed otherwise</td>
 </tr>
 <tr>
-<td class="left">Ignore</td>
+<td class="left"><samp>Ignore  </samp></td>
 <td class="left">Cancel any default preference for this property</td>
 </tr>
 <tr>
-<td class="left">Avoid</td>
+<td class="left"><samp>Avoid   </samp></td>
 <td class="left">Prefer protocols/paths not providing the property, proceed otherwise</td>
 </tr>
 <tr>
-<td class="left">Prohibit</td>
+<td class="left"><samp>Prohibit</samp></td>
 <td class="left">Select only protocols/paths not providing the property, fail otherwise</td>
 </tr>
 </tbody>
@@ -651,7 +649,7 @@ LocalSpecifier.WithStunServer(address, port, credentials)
 <li>Reliable Data Transfer: This boolean property specifies whether the application needs the transport protocol to ensure that data is received completely and without corruption on the other side. This also entails being notified when a Connection is closed or aborted. This property applies to Connections and Connection Groups.  This is a strict requirement. The default is to enable Reliable Data Transfer.</li>
 <li>Preservation of data ordering: This boolean property specifies whether the application needs the transport protocol to assure that data is received by the application on the other end in the same order as it was sent. This property applies to Connections and Connection Groups. This is a strict requirement. The default is to preserve data ordering.</li>
 <li>Configure reliability on a per-Message basis: This boolean property specifies whether an application considers it useful to indicate its reliability requirements on a per-Message basis.  This property applies to Connections and Connection Groups. This is not a strict requirement.  The default is to not have this option.</li>
-<li>Use 0-RTT session establishment with an idempotent Message: This boolean property specifies whether an application would like to supply a Message to the transport protocol before Connection establishment, which will then be reliably transferred to the other side before or during Connection establishment, potentially multiple times.  See also <a href="#send-idempotent" class="xref">Section 7.1.4</a>.  This is a strict requirement. The default is to not have this option.</li>
+<li>Use 0-RTT session establishment with an idempotent Message: This boolean property specifies whether an application would like to supply a Message to the transport protocol before Connection establishment, which will then be reliably transferred to the other side before or during Connection establishment, potentially multiple times.  See also <a href="#send-idempotent" class="xref">Section 7.1.1.4</a>.  This is a strict requirement. The default is to not have this option.</li>
 <li>Multiplex Connections: This boolean property specifies that the application would prefer multiple Connections between the same endpoints within a Connection Group to be multiplexed onto a single underlying transport connection where possible, for reasons of efficiency. This is not a strict requirement. The default is to not have this option.</li>
 <li>Notification of excessive retransmissions: This boolean property specifies whether an application considers it useful to be informed in case sent data was retransmitted more often than a certain threshold. This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</li>
 <li>Notification of ICMP error message arrival: This boolean property specifies whether an application considers it useful to be informed when an ICMP error message arrives. This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</li>
@@ -677,7 +675,7 @@ LocalSpecifier.WithStunServer(address, port, credentials)
 <pre>
 TransportParameters := NewTransportParameters()
 </pre>
-<p id="rfc.section.5.2.1.p.2">The Individual parameters are then added to the TransportParameters Object.  While Protocol Properties use the <samp>add</samp> call, Transport Preferences use special calls for the levels defined in <a href="#transport-params" class="xref">Section 5.2</a>.</p>
+<p id="rfc.section.5.2.1.p.2">The Individual parameters are then added to the TransportParameters Object.  While Protocol Properties and Application Intents use the <samp>add</samp> call, Transport Preferences use special calls for the levels defined in <a href="#transport-params" class="xref">Section 5.2</a>.</p>
 <pre>
 TransportParameters.Add(parameter, value)
 
@@ -822,7 +820,7 @@ Connection := Connection.Clone()
 <p id="rfc.section.6.4.p.2">Calling Clone on a Connection yields a group of two Connections: the parent Connection on which Clone was called, and the resulting clone Connection. These connections are &#8220;entangled&#8221; with each other, and become part of a Connection group. Calling Clone on any of these two Connections adds a third Connection to the group, and so on. Connections in a Connection Group share all their properties, and changing the properties on one Connection in the group changes the property for all others.</p>
 <p id="rfc.section.6.4.p.3">Calling Clone on a Preconnection yields a Preconnection with the same parameters, which is entangled with the parent Preconnection: all the Connections created from entangled Preconnections will be entangled as if they had been cloned, and will belong to the same Connection Group.</p>
 <p id="rfc.section.6.4.p.4">Establishing a Connection from a cloned Preconnection will not cause Connections for other entangled Preconnections to be established; each such Connection must be established separately. Changes to the parameters of a Preconnection entangled with a Preconnection from which a Connection has already been established will fail. Calling Clone on a Preconnection may be taken by the system an implicit signal that Protocol Stacks supporting multiplexed Connections for efficient Connection Grouping are preferred by the application.</p>
-<p id="rfc.section.6.4.p.5">There is only one Protocol Property that is not entangled, i.e., it is a separate per-Connection Property for individual Connections in the group: niceness. Niceness works as in <a href="#send-niceness" class="xref">Section 7.1.2</a>: when allocating available network capacity among Connections in a Connection Group, sends on Connections with higher Niceness values will be prioritized over sends on Connections with lower Niceness values. An ideal transport system implementation would assign the Connection the capacity share (M-N) x C / M, where N is the Connection&#8217;s Niceness value, M is the maximum Niceness value used by all Connections in the group and C is the total available capacity. However, the niceness setting is purely advisory, and no guarantees are given about capacity allocation and each implementation is free to implement exact capacity allocation as it sees fit.</p>
+<p id="rfc.section.6.4.p.5">There is only one Protocol Property that is not entangled, i.e., it is a separate per-Connection Property for individual Connections in the group: niceness. Niceness works as in <a href="#send-niceness" class="xref">Section 7.1.1.2</a>: when allocating available network capacity among Connections in a Connection Group, sends on Connections with higher Niceness values will be prioritized over sends on Connections with lower Niceness values. An ideal transport system implementation would assign the Connection the capacity share (M-N) x C / M, where N is the Connection&#8217;s Niceness value, M is the maximum Niceness value used by all Connections in the group and C is the total available capacity. However, the niceness setting is purely advisory, and no guarantees are given about capacity allocation and each implementation is free to implement exact capacity allocation as it sees fit.</p>
 <h1 id="rfc.section.7">
 <a href="#rfc.section.7">7.</a> <a href="#sending" id="sending">Sending Data</a>
 </h1>
@@ -833,7 +831,7 @@ Connection.Send(Message, sendParameters)
 <p id="rfc.section.7.p.2">The type of the Message to be passed is dependent on the implementation, and on the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. It may itself contain an array of octets to be transmitted in the transport protocol payload, or be transformable to an array of octets by a sender-side framer (see <a href="#send-framing" class="xref">Section 7.2</a>).</p>
 <p id="rfc.section.7.p.3">Some transport protocols can deliver arbitrarily sized Messages, but other protocols constrain the maximum Message size. Applications can query the protocol property Maximum Message Size on Send to determine the maximum size.</p>
 <p id="rfc.section.7.p.4">There may also be system and Protocol Stack dependent limits on the size of a Message which can be transmitted atomically. For that reason, the Message object passed to the Send action may also be a partial Message, either representing the whole data object and information about the range of bytes to send from it, or an object referring back to the larger whole Message.  The details of partial Message sending are implementation-dependent.</p>
-<p id="rfc.section.7.p.5">If Send is called on a Connection which has not yet been established, an Initiate Action will be implicitly performed simultaneously with the Send.  Used together with the Idempotent property (see <a href="#send-idempotent" class="xref">Section 7.1.4</a>), this can be used to send data during establishment for 0-RTT session resumption on Protocol Stacks that support it.</p>
+<p id="rfc.section.7.p.5">If Send is called on a Connection which has not yet been established, an Initiate Action will be implicitly performed simultaneously with the Send.  Used together with the Idempotent property (see <a href="#send-idempotent" class="xref">Section 7.1.1.4</a>), this can be used to send data during establishment for 0-RTT session resumption on Protocol Stacks that support it.</p>
 <p id="rfc.section.7.p.6">Like all Actions in this interface, the Send Action is asynchronous.</p>
 <pre>
 Connection -&gt; Sent&lt;msgRef&gt;
@@ -843,7 +841,7 @@ Connection -&gt; Sent&lt;msgRef&gt;
 <pre>
 Connection -&gt; Expired&lt;msgRef&gt;
 </pre>
-<p id="rfc.section.7.p.9">The Expired Event occurs when a previous Send Action expired before completion; i.e. when the Message was not sent before its Lifetime (see <a href="#send-lifetime" class="xref">Section 7.1.1</a>) expired. This is separate from SendError, as it is an expected behavior for partially reliable transports. The Expired Event contains an implementation-specific reference to the Message to which it applies.</p>
+<p id="rfc.section.7.p.9">The Expired Event occurs when a previous Send Action expired before completion; i.e. when the Message was not sent before its Lifetime (see <a href="#send-lifetime" class="xref">Section 7.1.1.1</a>) expired. This is separate from SendError, as it is an expected behavior for partially reliable transports. The Expired Event contains an implementation-specific reference to the Message to which it applies.</p>
 <pre>
 Connection -&gt; SendError&lt;msgRef&gt;
 </pre>
@@ -857,39 +855,41 @@ Connection -&gt; SendError&lt;msgRef&gt;
 SendParameters := NewSendParameters()
 SendParameters.Add(parameter, value)
 </pre>
-<p id="rfc.section.7.1.p.3">The Send Parameters share a single namespace with the Transport Parameters (see <a href="#transport-params" class="xref">Section 5.2</a>). This allows the specification of Protocol Properties that can be overridden on a per-Message basis.</p>
+<p id="rfc.section.7.1.p.3">The Send Parameters are organized in <em>Message Properties</em> and <em>Application Intents</em>.  The Send Parameters share a single namespace with the Transport Parameters (see <a href="#transport-params" class="xref">Section 5.2</a>). This allows to specify Protocol Properties and that can be overridden on a per-Message basis or Application Intents that apply to a specific Message.</p>
 <p id="rfc.section.7.1.p.4">Send Parameters may be inconsistent with the properties of the Protocol Stacks underlying the Connection on which a given Message is sent. For example, infinite Lifetime is not possible on a Message over a Connection not providing reliability. Sending a Message with Send Properties inconsistent with the Transport Preferences on the Connection yields an error.</p>
-<p id="rfc.section.7.1.p.5">The following send parameters are supported:</p>
 <h1 id="rfc.section.7.1.1">
-<a href="#rfc.section.7.1.1">7.1.1.</a> <a href="#send-lifetime" id="send-lifetime">Lifetime</a>
+<a href="#rfc.section.7.1.1">7.1.1.</a> <a href="#message-properties" id="message-properties">Message Properties</a>
 </h1>
-<p id="rfc.section.7.1.1.p.1">Lifetime specifies how long a particular Message can wait to be sent to the remote endpoint before it is irrelevant and no longer needs to be (re-)transmitted. When a Message&#8217;s Lifetime is infinite, it must be transmitted reliably. The type and units of Lifetime are implementation-specific.</p>
-<h1 id="rfc.section.7.1.2">
-<a href="#rfc.section.7.1.2">7.1.2.</a> <a href="#send-niceness" id="send-niceness">Niceness</a>
+<h1 id="rfc.section.7.1.1.1">
+<a href="#rfc.section.7.1.1.1">7.1.1.1.</a> <a href="#send-lifetime" id="send-lifetime">Lifetime</a>
 </h1>
-<p id="rfc.section.7.1.2.p.1">Niceness represents an unbounded hierarchy of priorities of Messages, relative to other Messages sent over the same Connection and/or Connection Group (see <a href="#groups" class="xref">Section 6.4</a>). It is most naturally represented as a non-negative integer.  A Message with Niceness 0 will yield to a Message with Niceness 1, which will yield to a Message with Niceness 2, and so on. Niceness may be used as a sender-side scheduling construct only, or be used to specify priorities on the wire for Protocol Stacks supporting prioritization.</p>
-<p id="rfc.section.7.1.2.p.2">Note that this inversion of normal schemes for expressing priority has a convenient property: priority increases as both Niceness and Lifetime decrease.</p>
-<h1 id="rfc.section.7.1.3">
-<a href="#rfc.section.7.1.3">7.1.3.</a> <a href="#send-ordered" id="send-ordered">Ordered</a>
+<p id="rfc.section.7.1.1.1.p.1">Lifetime specifies how long a particular Message can wait to be sent to the remote endpoint before it is irrelevant and no longer needs to be (re-)transmitted. When a Message&#8217;s Lifetime is infinite, it must be transmitted reliably. The type and units of Lifetime are implementation-specific.</p>
+<h1 id="rfc.section.7.1.1.2">
+<a href="#rfc.section.7.1.1.2">7.1.1.2.</a> <a href="#send-niceness" id="send-niceness">Niceness</a>
 </h1>
-<p id="rfc.section.7.1.3.p.1">Ordered is a boolean property. If true, this Message should be delivered after the last Message passed to the same Connection via the Send Action; if false, this Message may be delivered out of order.</p>
-<h1 id="rfc.section.7.1.4">
-<a href="#rfc.section.7.1.4">7.1.4.</a> <a href="#send-idempotent" id="send-idempotent">Idempotent</a>
+<p id="rfc.section.7.1.1.2.p.1">Niceness represents an unbounded hierarchy of priorities of Messages, relative to other Messages sent over the same Connection and/or Connection Group (see <a href="#groups" class="xref">Section 6.4</a>). It is most naturally represented as a non-negative integer.  A Message with Niceness 0 will yield to a Message with Niceness 1, which will yield to a Message with Niceness 2, and so on. Niceness may be used as a sender-side scheduling construct only, or be used to specify priorities on the wire for Protocol Stacks supporting prioritization.</p>
+<p id="rfc.section.7.1.1.2.p.2">Note that this inversion of normal schemes for expressing priority has a convenient property: priority increases as both Niceness and Lifetime decrease.</p>
+<h1 id="rfc.section.7.1.1.3">
+<a href="#rfc.section.7.1.1.3">7.1.1.3.</a> <a href="#send-ordered" id="send-ordered">Ordered</a>
 </h1>
-<p id="rfc.section.7.1.4.p.1">Idempotent is a boolean property. If true, the application-layer entity in the Message is safe to send to the remote endpoint more than once for a single Send Action. It is used to mark data safe for certain 0-RTT establishment techniques, where retransmission of the 0-RTT data may cause the remote application to receive the Message multiple times.</p>
-<h1 id="rfc.section.7.1.5">
-<a href="#rfc.section.7.1.5">7.1.5.</a> <a href="#send-checksum" id="send-checksum">Corruption Protection Length</a>
+<p id="rfc.section.7.1.1.3.p.1">Ordered is a boolean property. If true, this Message should be delivered after the last Message passed to the same Connection via the Send Action; if false, this Message may be delivered out of order.</p>
+<h1 id="rfc.section.7.1.1.4">
+<a href="#rfc.section.7.1.1.4">7.1.1.4.</a> <a href="#send-idempotent" id="send-idempotent">Idempotent</a>
 </h1>
-<p id="rfc.section.7.1.5.p.1">This numeric property specifies the length of the section of the Message, starting from byte 0, that the application assumes will be received without corruption due to lower layer errors. It is used to specify options for simple integrity protection via checksums. By default, the entire Message is protected by checksum. A value of 0 means that no checksum is required, and a special value (e.g. -1) can be used to indicate the default. Only full coverage is guaranteed, any other requests are advisory.</p>
-<h1 id="rfc.section.7.1.6">
-<a href="#rfc.section.7.1.6">7.1.6.</a> <a href="#send-ackimmed" id="send-ackimmed">Immediate Acknowledgement</a>
+<p id="rfc.section.7.1.1.4.p.1">Idempotent is a boolean property. If true, the application-layer entity in the Message is safe to send to the remote endpoint more than once for a single Send Action. It is used to mark data safe for certain 0-RTT establishment techniques, where retransmission of the 0-RTT data may cause the remote application to receive the Message multiple times.</p>
+<h1 id="rfc.section.7.1.1.5">
+<a href="#rfc.section.7.1.1.5">7.1.1.5.</a> <a href="#send-checksum" id="send-checksum">Corruption Protection Length</a>
 </h1>
-<p id="rfc.section.7.1.6.p.1">This boolean property specifies, if true, that an application wants this Message to be acknowledged immediately by the receiver. In case of reliable transmission, this informs the transport protocol on the sender side faster that it can remove the Message from its buffer; therefore this property can be useful for latency-critical applications that maintain tight control over the send buffer (see <a href="#sending" class="xref">Section 7</a>).</p>
-<h1 id="rfc.section.7.1.7">
-<a href="#rfc.section.7.1.7">7.1.7.</a> <a href="#instantaneous-capacity-profile" id="instantaneous-capacity-profile">Instantaneous Capacity Profile</a>
+<p id="rfc.section.7.1.1.5.p.1">This numeric property specifies the length of the section of the Message, starting from byte 0, that the application assumes will be received without corruption due to lower layer errors. It is used to specify options for simple integrity protection via checksums. By default, the entire Message is protected by checksum. A value of 0 means that no checksum is required, and a special value (e.g. -1) can be used to indicate the default. Only full coverage is guaranteed, any other requests are advisory.</p>
+<h1 id="rfc.section.7.1.1.6">
+<a href="#rfc.section.7.1.1.6">7.1.1.6.</a> <a href="#send-ackimmed" id="send-ackimmed">Immediate Acknowledgement</a>
 </h1>
-<p id="rfc.section.7.1.7.p.1">This enumerated property specifies the application&#8217;s preferred tradeoffs for sending this Message; it is a per-Message override of the Capacity Profile protocol and path selection property (see <a href="#transport-params" class="xref">Section 5.2</a>).</p>
-<p id="rfc.section.7.1.7.p.2">The following values are valid for Instantaneous Capacity Profile:</p>
+<p id="rfc.section.7.1.1.6.p.1">This boolean property specifies, if true, that an application wants this Message to be acknowledged immediately by the receiver. In case of reliable transmission, this informs the transport protocol on the sender side faster that it can remove the Message from its buffer; therefore this property can be useful for latency-critical applications that maintain tight control over the send buffer (see <a href="#sending" class="xref">Section 7</a>).</p>
+<h1 id="rfc.section.7.1.1.7">
+<a href="#rfc.section.7.1.1.7">7.1.1.7.</a> <a href="#instantaneous-capacity-profile" id="instantaneous-capacity-profile">Instantaneous Capacity Profile</a>
+</h1>
+<p id="rfc.section.7.1.1.7.p.1">This enumerated property specifies the application&#8217;s preferred tradeoffs for sending this Message; it is a per-Message override of the Capacity Profile protocol and path selection property (see <a href="#transport-params" class="xref">Section 5.2</a>).</p>
+<p id="rfc.section.7.1.1.7.p.2">The following values are valid for Instantaneous Capacity Profile:</p>
 <p></p>
 
 <dl>
@@ -987,12 +987,12 @@ Connection.SetProperties()
 <p></p>
 
 <ul>
-<li>Relative niceness: This numeric property is similar to the Niceness send property (see <a href="#send-niceness" class="xref">Section 7.1.2</a>), a non-negative integer representing the relative inverse priority of this Connection relative to other Connections in the same Connection Group. It has no effect on Connections not part of a Connection Group. As noted in <a href="#groups" class="xref">Section 6.4</a>, this property is not entangled when Connections are cloned.</li>
+<li>Relative niceness: This numeric property is similar to the Niceness send property (see <a href="#send-niceness" class="xref">Section 7.1.1.2</a>), a non-negative integer representing the relative inverse priority of this Connection relative to other Connections in the same Connection Group. It has no effect on Connections not part of a Connection Group. As noted in <a href="#groups" class="xref">Section 6.4</a>, this property is not entangled when Connections are cloned.</li>
 <li>Timeout for aborting Connection: This numeric property specifies how long to wait before aborting a Connection during establishment, or before deciding that a Connection has failed after establishment. It is given in seconds.</li>
 <li>Retransmission threshold before excessive retransmission notification: This numeric property specifies after how many retransmissions to inform the application about &#8220;Excessive Retransmissions&#8221;.</li>
 <li>Required minimum coverage of the checksum for receiving: This numeric property specifies the part of the received data that needs to be covered by a checksum. It is given in Bytes. A value of 0 means that no checksum is required, and a special value (e.g., -1) indicates full checksum coverage.</li>
 <li>Connection group transmission scheduler: This enumerated property specifies which scheduler should be used among Connections within a Connection Group. It applies to Connection Groups; the set of schedulers can be taken from <a href="#I-D.ietf-tsvwg-sctp-ndata" class="xref">[I-D.ietf-tsvwg-sctp-ndata]</a>.</li>
-<li>Maximum message size concurrent with Connection establishment: This numeric property represents the maximum Message size that can be sent before or during Connection establishment, see also <a href="#send-idempotent" class="xref">Section 7.1.4</a>.  It is given in Bytes. This property is read-only.</li>
+<li>Maximum message size concurrent with Connection establishment: This numeric property represents the maximum Message size that can be sent before or during Connection establishment, see also <a href="#send-idempotent" class="xref">Section 7.1.1.4</a>.  It is given in Bytes. This property is read-only.</li>
 <li>Maximum Message size before fragmentation or segmentation: This numeric property, if applicable, represents the maximum Message size that can be sent without incurring network-layer fragmentation and/or transport layer segmentation at the sender. This property is read-only.</li>
 <li>Maximum Message size on send: This numeric property represents the maximum Message size that can be sent. This property is read-only.</li>
 <li>Maximum Message size on receive: This numeric property represents the maximum Message size that can be received.  This property is read-only.</li>
