@@ -98,7 +98,7 @@ Table of Contents
    8.  Receiving Data  . . . . . . . . . . . . . . . . . . . . . . .  22
      8.1.  Receiver-side De-framing over Stream Protocols  . . . . .  24
    9.  Setting and Querying of Connection Properties . . . . . . . .  25
-     9.1.  Protocol Properties . . . . . . . . . . . . . . . . . . .  25
+     9.1.  Protocol Properties . . . . . . . . . . . . . . . . . . .  26
    10. Connection Termination  . . . . . . . . . . . . . . . . . . .  27
    11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  28
    12. Security Considerations . . . . . . . . . . . . . . . . . . .  28
@@ -118,7 +118,7 @@ Internet-Draft               TAPS Interface                   March 2018
      A.1.  Protocol and Path Selection Properties  . . . . . . . . .  30
        A.1.1.  Application Intents . . . . . . . . . . . . . . . . .  30
      A.2.  Protocol Properties . . . . . . . . . . . . . . . . . . .  32
-     A.3.  Send Parameters . . . . . . . . . . . . . . . . . . . . .  32
+     A.3.  Send Parameters . . . . . . . . . . . . . . . . . . . . .  33
    Appendix B.  Sample API definition in Go  . . . . . . . . . . . .  33
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  33
 
@@ -975,14 +975,18 @@ Internet-Draft               TAPS Interface                   March 2018
    or be transformable to an array of octets by a sender-side framer
    (see Section 7.2).
 
-   Messages may be arbitrarily large; however, there may be system and
-   Protocol Stack dependent limits on the size of a data object which
-   can be transmitted atomically.  For that reason, the Message object
-   passed to the Send action may also be a partial Message, either
-   representing the whole data object and information about the range of
-   bytes to send from it, or an object referring back to the larger
-   whole Message.  The details of partial Message sending are
-   implementation-dependent.
+   Some transport protocols can deliver arbitrarily sized Messages, but
+   other protocols constrain the maximum Message size.  Applications can
+   query the protocol property Maximum Message Size on Send to determine
+   the maximum size.
+
+   There may also be system and Protocol Stack dependent limits on the
+   size of a Message which can be transmitted atomically.  For that
+   reason, the Message object passed to the Send action may also be a
+   partial Message, either representing the whole data object and
+   information about the range of bytes to send from it, or an object
+   referring back to the larger whole Message.  The details of partial
+   Message sending are implementation-dependent.
 
    If Send is called on a Connection which has not yet been established,
    an Initiate action will be implicitly performed simultaneously with
@@ -998,10 +1002,6 @@ Internet-Draft               TAPS Interface                   March 2018
    i.e., when the data derived from the Message has been passed down or
    through the underlying Protocol Stack and is no longer the
    responsibility of the implementation of this interface.  The exact
-   disposition of the Message when the Sent event occurs is specific to
-   the implementation and the constraints on the Protocol Stacks implied
-   by the Connection's transport parameters.  The Sent event contains an
-   implementation-specific reference to the Message to which it applies.
 
 
 
@@ -1009,6 +1009,11 @@ Trammell, et al.        Expires September 2, 2018              [Page 18]
 
 Internet-Draft               TAPS Interface                   March 2018
 
+
+   disposition of the Message when the Sent event occurs is specific to
+   the implementation and the constraints on the Protocol Stacks implied
+   by the Connection's transport parameters.  The Sent event contains an
+   implementation-specific reference to the Message to which it applies.
 
    Sent events allow an application to obtain an understanding of the
    amount of buffering it creates.  That is, if an application calls the
@@ -1052,12 +1057,7 @@ Internet-Draft               TAPS Interface                   March 2018
    _Application Intents_.  The Send Parameters share a single namespace
    with the Transport Parameters (see Section 5.2).  This allows to
    specify Protocol Properties and that can be overridden on a per-
-   Message basis or Application Intents that apply to a specific
-   Message.
 
-   Send Parameters may be inconsistent with the properties of the
-   Protocol Stacks underlying the Connection on which a given Message is
-   sent.  For example, infinite Lifetime is not possible on a Message
 
 
 
@@ -1066,6 +1066,12 @@ Trammell, et al.        Expires September 2, 2018              [Page 19]
 Internet-Draft               TAPS Interface                   March 2018
 
 
+   Message basis or Application Intents that apply to a specific
+   Message.
+
+   Send Parameters may be inconsistent with the properties of the
+   Protocol Stacks underlying the Connection on which a given Message is
+   sent.  For example, infinite Lifetime is not possible on a Message
    over a Connection not providing reliability.  Sending a Message with
    Send Properties inconsistent with the Transport Preferences on the
    connection yields an error.
@@ -1108,12 +1114,6 @@ Internet-Draft               TAPS Interface                   March 2018
    entity in the Message is safe to send to the remote endpoint more
    than once for a single Send action.  It is used to mark data safe for
    certain 0-RTT establishment techniques, where retransmission of the
-   0-RTT data may cause the remote application to receive the Message
-   multiple times.
-
-
-
-
 
 
 
@@ -1121,6 +1121,9 @@ Trammell, et al.        Expires September 2, 2018              [Page 20]
 
 Internet-Draft               TAPS Interface                   March 2018
 
+
+   0-RTT data may cause the remote application to receive the Message
+   multiple times.
 
 7.1.1.5.  Corruption Protection Length
 
@@ -1166,10 +1169,7 @@ Internet-Draft               TAPS Interface                   March 2018
    Constant Rate:  Delay and delay variation should be optimized at the
       expense of bandwidth efficiency.
 
-   Scavenger/Bulk:  This Message may be sent at the system's leisure.
-      This can be used to signal a preference for less-than-best-effort
-      treatment, to delay sending until lower-cost paths are available,
-      and so on.
+
 
 
 
@@ -1177,6 +1177,11 @@ Trammell, et al.        Expires September 2, 2018              [Page 21]
 
 Internet-Draft               TAPS Interface                   March 2018
 
+
+   Scavenger/Bulk:  This Message may be sent at the system's leisure.
+      This can be used to signal a preference for less-than-best-effort
+      treatment, to delay sending until lower-cost paths are available,
+      and so on.
 
 7.2.  Sender-side Framing
 
@@ -1222,11 +1227,6 @@ Internet-Draft               TAPS Interface                   March 2018
    they are available; the interface may return partial Messages smaller
    than maxLength according to implementation constraints.
 
-   Connection -> Received<Message>
-
-   As with sending, the type of the Message to be passed is dependent on
-   the implementation, and on the constraints on the Protocol Stacks
-
 
 
 Trammell, et al.        Expires September 2, 2018              [Page 22]
@@ -1234,6 +1234,10 @@ Trammell, et al.        Expires September 2, 2018              [Page 22]
 Internet-Draft               TAPS Interface                   March 2018
 
 
+   Connection -> Received<Message>
+
+   As with sending, the type of the Message to be passed is dependent on
+   the implementation, and on the constraints on the Protocol Stacks
    implied by the Connection's transport parameters.  The Message may
    also contain metadata from protocols in the Protocol Stack; which
    metadata is available is Protocol Stack dependent.  In particular,
@@ -1277,10 +1281,6 @@ Internet-Draft               TAPS Interface                   March 2018
        (highest-offset) partial Message in the full Message, and an
        optional reference to the full Message it belongs to; or
 
-   3.  this is a partial message containing data with no definite
-       message boundary, i.e. the only known message boundary is given
-       by termination of the Connection
-
 
 
 
@@ -1289,6 +1289,10 @@ Trammell, et al.        Expires September 2, 2018              [Page 23]
 
 Internet-Draft               TAPS Interface                   March 2018
 
+
+   3.  this is a partial message containing data with no definite
+       message boundary, i.e. the only known message boundary is given
+       by termination of the Connection
 
    Note that in the absence of message boundary preservation and without
    deframing, the entire connection is represented as one large message
@@ -1332,10 +1336,6 @@ Internet-Draft               TAPS Interface                   March 2018
    the Deframer depends on the protocol used at the application layer,
    it is bound to the Preconnection during the pre-establishment phase:
 
-   Preconnection.DeframeWith(Deframer)
-
-   Message := Deframer.Deframe(OctetStream, ...)
-
 
 
 
@@ -1345,6 +1345,10 @@ Trammell, et al.        Expires September 2, 2018              [Page 24]
 
 Internet-Draft               TAPS Interface                   March 2018
 
+
+   Preconnection.DeframeWith(Deframer)
+
+   Message := Deframer.Deframe(OctetStream, ...)
 
 9.  Setting and Querying of Connection Properties
 
@@ -1389,11 +1393,7 @@ Internet-Draft               TAPS Interface                   March 2018
       provisioning domain, measurements by the protocol stack, or other
       sources.  They can only be queried.
 
-9.1.  Protocol Properties
 
-   Protocol Properties represent the configuration of the selected
-   Protocol Stacks backing a connection.  Some properties apply
-   generically across multiple transport protocols, while other
 
 
 
@@ -1402,6 +1402,11 @@ Trammell, et al.        Expires September 2, 2018              [Page 25]
 Internet-Draft               TAPS Interface                   March 2018
 
 
+9.1.  Protocol Properties
+
+   Protocol Properties represent the configuration of the selected
+   Protocol Stacks backing a connection.  Some properties apply
+   generically across multiple transport protocols, while other
    properties only apply to specific protocols.  The default settings of
    these properties will vary based on the specific protocols being used
    and the system's configuration.
@@ -1444,12 +1449,7 @@ Internet-Draft               TAPS Interface                   March 2018
    o  Maximum message size concurrent with connection establishment:
       This numeric property represents the maximum Message size that can
       be sent before or during Connection establishment, see also
-      Section 7.1.1.4.  It is given in Bytes.  This property is read-
-      only.
 
-   o  Maximum Message size before fragmentation or segmentation: This
-      numeric property, if applicable, represents the maximum Message
-      size that can be sent without incurring network-layer
 
 
 
@@ -1458,6 +1458,12 @@ Trammell, et al.        Expires September 2, 2018              [Page 26]
 Internet-Draft               TAPS Interface                   March 2018
 
 
+      Section 7.1.1.4.  It is given in Bytes.  This property is read-
+      only.
+
+   o  Maximum Message size before fragmentation or segmentation: This
+      numeric property, if applicable, represents the maximum Message
+      size that can be sent without incurring network-layer
       fragmentation and/or transport layer segmentation at the sender.
       This property is read-only.
 
@@ -1500,12 +1506,6 @@ Internet-Draft               TAPS Interface                   March 2018
 
    Connection.Abort()
 
-   A ConnectionError can inform the application that the other side has
-   aborted the Connection; however, there is no guarantee that an abort
-   will be signaled:
-
-   Connection -> ConnectionError<>
-
 
 
 
@@ -1513,6 +1513,12 @@ Trammell, et al.        Expires September 2, 2018              [Page 27]
 
 Internet-Draft               TAPS Interface                   March 2018
 
+
+   A ConnectionError can inform the application that the other side has
+   aborted the Connection; however, there is no guarantee that an abort
+   will be signaled:
+
+   Connection -> ConnectionError<>
 
 11.  IANA Considerations
 
@@ -1557,18 +1563,17 @@ Internet-Draft               TAPS Interface                   March 2018
               Services for TAPS Systems", draft-ietf-taps-minset-02
               (work in progress), February 2018.
 
-   [I-D.ietf-tsvwg-rtcweb-qos]
-              Jones, P., Dhesikan, S., Jennings, C., and D. Druta, "DSCP
-              Packet Markings for WebRTC QoS", draft-ietf-tsvwg-rtcweb-
-              qos-18 (work in progress), August 2016.
-
-
 
 
 Trammell, et al.        Expires September 2, 2018              [Page 28]
 
 Internet-Draft               TAPS Interface                   March 2018
 
+
+   [I-D.ietf-tsvwg-rtcweb-qos]
+              Jones, P., Dhesikan, S., Jennings, C., and D. Druta, "DSCP
+              Packet Markings for WebRTC QoS", draft-ietf-tsvwg-rtcweb-
+              qos-18 (work in progress), August 2016.
 
    [I-D.ietf-tsvwg-sctp-ndata]
               Stewart, R., Tuexen, M., Loreto, S., and R. Seggelmann,
@@ -1613,11 +1618,6 @@ Appendix A.  Additional Properties
    The interface specified by this document represents the minimal
    common interface to an endpoint in the transport services
    architecture [TAPS-ARCH], based upon that architecture and on the
-   minimal set of transport service features elaborated in
-   [I-D.ietf-taps-minset].  However, the interface has been designed
-   with extension points to allow the implementation of features beyond
-   those in the minimal common interface: Protocol Selection Properties,
-   Path Selection Properties, and options on Message send are open sets.
 
 
 
@@ -1626,6 +1626,11 @@ Trammell, et al.        Expires September 2, 2018              [Page 29]
 Internet-Draft               TAPS Interface                   March 2018
 
 
+   minimal set of transport service features elaborated in
+   [I-D.ietf-taps-minset].  However, the interface has been designed
+   with extension points to allow the implementation of features beyond
+   those in the minimal common interface: Protocol Selection Properties,
+   Path Selection Properties, and options on Message send are open sets.
    Implementations of the interface are free to extend these sets to
    provide additional expressiveness to applications written on top of
    them.
@@ -1669,11 +1674,6 @@ A.1.1.  Application Intents
    should express its intentions and its expected traffic
    characteristics in order to help the transport system make decisions
    that best match it, but on a best-effort basis.  Even though
-   Application Intents do not represent Quality of Service requirements,
-   a transport system may use them to determine a DSCP value, e.g.
-   similar to Table 1 in [I-D.ietf-tsvwg-rtcweb-qos].
-
-
 
 
 
@@ -1681,6 +1681,10 @@ Trammell, et al.        Expires September 2, 2018              [Page 30]
 
 Internet-Draft               TAPS Interface                   March 2018
 
+
+   Application Intents do not represent Quality of Service requirements,
+   a transport system may use them to determine a DSCP value, e.g.
+   similar to Table 1 in [I-D.ietf-tsvwg-rtcweb-qos].
 
    Application Intents can influence protocol selection, protocol
    configuration, path selection, and endpoint selection.  For example,
@@ -1725,10 +1729,6 @@ A.1.1.1.  Traffic Category
    use of the Message Size intents or the stream category suggesting the
    Stream Bitrate and Duration intents.
 
-A.1.1.2.  Size to be Sent / Received
-
-   This Intent specifies what the application expects the size of a
-   transfer to be.  It is a numeric property and given in Bytes.
 
 
 
@@ -1737,6 +1737,11 @@ Trammell, et al.        Expires September 2, 2018              [Page 31]
 
 Internet-Draft               TAPS Interface                   March 2018
 
+
+A.1.1.2.  Size to be Sent / Received
+
+   This Intent specifies what the application expects the size of a
+   transfer to be.  It is a numeric property and given in Bytes.
 
 A.1.1.3.  Duration
 
@@ -1779,13 +1784,8 @@ A.2.  Protocol Properties
       It is given in seconds.  [EDITOR'S NOTE: For discussion of this
       property, see https://github.com/taps-api/drafts/issues/109]
 
-A.3.  Send Parameters
 
-   The following send parameters might be made available in addition to
-   those specified in Section 7.1:
 
-   o  Immediate: Immediate is a boolean property.  If true, the caller
-      prefers immediacy to efficient capacity usage for this Message.
 
 
 
@@ -1794,6 +1794,13 @@ Trammell, et al.        Expires September 2, 2018              [Page 32]
 Internet-Draft               TAPS Interface                   March 2018
 
 
+A.3.  Send Parameters
+
+   The following send parameters might be made available in addition to
+   those specified in Section 7.1:
+
+   o  Immediate: Immediate is a boolean property.  If true, the caller
+      prefers immediacy to efficient capacity usage for this Message.
       For example, this means that the Message should not be bundled
       with other Message into the same transmission by the underlying
       Protocol Stack.
@@ -1835,13 +1842,6 @@ Authors' Addresses
    Norway
 
    Email: michawe@ifi.uio.no
-
-
-
-
-
-
-
 
 
 
