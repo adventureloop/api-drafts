@@ -5,7 +5,7 @@
 TAPS Working Group                                         T. Pauly, Ed.
 Internet-Draft                                                Apple Inc.
 Intended status: Informational                          B. Trammell, Ed.
-Expires: September 1, 2018                                    ETH Zurich
+Expires: September 2, 2018                                    ETH Zurich
                                                             A. Brunstrom
                                                      Karlstad University
                                                             G. Fairhurst
@@ -16,7 +16,7 @@ Expires: September 1, 2018                                    ETH Zurich
                                                                TU Berlin
                                                                  C. Wood
                                                               Apple Inc.
-                                                       February 28, 2018
+                                                          March 01, 2018
 
 
                  An Architecture for Transport Services
@@ -47,15 +47,15 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on September 1, 2018.
+   This Internet-Draft will expire on September 2, 2018.
 
 
 
 
 
-Pauly, et al.           Expires September 1, 2018               [Page 1]
+Pauly, et al.           Expires September 2, 2018               [Page 1]
 
-Internet-Draft              TAPS Architecture              February 2018
+Internet-Draft              TAPS Architecture                 March 2018
 
 
 Copyright Notice
@@ -93,7 +93,7 @@ Table of Contents
        4.2.1.  Gathering . . . . . . . . . . . . . . . . . . . . . .  14
        4.2.2.  Racing  . . . . . . . . . . . . . . . . . . . . . . .  14
    5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  14
-   6.  Security Considerations . . . . . . . . . . . . . . . . . . .  14
+   6.  Security Considerations . . . . . . . . . . . . . . . . . . .  15
    7.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  15
    8.  Informative References  . . . . . . . . . . . . . . . . . . .  15
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Pauly, et al.           Expires September 1, 2018               [Page 2]
+Pauly, et al.           Expires September 2, 2018               [Page 2]
 
-Internet-Draft              TAPS Architecture              February 2018
+Internet-Draft              TAPS Architecture                 March 2018
 
 
    TLS stream over TCP, but applications cannot use the same socket
@@ -165,9 +165,9 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.           Expires September 1, 2018               [Page 3]
+Pauly, et al.           Expires September 2, 2018               [Page 3]
 
-Internet-Draft              TAPS Architecture              February 2018
+Internet-Draft              TAPS Architecture                 March 2018
 
 
 3.  Design Principles
@@ -221,9 +221,9 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.           Expires September 1, 2018               [Page 4]
+Pauly, et al.           Expires September 2, 2018               [Page 4]
 
-Internet-Draft              TAPS Architecture              February 2018
+Internet-Draft              TAPS Architecture                 March 2018
 
 
    options.  In such cases, the API should expose the features in such a
@@ -277,9 +277,9 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.           Expires September 1, 2018               [Page 5]
+Pauly, et al.           Expires September 2, 2018               [Page 5]
 
-Internet-Draft              TAPS Architecture              February 2018
+Internet-Draft              TAPS Architecture                 March 2018
 
 
    better use of available capabilities on a system and protocol
@@ -333,9 +333,9 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.           Expires September 1, 2018               [Page 6]
+Pauly, et al.           Expires September 2, 2018               [Page 6]
 
-Internet-Draft              TAPS Architecture              February 2018
+Internet-Draft              TAPS Architecture                 March 2018
 
 
      +------------------------------------------------------+
@@ -389,9 +389,9 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.           Expires September 1, 2018               [Page 7]
+Pauly, et al.           Expires September 2, 2018               [Page 7]
 
-Internet-Draft              TAPS Architecture              February 2018
+Internet-Draft              TAPS Architecture                 March 2018
 
 
       any system that provides generic Transport Services, these
@@ -445,9 +445,9 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.           Expires September 1, 2018               [Page 8]
+Pauly, et al.           Expires September 2, 2018               [Page 8]
 
-Internet-Draft              TAPS Architecture              February 2018
+Internet-Draft              TAPS Architecture                 March 2018
 
 
      Pre-Establishment     :       Established             : Termination
@@ -501,9 +501,9 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-Pauly, et al.           Expires September 1, 2018               [Page 9]
+Pauly, et al.           Expires September 2, 2018               [Page 9]
 
-Internet-Draft              TAPS Architecture              February 2018
+Internet-Draft              TAPS Architecture                 March 2018
 
 
    o  Connection: A Connection object represents an active transport
@@ -518,6 +518,11 @@ Internet-Draft              TAPS Architecture              February 2018
       connections from Remote Endpoints and generates corresponding
       Connection objects.  It is created from a Preconnection object
       that specifies the type of incoming connections it will accept.
+
+   o  Rendezvous: A Rendezvous object represents peer-to-peer connection
+      establishment between a Local Endpoint and a Remote Endpoint.  It
+      is created from a Preconnection object specifying two peer
+      endpoints, and generates a corresponding Connection object.
 
 4.1.2.  Pre-Establishment
 
@@ -548,20 +553,20 @@ Internet-Draft              TAPS Architecture              February 2018
       or discovered like Path MTU (PMTU), or predicted based on cached
       information like expected throughput or latency.
 
+
+
+
+
+Pauly, et al.           Expires September 2, 2018              [Page 10]
+
+Internet-Draft              TAPS Architecture                 March 2018
+
+
    o  Protocol Selection Properties: The Protocol Selection Properties
       consist of the options that an application may set to influence
       the selection of transport protocol, or to configure the behavior
       of generic transport protocol features.  These options come in the
       form of requirements, prohibitions, and preferences.  Examples
-
-
-
-
-Pauly, et al.           Expires September 1, 2018              [Page 10]
-
-Internet-Draft              TAPS Architecture              February 2018
-
-
       include reliability, service class, multipath support, and fast
       open support.
 
@@ -605,19 +610,19 @@ Internet-Draft              TAPS Architecture              February 2018
       over a transport connection.  The bytes within a Message are
       assumed to be ordered within the Message.  If an application does
       not care about the order in which a peer receives two distinct
+
+
+
+Pauly, et al.           Expires September 2, 2018              [Page 11]
+
+Internet-Draft              TAPS Architecture                 March 2018
+
+
       spans of bytes, those spans of bytes are considered independent
       Messages.  Messages may or may not be usable if incomplete or
       corrupted.  Boundaries of a Message may or may not be understood
       or transmitted by transport protocols.  Specifically, what one
       application considers to be two Messages sent on a stream-based
-
-
-
-Pauly, et al.           Expires September 1, 2018              [Page 11]
-
-Internet-Draft              TAPS Architecture              February 2018
-
-
       transport may be treated as a single Message by the application on
       the other side.
 
@@ -662,17 +667,16 @@ Internet-Draft              TAPS Architecture              February 2018
       action.  This may be an error if the Message cannot be sent, or an
       indication that Message has been processed by the protocol stack.
 
+
+
+Pauly, et al.           Expires September 2, 2018              [Page 12]
+
+Internet-Draft              TAPS Architecture                 March 2018
+
+
    o  Path Properties Changed: Notifies the application that some
       property of the Connection has changed that may influence how and
       where data is sent and/or received.
-
-
-
-
-Pauly, et al.           Expires September 1, 2018              [Page 12]
-
-Internet-Draft              TAPS Architecture              February 2018
-
 
 4.1.6.  Termination Actions
 
@@ -718,17 +722,17 @@ Internet-Draft              TAPS Architecture              February 2018
       operating system or other global preferences that can constrain or
       influence how an implementation will gather candidate paths and
       protocols (Section 4.2.1) and race the candidates during
+
+
+
+Pauly, et al.           Expires September 2, 2018              [Page 13]
+
+Internet-Draft              TAPS Architecture                 March 2018
+
+
       establishment (Section 4.2.2).  Specific aspects of the System
       Policy may apply to all Connections, or only certain ones
       depending on the runtime context and properties of the Connection.
-
-
-
-
-Pauly, et al.           Expires September 1, 2018              [Page 13]
-
-Internet-Draft              TAPS Architecture              February 2018
-
 
    o  Cached State: Cached State is the state and history that the
       implementation keeps for each set of associated endpoints that
@@ -772,20 +776,22 @@ Internet-Draft              TAPS Architecture              February 2018
 
    This document has no actions for IANA.
 
+
+
+
+
+
+Pauly, et al.           Expires September 2, 2018              [Page 14]
+
+Internet-Draft              TAPS Architecture                 March 2018
+
+
 6.  Security Considerations
 
    The Transport Services architecture does not recommend use of
    specific security protocols or algorithms.  Its goal is to offer ease
    of use for existing protocols by providing a generic security-related
    interface.  Each provided interface mimics an existing protocol-
-
-
-
-Pauly, et al.           Expires September 1, 2018              [Page 14]
-
-Internet-Draft              TAPS Architecture              February 2018
-
-
    specific interface provided by supported security protocols.  For
    example, trust verification callbacks are common parts of TLS APIs.
    Transport Services APIs will expose similar functionality.  Clients
@@ -829,18 +835,17 @@ Internet-Draft              TAPS Architecture              February 2018
               "An Abstract Application Layer Interface to Transport
               Services", n.d..
 
+
+
+Pauly, et al.           Expires September 2, 2018              [Page 15]
+
+Internet-Draft              TAPS Architecture                 March 2018
+
+
    [I-D.ietf-taps-minset]
               Welzl, M. and S. Gjessing, "A Minimal Set of Transport
               Services for TAPS Systems", draft-ietf-taps-minset-02
               (work in progress), February 2018.
-
-
-
-
-Pauly, et al.           Expires September 1, 2018              [Page 15]
-
-Internet-Draft              TAPS Architecture              February 2018
-
 
    [I-D.pauly-taps-transport-security]
               Pauly, T., Rose, K., and C. Wood, "A Survey of Transport
@@ -882,6 +887,17 @@ Authors' Addresses
    Email: anna.brunstrom@kau.se
 
 
+
+
+
+
+
+
+Pauly, et al.           Expires September 2, 2018              [Page 16]
+
+Internet-Draft              TAPS Architecture                 March 2018
+
+
    Godred Fairhurst
    University of Aberdeen
    Fraser Noble Building
@@ -890,12 +906,6 @@ Authors' Addresses
 
    Email: gorry@erg.abdn.ac.uk
    URI:   http://www.erg.abdn.ac.uk/
-
-
-
-Pauly, et al.           Expires September 1, 2018              [Page 16]
-
-Internet-Draft              TAPS Architecture              February 2018
 
 
    Colin Perkins
@@ -939,14 +949,4 @@ Internet-Draft              TAPS Architecture              February 2018
 
 
 
-
-
-
-
-
-
-
-
-
-
-Pauly, et al.           Expires September 1, 2018              [Page 17]
+Pauly, et al.           Expires September 2, 2018              [Page 17]

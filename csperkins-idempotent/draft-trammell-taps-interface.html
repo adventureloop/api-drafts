@@ -325,7 +325,7 @@ address {
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-trammell-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-02-28" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-03-01" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -349,7 +349,7 @@ address {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: September 1, 2018</td>
+<td class="left">Expires: September 2, 2018</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -402,7 +402,7 @@ address {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">February 28, 2018</td>
+<td class="right">March 01, 2018</td>
 </tr>
 
     	
@@ -418,7 +418,7 @@ address {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on September 1, 2018.</p>
+<p>This Internet-Draft will expire on September 2, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -872,7 +872,7 @@ Connection -&gt; Expired&lt;msgRef&gt;
 <pre>
 Connection -&gt; SendError&lt;msgRef&gt;
 </pre>
-<p id="rfc.section.7.p.9">A SendError occurs when a Message could not be sent due to an error condition: an attempt to send a non-partial Message which is too large for the system and Protocol Stack to handle, some failure of the underlying Protocol Stack, or a set of send parameters not consistent with the Connection&#8217;s transport parameters. The SendError contains an implementation-specific reference to the Message to which it applies.</p>
+<p id="rfc.section.7.p.9">A SendError occurs when a Message could not be sent due to an error condition: an attempt to send a Message which is too large for the system and Protocol Stack to handle, some failure of the underlying Protocol Stack, or a set of send parameters not consistent with the Connection&#8217;s transport parameters. The SendError contains an implementation-specific reference to the Message to which it applies.</p>
 <h1 id="rfc.section.7.1">
 <a href="#rfc.section.7.1">7.1.</a> <a href="#send-params" id="send-params">Send Parameters</a>
 </h1>
@@ -947,7 +947,7 @@ OctetArray := Framer.Frame(Message)
 Connection.Receive(ReceiveHandler, maxLength)
 </pre>
 <p id="rfc.section.8.p.2">Receive takes a ReceiveHandler, which can handle the Received event and the ReceiveError error. Each call to Receive will result in at most one Received event being sent to the handler, though implementations may provide convenience functions to indicate readiness to receive a larger but finite number of Messages with a single call. This allows an application to provide backpressure to the transport stack when it is temporarily not ready to receive messages.</p>
-<p id="rfc.section.8.p.3">Receive also takes an optional maxLength argument, the maximum size (in bytes of data) Message the application is currently prepared to receive. The default value for maxLength is infinite. If an incoming Message is larger than the minimum of this size and the maximum non-partial Message size on receive for the Connection&#8217;s Protocol Stack, it will be received as a partial Message.  Note that maxLength does not guarantee that the application will receive that many bytes if they are available; the interface may return partial Messages smaller than maxLength according to implementation constraints.</p>
+<p id="rfc.section.8.p.3">Receive also takes an optional maxLength argument, the maximum size (in bytes of data) Message the application is currently prepared to receive. The default value for maxLength is infinite. If an incoming Message is larger than the minimum of this size and the maximum Message size on receive for the Connection&#8217;s Protocol Stack, it will be received as a partial Message.  Note that maxLength does not guarantee that the application will receive that many bytes if they are available; the interface may return partial Messages smaller than maxLength according to implementation constraints.</p>
 <pre>
 Connection -&gt; Received&lt;Message&gt;
 </pre>
@@ -1021,8 +1021,8 @@ Connection.setProperties()
 <li>Connection group transmission scheduler: This enumerated property specifies which scheduler should be used among Connections within a Connection Group. It applies to connection groups; the set of schedulers can be taken from <a href="#I-D.ietf-tsvwg-sctp-ndata" class="xref">[I-D.ietf-tsvwg-sctp-ndata]</a>.</li>
 <li>Maximum message size concurrent with connection establishment: This numeric property represents the maximum Message size that can be sent before or during Connection establishment, see also <a href="#send-idempotent" class="xref">Section 7.1.1.4</a>.  It is given in Bytes. This property is read-only.</li>
 <li>Maximum Message size before fragmentation or segmentation: This numeric property, if applicable, represents the maximum Message size that can be sent without incurring network-layer fragmentation and/or transport layer segmentation at the sender. This property is read-only.</li>
-<li>Maximum non-partial Message size on send: This numeric property represents the maximum Message size that can be sent as a non-partial Message. This property is read-only.</li>
-<li>Maximum non-partial Message size on receive: This numeric property represents the maximum Message size that can be received as a non-partial Message. This property is read-only.</li>
+<li>Maximum Message size on send: This numeric property represents the maximum Message size that can be sent. This property is read-only.</li>
+<li>Maximum Message size on receive: This numeric property represents the maximum Message size that can be received.  This property is read-only.</li>
 </ul>
 <p id="rfc.section.9.1.p.5">In order to specify Specific Protocol Properties, Transport System implementations may offer applications to attach a set of options to the Preconnection object, associated with a specific protocol. For example, an application could specify a set of TCP Options to use if and only if TCP is selected by the system. Such properties must not be assumed to apply across different protocols. Attempts to set specific protocol properties on a protocol stack not containing that specific protocol are simply ignored, and do not raise an error..</p>
 <h1 id="rfc.section.10">
