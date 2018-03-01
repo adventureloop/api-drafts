@@ -662,7 +662,7 @@ localSpecifier.withStunServer(address, port, credentials)
 <dt>Interactive/Low Latency:</dt>
 <dd style="margin-left: 8">The application is interactive. Response time (latency) should be optimized at the expense of bandwidth efficiency and delay variation. This can be used by the system to disable the coalescing of multiple small Messages into larger packets (Nagle&#8217;s algorithm), to prefer lower-latency paths, signal a preference for lower-latency, higher-loss treatment, and so on.</dd>
 <dt>Constant Rate:</dt>
-<dd style="margin-left: 8">The application expects to send/receive data at a constant rate after connection establishment. Delay and delay variation should be optimized at the expense of bandwidth efficiency. This implies that the Connection may fail if the desired rate cannot be maintained across the Path. A transport may interpret this capacity profile as preferring a circuit breaker <a href="#RFC8084" class="xref">[RFC8084]</a> to a rate adaptive congestion controller.</dd>
+<dd style="margin-left: 8">The application expects to send/receive data at a constant rate after connection establishment. Delay and delay variation should be optimized at the expense of bandwidth efficiency.</dd>
 <dt>Scavenger/Bulk:</dt>
 <dd style="margin-left: 8">The application is not interactive. It expects to send/receive a large amount of data, without any urgency. This can be used to select protocol stacks with scavenger transmission control, to signal a preference for less-than-best-effort treatment, and so on.</dd>
 </dl>
@@ -872,7 +872,7 @@ Connection -&gt; Expired&lt;msgRef&gt;
 <pre>
 Connection -&gt; SendError&lt;msgRef&gt;
 </pre>
-<p id="rfc.section.7.p.9">A SendError occurs when a Message could not be sent due to an error condition: an attempt to send a Message which is too large for the system and Protocol Stack to handle, some failure of the underlying Protocol Stack, or a set of send parameters not consistent with the Connection&#8217;s transport parameters. The SendError contains an implementation-specific reference to the Message to which it applies.</p>
+<p id="rfc.section.7.p.9">A SendError occurs when a Message could not be sent due to an error condition: an attempt to send a non-partial Message which is too large for the system and Protocol Stack to handle, some failure of the underlying Protocol Stack, or a set of send parameters not consistent with the Connection&#8217;s transport parameters. The SendError contains an implementation-specific reference to the Message to which it applies.</p>
 <h1 id="rfc.section.7.1">
 <a href="#rfc.section.7.1">7.1.</a> <a href="#send-params" id="send-params">Send Parameters</a>
 </h1>
@@ -947,7 +947,7 @@ OctetArray := Framer.Frame(Message)
 Connection.Receive(ReceiveHandler, maxLength)
 </pre>
 <p id="rfc.section.8.p.2">Receive takes a ReceiveHandler, which can handle the Received event and the ReceiveError error. Each call to Receive will result in at most one Received event being sent to the handler, though implementations may provide convenience functions to indicate readiness to receive a larger but finite number of Messages with a single call. This allows an application to provide backpressure to the transport stack when it is temporarily not ready to receive messages.</p>
-<p id="rfc.section.8.p.3">Receive also takes an optional maxLength argument, the maximum size (in bytes of data) Message the application is currently prepared to receive. The default value for maxLength is infinite. If an incoming Message is larger than the minimum of this size and the maximum Message size on receive for the Connection&#8217;s Protocol Stack, it will be received as a partial Message.  Note that maxLength does not guarantee that the application will receive that many bytes if they are available; the interface may return partial Messages smaller than maxLength according to implementation constraints.</p>
+<p id="rfc.section.8.p.3">Receive also takes an optional maxLength argument, the maximum size (in bytes of data) Message the application is currently prepared to receive. The default value for maxLength is infinite. If an incoming Message is larger than the minimum of this size and the maximum non-partial Message size on receive for the Connection&#8217;s Protocol Stack, it will be received as a partial Message.  Note that maxLength does not guarantee that the application will receive that many bytes if they are available; the interface may return partial Messages smaller than maxLength according to implementation constraints.</p>
 <pre>
 Connection -&gt; Received&lt;Message&gt;
 </pre>
@@ -1021,8 +1021,8 @@ Connection.setProperties()
 <li>Connection group transmission scheduler: This enumerated property specifies which scheduler should be used among Connections within a Connection Group. It applies to connection groups; the set of schedulers can be taken from <a href="#I-D.ietf-tsvwg-sctp-ndata" class="xref">[I-D.ietf-tsvwg-sctp-ndata]</a>.</li>
 <li>Maximum message size concurrent with connection establishment: This numeric property represents the maximum Message size that can be sent before or during Connection establishment, see also <a href="#send-idempotent" class="xref">Section 7.1.1.4</a>.  It is given in Bytes. This property is read-only.</li>
 <li>Maximum Message size before fragmentation or segmentation: This numeric property, if applicable, represents the maximum Message size that can be sent without incurring network-layer fragmentation and/or transport layer segmentation at the sender. This property is read-only.</li>
-<li>Maximum Message size on send: This numeric property represents the maximum Message size that can be sent. This property is read-only.</li>
-<li>Maximum Message size on receive: This numeric property represents the maximum Message size that can be received.  This property is read-only.</li>
+<li>Maximum non-partial Message size on send: This numeric property represents the maximum Message size that can be sent as a non-partial Message. This property is read-only.</li>
+<li>Maximum non-partial Message size on receive: This numeric property represents the maximum Message size that can be received as a non-partial Message. This property is read-only.</li>
 </ul>
 <p id="rfc.section.9.1.p.5">In order to specify Specific Protocol Properties, Transport System implementations may offer applications to attach a set of options to the Preconnection object, associated with a specific protocol. For example, an application could specify a set of TCP Options to use if and only if TCP is selected by the system. Such properties must not be assumed to apply across different protocols. Attempts to set specific protocol properties on a protocol stack not containing that specific protocol are simply ignored, and do not raise an error..</p>
 <h1 id="rfc.section.10">
@@ -1103,11 +1103,6 @@ Connection -&gt; ConnectionError&lt;&gt;
 <td class="reference"><b id="RFC5245">[RFC5245]</b></td>
 <td class="top">
 <a>Rosenberg, J.</a>, "<a href="https://tools.ietf.org/html/rfc5245">Interactive Connectivity Establishment (ICE): A Protocol for Network Address Translator (NAT) Traversal for Offer/Answer Protocols</a>", RFC 5245, DOI 10.17487/RFC5245, April 2010.</td>
-</tr>
-<tr>
-<td class="reference"><b id="RFC8084">[RFC8084]</b></td>
-<td class="top">
-<a>Fairhurst, G.</a>, "<a href="https://tools.ietf.org/html/rfc8084">Network Transport Circuit Breakers</a>", BCP 208, RFC 8084, DOI 10.17487/RFC8084, March 2017.</td>
 </tr>
 <tr>
 <td class="reference"><b id="RFC8095">[RFC8095]</b></td>

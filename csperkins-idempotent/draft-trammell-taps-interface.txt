@@ -584,10 +584,7 @@ Internet-Draft               TAPS Interface                   March 2018
       Constant Rate:  The application expects to send/receive data at a
          constant rate after connection establishment.  Delay and delay
          variation should be optimized at the expense of bandwidth
-         efficiency.  This implies that the Connection may fail if the
-         desired rate cannot be maintained across the Path.  A transport
-         may interpret this capacity profile as preferring a circuit
-         breaker [RFC8084] to a rate adaptive congestion controller.
+         efficiency.
 
       Scavenger/Bulk:  The application is not interactive.  It expects
          to send/receive a large amount of data, without any urgency.
@@ -609,7 +606,10 @@ Internet-Draft               TAPS Interface                   March 2018
 
    transportParameters := NewTransportParameters()
 
-
+   The Individual parameters are then added to the TransportParameters
+   object.  While Protocol Properties and Application Intents use the
+   "add" call, Transport Preferences use special calls for the levels
+   defined in Section 5.2.
 
 
 
@@ -617,11 +617,6 @@ Trammell, et al.        Expires September 2, 2018              [Page 11]
 
 Internet-Draft               TAPS Interface                   March 2018
 
-
-   The Individual parameters are then added to the TransportParameters
-   object.  While Protocol Properties and Application Intents use the
-   "add" call, Transport Preferences use special calls for the levels
-   defined in Section 5.2.
 
    transportParameters.add(parameter, value)
 
@@ -667,6 +662,11 @@ Internet-Draft               TAPS Interface                   March 2018
    securityParameters.AddIdentity(identity)
    securityParameters.AddPrivateKey(privateKey, publicKey)
 
+   o  Supported algorithms: Used to restrict what parameters are used by
+      underlying transport security protocols.  When not specified,
+      these algorithms SHOULD default to known and safe defaults for the
+
+
 
 
 Trammell, et al.        Expires September 2, 2018              [Page 12]
@@ -674,9 +674,6 @@ Trammell, et al.        Expires September 2, 2018              [Page 12]
 Internet-Draft               TAPS Interface                   March 2018
 
 
-   o  Supported algorithms: Used to restrict what parameters are used by
-      underlying transport security protocols.  When not specified,
-      these algorithms SHOULD default to known and safe defaults for the
       system.  Parameters include: ciphersuites, supported groups, and
       signature algorithms.
 
@@ -722,6 +719,9 @@ securityParameters.AddSignatureAlgorithm(7) // ed25519
 
    Like transport parameters, security parameters are inherited during
    cloning (see Section 6.4).
+
+
+
 
 
 
@@ -1087,11 +1087,12 @@ Internet-Draft               TAPS Interface                   March 2018
    Connection -> SendError<msgRef>
 
    A SendError occurs when a Message could not be sent due to an error
-   condition: an attempt to send a Message which is too large for the
-   system and Protocol Stack to handle, some failure of the underlying
-   Protocol Stack, or a set of send parameters not consistent with the
-   Connection's transport parameters.  The SendError contains an
-   implementation-specific reference to the Message to which it applies.
+   condition: an attempt to send a non-partial Message which is too
+   large for the system and Protocol Stack to handle, some failure of
+   the underlying Protocol Stack, or a set of send parameters not
+   consistent with the Connection's transport parameters.  The SendError
+   contains an implementation-specific reference to the Message to which
+   it applies.
 
 7.1.  Send Parameters
 
@@ -1113,7 +1114,6 @@ Internet-Draft               TAPS Interface                   March 2018
    specify Protocol Properties and that can be overridden on a per-
    Message basis or Application Intents that apply to a specific
    Message.
-
 
 
 
@@ -1272,16 +1272,16 @@ Internet-Draft               TAPS Interface                   March 2018
    (in bytes of data) Message the application is currently prepared to
    receive.  The default value for maxLength is infinite.  If an
    incoming Message is larger than the minimum of this size and the
-   maximum Message size on receive for the Connection's Protocol Stack,
-   it will be received as a partial Message.  Note that maxLength does
-   not guarantee that the application will receive that many bytes if
-   they are available; the interface may return partial Messages smaller
-   than maxLength according to implementation constraints.
+   maximum non-partial Message size on receive for the Connection's
+   Protocol Stack, it will be received as a partial Message.  Note that
+   maxLength does not guarantee that the application will receive that
+   many bytes if they are available; the interface may return partial
+   Messages smaller than maxLength according to implementation
+   constraints.
 
    Connection -> Received<Message>
 
-   As with sending, the type of the Message to be passed is dependent on
-   the implementation, and on the constraints on the Protocol Stacks
+
 
 
 
@@ -1290,6 +1290,8 @@ Trammell, et al.        Expires September 2, 2018              [Page 23]
 Internet-Draft               TAPS Interface                   March 2018
 
 
+   As with sending, the type of the Message to be passed is dependent on
+   the implementation, and on the constraints on the Protocol Stacks
    implied by the Connection's transport parameters.  The Message may
    also contain metadata from protocols in the Protocol Stack; which
    metadata is available is Protocol Stack dependent.  In particular,
@@ -1336,8 +1338,6 @@ Internet-Draft               TAPS Interface                   March 2018
    3.  this is a partial message containing data with no definite
        message boundary, i.e. the only known message boundary is given
        by termination of the Connection
-
-
 
 
 
@@ -1517,13 +1517,13 @@ Internet-Draft               TAPS Interface                   March 2018
       fragmentation and/or transport layer segmentation at the sender.
       This property is read-only.
 
-   o  Maximum Message size on send: This numeric property represents the
-      maximum Message size that can be sent.  This property is read-
-      only.
+   o  Maximum non-partial Message size on send: This numeric property
+      represents the maximum Message size that can be sent as a non-
+      partial Message.  This property is read-only.
 
-   o  Maximum Message size on receive: This numeric property represents
-      the maximum Message size that can be received.  This property is
-      read-only.
+   o  Maximum non-partial Message size on receive: This numeric property
+      represents the maximum Message size that can be received as a non-
+      partial Message.  This property is read-only.
 
    In order to specify Specific Protocol Properties, Transport System
    implementations may offer applications to attach a set of options to
@@ -1654,10 +1654,6 @@ Internet-Draft               TAPS Interface                   March 2018
               DOI 10.17487/RFC5245, April 2010,
               <https://www.rfc-editor.org/info/rfc5245>.
 
-   [RFC8084]  Fairhurst, G., "Network Transport Circuit Breakers",
-              BCP 208, RFC 8084, DOI 10.17487/RFC8084, March 2017,
-              <https://www.rfc-editor.org/info/rfc8084>.
-
    [RFC8095]  Fairhurst, G., Ed., Trammell, B., Ed., and M. Kuehlewind,
               Ed., "Services Provided by IETF Transport Protocols and
               Congestion Control Mechanisms", RFC 8095,
@@ -1674,6 +1670,10 @@ Appendix A.  Additional Properties
    with extension points to allow the implementation of features beyond
    those in the minimal common interface: Protocol Selection Properties,
    Path Selection Properties, and options on Message send are open sets.
+   Implementations of the interface are free to extend these sets to
+   provide additional expressiveness to applications written on top of
+   them.
+
 
 
 
@@ -1681,10 +1681,6 @@ Trammell, et al.        Expires September 2, 2018              [Page 30]
 
 Internet-Draft               TAPS Interface                   March 2018
 
-
-   Implementations of the interface are free to extend these sets to
-   provide additional expressiveness to applications written on top of
-   them.
 
    This appendix enumerates a few additional parameters and properties
    that could be used to enhance transport protocol and/or path
@@ -1729,7 +1725,11 @@ A.1.1.  Application Intents
    a transport system may use them to determine a DSCP value, e.g.
    similar to Table 1 in [I-D.ietf-tsvwg-rtcweb-qos].
 
-
+   Application Intents can influence protocol selection, protocol
+   configuration, path selection, and endpoint selection.  For example,
+   setting the "Timeliness" Intent to "Interactive" may lead the
+   transport system to disable the Nagle algorithm for a connection,
+   while setting the "Timeliness" to "Background" may lead it to setting
 
 
 
@@ -1738,11 +1738,6 @@ Trammell, et al.        Expires September 2, 2018              [Page 31]
 Internet-Draft               TAPS Interface                   March 2018
 
 
-   Application Intents can influence protocol selection, protocol
-   configuration, path selection, and endpoint selection.  For example,
-   setting the "Timeliness" Intent to "Interactive" may lead the
-   transport system to disable the Nagle algorithm for a connection,
-   while setting the "Timeliness" to "Background" may lead it to setting
    the DSCP value to "scavenger".  If the "Size to be Sent" Intent is
    set on an individual Message, it may influence path selection.
 
@@ -1786,6 +1781,11 @@ A.1.1.2.  Size to be Sent / Received
    This Intent specifies what the application expects the size of a
    transfer to be.  It is a numeric property and given in Bytes.
 
+A.1.1.3.  Duration
+
+   This Intent specifies what the application expects the lifetime of a
+   transfer to be.  It is a numeric property and given in milliseconds.
+
 
 
 
@@ -1793,11 +1793,6 @@ Trammell, et al.        Expires September 2, 2018              [Page 32]
 
 Internet-Draft               TAPS Interface                   March 2018
 
-
-A.1.1.3.  Duration
-
-   This Intent specifies what the application expects the lifetime of a
-   transfer to be.  It is a numeric property and given in milliseconds.
 
 A.1.1.4.  Send / Receive Bit-rate
 
@@ -1842,6 +1837,11 @@ A.3.  Send Parameters
 
    o  Immediate: Immediate is a boolean property.  If true, the caller
       prefers immediacy to efficient capacity usage for this Message.
+      For example, this means that the Message should not be bundled
+      with other Message into the same transmission by the underlying
+      Protocol Stack.
+
+
 
 
 
@@ -1849,10 +1849,6 @@ Trammell, et al.        Expires September 2, 2018              [Page 33]
 
 Internet-Draft               TAPS Interface                   March 2018
 
-
-      For example, this means that the Message should not be bundled
-      with other Message into the same transmission by the underlying
-      Protocol Stack.
 
    o  Send Bitrate: This numeric property in Bytes per second specifies
       at what bitrate the application wishes the Message to be sent.  A
@@ -1893,9 +1889,13 @@ Authors' Addresses
    Email: michawe@ifi.uio.no
 
 
+   Theresa Enghardt
+   TU Berlin
+   Marchstrasse 23
+   10587 Berlin
+   Germany
 
-
-
+   Email: theresa@inet.tu-berlin.de
 
 
 
@@ -1904,15 +1904,6 @@ Authors' Addresses
 Trammell, et al.        Expires September 2, 2018              [Page 34]
 
 Internet-Draft               TAPS Interface                   March 2018
-
-
-   Theresa Enghardt
-   TU Berlin
-   Marchstrasse 23
-   10587 Berlin
-   Germany
-
-   Email: theresa@inet.tu-berlin.de
 
 
    Godred Fairhurst
@@ -1952,16 +1943,6 @@ Internet-Draft               TAPS Interface                   March 2018
    Email: philipp@inet.tu-berlin.de
 
 
-
-
-
-
-
-Trammell, et al.        Expires September 2, 2018              [Page 35]
-
-Internet-Draft               TAPS Interface                   March 2018
-
-
    Chris Wood
    Apple Inc.
    1 Infinite Loop
@@ -1976,41 +1957,4 @@ Internet-Draft               TAPS Interface                   March 2018
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Trammell, et al.        Expires September 2, 2018              [Page 36]
+Trammell, et al.        Expires September 2, 2018              [Page 35]
