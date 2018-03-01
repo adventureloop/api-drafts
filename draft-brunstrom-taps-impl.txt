@@ -123,16 +123,15 @@ Internet-Draft             TAPS Implementation                March 2018
      9.6.  QUIC  . . . . . . . . . . . . . . . . . . . . . . . . . .  26
      9.7.  HTTP/2 transport  . . . . . . . . . . . . . . . . . . . .  26
    10. Rendezvous and Environment Discovery  . . . . . . . . . . . .  27
-     10.1.  ICE and STUN . . . . . . . . . . . . . . . . . . . . . .  27
-   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  27
-   12. Security Considerations . . . . . . . . . . . . . . . . . . .  27
-     12.1.  Considerations for Candidate Gathering . . . . . . . . .  27
-     12.2.  Considerations for Candidate Racing  . . . . . . . . . .  27
-   13. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  27
-   14. References  . . . . . . . . . . . . . . . . . . . . . . . . .  28
-     14.1.  Normative References . . . . . . . . . . . . . . . . . .  28
-     14.2.  Informative References . . . . . . . . . . . . . . . . .  29
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  29
+   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  29
+   12. Security Considerations . . . . . . . . . . . . . . . . . . .  29
+     12.1.  Considerations for Candidate Gathering . . . . . . . . .  29
+     12.2.  Considerations for Candidate Racing  . . . . . . . . . .  29
+   13. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  29
+   14. References  . . . . . . . . . . . . . . . . . . . . . . . . .  30
+     14.1.  Normative References . . . . . . . . . . . . . . . . . .  30
+     14.2.  Informative References . . . . . . . . . . . . . . . . .  31
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  31
 
 1.  Introduction
 
@@ -162,6 +161,7 @@ Internet-Draft             TAPS Implementation                March 2018
       a Connection object
 
    o  For QUIC, one stream is a Connection object
+
 
 
 
@@ -1460,7 +1460,115 @@ Internet-Draft             TAPS Implementation                March 2018
 
 10.  Rendezvous and Environment Discovery
 
-10.1.  ICE and STUN
+   The connection establishment process outlined in Section 4 is
+   appropriate for client-server connections, but needs to be expanded
+   in peer-to-peer Rendezvous scenarios, as follows:
+
+   o  Gathering Local Endpoint candidates
+
+      The set of possible Local Endpoints is gathered.  In the simple
+      case, this merely enumerates the local interfaces and protocols,
+      allocates ephemeral source ports.  For example, a system that has
+      WiFi and Ethernet and supports IPv4 and IPv6 might gather four
+      candidate locals (IPv4 on Ethernet, IPv6 on Ethernet, IPv4 on
+      WiFi, and IPv6 on WiFi) that can form the source for a transient.
+
+      If NAT traversal is required, the process of gathering Local
+      Endpoints becomes broadly equivalent to the ICE candidate
+      gathering phase [RFC5245].  The endpoint determines its server
+      reflexive Local Endpoints (i.e., the translated address of a
+      local, on the other side of a NAT) and relayed locals (e.g., via a
+      TURN server or other relay), for each interface and network
+      protocol.  These are added to the set of candidate Local Endpoints
+      for this association.
+
+      Gathering locals is primarily an endpoint local operation,
+      although it might involve exchanges with a STUN server to derive
+      server reflexive locals, or with a TURN server or other relay to
+      derive relayed locals.  It does not involve communication with the
+      Remote Endpoint.
+
+   o  Gathering Remote Endpoint Candidates
+
+      The Remote Endpoint is typically a name that needs to be resolved
+      into a set of possible addresses that can be used for
+      communication.  Resolving the Remote Endpoint is the process of
+      recursively performing such name lookups, until fully resolved, to
+      return the set of candidates for the remote of this association.
+
+      How this is done will depend on the type of the Remote Endpoint,
+      and can also be specific to each Local Endpoint.  A common case is
+      when the Remote Endpoint is a DNS name, in which case it is
+      resolved to give a set of IPv4 and IPv6 addresses representing
+      that name.  Some types of remote might require more complex
+      resolution.  Resolving the Remote Endpoint for a peer-to-peer
+      connection might involve communication with a rendezvous server,
+      which in turn contacts the peer to gain consent to communicate and
+      retrieve its set of candidate locals, which are returned and form
+      the candidate remote addresses for contacting that peer.
+
+
+
+Brunstrom, et al.       Expires September 2, 2018              [Page 27]
+
+Internet-Draft             TAPS Implementation                March 2018
+
+
+      Resolving the remote is _not_ a local operation.  It will involve
+      a directory service, and can require communication with the remote
+      to rendezvous and exchange peer addresses.  This can expose some
+      or all of the candidate locals to the remote.
+
+   o  Establishing Connections
+
+      The set of candidate Local Endpoints and the set of candidate
+      Remote Endpoints are paired, to derive a priority ordered set of
+      Candidate Paths that can potentially be used to establish a
+      Connection.
+
+      Then, communication is attempted over each candidate path, in
+      priority order.  If there are multiple candidates with the same
+      priority, then connection establishment proceeds simultaneously
+      and uses the transient that wins the race to be established.
+      Otherwise, connection establishment is sequential, paced at a rate
+      that should not congest the network.  Depending on the chosen
+      transport, this phase might involve racing TCP connections to a
+      server over IPv4 and IPv6 [RFC6555], or it could involve a STUN
+      exchange to establish peer-to-peer UDP connectivity [RFC5245], or
+      some other means.
+
+   o  Confirming and Maintaining Connections
+
+      Once connectivity has been established, unused resources can be
+      released and the chosen path can be confirmed.  This is primarily
+      required when establishing peer-to-peer connectivity, where
+      connections supporting relayed locals that were not required can
+      be closed, and where an associated signalling operation might be
+      needed to inform middleboxes and proxies of the chosen path.
+      Keep-alive messages may also be sent, as appropriate, to ensure
+      NAT and firewall state is maintained, so the Connection remains
+      operational.
+
+   To support ICE, or similar protocols, that involve an out-of-band
+   indirect signalling exchange to exchange candidates with the Remote
+   Endpoint, it's important to be able to query the set of candidate
+   Local Endpoints, and give the protocol stack a set of candidate
+   Remote Endpoints, before it attempts to establish connections.
+
+   (TO-DO: It is expected that a single abstract algorithm can be
+   identified that supports both the peer-to-peer and client-server
+   connection racing, allowing this text to be merged with Section 4)
+
+
+
+
+
+
+
+Brunstrom, et al.       Expires September 2, 2018              [Page 28]
+
+Internet-Draft             TAPS Implementation                March 2018
+
 
 11.  IANA Considerations
 
@@ -1507,15 +1615,16 @@ Internet-Draft             TAPS Implementation                March 2018
    German Research Foundation: Gottfried Wilhelm Leibniz-Preis 2011 (FKZ
    FE 570/4-1).
 
+   This work has been supported by the UK Engineering and Physical
+   Sciences Research Council under grant EP/R04144X/1.
 
 
-Brunstrom, et al.       Expires September 2, 2018              [Page 27]
+
+
+Brunstrom, et al.       Expires September 2, 2018              [Page 29]
 
 Internet-Draft             TAPS Implementation                March 2018
 
-
-   This work has been supported by the UK Engineering and Physical
-   Sciences Research Council under grant EP/R04144X/1.
 
    Thanks to Stuart Cheshire, Josh Graessley, David Schinazi, and Eric
    Kinnear for their implementation and design efforts, including Happy
@@ -1565,7 +1674,10 @@ Internet-Draft             TAPS Implementation                March 2018
 
 
 
-Brunstrom, et al.       Expires September 2, 2018              [Page 28]
+
+
+
+Brunstrom, et al.       Expires September 2, 2018              [Page 30]
 
 Internet-Draft             TAPS Implementation                March 2018
 
@@ -1596,6 +1708,16 @@ Internet-Draft             TAPS Implementation                March 2018
               "Transparent Flow Mapping for NEAT (in Workshop on Future
               of Internet Transport (FIT 2017))", n.d..
 
+   [RFC5245]  Rosenberg, J., "Interactive Connectivity Establishment
+              (ICE): A Protocol for Network Address Translator (NAT)
+              Traversal for Offer/Answer Protocols", RFC 5245,
+              DOI 10.17487/RFC5245, April 2010,
+              <https://www.rfc-editor.org/info/rfc5245>.
+
+   [RFC6555]  Wing, D. and A. Yourtchenko, "Happy Eyeballs: Success with
+              Dual-Stack Hosts", RFC 6555, DOI 10.17487/RFC6555, April
+              2012, <https://www.rfc-editor.org/info/rfc6555>.
+
 Authors' Addresses
 
    Anna Brunstrom (editor)
@@ -1607,6 +1729,15 @@ Authors' Addresses
    Email: anna.brunstrom@kau.se
 
 
+
+
+
+
+Brunstrom, et al.       Expires September 2, 2018              [Page 31]
+
+Internet-Draft             TAPS Implementation                March 2018
+
+
    Tommy Pauly (editor)
    Apple Inc.
    One Apple Park Way
@@ -1614,16 +1745,6 @@ Authors' Addresses
    United States of America
 
    Email: tpauly@apple.com
-
-
-
-
-
-
-
-Brunstrom, et al.       Expires September 2, 2018              [Page 29]
-
-Internet-Draft             TAPS Implementation                March 2018
 
 
    Theresa Enghardt
@@ -1662,6 +1783,17 @@ Internet-Draft             TAPS Implementation                March 2018
    Email: philipp@inet.tu-berlin.de
 
 
+
+
+
+
+
+
+Brunstrom, et al.       Expires September 2, 2018              [Page 32]
+
+Internet-Draft             TAPS Implementation                March 2018
+
+
    Colin Perkins
    University of Glasgow
    School of Computing Science
@@ -1669,17 +1801,6 @@ Internet-Draft             TAPS Implementation                March 2018
    United Kingdom
 
    Email: csp@csperkins.org
-
-
-
-
-
-
-
-
-Brunstrom, et al.       Expires September 2, 2018              [Page 30]
-
-Internet-Draft             TAPS Implementation                March 2018
 
 
    Michael Welzl
@@ -1724,13 +1845,4 @@ Internet-Draft             TAPS Implementation                March 2018
 
 
 
-
-
-
-
-
-
-
-
-
-Brunstrom, et al.       Expires September 2, 2018              [Page 31]
+Brunstrom, et al.       Expires September 2, 2018              [Page 33]
