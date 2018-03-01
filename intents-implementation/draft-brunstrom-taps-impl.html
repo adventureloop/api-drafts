@@ -292,7 +292,7 @@ address {
 <link href="#rfc.section.4.1.1" rel="Chapter" title="4.1.1 Structuring Options as a Tree">
 <link href="#rfc.section.4.1.2" rel="Chapter" title="4.1.2 Branch Types">
 <link href="#rfc.section.4.2" rel="Chapter" title="4.2 Branching Order-of-Operations">
-<link href="#rfc.section.4.3" rel="Chapter" title="4.3 Ranking Branches">
+<link href="#rfc.section.4.3" rel="Chapter" title="4.3 Sorting Branches">
 <link href="#rfc.section.4.4" rel="Chapter" title="4.4 Candidate Racing">
 <link href="#rfc.section.4.4.1" rel="Chapter" title="4.4.1 Delayed Racing">
 <link href="#rfc.section.4.4.2" rel="Chapter" title="4.4.2 Failover">
@@ -332,6 +332,9 @@ address {
 <link href="#rfc.references" rel="Chapter" title="14 References">
 <link href="#rfc.references.1" rel="Chapter" title="14.1 Normative References">
 <link href="#rfc.references.2" rel="Chapter" title="14.2 Informative References">
+<link href="#rfc.appendix.A" rel="Chapter" title="A Additional Properties">
+<link href="#rfc.appendix.A.1" rel="Chapter" title="A.1 Properties Effecting Sorting of Branches">
+<link href="#rfc.appendix.A.2" rel="Chapter" title="A.2 Send Parameters">
 <link href="#rfc.authors" rel="Chapter">
 
 
@@ -340,7 +343,7 @@ address {
 
   <meta name="dct.creator" content="Brunstrom, A., Ed., Pauly, T., Ed., Enghardt, T., Grinnemo, K-J., Jones, T., Tiesel, P., Perkins, C., and M. Welzl" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-brunstrom-taps-impl-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-02-28" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-03-01" />
   <meta name="dct.abstract" content="The Transport Services architecture " />
   <meta name="description" content="The Transport Services architecture " />
 
@@ -364,7 +367,7 @@ address {
 <td class="right">T. Pauly, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: September 1, 2018</td>
+<td class="left">Expires: September 2, 2018</td>
 <td class="right">Apple Inc.</td>
 </tr>
 <tr>
@@ -417,7 +420,7 @@ address {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">February 28, 2018</td>
+<td class="right">March 01, 2018</td>
 </tr>
 
     	
@@ -433,7 +436,7 @@ address {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on September 1, 2018.</p>
+<p>This Internet-Draft will expire on September 2, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -463,7 +466,7 @@ address {
 </li>
 </ul><li>4.2.   <a href="#rfc.section.4.2">Branching Order-of-Operations</a>
 </li>
-<li>4.3.   <a href="#rfc.section.4.3">Ranking Branches</a>
+<li>4.3.   <a href="#rfc.section.4.3">Sorting Branches</a>
 </li>
 <li>4.4.   <a href="#rfc.section.4.4">Candidate Racing</a>
 </li>
@@ -542,6 +545,12 @@ address {
 <ul><li>14.1.   <a href="#rfc.references.1">Normative References</a>
 </li>
 <li>14.2.   <a href="#rfc.references.2">Informative References</a>
+</li>
+</ul><li>Appendix A.   <a href="#rfc.appendix.A">Additional Properties</a>
+</li>
+<ul><li>A.1.   <a href="#rfc.appendix.A.1">Properties Effecting Sorting of Branches</a>
+</li>
+<li>A.2.   <a href="#rfc.appendix.A.2">Send Parameters</a>
 </li>
 </ul><li><a href="#rfc.authors">Authors' Addresses</a>
 </li>
@@ -743,24 +752,22 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <p id="rfc.section.4.2.p.5">Protocol options are checked next in order. Whether or not a set of protocol, or protocol-specific options, can successfully connect is generally not dependent on which specific IP address is used. Furthermore, the protocol stacks being attempted may influence or altogether change the endpoints being used. Adding a proxy to a connection&#8217;s branch will change the endpoint to the proxy&#8217;s IP address or hostname. Choosing an alternate protocol may also modify the ports that should be selected.</p>
 <p id="rfc.section.4.2.p.6">Branching for derived endpoints is the final step, and may have multiple layers of derivation or resolution, such as DNS service resolution and DNS hostname resolution.</p>
 <h1 id="rfc.section.4.3">
-<a href="#rfc.section.4.3">4.3.</a> <a href="#ranking-branches" id="ranking-branches">Ranking Branches</a>
+<a href="#rfc.section.4.3">4.3.</a> <a href="#branch-sorting" id="branch-sorting">Sorting Branches</a>
 </h1>
-<p id="rfc.section.4.3.p.1">Implementations SHOULD rank the branches of the tree of connection options in order to prioritize them for candidate racing. Leaf nodes on branches with higher rankings represent connection attempts that will be raced first. Implementations SHOULD order the branches to reflect the preferences expressed by the application for its new connection, including Protocol and Path Selection Properties as well as Application Intents, which are specified in <a href="#draft-trammell-taps-interface" class="xref">[draft-trammell-taps-interface]</a>. In addition to the properties provided by the application, an implementation MAY include additional criteria such as cached performance estimates, see <a href="#performance-caches" class="xref">Section 8.2</a>, or system policy, see <a href="#role-of-system-policy" class="xref">Section 3.2</a>, in the ranking.</p>
-<p id="rfc.section.4.3.p.2">The Transport Parameters specified in <a href="#draft-trammell-taps-interface" class="xref">[draft-trammell-taps-interface]</a> may be used to rank branches in the following ways:</p>
+<p id="rfc.section.4.3.p.1">Implementations SHOULD sort the branches of the tree of connection options in order of their preference rank.  Leaf nodes on branches with higher rankings represent connection attempts that will be raced first.  Implementations SHOULD order the branches to reflect the preferences expressed by the application for its new connection, including Protocol and Path Selection Properties, which are specified in <a href="#draft-trammell-taps-interface" class="xref">[draft-trammell-taps-interface]</a> In addition to the properties provided by the application, an implementation MAY include additional criteria such as cached performance estimates, see <a href="#performance-caches" class="xref">Section 8.2</a>, or system policy, see <a href="#role-of-system-policy" class="xref">Section 3.2</a>, in the ranking.</p>
+<p id="rfc.section.4.3.p.2">The Transport Parameters specified in <a href="#draft-trammell-taps-interface" class="xref">[draft-trammell-taps-interface]</a> may be used to sort branches in the following ways:</p>
 <p></p>
 
 <ul>
-<li>Interface Type: If the application specifies an interface type to be required, an implementation MUST purge all branches that correspond to paths over interfaces that do not match this type. Similarly, it MUST purge paths that correspond to interface types that the application prohibits. If the application specifies an interface type to be preferred or avoided, implementations SHOULD rank paths accordingly.</li>
-<li>Capacity Profile: An implementation may use the Capacity Profile to prefer paths optimized for the application&#8217;s expected traffic pattern according to cached performance estimates, see <a href="#performance-caches" class="xref">Section 8.2</a>: <ul>
+<li>Interface Type: If the application specifies an interface type to be preferred or avoided, implementations SHOULD rank paths accordingly.  If the application specifies an interface type to be required or prohibited, we expect an implementation to not include the non-conforming paths into the three.</li>
+<li>Capacity Profile: An implementation may use the Capacity Profile to prefer paths optimized for the application&#8217;s expected traffic pattern according to cached performance estimates, see <a href="#performance-caches" class="xref">Section 8.2</a>:  <ul>
 <li>Interactive/Low Latency: Prefer paths with the lowest expected Round Trip Time</li>
 <li>Constant Rate: Prefer paths that can satisfy the requested Stream Send or Stream Receive Bitrate, based on observed maximum throughput</li>
 <li>Scavenger/Bulk: Prefer paths with the highest expected available bandwidth, based on observed maximum throughput</li>
 </ul>
 </li>
-<li>Size to be Sent or Received: An implementation may use the Size to be Sent or Received in combination with cached performance estimates, see <a href="#performance-caches" class="xref">Section 8.2</a>, e.g. the observed Round Trip Time and the observed maximum throughput, to compute an estimate of the completion time of a transfer over different available paths. It may then prefer the path with the shorter expected completion time. This Intent may be used instead of the Capacity profile, as the application does not always know whether its transfer will be latency-bound or bandwidth-bound, and thus may not be able to specify a Capacity Profile. However, the application may know the Size to be Sent or Received from metadata, e.g., in adaptive HTTP streaming such as MPEG-DASH, or in operating system upgrades. A related paper is currently under submission.</li>
-<li>Send / Receive Bitrate: If the application indicates an expected send or receive bitrate, an implementation may prefer a path that can likely provide the desired bandwidth, based on cached maximum throughput, see <a href="#performance-caches" class="xref">Section 8.2</a>. The application may know the Send or Receive Bitrate from metadata in adaptive HTTP streaming, such as MPEG-DASH.</li>
-<li>Cost Preferences: If the application indicates a preference to avoid expensive paths, and some paths are associated with a monetary cost, an implementation SHOULD decrease the ranking of such paths. If the application indicates that it prohibits using expensive paths, paths that are associated with a cost should be purged from the decision tree.</li>
 </ul>
+<p id="rfc.section.4.3.p.4">[Note: See also <a href="#branch-sorting-non-consensus" class="xref">Appendix A.1</a> for Application Intents under discussion.]</p>
 <h1 id="rfc.section.4.4">
 <a href="#rfc.section.4.4">4.4.</a> <a href="#candidate-racing" id="candidate-racing">Candidate Racing</a>
 </h1>
@@ -840,7 +847,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 </h1>
 <p id="rfc.section.5.1.1.p.1">The effect of the application sending a Message is determined by the top-level protocol in the established Protocol Stack. That is, if the top-level protocol provides an abstraction of framed messages over a connection, the receiving application will be able to obtain multiple Messages on that connection, even if the framing protocol is built on a byte-stream protocol like TCP.</p>
 <h1 id="rfc.section.5.1.1.1">
-<a href="#rfc.section.5.1.1.1">5.1.1.1.</a> <a href="#send-parameters" id="send-parameters">Send Parameters</a>
+<a href="#rfc.section.5.1.1.1">5.1.1.1.</a> <a href="#send-params" id="send-params">Send Parameters</a>
 </h1>
 <p></p>
 
@@ -852,8 +859,8 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <li>Corruption Protection Length: when this is set to any value other than -1, it limits the required checksum in protocols that allow limiting the checksum length (e.g. UDP-Lite).</li>
 <li>Immediate Acknowledgement: this informs the implementation that the sender intends to execute tight control over the send buffer, and therefore wants to avoid delayed acknowledgements. In case of SCTP, a request to immediately send acknowledgements can be implemented using the &#8220;sack-immediately flag&#8221; described in Section 4.2 of <a href="#RFC8303" class="xref">[RFC8303]</a> for the SEND.SCTP primitive.</li>
 <li>Instantaneous Capacity Profile: when this is&#160;set to &#8220;Interactive/Low Latency&#8221;, the Message should be sent immediately, even when this comes at the cost of using the network capacity less efficiently. For example, small messages can sometimes be bundled to fit into a single data packet for the sake of reducing header overhead; such bundling SHOULD not be used in case this parameter is true. For example, in case of TCP, the Nagle algorithm SHOULD be disabled when Immediate=true. Scavenger/Bulk can translate into usage of a congestion control mechanism such as LEDBAT, and/or the capacity profile can lead to a choice of a DSCP value as described in <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>).</li>
-<li>Send Bitrate: If an application indicates a certain bitrate it wants to send on the connection, the implementation may limit the bitrate of the outgoing communication to that rate, for example by setting an upper bound for the TCP congestion window of a connection calculated from the Send Bitrate and the Round Trip Time. This helps to avoid bursty traffic patterns on video streaming servers, see <a href="#Trickle" class="xref">[Trickle]</a>.</li>
 </ul>
+<p id="rfc.section.5.1.1.1.p.2">[Note: See also <a href="#send-params-non-consensus" class="xref">Appendix A.2</a> for additional Send Parameters under discussion.]</p>
 <h1 id="rfc.section.5.1.1.2">
 <a href="#rfc.section.5.1.1.2">5.1.1.2.</a> <a href="#send-completion" id="send-completion">Send Completion</a>
 </h1>
@@ -1105,6 +1112,28 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <td class="top">"<a>Trickle - Rate Limiting YouTube Video Streaming (ATC 2012)</a>", n.d..</td>
 </tr>
 </tbody></table>
+<h1 id="rfc.appendix.A">
+<a href="#rfc.appendix.A">Appendix A.</a> <a href="#appendix-non-consensus" id="appendix-non-consensus">Additional Properties</a>
+</h1>
+<p id="rfc.section.A.p.1">This appendix discusses implementation considerations for additional parameters and properties that could be used to enhance transport protocol and/or path selection, or the transmission of messages given a Protocol Stack that implements them.  These are not part of the interface, and may be removed from the final document, but are presented here to support discussion within the TAPS working group as to whether they should be added to a future revision of the base specification.</p>
+<h1 id="rfc.appendix.A.1">
+<a href="#rfc.appendix.A.1">A.1.</a> <a href="#branch-sorting-non-consensus" id="branch-sorting-non-consensus">Properties Effecting Sorting of Branches</a>
+</h1>
+<p id="rfc.section.A.1.p.1">In addition to the Transport Parameters listed in <a href="#branch-sorting" class="xref">Section 4.3</a>, the following Transport Parameters under discussion can influence branch sorting:</p>
+<p></p>
+
+<ul>
+<li>Size to be Sent or Received: An implementation may use the Size to be Sent or Received in combination with cached performance estimates, see <a href="#performance-caches" class="xref">Section 8.2</a>, e.g. the observed Round Trip Time and the observed maximum throughput, to compute an estimate of the completion time of a transfer over different available paths. It may then prefer the path with the shorter expected completion time. This Intent may be used instead of the Capacity profile, as the application does not always know whether its transfer will be latency-bound or bandwidth-bound, and thus may not be able to specify a Capacity Profile. However, the application may know the Size to be Sent or Received from metadata, e.g., in adaptive HTTP streaming such as MPEG-DASH, or in operating system upgrades. A related paper is currently under submission.</li>
+<li>Send / Receive Bitrate: If the application indicates an expected send or receive bitrate, an implementation may prefer a path that can likely provide the desired bandwidth, based on cached maximum throughput, see <a href="#performance-caches" class="xref">Section 8.2</a>. The application may know the Send or Receive Bitrate from metadata in adaptive HTTP streaming, such as MPEG-DASH.</li>
+<li>Cost Preferences: If the application indicates a preference to avoid expensive paths, and some paths are associated with a monetary cost, an implementation SHOULD decrease the ranking of such paths. If the application indicates that it prohibits using expensive paths, paths that are associated with a cost should be purged from the decision tree.</li>
+</ul>
+<h1 id="rfc.appendix.A.2">
+<a href="#rfc.appendix.A.2">A.2.</a> <a href="#send-params-non-consensus" id="send-params-non-consensus">Send Parameters</a>
+</h1>
+<p id="rfc.section.A.2.p.1">In addition to the Send Parameters listed in <a href="#send-params" class="xref">Section 5.1.1.1</a>, the following  Send Parameters are under discussion:</p>
+<p></p>
+
+<ul><li>Send Bitrate: If an application indicates a certain bitrate it wants to send on the connection, the implementation may limit the bitrate of the outgoing communication to that rate, for example by setting an upper bound for the TCP congestion window of a connection calculated from the Send Bitrate and the Round Trip Time. This helps to avoid bursty traffic patterns on video streaming servers, see <a href="#Trickle" class="xref">[Trickle]</a>.</li></ul>
 <h1 id="rfc.authors"><a href="#rfc.authors">Authors' Addresses</a></h1>
 <div class="avoidbreak">
   <address class="vcard">

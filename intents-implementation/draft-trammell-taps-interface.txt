@@ -5,7 +5,7 @@
 TAPS Working Group                                      B. Trammell, Ed.
 Internet-Draft                                                ETH Zurich
 Intended status: Informational                             M. Welzl, Ed.
-Expires: September 1, 2018                            University of Oslo
+Expires: September 2, 2018                            University of Oslo
                                                              T. Enghardt
                                                                TU Berlin
                                                             G. Fairhurst
@@ -18,7 +18,7 @@ Expires: September 1, 2018                            University of Oslo
                                                                TU Berlin
                                                                  C. Wood
                                                               Apple Inc.
-                                                       February 28, 2018
+                                                          March 01, 2018
 
 
      An Abstract Application Layer Interface to Transport Services
@@ -53,12 +53,12 @@ Status of This Memo
 
 
 
-Trammell, et al.        Expires September 1, 2018               [Page 1]
+Trammell, et al.        Expires September 2, 2018               [Page 1]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
-   This Internet-Draft will expire on September 1, 2018.
+   This Internet-Draft will expire on September 2, 2018.
 
 Copyright Notice
 
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Trammell, et al.        Expires September 1, 2018               [Page 2]
+Trammell, et al.        Expires September 2, 2018               [Page 2]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
    Appendix A.  Additional Properties  . . . . . . . . . . . . . . .  29
@@ -165,9 +165,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018               [Page 3]
+Trammell, et al.        Expires September 2, 2018               [Page 3]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
          An Action creates an Object.
@@ -221,9 +221,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018               [Page 4]
+Trammell, et al.        Expires September 2, 2018               [Page 4]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
 3.  Interface Design Principles
@@ -277,9 +277,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018               [Page 5]
+Trammell, et al.        Expires September 2, 2018               [Page 5]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
    Preconnection (i.e., passively opening, as in a server), or
@@ -333,9 +333,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018               [Page 6]
+Trammell, et al.        Expires September 2, 2018               [Page 6]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
    Preconnections, as connections, can be cloned, in order to establish
@@ -389,9 +389,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018               [Page 7]
+Trammell, et al.        Expires September 2, 2018               [Page 7]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
    Endpoint or a Remote Endpoint in cases where this is required, for
@@ -445,9 +445,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018               [Page 8]
+Trammell, et al.        Expires September 2, 2018               [Page 8]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
    +------------+------------------------------------------------------+
@@ -501,9 +501,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018               [Page 9]
+Trammell, et al.        Expires September 2, 2018               [Page 9]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
    o  Use 0-RTT session establishment with an idempotent Message: This
@@ -557,9 +557,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018              [Page 10]
+Trammell, et al.        Expires September 2, 2018              [Page 10]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
       this connection.  The Capacity Profile should only be used with
@@ -584,7 +584,10 @@ Internet-Draft               TAPS Interface                February 2018
       Constant Rate:  The application expects to send/receive data at a
          constant rate after connection establishment.  Delay and delay
          variation should be optimized at the expense of bandwidth
-         efficiency.
+         efficiency.  This implies that the Connection may fail if the
+         desired rate cannot be maintained across the Path.  A transport
+         may interpret this capacity profile as preferring a circuit
+         breaker [RFC8084] to a rate adaptive congestion controller.
 
       Scavenger/Bulk:  The application is not interactive.  It expects
          to send/receive a large amount of data, without any urgency.
@@ -606,17 +609,19 @@ Internet-Draft               TAPS Interface                February 2018
 
    transportParameters := NewTransportParameters()
 
+
+
+
+
+Trammell, et al.        Expires September 2, 2018              [Page 11]
+
+Internet-Draft               TAPS Interface                   March 2018
+
+
    The Individual parameters are then added to the TransportParameters
    object.  While Protocol Properties and Application Intents use the
    "add" call, Transport Preferences use special calls for the levels
    defined in Section 5.2.
-
-
-
-Trammell, et al.        Expires September 1, 2018              [Page 11]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
    transportParameters.add(parameter, value)
 
@@ -662,18 +667,16 @@ Internet-Draft               TAPS Interface                February 2018
    securityParameters.AddIdentity(identity)
    securityParameters.AddPrivateKey(privateKey, publicKey)
 
+
+
+Trammell, et al.        Expires September 2, 2018              [Page 12]
+
+Internet-Draft               TAPS Interface                   March 2018
+
+
    o  Supported algorithms: Used to restrict what parameters are used by
       underlying transport security protocols.  When not specified,
       these algorithms SHOULD default to known and safe defaults for the
-
-
-
-
-Trammell, et al.        Expires September 1, 2018              [Page 12]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
       system.  Parameters include: ciphersuites, supported groups, and
       signature algorithms.
 
@@ -722,12 +725,9 @@ securityParameters.AddSignatureAlgorithm(7) // ed25519
 
 
 
-
-
-
-Trammell, et al.        Expires September 1, 2018              [Page 13]
+Trammell, et al.        Expires September 2, 2018              [Page 13]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
 6.  Establishing Connections
@@ -781,9 +781,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018              [Page 14]
+Trammell, et al.        Expires September 2, 2018              [Page 14]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
    Connection -> InitiateError<>
@@ -837,9 +837,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018              [Page 15]
+Trammell, et al.        Expires September 2, 2018              [Page 15]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
 6.3.  Peer-to-Peer Establishment: Rendezvous
@@ -893,9 +893,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018              [Page 16]
+Trammell, et al.        Expires September 2, 2018              [Page 16]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
    The Resolve() call returns a list of Preconnection objects, that
@@ -949,9 +949,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018              [Page 17]
+Trammell, et al.        Expires September 2, 2018              [Page 17]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
    all Connections in the group and C is the total available capacity.
@@ -1005,9 +1005,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018              [Page 18]
+Trammell, et al.        Expires September 2, 2018              [Page 18]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
    Sent events allow an application to obtain an understanding of the
@@ -1061,9 +1061,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018              [Page 19]
+Trammell, et al.        Expires September 2, 2018              [Page 19]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
    sent.  For example, infinite Lifetime is not possible on a Message
@@ -1117,9 +1117,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018              [Page 20]
+Trammell, et al.        Expires September 2, 2018              [Page 20]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
 7.1.1.5.  Corruption Protection Length
@@ -1173,9 +1173,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018              [Page 21]
+Trammell, et al.        Expires September 2, 2018              [Page 21]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
 7.2.  Sender-side Framing
@@ -1229,9 +1229,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018              [Page 22]
+Trammell, et al.        Expires September 2, 2018              [Page 22]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
    As with sending, the type of the Message to be passed is dependent on
@@ -1285,9 +1285,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018              [Page 23]
+Trammell, et al.        Expires September 2, 2018              [Page 23]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
    Note that in the absence of message boundary preservation and without
@@ -1341,9 +1341,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018              [Page 24]
+Trammell, et al.        Expires September 2, 2018              [Page 24]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
 9.  Setting and Querying of Connection Properties
@@ -1397,9 +1397,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018              [Page 25]
+Trammell, et al.        Expires September 2, 2018              [Page 25]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
    properties only apply to specific protocols.  The default settings of
@@ -1453,9 +1453,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018              [Page 26]
+Trammell, et al.        Expires September 2, 2018              [Page 26]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
       fragmentation and/or transport layer segmentation at the sender.
@@ -1509,9 +1509,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018              [Page 27]
+Trammell, et al.        Expires September 2, 2018              [Page 27]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
 11.  IANA Considerations
@@ -1565,9 +1565,9 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018              [Page 28]
+Trammell, et al.        Expires September 2, 2018              [Page 28]
 
-Internet-Draft               TAPS Interface                February 2018
+Internet-Draft               TAPS Interface                   March 2018
 
 
    [I-D.ietf-tsvwg-sctp-ndata]
@@ -1598,6 +1598,10 @@ Internet-Draft               TAPS Interface                February 2018
               DOI 10.17487/RFC5245, April 2010,
               <https://www.rfc-editor.org/info/rfc5245>.
 
+   [RFC8084]  Fairhurst, G., "Network Transport Circuit Breakers",
+              BCP 208, RFC 8084, DOI 10.17487/RFC8084, March 2017,
+              <https://www.rfc-editor.org/info/rfc8084>.
+
    [RFC8095]  Fairhurst, G., Ed., Trammell, B., Ed., and M. Kuehlewind,
               Ed., "Services Provided by IETF Transport Protocols and
               Congestion Control Mechanisms", RFC 8095,
@@ -1614,17 +1618,17 @@ Appendix A.  Additional Properties
    with extension points to allow the implementation of features beyond
    those in the minimal common interface: Protocol Selection Properties,
    Path Selection Properties, and options on Message send are open sets.
+
+
+
+Trammell, et al.        Expires September 2, 2018              [Page 29]
+
+Internet-Draft               TAPS Interface                   March 2018
+
+
    Implementations of the interface are free to extend these sets to
    provide additional expressiveness to applications written on top of
    them.
-
-
-
-
-Trammell, et al.        Expires September 1, 2018              [Page 29]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
    This appendix enumerates a few additional parameters and properties
    that could be used to enhance transport protocol and/or path
@@ -1669,19 +1673,20 @@ A.1.1.  Application Intents
    a transport system may use them to determine a DSCP value, e.g.
    similar to Table 1 in [I-D.ietf-tsvwg-rtcweb-qos].
 
+
+
+
+
+Trammell, et al.        Expires September 2, 2018              [Page 30]
+
+Internet-Draft               TAPS Interface                   March 2018
+
+
    Application Intents can influence protocol selection, protocol
    configuration, path selection, and endpoint selection.  For example,
    setting the "Timeliness" Intent to "Interactive" may lead the
    transport system to disable the Nagle algorithm for a connection,
    while setting the "Timeliness" to "Background" may lead it to setting
-
-
-
-Trammell, et al.        Expires September 1, 2018              [Page 30]
-
-Internet-Draft               TAPS Interface                February 2018
-
-
    the DSCP value to "scavenger".  If the "Size to be Sent" Intent is
    set on an individual Message, it may influence path selection.
 
@@ -1725,18 +1730,18 @@ A.1.1.2.  Size to be Sent / Received
    This Intent specifies what the application expects the size of a
    transfer to be.  It is a numeric property and given in Bytes.
 
+
+
+
+Trammell, et al.        Expires September 2, 2018              [Page 31]
+
+Internet-Draft               TAPS Interface                   March 2018
+
+
 A.1.1.3.  Duration
 
    This Intent specifies what the application expects the lifetime of a
    transfer to be.  It is a numeric property and given in milliseconds.
-
-
-
-
-Trammell, et al.        Expires September 1, 2018              [Page 31]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
 A.1.1.4.  Send / Receive Bit-rate
 
@@ -1781,18 +1786,17 @@ A.3.  Send Parameters
 
    o  Immediate: Immediate is a boolean property.  If true, the caller
       prefers immediacy to efficient capacity usage for this Message.
+
+
+
+Trammell, et al.        Expires September 2, 2018              [Page 32]
+
+Internet-Draft               TAPS Interface                   March 2018
+
+
       For example, this means that the Message should not be bundled
       with other Message into the same transmission by the underlying
       Protocol Stack.
-
-
-
-
-
-Trammell, et al.        Expires September 1, 2018              [Page 32]
-
-Internet-Draft               TAPS Interface                February 2018
-
 
    o  Send Bitrate: This numeric property in Bytes per second specifies
       at what bitrate the application wishes the Message to be sent.  A
@@ -1833,6 +1837,19 @@ Authors' Addresses
    Email: michawe@ifi.uio.no
 
 
+
+
+
+
+
+
+
+
+Trammell, et al.        Expires September 2, 2018              [Page 33]
+
+Internet-Draft               TAPS Interface                   March 2018
+
+
    Theresa Enghardt
    TU Berlin
    Marchstrasse 23
@@ -1840,14 +1857,6 @@ Authors' Addresses
    Germany
 
    Email: theresa@inet.tu-berlin.de
-
-
-
-
-
-Trammell, et al.        Expires September 1, 2018              [Page 33]
-
-Internet-Draft               TAPS Interface                February 2018
 
 
    Godred Fairhurst
@@ -1887,6 +1896,16 @@ Internet-Draft               TAPS Interface                February 2018
    Email: philipp@inet.tu-berlin.de
 
 
+
+
+
+
+
+Trammell, et al.        Expires September 2, 2018              [Page 34]
+
+Internet-Draft               TAPS Interface                   March 2018
+
+
    Chris Wood
    Apple Inc.
    1 Infinite Loop
@@ -1901,4 +1920,41 @@ Internet-Draft               TAPS Interface                February 2018
 
 
 
-Trammell, et al.        Expires September 1, 2018              [Page 34]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Trammell, et al.        Expires September 2, 2018              [Page 35]
