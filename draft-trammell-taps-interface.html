@@ -527,7 +527,7 @@ address {
 </h1>
 <p id="rfc.section.1.p.1">The BSD Unix Sockets API&#8217;s SOCK_STREAM abstraction, by bringing network sockets into the UNIX programming model, allowing anyone who knew how to write programs that dealt with sequential-access files to also write network applications, was a revolution in simplicity. It would not be an overstatement to say that this simple API is the reason the Internet won the protocol wars of the 1980s. SOCK_STREAM is tied to the Transmission Control Protocol (TCP), specified in 1981 <a href="#RFC0793" class="xref">[RFC0793]</a>. TCP has scaled remarkably well over the past three and a half decades, but its total ubiquity has hidden an uncomfortable fact: the network is not really a file, and stream abstractions are too simplistic for many modern application programming models.</p>
 <p id="rfc.section.1.p.2">In the meantime, the nature of Internet access, and the variety of Internet transport protocols, is evolving. The challenges that new protocols and access paradigms present to the sockets API and to programming models based on them inspire the design principles of a new approach, which we outline in <a href="#principles" class="xref">Section 3</a>.</p>
-<p id="rfc.section.1.p.3">As a first step to realizing this design, <a href="#TAPS-ARCH" class="xref">[TAPS-ARCH]</a> describes a high-level architecture for transport services. This document builds a modern abstract programming interface atop this architecture, deriving specific path and protocol selection properties and supported transport features from the analysis provided in <a href="#RFC8095" class="xref">[RFC8095]</a> and <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>.</p>
+<p id="rfc.section.1.p.3">As a first step to realizing this design, <a href="#I-D.pauly-taps-arch" class="xref">[I-D.pauly-taps-arch]</a> describes a high-level architecture for transport services. This document builds a modern abstract programming interface atop this architecture, deriving specific path and protocol selection properties and supported transport features from the analysis provided in <a href="#RFC8095" class="xref">[RFC8095]</a> and <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>.</p>
 <h1 id="rfc.section.2">
 <a href="#rfc.section.2">2.</a> <a href="#terminology-and-notation" id="terminology-and-notation">Terminology and Notation</a>
 </h1>
@@ -547,7 +547,7 @@ address {
 <h1 id="rfc.section.3">
 <a href="#rfc.section.3">3.</a> <a href="#principles" id="principles">Interface Design Principles</a>
 </h1>
-<p id="rfc.section.3.p.1">We begin with the architectural design principles defined in <a href="#TAPS-ARCH" class="xref">[TAPS-ARCH]</a>; from these, we derive and elaborate a set of principles on which the design of the interface is based. The interface defined in this document provides:</p>
+<p id="rfc.section.3.p.1">We begin with the architectural design principles defined in <a href="#I-D.pauly-taps-arch" class="xref">[I-D.pauly-taps-arch]</a>; from these, we derive and elaborate a set of principles on which the design of the interface is based. The interface defined in this document provides:</p>
 <p></p>
 
 <ul>
@@ -560,9 +560,9 @@ address {
 <h1 id="rfc.section.4">
 <a href="#rfc.section.4">4.</a> <a href="#api-summary" id="api-summary">API Summary</a>
 </h1>
-<p id="rfc.section.4.p.1">The Transport Services Interface is the basic common abstract application programming interface to the Transport Services Architecture defined in <a href="#TAPS-ARCH" class="xref">[TAPS-ARCH]</a>. An application primarily interacts with this interface through two Objects, Preconnections and Connections. A Preconnection represents a set of parameters and constraints on the selection and configuration of paths and protocols to establish a Connection with a remote endpoint. A Connection represents a transport Protocol Stack on which data can be sent to and received from a remote endpoint. Connections can be created from Preconnections in three ways: by initiating the Preconnection (i.e., actively opening, as in a client), through listening on the Preconnection (i.e., passively opening, as in a server), or rendezvousing on the Preconnection (i.e. peer to peer establishment).</p>
+<p id="rfc.section.4.p.1">The Transport Services Interface is the basic common abstract application programming interface to the Transport Services Architecture defined in <a href="#I-D.pauly-taps-arch" class="xref">[I-D.pauly-taps-arch]</a>. An application primarily interacts with this interface through two Objects, Preconnections and Connections. A Preconnection represents a set of parameters and constraints on the selection and configuration of paths and protocols to establish a Connection with a remote endpoint. A Connection represents a transport Protocol Stack on which data can be sent to and received from a remote endpoint. Connections can be created from Preconnections in three ways: by initiating the Preconnection (i.e., actively opening, as in a client), through listening on the Preconnection (i.e., passively opening, as in a server), or rendezvousing on the Preconnection (i.e. peer to peer establishment).</p>
 <p id="rfc.section.4.p.2">Once a Connection is established, data can be sent on it in the form of Messages. The interface supports the preservation of message boundaries both via explicit Protocol Stack support, and via application support through a deframing callback which finds message boundaries in a stream. Messages are received asynchronously through a callback registered by the application. Errors and other notifications also happen asynchronously on the Connection.</p>
-<p id="rfc.section.4.p.3">In the following sections, we describe the details of application interaction with Objects through Actions and Events in each phase of a Connection, following the phases described in <a href="#TAPS-ARCH" class="xref">[TAPS-ARCH]</a>.</p>
+<p id="rfc.section.4.p.3">In the following sections, we describe the details of application interaction with Objects through Actions and Events in each phase of a Connection, following the phases described in <a href="#I-D.pauly-taps-arch" class="xref">[I-D.pauly-taps-arch]</a>.</p>
 <h1 id="rfc.section.5">
 <a href="#rfc.section.5">5.</a> <a href="#pre-establishment-phase" id="pre-establishment-phase">Pre-Establishment Phase</a>
 </h1>
@@ -1054,9 +1054,9 @@ Connection -&gt; ConnectionError&lt;&gt;
 <a>Stewart, R.</a>, <a>Tuexen, M.</a>, <a>Loreto, S.</a> and <a>R. Seggelmann</a>, "<a href="https://tools.ietf.org/html/draft-ietf-tsvwg-sctp-ndata-13">Stream Schedulers and User Message Interleaving for the Stream Control Transmission Protocol</a>", Internet-Draft draft-ietf-tsvwg-sctp-ndata-13, September 2017.</td>
 </tr>
 <tr>
-<td class="reference"><b id="TAPS-ARCH">[TAPS-ARCH]</b></td>
+<td class="reference"><b id="I-D.pauly-taps-arch">[I-D.pauly-taps-arch]</b></td>
 <td class="top">
-<a>Pauly, T.</a>, <a>Trammell, B.</a>, <a>Brunstrom, A.</a>, <a>Fairhurst, G.</a>, <a>Perkins, C.</a>, <a>Tiesel, P.</a> and <a>C. Wood</a>, "<a>An Architecture for Transport Services</a>", n.d..</td>
+<a>Pauly, T.</a>, <a>Trammell, B.</a>, <a>Brunstrom, A.</a>, <a>Fairhurst, G.</a>, <a>Perkins, C.</a>, <a>Tiesel, P.</a> and <a>C. Wood</a>, "<a href="https://tools.ietf.org/html/draft-pauly-taps-arch-00">An Architecture for Transport Services</a>", Internet-Draft draft-pauly-taps-arch-00, February 2018.</td>
 </tr>
 </tbody></table>
 <h1 id="rfc.references.2">
@@ -1091,7 +1091,7 @@ Connection -&gt; ConnectionError&lt;&gt;
 <h1 id="rfc.appendix.A">
 <a href="#rfc.appendix.A">Appendix A.</a> <a href="#appendix-non-consensus" id="appendix-non-consensus">Additional Properties</a>
 </h1>
-<p id="rfc.section.A.p.1">The interface specified by this document represents the minimal common interface to an endpoint in the transport services architecture <a href="#TAPS-ARCH" class="xref">[TAPS-ARCH]</a>, based upon that architecture and on the minimal set of transport service features elaborated in <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>. However, the interface has been designed with extension points to allow the implementation of features beyond those in the minimal common interface: Protocol Selection Properties, Path Selection Properties, and options on Message send are open sets. Implementations of the interface are free to extend these sets to provide additional expressiveness to applications written on top of them.</p>
+<p id="rfc.section.A.p.1">The interface specified by this document represents the minimal common interface to an endpoint in the transport services architecture <a href="#I-D.pauly-taps-arch" class="xref">[I-D.pauly-taps-arch]</a>, based upon that architecture and on the minimal set of transport service features elaborated in <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>. However, the interface has been designed with extension points to allow the implementation of features beyond those in the minimal common interface: Protocol Selection Properties, Path Selection Properties, and options on Message send are open sets. Implementations of the interface are free to extend these sets to provide additional expressiveness to applications written on top of them.</p>
 <p id="rfc.section.A.p.2">This appendix enumerates a few additional parameters and properties that could be used to enhance transport protocol and/or path selection, or the transmission of messages given a Protocol Stack that implements them. These are not part of the interface, and may be removed from the final document, but are presented here to support discussion within the TAPS working group as to whether they should be added to a future revision of the base specification.</p>
 <h1 id="rfc.appendix.A.1">
 <a href="#rfc.appendix.A.1">A.1.</a> <a href="#protocol-and-path-selection-properties" id="protocol-and-path-selection-properties">Protocol and Path Selection Properties</a>

@@ -148,12 +148,12 @@ Internet-Draft               TAPS Interface                   March 2018
    programming models based on them inspire the design principles of a
    new approach, which we outline in Section 3.
 
-   As a first step to realizing this design, [TAPS-ARCH] describes a
-   high-level architecture for transport services.  This document builds
-   a modern abstract programming interface atop this architecture,
-   deriving specific path and protocol selection properties and
-   supported transport features from the analysis provided in [RFC8095]
-   and [I-D.ietf-taps-minset].
+   As a first step to realizing this design, [I-D.pauly-taps-arch]
+   describes a high-level architecture for transport services.  This
+   document builds a modern abstract programming interface atop this
+   architecture, deriving specific path and protocol selection
+   properties and supported transport features from the analysis
+   provided in [RFC8095] and [I-D.ietf-taps-minset].
 
 2.  Terminology and Notation
 
@@ -209,9 +209,9 @@ Internet-Draft               TAPS Interface                   March 2018
 3.  Interface Design Principles
 
    We begin with the architectural design principles defined in
-   [TAPS-ARCH]; from these, we derive and elaborate a set of principles
-   on which the design of the interface is based.  The interface defined
-   in this document provides:
+   [I-D.pauly-taps-arch]; from these, we derive and elaborate a set of
+   principles on which the design of the interface is based.  The
+   interface defined in this document provides:
 
    o  A single interface to a variety of transport protocols to be used
       in a variety of application design patterns, independent of the
@@ -253,17 +253,18 @@ Internet-Draft               TAPS Interface                   March 2018
 
    The Transport Services Interface is the basic common abstract
    application programming interface to the Transport Services
-   Architecture defined in [TAPS-ARCH].  An application primarily
-   interacts with this interface through two Objects, Preconnections and
-   Connections.  A Preconnection represents a set of parameters and
-   constraints on the selection and configuration of paths and protocols
-   to establish a Connection with a remote endpoint.  A Connection
-   represents a transport Protocol Stack on which data can be sent to
-   and received from a remote endpoint.  Connections can be created from
-   Preconnections in three ways: by initiating the Preconnection (i.e.,
-   actively opening, as in a client), through listening on the
-   Preconnection (i.e., passively opening, as in a server), or
-   rendezvousing on the Preconnection (i.e. peer to peer establishment).
+   Architecture defined in [I-D.pauly-taps-arch].  An application
+   primarily interacts with this interface through two Objects,
+   Preconnections and Connections.  A Preconnection represents a set of
+   parameters and constraints on the selection and configuration of
+   paths and protocols to establish a Connection with a remote endpoint.
+   A Connection represents a transport Protocol Stack on which data can
+   be sent to and received from a remote endpoint.  Connections can be
+   created from Preconnections in three ways: by initiating the
+   Preconnection (i.e., actively opening, as in a client), through
+   listening on the Preconnection (i.e., passively opening, as in a
+   server), or rendezvousing on the Preconnection (i.e. peer to peer
+   establishment).
 
    Once a Connection is established, data can be sent on it in the form
    of Messages.  The interface supports the preservation of message
@@ -276,7 +277,6 @@ Internet-Draft               TAPS Interface                   March 2018
 
 
 
-
 Trammell, et al.        Expires September 3, 2018               [Page 5]
 
 Internet-Draft               TAPS Interface                   March 2018
@@ -284,7 +284,8 @@ Internet-Draft               TAPS Interface                   March 2018
 
    In the following sections, we describe the details of application
    interaction with Objects through Actions and Events in each phase of
-   a Connection, following the phases described in [TAPS-ARCH].
+   a Connection, following the phases described in
+   [I-D.pauly-taps-arch].
 
 5.  Pre-Establishment Phase
 
@@ -327,7 +328,6 @@ Internet-Draft               TAPS Interface                   March 2018
    Subtypes of these represent various different types of endpoint
    identifiers, such as IP addresses, DNS names, and interface names, as
    well as port numbers and service names.
-
 
 
 
@@ -1547,10 +1547,11 @@ Internet-Draft               TAPS Interface                   March 2018
               Stream Control Transmission Protocol", draft-ietf-tsvwg-
               sctp-ndata-13 (work in progress), September 2017.
 
-   [TAPS-ARCH]
-              Pauly, T., Ed., Trammell, B., Ed., Brunstrom, A.,
-              Fairhurst, G., Perkins, C., Tiesel, P., and C. Wood, "An
-              Architecture for Transport Services", n.d..
+   [I-D.pauly-taps-arch]
+              Pauly, T., Trammell, B., Brunstrom, A., Fairhurst, G.,
+              Perkins, C., Tiesel, P., and C. Wood, "An Architecture for
+              Transport Services", draft-pauly-taps-arch-00 (work in
+              progress), February 2018.
 
 14.2.  Informative References
 
@@ -1559,9 +1560,8 @@ Internet-Draft               TAPS Interface                   March 2018
               Security Protocols", draft-pauly-taps-transport-
               security-01 (work in progress), January 2018.
 
-   [RFC0793]  Postel, J., "Transmission Control Protocol", STD 7,
-              RFC 793, DOI 10.17487/RFC0793, September 1981,
-              <https://www.rfc-editor.org/info/rfc793>.
+
+
 
 
 
@@ -1569,6 +1569,10 @@ Trammell, et al.        Expires September 3, 2018              [Page 28]
 
 Internet-Draft               TAPS Interface                   March 2018
 
+
+   [RFC0793]  Postel, J., "Transmission Control Protocol", STD 7,
+              RFC 793, DOI 10.17487/RFC0793, September 1981,
+              <https://www.rfc-editor.org/info/rfc793>.
 
    [RFC5245]  Rosenberg, J., "Interactive Connectivity Establishment
               (ICE): A Protocol for Network Address Translator (NAT)
@@ -1590,8 +1594,8 @@ Appendix A.  Additional Properties
 
    The interface specified by this document represents the minimal
    common interface to an endpoint in the transport services
-   architecture [TAPS-ARCH], based upon that architecture and on the
-   minimal set of transport service features elaborated in
+   architecture [I-D.pauly-taps-arch], based upon that architecture and
+   on the minimal set of transport service features elaborated in
    [I-D.ietf-taps-minset].  However, the interface has been designed
    with extension points to allow the implementation of features beyond
    those in the minimal common interface: Protocol Selection Properties,
@@ -1613,11 +1617,7 @@ A.1.  Protocol and Path Selection Properties
    The following protocol and path selection properties might be made
    available in addition to those specified in Section 5.2:
 
-   o  Suggest a timeout to the Remote Endpoint: This boolean property
-      specifies whether an application considers it useful to propose a
-      timeout until the Connection is assumed to be lost.  This property
-      applies to Connections and Connection Groups.  This is not a
-      strict requirement.  The default is to have this option.
+
 
 
 
@@ -1626,6 +1626,11 @@ Trammell, et al.        Expires September 3, 2018              [Page 29]
 Internet-Draft               TAPS Interface                   March 2018
 
 
+   o  Suggest a timeout to the Remote Endpoint: This boolean property
+      specifies whether an application considers it useful to propose a
+      timeout until the Connection is assumed to be lost.  This property
+      applies to Connections and Connection Groups.  This is not a
+      strict requirement.  The default is to have this option.
       [EDITOR'S NOTE: For discussion of this option, see
       https://github.com/taps-api/drafts/issues/109]
 
@@ -1670,17 +1675,15 @@ A.1.1.  Application Intents
    corresponding Message Properties, similar to the properties in
    Section 7.1.
 
-   Application Intents can be added to this interface as Transport
-   Preferences with the "Prefer" preference level.
-
-
-
 
 
 Trammell, et al.        Expires September 3, 2018              [Page 30]
 
 Internet-Draft               TAPS Interface                   March 2018
 
+
+   Application Intents can be added to this interface as Transport
+   Preferences with the "Prefer" preference level.
 
 A.1.1.1.  Traffic Category
 
@@ -1728,15 +1731,14 @@ A.1.1.5.  Cost Preferences
    handle trade-offs between cost and performance or reliability.  This
    Intent can also apply to an individual Messages.
 
-   No Expense:  Avoid transports associated with monetary cost
-
-
 
 
 Trammell, et al.        Expires September 3, 2018              [Page 31]
 
 Internet-Draft               TAPS Interface                   March 2018
 
+
+   No Expense:  Avoid transports associated with monetary cost
 
    Optimize Cost:  Prefer inexpensive transports and accept service
       degradation
@@ -1784,8 +1786,6 @@ Appendix B.  Sample API definition in Go
    project/postsocket.  Documentation for this API - an illustration of
    the documentation an application developer would see for an instance
    of this interface - is available online at
-   https://godoc.org/github.com/mami-project/postsocket.  This API
-
 
 
 
@@ -1794,6 +1794,7 @@ Trammell, et al.        Expires September 3, 2018              [Page 32]
 Internet-Draft               TAPS Interface                   March 2018
 
 
+   https://godoc.org/github.com/mami-project/postsocket.  This API
    definition will be kept largely in sync with the development of this
    abstract interface definition.
 
@@ -1834,7 +1835,6 @@ Authors' Addresses
 
    Email: gorry@erg.abdn.ac.uk
    URI:   http://www.erg.abdn.ac.uk/
-
 
 
 
