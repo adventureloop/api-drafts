@@ -311,7 +311,7 @@ address {
 <link href="#rfc.section.5.2" rel="Chapter" title="5.2 Handling of data for fast-open protocols">
 <link href="#rfc.section.6" rel="Chapter" title="6 Implementing Maintenance">
 <link href="#rfc.section.6.1" rel="Chapter" title="6.1 Changing Protocol Properties">
-<link href="#rfc.section.6.2" rel="Chapter" title="6.2 Maintenance Events">
+<link href="#rfc.section.6.2" rel="Chapter" title="6.2 Handling Path Changes">
 <link href="#rfc.section.7" rel="Chapter" title="7 Implementing Termination">
 <link href="#rfc.section.8" rel="Chapter" title="8 Cached State">
 <link href="#rfc.section.8.1" rel="Chapter" title="8.1 Protocol state caches">
@@ -505,7 +505,7 @@ address {
 </li>
 <ul><li>6.1.   <a href="#rfc.section.6.1">Changing Protocol Properties</a>
 </li>
-<li>6.2.   <a href="#rfc.section.6.2">Maintenance Events</a>
+<li>6.2.   <a href="#rfc.section.6.2">Handling Path Changes</a>
 </li>
 </ul><li>7.   <a href="#rfc.section.7">Implementing Termination</a>
 </li>
@@ -891,6 +891,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <h1 id="rfc.section.6">
 <a href="#rfc.section.6">6.</a> <a href="#implementing-maintenance" id="implementing-maintenance">Implementing Maintenance</a>
 </h1>
+<p id="rfc.section.6.p.1">Maintenance encompasses changes that the application can request to a Connection, or that a Connection can react to based on system and network changes.</p>
 <h1 id="rfc.section.6.1">
 <a href="#rfc.section.6.1">6.1.</a> <a href="#changing-protocol-properties" id="changing-protocol-properties">Changing Protocol Properties</a>
 </h1>
@@ -906,32 +907,21 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <li>Connection group transmission scheduler: for SCTP, this can be done using the primitive SET_STREAM_SCHEDULER.SCTP described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.</li>
 </ul>
 <h1 id="rfc.section.6.2">
-<a href="#rfc.section.6.2">6.2.</a> <a href="#maintenance-events" id="maintenance-events">Maintenance Events</a>
+<a href="#rfc.section.6.2">6.2.</a> <a href="#handling-path-changes" id="handling-path-changes">Handling Path Changes</a>
 </h1>
-<p id="rfc.section.6.2.p.1">Implications of a network change on a protocol</p>
-<p></p>
-
-<ul>
-<li>Multipath or migratable protocols</li>
-<li>Single-path protocols</li>
-</ul>
-<p id="rfc.section.6.2.p.3">Quality changes</p>
+<p id="rfc.section.6.2.p.1">When a path change occurs, the Transport Services implementation is responsible for notifying Protocol Instances in the Protocol Stack, as well as notifying the application when the path used by the Protocol Stack changes.</p>
+<p id="rfc.section.6.2.p.2">If the Protocol Stack includes a transport protocol that supports multipath connectivity, an update to the available paths should inform the Protocol Instance of the new set of paths that are permissible based on the Path Selection Properties passed by the application. A multipath protocol can establish new subflows over new paths, and should tear down subflows over paths that are no longer available. If the Protocol Stack includes a transport protocol that does not support multipath, but support migrating between paths, the update to available paths can be used as the trigger to migrating the flow. For protocols that do not support multipath or migration, the Protocol Instances may be informed of the path change, but should not be forcibly disconnected if the previously used path becomes unavailable. An exception to this case is if the System Policy changes to prohibit traffic from the Connection based on its properties, in which case the Protocol Stack should be disconnected.</p>
+<p id="rfc.section.6.2.p.3">The application should be notified of the currently used paths. For protocols that are multipath or migratable, the path reported to the application should report the state of the transport protocol. For protocols that do not support changing paths, the application should be notified when the path being used by the Protocol Stack becomes unavailable (implying that packets can no longer be sent), or when there is a more preferred path available than the one currently being used by the Protocol Stack.</p>
+<p id="rfc.section.6.2.p.4">If the path changes only in terms of quality, the Protocol Stack and application should be informed in case the rate of sending can be adjusted.</p>
 <h1 id="rfc.section.7">
 <a href="#rfc.section.7">7.</a> <a href="#implementing-termination" id="implementing-termination">Implementing Termination</a>
 </h1>
-<p id="rfc.section.7.p.1">How to handle termination requested by application:</p>
-<p></p>
-
-<ul><li>How gracefully to tear down at various protocol layers</li></ul>
-<p id="rfc.section.7.p.3">With TCP, when an application closes a connection, this means that it has no more data to send (but expects all data that has been handed over to be reliably delivered). However, with TCP only, &#8220;close&#8221; does not mean that the application will stop receiving data. This is related to TCP&#8217;s ability to support half-closed connections.</p>
-<p id="rfc.section.7.p.4">SCTP is an example of a protocol that does not support such half-closed connections.  Hence, with SCTP, the meaning of &#8220;close&#8221; is stricter: an application has no more data to send (but expects all data that has been handed over to be reliably delivered), and will also not receive any more data.</p>
-<p id="rfc.section.7.p.5">Implementing a protocol independent transport system means that the exposed semantics must be the strictest subset of the semantics of all supported protocols.  Hence, as is common with all reliable transport protocols, after a Close action, the application can expect to have its reliability requirements honored regarding the data it has given to the Transport System &#8211; but it cannot expect to be able to read any more data after calling Close.</p>
-<p id="rfc.section.7.p.6">Abort differs from Close only in that no guarantees are given regarding data that the application has handed over to the Tranport System before calling Abort.</p>
-<p></p>
-
-<ul><li>How much to tear down for multiplexed protocols, or protocols capable of multiplexing</li></ul>
-<p id="rfc.section.7.p.8">As explained in section <a href="#establish-mux" class="xref">Section 4.6</a>, when a new stream is multiplexed on an already existing connection of a Transport Protocol Instance, there is no need for a connection establishment procedure. Because the Connections that are offered by the Transport System can be implemented as streams that are multiplexed on a transport protocol&#8217;s connection, it can therefore not be guaranteed that one Endpoint&#8217;s Initiate action provokes a ConnectionReceived event at its peer.</p>
-<p id="rfc.section.7.p.9">For Close (provoking a Finished event) and Abort (provoking a ConnectionError event), the same logic applies: while it is desirable to be informed when a peer closes or aborts a Connection, whether this is possible depends on the underlying protocol, and no guarantees can be given. With SCTP, the transport system can use the stream reset procedure to cause a Finish event upon a Close action from the peer <a href="#NEAT-flow-mapping" class="xref">[NEAT-flow-mapping]</a>.</p>
+<p id="rfc.section.7.p.1">With TCP, when an application closes a connection, this means that it has no more data to send (but expects all data that has been handed over to be reliably delivered). However, with TCP only, &#8220;close&#8221; does not mean that the application will stop receiving data. This is related to TCP&#8217;s ability to support half-closed connections.</p>
+<p id="rfc.section.7.p.2">SCTP is an example of a protocol that does not support such half-closed connections.  Hence, with SCTP, the meaning of &#8220;close&#8221; is stricter: an application has no more data to send (but expects all data that has been handed over to be reliably delivered), and will also not receive any more data.</p>
+<p id="rfc.section.7.p.3">Implementing a protocol independent transport system means that the exposed semantics must be the strictest subset of the semantics of all supported protocols.  Hence, as is common with all reliable transport protocols, after a Close action, the application can expect to have its reliability requirements honored regarding the data it has given to the Transport System, but it cannot expect to be able to read any more data after calling Close.</p>
+<p id="rfc.section.7.p.4">Abort differs from Close only in that no guarantees are given regarding data that the application has handed over to the Tranport System before calling Abort.</p>
+<p id="rfc.section.7.p.5">As explained in section <a href="#establish-mux" class="xref">Section 4.6</a>, when a new stream is multiplexed on an already existing connection of a Transport Protocol Instance, there is no need for a connection establishment procedure. Because the Connections that are offered by the Transport System can be implemented as streams that are multiplexed on a transport protocol&#8217;s connection, it can therefore not be guaranteed that one Endpoint&#8217;s Initiate action provokes a ConnectionReceived event at its peer.</p>
+<p id="rfc.section.7.p.6">For Close (provoking a Finished event) and Abort (provoking a ConnectionError event), the same logic applies: while it is desirable to be informed when a peer closes or aborts a Connection, whether this is possible depends on the underlying protocol, and no guarantees can be given. With SCTP, the transport system can use the stream reset procedure to cause a Finish event upon a Close action from the peer <a href="#NEAT-flow-mapping" class="xref">[NEAT-flow-mapping]</a>.</p>
 <h1 id="rfc.section.8">
 <a href="#rfc.section.8">8.</a> <a href="#cached-state" id="cached-state">Cached State</a>
 </h1>
