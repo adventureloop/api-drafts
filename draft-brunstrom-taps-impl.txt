@@ -94,18 +94,18 @@ Table of Contents
      4.6.  Establishing multiplexed connections  . . . . . . . . . .  16
      4.7.  Handling racing with "unconnected" protocols  . . . . . .  16
      4.8.  Implementing listeners  . . . . . . . . . . . . . . . . .  17
-       4.8.1.  Implementing listeners for Unconnected Protocols  . .  17
-   5.  Implementing Data Transfer  . . . . . . . . . . . . . . . . .  17
-     5.1.  Data transfer for streams, datagrams, and frames  . . . .  17
+       4.8.1.  Implementing listeners for Connected Protocols  . . .  17
+       4.8.2.  Implementing listeners for Unconnected Protocols  . .  17
+       4.8.3.  Implementing listeners for Multiplexed Protocols  . .  18
+   5.  Implementing Data Transfer  . . . . . . . . . . . . . . . . .  18
+     5.1.  Data transfer for streams, datagrams, and frames  . . . .  18
        5.1.1.  Sending Messages  . . . . . . . . . . . . . . . . . .  18
-       5.1.2.  Receiving Messages  . . . . . . . . . . . . . . . . .  19
-     5.2.  Handling of data for fast-open protocols  . . . . . . . .  20
-   6.  Implementing Maintenance  . . . . . . . . . . . . . . . . . .  21
-     6.1.  Changing Protocol Properties  . . . . . . . . . . . . . .  21
+       5.1.2.  Receiving Messages  . . . . . . . . . . . . . . . . .  20
+     5.2.  Handling of data for fast-open protocols  . . . . . . . .  21
+   6.  Implementing Maintenance  . . . . . . . . . . . . . . . . . .  22
+     6.1.  Changing Protocol Properties  . . . . . . . . . . . . . .  22
      6.2.  Maintenance Events  . . . . . . . . . . . . . . . . . . .  22
-   7.  Implementing Termination  . . . . . . . . . . . . . . . . . .  22
-   8.  Cached State  . . . . . . . . . . . . . . . . . . . . . . . .  23
-     8.1.  Protocol state caches . . . . . . . . . . . . . . . . . .  23
+   7.  Implementing Termination  . . . . . . . . . . . . . . . . . .  23
 
 
 
@@ -114,27 +114,29 @@ Brunstrom, et al.       Expires September 3, 2018               [Page 2]
 Internet-Draft             TAPS Implementation                March 2018
 
 
-     8.2.  Performance caches  . . . . . . . . . . . . . . . . . . .  24
-   9.  Specific Transport Protocol Considerations  . . . . . . . . .  25
-     9.1.  TCP . . . . . . . . . . . . . . . . . . . . . . . . . . .  25
-     9.2.  UDP . . . . . . . . . . . . . . . . . . . . . . . . . . .  25
+   8.  Cached State  . . . . . . . . . . . . . . . . . . . . . . . .  24
+     8.1.  Protocol state caches . . . . . . . . . . . . . . . . . .  24
+     8.2.  Performance caches  . . . . . . . . . . . . . . . . . . .  25
+   9.  Specific Transport Protocol Considerations  . . . . . . . . .  26
+     9.1.  TCP . . . . . . . . . . . . . . . . . . . . . . . . . . .  26
+     9.2.  UDP . . . . . . . . . . . . . . . . . . . . . . . . . . .  26
      9.3.  SCTP  . . . . . . . . . . . . . . . . . . . . . . . . . .  26
-     9.4.  TLS . . . . . . . . . . . . . . . . . . . . . . . . . . .  26
-     9.5.  HTTP  . . . . . . . . . . . . . . . . . . . . . . . . . .  26
-     9.6.  QUIC  . . . . . . . . . . . . . . . . . . . . . . . . . .  27
-     9.7.  HTTP/2 transport  . . . . . . . . . . . . . . . . . . . .  27
-   10. Rendezvous and Environment Discovery  . . . . . . . . . . . .  27
-   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  29
+     9.4.  TLS . . . . . . . . . . . . . . . . . . . . . . . . . . .  27
+     9.5.  HTTP  . . . . . . . . . . . . . . . . . . . . . . . . . .  27
+     9.6.  QUIC  . . . . . . . . . . . . . . . . . . . . . . . . . .  28
+     9.7.  HTTP/2 transport  . . . . . . . . . . . . . . . . . . . .  28
+   10. Rendezvous and Environment Discovery  . . . . . . . . . . . .  28
+   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  30
    12. Security Considerations . . . . . . . . . . . . . . . . . . .  30
      12.1.  Considerations for Candidate Gathering . . . . . . . . .  30
-     12.2.  Considerations for Candidate Racing  . . . . . . . . . .  30
-   13. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  30
+     12.2.  Considerations for Candidate Racing  . . . . . . . . . .  31
+   13. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  31
    14. References  . . . . . . . . . . . . . . . . . . . . . . . . .  31
      14.1.  Normative References . . . . . . . . . . . . . . . . . .  31
-     14.2.  Informative References . . . . . . . . . . . . . . . . .  32
-   Appendix A.  Additional Properties  . . . . . . . . . . . . . . .  32
+     14.2.  Informative References . . . . . . . . . . . . . . . . .  33
+   Appendix A.  Additional Properties  . . . . . . . . . . . . . . .  33
      A.1.  Properties Effecting Sorting of Branches  . . . . . . . .  33
-     A.2.  Send Parameters . . . . . . . . . . . . . . . . . . . . .  33
+     A.2.  Send Parameters . . . . . . . . . . . . . . . . . . . . .  34
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  34
 
 1.  Introduction
@@ -160,8 +162,6 @@ Internet-Draft             TAPS Implementation                March 2018
    o  A flow of data in either direction
 
    o  For TCP, one connection is a Connection object
-
-
 
 
 
@@ -903,22 +903,69 @@ Internet-Draft             TAPS Implementation                March 2018
 
 4.8.  Implementing listeners
 
-   How to passively wait for incoming connections, and what that means
-   for protocols with and without handshakes.
+   When an implementation is asked to Listen, it registers with the
+   system to wait for incoming traffic to the Local Endpoint.  If no
+   Local Endpoint is specified, the implementation should either use an
+   ephemeral port or generate an error.
 
-4.8.1.  Implementing listeners for Unconnected Protocols
+   If the Path Selection Properties do not require a single network
+   interface or path, but allow the use of multiple paths, the Listener
+   object should register for incoming traffic on all of the network
+   interfaces or paths that conform to the Path Selection Properties.
+   The set of available paths can change over time, so the
+   implementation should monitor network path changes and register and
+   de-register the Listener across all usable paths.  When using
+   multiple paths, the Listener is generally expected to use the same
+   port for listening on each.
+
+   If the Protocol Selection Properties allow multiple protocols to be
+   used for listening, and the implementation supports it, the Listener
+   object should register across the eligble protocols for each path.
+   This means that inbound Connections delivered by the implementation
+   may have heterogeneous protocol stacks.
+
+4.8.1.  Implementing listeners for Connected Protocols
+
+   Connected protocols such as TCP and TLS-over-TCP have a strong
+   mapping between the Local and Remote Endpoints (five-tuple) and their
+   protocol connection state.  These map well into Connection objects.
+   Whenever a new inbound handshake is being started, the Listener
+   should generate a new Connection object and pass it to the
+   application.
+
+4.8.2.  Implementing listeners for Unconnected Protocols
 
    Unconnected protocols such as UDP and UDP-lite generally do not
    provide the same mechanisms that connected protocols do to offer
-   Connection objects.
+   Connection objects.  Implementations should wait for incoming packets
+   for unconnected protocols on a listening port and should perform
+   five-tuple matching of packets to either existing Connection objects
+   or the creation of new Connection objects.  On platforms with
+   facilities to create a "virtual connection" for unconnected protocols
+   implementations should use these mechanisms to minimise the handling
+   of datagrams intended for already created Connection objects.
 
-   Implementations should wait for incoming packets for unconnected
-   protocols on a listening port and should perform five-tuple matching
-   of packets to either existing Connection objects or the creation of
-   new Connection objects.  On platforms with facilities to create a
-   "virtual connection" for unconnected protocols implementations should
-   use these mechanisms to minimise the handling of datagrams intended
-   for already created Connection objects.
+
+
+
+
+Brunstrom, et al.       Expires September 3, 2018              [Page 17]
+
+Internet-Draft             TAPS Implementation                March 2018
+
+
+4.8.3.  Implementing listeners for Multiplexed Protocols
+
+   Protocols that provide multiplexing of streams into a single five-
+   tuple can listen both for entirely new connections (a new HTTP/2
+   stream on a new TCP connection, for example) and for new sub-
+   connections (a new HTTP/2 stream on an existing connection).  If the
+   abstraction of Connection presented to the application is mapped to
+   the multiplexed stream, then the Listener should deliver new
+   Connection objects in the same way for either case.  The
+   implementation should allow the application to introspect the
+   Connection Group marked on the Connections to determine the grouping
+   of the multiplexing.
 
 5.  Implementing Data Transfer
 
@@ -942,18 +989,6 @@ Internet-Draft             TAPS Implementation                March 2018
    protocols corresponds to a single frame, which may be sent either as
    a complete Message, or in multiple parts.
 
-
-
-
-
-
-
-
-Brunstrom, et al.       Expires September 3, 2018              [Page 17]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
 5.1.1.  Sending Messages
 
    The effect of the application sending a Message is determined by the
@@ -962,6 +997,18 @@ Internet-Draft             TAPS Implementation                March 2018
    over a connection, the receiving application will be able to obtain
    multiple Messages on that connection, even if the framing protocol is
    built on a byte-stream protocol like TCP.
+
+
+
+
+
+
+
+
+Brunstrom, et al.       Expires September 3, 2018              [Page 18]
+
+Internet-Draft             TAPS Implementation                March 2018
+
 
 5.1.1.1.  Send Parameters
 
@@ -1002,14 +1049,6 @@ Internet-Draft             TAPS Implementation                March 2018
       the sender intends to execute tight control over the send buffer,
       and therefore wants to avoid delayed acknowledgements.  In case of
       SCTP, a request to immediately send acknowledgements can be
-
-
-
-Brunstrom, et al.       Expires September 3, 2018              [Page 18]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
       implemented using the "sack-immediately flag" described in
       Section 4.2 of [RFC8303] for the SEND.SCTP primitive.
 
@@ -1019,6 +1058,14 @@ Internet-Draft             TAPS Implementation                March 2018
       efficiently.  For example, small messages can sometimes be bundled
       to fit into a single data packet for the sake of reducing header
       overhead; such bundling SHOULD not be used in case this parameter
+
+
+
+Brunstrom, et al.       Expires September 3, 2018              [Page 19]
+
+Internet-Draft             TAPS Implementation                March 2018
+
+
       is true.  For example, in case of TCP, the Nagle algorithm SHOULD
       be disabled when Immediate=true.  Scavenger/Bulk can translate
       into usage of a congestion control mechanism such as LEDBAT, and/
@@ -1058,14 +1105,6 @@ Internet-Draft             TAPS Implementation                March 2018
    Message are not known beforehand.  The application can communicate in
    its Receive action the parameters for the Message, which can help the
    implementation know how much data to deliver and when.  For example,
-
-
-
-Brunstrom, et al.       Expires September 3, 2018              [Page 19]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
    if the application only wants to receive a complete Message, the
    implementation should wait until an entire Message (datagram, stream,
    or frame) is read before delivering any Message content to the
@@ -1075,6 +1114,14 @@ Internet-Draft             TAPS Implementation                March 2018
    boundaries; if, on the other hand, the top-level protocol only
    supports a byte-stream and no deframers were supported, the
    application must specify the minimum number of bytes of Message
+
+
+
+Brunstrom, et al.       Expires September 3, 2018              [Page 20]
+
+Internet-Draft             TAPS Implementation                March 2018
+
+
    content it wants to receive (which may be just a single byte) to
    control the flow of received data.
 
@@ -1113,15 +1160,6 @@ Internet-Draft             TAPS Implementation                March 2018
    For example, TCP Fast Open could use a Client Hello from a TLS as its
    0-RTT data, shortening the cumulative handshake time.
 
-
-
-
-
-Brunstrom, et al.       Expires September 3, 2018              [Page 20]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
    0-RTT handshakes often rely on previous state, such as TCP Fast Open
    cookies, previously established TLS tickets, or out-of-band
    distributed pre-shared keys (PSKs).  Implementations should be aware
@@ -1132,6 +1170,13 @@ Internet-Draft             TAPS Implementation                March 2018
    attempt MUST use a different ticket.  In effect, each leaf node will
    send the same early application data, yet encoded (encrypted)
    differently on the wire.
+
+
+
+Brunstrom, et al.       Expires September 3, 2018              [Page 21]
+
+Internet-Draft             TAPS Implementation                March 2018
+
 
 6.  Implementing Maintenance
 
@@ -1168,16 +1213,6 @@ Internet-Draft             TAPS Implementation                March 2018
       done using the primitive SET_STREAM_SCHEDULER.SCTP described in
       section 4 of [RFC8303].
 
-
-
-
-
-
-Brunstrom, et al.       Expires September 3, 2018              [Page 21]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
 6.2.  Maintenance Events
 
    Implications of a network change on a protocol
@@ -1187,6 +1222,17 @@ Internet-Draft             TAPS Implementation                March 2018
    o  Single-path protocols
 
    Quality changes
+
+
+
+
+
+
+
+Brunstrom, et al.       Expires September 3, 2018              [Page 22]
+
+Internet-Draft             TAPS Implementation                March 2018
+
 
 7.  Implementing Termination
 
@@ -1226,14 +1272,6 @@ Internet-Draft             TAPS Implementation                March 2018
    there is no need for a connection establishment procedure.  Because
    the Connections that are offered by the Transport System can be
    implemented as streams that are multiplexed on a transport protocol's
-
-
-
-Brunstrom, et al.       Expires September 3, 2018              [Page 22]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
    connection, it can therefore not be guaranteed that one Endpoint's
    Initiate action provokes a ConnectionReceived event at its peer.
 
@@ -1244,6 +1282,13 @@ Internet-Draft             TAPS Implementation                March 2018
    guarantees can be given.  With SCTP, the transport system can use the
    stream reset procedure to cause a Finish event upon a Close action
    from the peer [NEAT-flow-mapping].
+
+
+
+Brunstrom, et al.       Expires September 3, 2018              [Page 23]
+
+Internet-Draft             TAPS Implementation                March 2018
+
 
 8.  Cached State
 
@@ -1282,14 +1327,6 @@ Internet-Draft             TAPS Implementation                March 2018
 
    Cached protocol state is primarily used during Connection
    establishment for a single Protocol Stack, but may be used to
-
-
-
-Brunstrom, et al.       Expires September 3, 2018              [Page 23]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
    influence an implementation's preference between several candidate
    Protocol Stacks.  For example, if two IP address Endpoints are
    otherwise equally preferred, an implementation may choose to attempt
@@ -1299,6 +1336,15 @@ Internet-Draft             TAPS Implementation                March 2018
    desired.  This may be necessary, for example, if application-layer
    identifiers rotate and clients wish to avoid linkability via
    trackable TLS tickets or TFO cookies.
+
+
+
+
+
+Brunstrom, et al.       Expires September 3, 2018              [Page 24]
+
+Internet-Draft             TAPS Implementation                March 2018
+
 
 8.2.  Performance caches
 
@@ -1338,19 +1384,23 @@ Internet-Draft             TAPS Implementation                March 2018
    connection establishment success rate to a Remote Endpoint using a
    given protocol stack, can be stored for a long period of time (hours
    or longer), since it is expected that the capabilities of the Remote
-
-
-
-Brunstrom, et al.       Expires September 3, 2018              [Page 24]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
    Endpoint are not changing very quickly.  On the other hand, Round
    Trip Time observed by TCP over a particular network path may vary
    over a relatively short time interval.  For such values, the
    implementation should remove them from the cache more quickly, or
    treat older values with less confidence/weight.
+
+
+
+
+
+
+
+
+Brunstrom, et al.       Expires September 3, 2018              [Page 25]
+
+Internet-Draft             TAPS Implementation                March 2018
+
 
 9.  Specific Transport Protocol Considerations
 
@@ -1392,16 +1442,6 @@ Internet-Draft             TAPS Implementation                March 2018
    metadata about the packet, such as the ECN bits applied to the
    packet.
 
-
-
-
-
-
-Brunstrom, et al.       Expires September 3, 2018              [Page 25]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
 9.3.  SCTP
 
    To support sender-side stream schedulers (which are implemented on
@@ -1410,6 +1450,14 @@ Internet-Draft             TAPS Implementation                March 2018
 
    SCTP messages can be very large.  To allow the reception of large
    messages in pieces, a "partial flag" can be used to inform a (native
+
+
+
+Brunstrom, et al.       Expires September 3, 2018              [Page 26]
+
+Internet-Draft             TAPS Implementation                March 2018
+
+
    SCTP) receiving application that a message is incomplete.  After
    receiving the "partial flag", this application would know that the
    next receive calls will only deliver remaining parts of the same
@@ -1451,13 +1499,6 @@ Internet-Draft             TAPS Implementation                March 2018
    transport.  To that end, HTTP can be seen as the most prevalent
    framing protocol that runs on top of streams like TCP, TLS, etc.
 
-
-
-Brunstrom, et al.       Expires September 3, 2018              [Page 26]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
    In order to use a transport Connection that provides HTTP Message
    support, the establishment and closing of the connection can be
    treated as it would without the framing protocol.  Sending and
@@ -1465,6 +1506,13 @@ Internet-Draft             TAPS Implementation                March 2018
    well-delineated HTTP request or response, with the content of the
    Message representing the body, and the Headers being provided in
    Message metadata.
+
+
+
+Brunstrom, et al.       Expires September 3, 2018              [Page 27]
+
+Internet-Draft             TAPS Implementation                March 2018
+
 
 9.6.  QUIC
 
@@ -1507,19 +1555,20 @@ Internet-Draft             TAPS Implementation                March 2018
 
    o  Gathering Local Endpoint candidates
 
-
-
-Brunstrom, et al.       Expires September 3, 2018              [Page 27]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
       The set of possible Local Endpoints is gathered.  In the simple
       case, this merely enumerates the local interfaces and protocols,
       allocates ephemeral source ports.  For example, a system that has
       WiFi and Ethernet and supports IPv4 and IPv6 might gather four
       candidate locals (IPv4 on Ethernet, IPv6 on Ethernet, IPv4 on
       WiFi, and IPv6 on WiFi) that can form the source for a transient.
+
+
+
+
+Brunstrom, et al.       Expires September 3, 2018              [Page 28]
+
+Internet-Draft             TAPS Implementation                March 2018
+
 
       If NAT traversal is required, the process of gathering Local
       Endpoints becomes broadly equivalent to the ICE candidate
@@ -1562,14 +1611,6 @@ Internet-Draft             TAPS Implementation                March 2018
 
    o  Establishing Connections
 
-
-
-
-Brunstrom, et al.       Expires September 3, 2018              [Page 28]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
       The set of candidate Local Endpoints and the set of candidate
       Remote Endpoints are paired, to derive a priority ordered set of
       Candidate Paths that can potentially be used to establish a
@@ -1577,6 +1618,14 @@ Internet-Draft             TAPS Implementation                March 2018
 
       Then, communication is attempted over each candidate path, in
       priority order.  If there are multiple candidates with the same
+
+
+
+Brunstrom, et al.       Expires September 3, 2018              [Page 29]
+
+Internet-Draft             TAPS Implementation                March 2018
+
+
       priority, then connection establishment proceeds simultaneously
       and uses the transient that wins the race to be established.
       Otherwise, connection establishment is sequential, paced at a rate
@@ -1614,18 +1663,6 @@ Internet-Draft             TAPS Implementation                March 2018
 
    This document has no actions for IANA.
 
-
-
-
-
-
-
-
-Brunstrom, et al.       Expires September 3, 2018              [Page 29]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
 12.  Security Considerations
 
 12.1.  Considerations for Candidate Gathering
@@ -1633,6 +1670,17 @@ Internet-Draft             TAPS Implementation                March 2018
    Implementations should avoid downgrade attacks that allow network
    interference to cause the implementation to select less secure, or
    entirely insecure, combinations of paths and protocols.
+
+
+
+
+
+
+
+Brunstrom, et al.       Expires September 3, 2018              [Page 30]
+
+Internet-Draft             TAPS Implementation                March 2018
+
 
 12.2.  Considerations for Candidate Racing
 
@@ -1672,16 +1720,6 @@ Internet-Draft             TAPS Implementation                March 2018
    Kinnear for their implementation and design efforts, including Happy
    Eyeballs, that heavily influenced this work.
 
-
-
-
-
-
-Brunstrom, et al.       Expires September 3, 2018              [Page 30]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
 14.  References
 
 14.1.  Normative References
@@ -1692,6 +1730,13 @@ Internet-Draft             TAPS Implementation                March 2018
    [draft-trammell-taps-interface]
               "An Abstract Application Layer Interface to Transport
               Services", n.d..
+
+
+
+Brunstrom, et al.       Expires September 3, 2018              [Page 31]
+
+Internet-Draft             TAPS Implementation                March 2018
+
 
    [I-D.ietf-taps-minset]
               Welzl, M. and S. Gjessing, "A Minimal Set of Transport
@@ -1729,15 +1774,6 @@ Internet-Draft             TAPS Implementation                March 2018
               RFC 8303, DOI 10.17487/RFC8303, February 2018,
               <https://www.rfc-editor.org/info/rfc8303>.
 
-
-
-
-
-Brunstrom, et al.       Expires September 3, 2018              [Page 31]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
    [RFC8304]  Fairhurst, G. and T. Jones, "Transport Features of the
               User Datagram Protocol (UDP) and Lightweight UDP (UDP-
               Lite)", RFC 8304, DOI 10.17487/RFC8304, February 2018,
@@ -1747,6 +1783,16 @@ Internet-Draft             TAPS Implementation                March 2018
               Better Connectivity Using Concurrency", RFC 8305,
               DOI 10.17487/RFC8305, December 2017,
               <https://www.rfc-editor.org/info/rfc8305>.
+
+
+
+
+
+
+Brunstrom, et al.       Expires September 3, 2018              [Page 32]
+
+Internet-Draft             TAPS Implementation                March 2018
+
 
 14.2.  Informative References
 
@@ -1785,15 +1831,6 @@ Appendix A.  Additional Properties
    a Protocol Stack that implements them.  These are not part of the
    interface, and may be removed from the final document, but are
    presented here to support discussion within the TAPS working group as
-
-
-
-
-Brunstrom, et al.       Expires September 3, 2018              [Page 32]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
    to whether they should be added to a future revision of the base
    specification.
 
@@ -1805,6 +1842,14 @@ A.1.  Properties Effecting Sorting of Branches
 
    o  Size to be Sent or Received: An implementation may use the Size to
       be Sent or Received in combination with cached performance
+
+
+
+Brunstrom, et al.       Expires September 3, 2018              [Page 33]
+
+Internet-Draft             TAPS Implementation                March 2018
+
+
       estimates, see Section 8.2, e.g. the observed Round Trip Time and
       the observed maximum throughput, to compute an estimate of the
       completion time of a transfer over different available paths.  It
@@ -1841,15 +1886,6 @@ A.2.  Send Parameters
       bitrate of the outgoing communication to that rate, for example by
       setting an upper bound for the TCP congestion window of a
       connection calculated from the Send Bitrate and the Round Trip
-
-
-
-
-Brunstrom, et al.       Expires September 3, 2018              [Page 33]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
       Time.  This helps to avoid bursty traffic patterns on video
       streaming servers, see [Trickle].
 
@@ -1862,6 +1898,12 @@ Authors' Addresses
    Sweden
 
    Email: anna.brunstrom@kau.se
+
+
+
+Brunstrom, et al.       Expires September 3, 2018              [Page 34]
+
+Internet-Draft             TAPS Implementation                March 2018
 
 
    Tommy Pauly (editor)
@@ -1900,12 +1942,6 @@ Authors' Addresses
    Email: tom@erg.abdn.ac.uk
 
 
-
-Brunstrom, et al.       Expires September 3, 2018              [Page 34]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
    Philipp S. Tiesel
    TU Berlin
    Marchstrasse 23
@@ -1913,6 +1949,17 @@ Internet-Draft             TAPS Implementation                March 2018
    Germany
 
    Email: philipp@inet.tu-berlin.de
+
+
+
+
+
+
+
+
+Brunstrom, et al.       Expires September 3, 2018              [Page 35]
+
+Internet-Draft             TAPS Implementation                March 2018
 
 
    Colin Perkins
@@ -1957,4 +2004,13 @@ Internet-Draft             TAPS Implementation                March 2018
 
 
 
-Brunstrom, et al.       Expires September 3, 2018              [Page 35]
+
+
+
+
+
+
+
+
+
+Brunstrom, et al.       Expires September 3, 2018              [Page 36]
