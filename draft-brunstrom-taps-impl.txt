@@ -100,7 +100,7 @@ Table of Contents
    5.  Implementing Data Transfer  . . . . . . . . . . . . . . . . .  18
      5.1.  Data transfer for streams, datagrams, and frames  . . . .  18
        5.1.1.  Sending Messages  . . . . . . . . . . . . . . . . . .  19
-       5.1.2.  Receiving Messages  . . . . . . . . . . . . . . . . .  21
+       5.1.2.  Receiving Messages  . . . . . . . . . . . . . . . . .  20
      5.2.  Handling of data for fast-open protocols  . . . . . . . .  21
    6.  Implementing Maintenance  . . . . . . . . . . . . . . . . . .  22
      6.1.  Changing Protocol Properties  . . . . . . . . . . . . . .  22
@@ -115,7 +115,7 @@ Internet-Draft             TAPS Implementation                March 2018
 
 
    8.  Cached State  . . . . . . . . . . . . . . . . . . . . . . . .  24
-     8.1.  Protocol state caches . . . . . . . . . . . . . . . . . .  25
+     8.1.  Protocol state caches . . . . . . . . . . . . . . . . . .  24
      8.2.  Performance caches  . . . . . . . . . . . . . . . . . . .  25
    9.  Specific Transport Protocol Considerations  . . . . . . . . .  26
      9.1.  TCP . . . . . . . . . . . . . . . . . . . . . . . . . . .  26
@@ -1106,25 +1106,6 @@ Internet-Draft             TAPS Implementation                March 2018
    TCP, this may correspond to when the data has entered the send
    buffer.
 
-5.1.1.3.  Batching Sends
-
-   Since sending a Message may involve a context switch between the
-   application and the transport system, sending patterns that involve
-   multiple small Messages can incur high overhead if each needs to be
-   enqueued separately.  To avoid this, the application should have a
-   way to indicate a batch of Send actions, during which time the
-   implementation will hold off on processing Messages until the batch
-
-
-
-Brunstrom, et al.       Expires September 5, 2018              [Page 20]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
-   is complete.  This can also help context switches when enqueuing data
-   in the interface driver if the operation can be batched.
-
 5.1.2.  Receiving Messages
 
    Similar to sending, Receiving a Message is determined by the top-
@@ -1133,6 +1114,14 @@ Internet-Draft             TAPS Implementation                March 2018
    Message are not known beforehand.  The application can communicate in
    its Receive action the parameters for the Message, which can help the
    implementation know how much data to deliver and when.  For example,
+
+
+
+Brunstrom, et al.       Expires September 5, 2018              [Page 20]
+
+Internet-Draft             TAPS Implementation                March 2018
+
+
    if the application only wants to receive a complete Message, the
    implementation should wait until an entire Message (datagram, stream,
    or frame) is read before delivering any Message content to the
@@ -1171,13 +1160,6 @@ Internet-Draft             TAPS Implementation                March 2018
    have the opportunity to send the same data independently.  If data is
    truly idempotent, this should be permissible.
 
-
-
-Brunstrom, et al.       Expires September 5, 2018              [Page 21]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
    Once the application has provided its 0-RTT data, an implementation
    should keep a copy of this data and provide it to each new leaf node
    that is started and for which a 0-RTT protocol is being used.
@@ -1186,6 +1168,15 @@ Internet-Draft             TAPS Implementation                March 2018
    node use 0-RTT handshakes without any idempotent application data.
    For example, TCP Fast Open could use a Client Hello from TLS as its
    0-RTT data, shortening the cumulative handshake time.
+
+
+
+
+
+Brunstrom, et al.       Expires September 5, 2018              [Page 21]
+
+Internet-Draft             TAPS Implementation                March 2018
+
 
    0-RTT handshakes often rely on previous state, such as TCP Fast Open
    cookies, previously established TLS tickets, or out-of-band
@@ -1224,6 +1215,15 @@ Internet-Draft             TAPS Implementation                March 2018
       be done using the primitive CHANGE_TIMEOUT.TCP described in
       section 4 of [RFC8303].
 
+   o  Retransmission threshold before excessive retransmission
+      notification: for TCP, this can be done using ERROR.TCP described
+      in section 4 of [RFC8303].
+
+   o  Required minimum coverage of the checksum for receiving: for UDP-
+      Lite, this can be done using the primitive
+      SET_MIN_CHECKSUM_COVERAGE.UDP-Lite described in section 4 of
+      [RFC8303].
+
 
 
 
@@ -1233,15 +1233,6 @@ Brunstrom, et al.       Expires September 5, 2018              [Page 22]
 
 Internet-Draft             TAPS Implementation                March 2018
 
-
-   o  Retransmission threshold before excessive retransmission
-      notification: for TCP, this can be done using ERROR.TCP described
-      in section 4 of [RFC8303].
-
-   o  Required minimum coverage of the checksum for receiving: for UDP-
-      Lite, this can be done using the primitive
-      SET_MIN_CHECKSUM_COVERAGE.UDP-Lite described in section 4 of
-      [RFC8303].
 
    o  Connection group transmission scheduler: for SCTP, this can be
       done using the primitive SET_STREAM_SCHEDULER.SCTP described in
@@ -1282,14 +1273,6 @@ Internet-Draft             TAPS Implementation                March 2018
    not mean that the application will stop receiving data.  This is
    related to TCP's ability to support half-closed connections.
 
-
-
-
-Brunstrom, et al.       Expires September 5, 2018              [Page 23]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
    SCTP is an example of a protocol that does not support such half-
    closed connections.  Hence, with SCTP, the meaning of "close" is
    stricter: an application has no more data to send (but expects all
@@ -1299,6 +1282,14 @@ Internet-Draft             TAPS Implementation                March 2018
    Implementing a protocol independent transport system means that the
    exposed semantics must be the strictest subset of the semantics of
    all supported protocols.  Hence, as is common with all reliable
+
+
+
+Brunstrom, et al.       Expires September 5, 2018              [Page 23]
+
+Internet-Draft             TAPS Implementation                March 2018
+
+
    transport protocols, after a Close action, the application can expect
    to have its reliability requirements honored regarding the data it
    has given to the Transport System, but it cannot expect to be able to
@@ -1337,15 +1328,6 @@ Internet-Draft             TAPS Implementation                March 2018
    For example, session tickets for TLS are associated with specific
    endpoints, and thus should be cached based on a Connection's hostname
    Endpoint (if applicable).  On the other hand, performance
-
-
-
-
-Brunstrom, et al.       Expires September 5, 2018              [Page 24]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
    characteristics of a path are more likely tied to the IP address and
    subnet being used.
 
@@ -1355,6 +1337,14 @@ Internet-Draft             TAPS Implementation                March 2018
    with Endpoints.  This state often has some time after which it is
    expired, so the implementation should allow each protocol to specify
    an expiration for cached content.
+
+
+
+
+Brunstrom, et al.       Expires September 5, 2018              [Page 24]
+
+Internet-Draft             TAPS Implementation                March 2018
+
 
    Examples of cached protocol state include:
 
@@ -1394,14 +1384,6 @@ Internet-Draft             TAPS Implementation                March 2018
 
    o  Connection Establishment success rate
 
-
-
-
-Brunstrom, et al.       Expires September 5, 2018              [Page 25]
-
-Internet-Draft             TAPS Implementation                March 2018
-
-
    These items can be cached on a per-address and per-subnet
    granularity, and averaged between different values.  The information
    should be cached on a per-network basis, since it is expected that
@@ -1411,6 +1393,15 @@ Internet-Draft             TAPS Implementation                March 2018
    for instance be signal strength information reported by radio modems
    like Wi-Fi and mobile broadband or information about the battery-
    level of the device.  Furthermore, the system may cache the observed
+
+
+
+
+Brunstrom, et al.       Expires September 5, 2018              [Page 25]
+
+Internet-Draft             TAPS Implementation                March 2018
+
+
    maximum throughput on a path as an estimate of the available
    bandwidth.
 
@@ -1450,6 +1441,15 @@ Internet-Draft             TAPS Implementation                March 2018
    the TCP state can be closed abruptly, leading to a RST being sent to
    the peer.
 
+   Without a layer of framing (a top-level protocol in the established
+   Protocol Stack that preserves message boundaries, or an application-
+   supplied deframer) on top of TCP, the receiver side of the transport
+   system implementation can only treat the incoming stream of bytes as
+   a single Message, terminated by a FIN when the Remote Endpoint closes
+   the Connection.
+
+
+
 
 
 
@@ -1457,13 +1457,6 @@ Brunstrom, et al.       Expires September 5, 2018              [Page 26]
 
 Internet-Draft             TAPS Implementation                March 2018
 
-
-   Without a layer of framing (a top-level protocol in the established
-   Protocol Stack that preserves message boundaries, or an application-
-   supplied deframer) on top of TCP, the receiver side of the transport
-   system implementation can only treat the incoming stream of bytes as
-   a single Message, terminated by a FIN when the Remote Endpoint closes
-   the Connection.
 
 9.2.  UDP
 
@@ -1507,18 +1500,19 @@ Internet-Draft             TAPS Implementation                March 2018
    stream receiver buffer anyway, so this potential benefit is lost and
    the "partial flag" becomes unnecessary for the system.
 
+   The problem of long messages either requiring large receiver-side
+   buffers or getting in the way of multiplexing is addressed by message
+   interleaving [RFC8260], which is yet another reason why a receivers-
+   side transport system supporting SCTP should implement this
+   mechanism.
+
+
 
 
 Brunstrom, et al.       Expires September 5, 2018              [Page 27]
 
 Internet-Draft             TAPS Implementation                March 2018
 
-
-   The problem of long messages either requiring large receiver-side
-   buffers or getting in the way of multiplexing is addressed by message
-   interleaving [RFC8260], which is yet another reason why a receivers-
-   side transport system supporting SCTP should implement this
-   mechanism.
 
 9.4.  TLS
 
@@ -1560,6 +1554,12 @@ Internet-Draft             TAPS Implementation                March 2018
    connection once all streams have been closed (possibly after some
    timeout), or after an individual stream Connection sends an Abort.
 
+   Messages over a direct QUIC stream should be represented similarly to
+   the TCP stream (one Message per direction, see Section 9.1), unless a
+   framing mapping is used on top of QUIC.
+
+
+
 
 
 
@@ -1569,10 +1569,6 @@ Brunstrom, et al.       Expires September 5, 2018              [Page 28]
 
 Internet-Draft             TAPS Implementation                March 2018
 
-
-   Messages over a direct QUIC stream should be represented similarly to
-   the TCP stream (one Message per direction, see Section 9.1), unless a
-   framing mapping is used on top of QUIC.
 
 9.7.  HTTP/2 transport
 
@@ -1619,6 +1615,10 @@ Internet-Draft             TAPS Implementation                March 2018
 
    o  Gathering Remote Endpoint Candidates
 
+      The Remote Endpoint is typically a name that needs to be resolved
+      into a set of possible addresses that can be used for
+      communication.  Resolving the Remote Endpoint is the process of
+
 
 
 Brunstrom, et al.       Expires September 5, 2018              [Page 29]
@@ -1626,9 +1626,6 @@ Brunstrom, et al.       Expires September 5, 2018              [Page 29]
 Internet-Draft             TAPS Implementation                March 2018
 
 
-      The Remote Endpoint is typically a name that needs to be resolved
-      into a set of possible addresses that can be used for
-      communication.  Resolving the Remote Endpoint is the process of
       recursively performing such name lookups, until fully resolved, to
       return the set of candidates for the remote of this connection.
 
@@ -1674,6 +1671,9 @@ Internet-Draft             TAPS Implementation                March 2018
       connections supporting relayed locals that were not required can
       be closed, and where an associated signalling operation might be
       needed to inform middleboxes and proxies of the chosen path.
+      Keep-alive messages may also be sent, as appropriate, to ensure
+      NAT and firewall state is maintained, so the Connection remains
+      operational.
 
 
 
@@ -1681,10 +1681,6 @@ Brunstrom, et al.       Expires September 5, 2018              [Page 30]
 
 Internet-Draft             TAPS Implementation                March 2018
 
-
-      Keep-alive messages may also be sent, as appropriate, to ensure
-      NAT and firewall state is maintained, so the Connection remains
-      operational.
 
    To support ICE, or similar protocols, that involve an out-of-band
    indirect signalling exchange to exchange candidates with the Remote
@@ -1730,6 +1726,10 @@ Internet-Draft             TAPS Implementation                March 2018
    maximum amount of state allowed for any given node, including the
    number of child nodes, especially when the state is based on results
    from the network.
+
+
+
+
 
 
 
