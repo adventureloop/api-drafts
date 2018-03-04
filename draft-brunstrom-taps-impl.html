@@ -605,7 +605,7 @@ address {
 <h1 id="rfc.section.4">
 <a href="#rfc.section.4">4.</a> <a href="#conn-establish" id="conn-establish">Implementing Connection Establishment</a>
 </h1>
-<p id="rfc.section.4.p.1">The process of establishing a network connection begins when an application expresses intent to communicate with a remote endpoint (along with any constraints or requirements it may have on the connection). The process can be considered complete once there is at least one set of network protocols that have completed any required setup to the point that it can transmit and receive the application&#8217;s data.</p>
+<p id="rfc.section.4.p.1">The process of establishing a network connection begins when an application expresses intent to communicate with a remote endpoint by calling Initiate. (At this point, any constraints or requirements the application may have on the connection are available from pre-establishment.) The process can be considered complete once there is at least one Protocol Stack that has completed any required setup to the point that it can transmit and receive the application&#8217;s data.</p>
 <p id="rfc.section.4.p.2">Connection establishment is divided into two top-level steps: Candidate Gathering, to identify the paths, protocols, and endpoints to use, and Candidate Racing, in which the necessary protocol handshakes are conducted in order to select which set to use.</p>
 <p id="rfc.section.4.p.3">The most simple example of this process might involve identifying the single IP address to which the implementation wishes to connect, using the system&#8217;s current default interface or path, and starting a TCP handshake to establish a stream to the specified IP address. However, each step may also vary depending on the requirements of the connection: if the endpoint is defined as a hostname and port, then there may be multiple resolved addresses that are available; there may also be multiple interfaces or paths available, other than the default system interface; and some protocols may not need any transport handshake to be considered &#8220;established&#8221; (such as UDP), while other connections may utilize layered protocol handshakes, such as TLS over TCP.</p>
 <p id="rfc.section.4.p.4">Whenever an implementation has multiple options for connection establishment, it can view the set of all individual connection establishment options as a single, aggregate connection establishment. The aggregate set conceptually includes every valid combination of endpoints, paths, and protocols. As an example, consider an implementation that initiates a TCP connection to a hostname + port endpoint, and has two valid interfaces available (Wi-Fi and LTE). The hostname resolves to a single IPv4 address on the Wi-Fi network, and resolves to the same IPv4 address on the LTE network, as well as a single IPv6 address. The aggregate set of connection establishment options can be viewed as follows:</p>
@@ -615,7 +615,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 |-&gt; [Endpoint: 192.0.2.1:80]       [Interface: LTE]   [Protocol: TCP]
 |-&gt; [Endpoint: 2001:DB8::1.80]     [Interface: LTE]   [Protocol: TCP]
 </pre>
-<p id="rfc.section.4.p.5">Any one of these sub-entries on the aggregate connection attempt would satisfy the original application intent. The concern of this document is the algorithm defining which of these options to try, when, and in what order.</p>
+<p id="rfc.section.4.p.5">Any one of these sub-entries on the aggregate connection attempt would satisfy the original application intent. The concern of this section is the algorithm defining which of these options to try, when, and in what order.</p>
 <h1 id="rfc.section.4.1">
 <a href="#rfc.section.4.1">4.1.</a> <a href="#gathering" id="gathering">Candidate Gathering</a>
 </h1>
@@ -665,7 +665,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <h1 id="rfc.section.4.1.2.1">
 <a href="#rfc.section.4.1.2.1">4.1.2.1.</a> <a href="#derived-endpoints" id="derived-endpoints">Derived Endpoints</a>
 </h1>
-<p id="rfc.section.4.1.2.1.p.1">If a connection originally targets a single endpoint, there may be multiple endpoints of different types that can be derived from the original. The connection library should order the derived endpoints according to application preference and expected performance.</p>
+<p id="rfc.section.4.1.2.1.p.1">If a connection originally targets a single endpoint, there may be multiple endpoints of different types that can be derived from the original. The connection library should order the derived endpoints according to application preference, system policy and expected performance.</p>
 <p id="rfc.section.4.1.2.1.p.2">DNS hostname-to-address resolution is the most common method of endpoint derivation. When trying to connect to a hostname endpoint on a traditional IP network, the implementation should send DNS queries for both A (IPv4) and AAAA (IPv6) records if both are supported on the local link. The algorithm for ordering and racing these addresses should follow the recommendations in Happy Eyeballs <a href="#RFC8305" class="xref">[RFC8305]</a>.</p>
 <pre>
 1 [www.example.com:80, Wi-Fi, TCP]
@@ -719,7 +719,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
   1.2 [www.example.com:80, Any, TCP]
     1.2.1 [192.0.2.1:80, Any, TCP]
 </pre>
-<p id="rfc.section.4.1.2.3.p.5">Implementations that support racing protocols and protocol options should maintain a history of which protocols and protocol options successfully established, on a per-network basis. This information can influence future racing decisions to prioritize or prune branches.</p>
+<p id="rfc.section.4.1.2.3.p.5">Implementations that support racing protocols and protocol options should maintain a history of which protocols and protocol options successfully established, on a per-network basis (see <a href="#performance-caches" class="xref">Section 8.2</a>). This information can influence future racing decisions to prioritize or prune branches.</p>
 <h1 id="rfc.section.4.2">
 <a href="#rfc.section.4.2">4.2.</a> <a href="#branching-order-of-operations" id="branching-order-of-operations">Branching Order-of-Operations</a>
 </h1>

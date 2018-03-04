@@ -303,12 +303,12 @@ Internet-Draft             TAPS Implementation                March 2018
 4.  Implementing Connection Establishment
 
    The process of establishing a network connection begins when an
-   application expresses intent to communicate with a remote endpoint
-   (along with any constraints or requirements it may have on the
-   connection).  The process can be considered complete once there is at
-   least one set of network protocols that have completed any required
-   setup to the point that it can transmit and receive the application's
-   data.
+   application expresses intent to communicate with a remote endpoint by
+   calling Initiate.  (At this point, any constraints or requirements
+   the application may have on the connection are available from pre-
+   establishment.)  The process can be considered complete once there is
+   at least one Protocol Stack that has completed any required setup to
+   the point that it can transmit and receive the application's data.
 
    Connection establishment is divided into two top-level steps:
    Candidate Gathering, to identify the paths, protocols, and endpoints
@@ -355,7 +355,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 
    Any one of these sub-entries on the aggregate connection attempt
    would satisfy the original application intent.  The concern of this
-   document is the algorithm defining which of these options to try,
+   section is the algorithm defining which of these options to try,
    when, and in what order.
 
 4.1.  Candidate Gathering
@@ -467,7 +467,8 @@ Internet-Draft             TAPS Implementation                March 2018
    If a connection originally targets a single endpoint, there may be
    multiple endpoints of different types that can be derived from the
    original.  The connection library should order the derived endpoints
-   according to application preference and expected performance.
+   according to application preference, system policy and expected
+   performance.
 
    DNS hostname-to-address resolution is the most common method of
    endpoint derivation.  When trying to connect to a hostname endpoint
@@ -494,7 +495,6 @@ Internet-Draft             TAPS Implementation                March 2018
    1 [term-printer._ipp._tcp.meeting.ietf.org, Wi-Fi, TCP]
      1.1 [term-printer.meeting.ietf.org:631, Wi-Fi, TCP]
        1.1.1 [31.133.160.18.631, Wi-Fi, TCP]
-
 
 
 
@@ -578,9 +578,9 @@ Internet-Draft             TAPS Implementation                March 2018
 
    Implementations that support racing protocols and protocol options
    should maintain a history of which protocols and protocol options
-   successfully established, on a per-network basis.  This information
-   can influence future racing decisions to prioritize or prune
-   branches.
+   successfully established, on a per-network basis (see Section 8.2).
+   This information can influence future racing decisions to prioritize
+   or prune branches.
 
 4.2.  Branching Order-of-Operations
 
