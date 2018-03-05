@@ -344,7 +344,7 @@ address {
 
   <meta name="dct.creator" content="Brunstrom, A., Ed., Pauly, T., Ed., Enghardt, T., Grinnemo, K-J., Jones, T., Tiesel, P., Perkins, C., and M. Welzl" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-brunstrom-taps-impl-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-03-04" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-03-05" />
   <meta name="dct.abstract" content="The Transport Services architecture " />
   <meta name="description" content="The Transport Services architecture " />
 
@@ -368,7 +368,7 @@ address {
 <td class="right">T. Pauly, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: September 5, 2018</td>
+<td class="left">Expires: September 6, 2018</td>
 <td class="right">Apple Inc.</td>
 </tr>
 <tr>
@@ -421,7 +421,7 @@ address {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">March 04, 2018</td>
+<td class="right">March 05, 2018</td>
 </tr>
 
     	
@@ -437,7 +437,7 @@ address {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on September 5, 2018.</p>
+<p>This Internet-Draft will expire on September 6, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -985,7 +985,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <ul>
 <li>Gathering Local Endpoint candidates  <br><br> The set of possible Local Endpoints is gathered.  In the simple case, this merely enumerates the local interfaces and protocols, allocates ephemeral source ports.  For example, a system that has WiFi and Ethernet and supports IPv4 and IPv6 might gather four candidate locals (IPv4 on Ethernet, IPv6 on Ethernet, IPv4 on WiFi, and IPv6 on WiFi) that can form the source for a transient.  <br><br> If NAT traversal is required, the process of gathering Local Endpoints becomes broadly equivalent to the ICE candidate gathering phase <a href="#RFC5245" class="xref">[RFC5245]</a>.  The endpoint determines its server reflexive Local Endpoints (i.e., the translated address of a local, on the other side of a NAT) and relayed locals (e.g., via a TURN server or other relay), for each interface and network protocol.  These are added to the set of candidate Local Endpoints for this connection.  <br><br> Gathering locals is primarily an endpoint local operation, although it might involve exchanges with a STUN server to derive server reflexive locals, or with a TURN server or other relay to derive relayed locals.  It does not involve communication with the Remote Endpoint.</li>
 <li>Gathering Remote Endpoint Candidates  <br><br> The Remote Endpoint is typically a name that needs to be resolved into a set of possible addresses that can be used for communication.  Resolving the Remote Endpoint is the process of recursively performing such name lookups, until fully resolved, to return the set of candidates for the remote of this connection.  <br><br> How this is done will depend on the type of the Remote Endpoint, and can also be specific to each Local Endpoint.  A common case is when the Remote Endpoint is a DNS name, in which case it is resolved to give a set of IPv4 and IPv6 addresses representing that name.  Some types of remote might require more complex resolution.  Resolving the Remote Endpoint for a peer-to-peer connection might involve communication with a rendezvous server, which in turn contacts the peer to gain consent to communicate and retrieve its set of candidate locals, which are returned and form the candidate remote addresses for contacting that peer.  <br><br> Resolving the remote is <em>not</em> a local operation.  It will involve a directory service, and can require communication with the remote to rendezvous and exchange peer addresses.  This can expose some or all of the candidate locals to the remote.</li>
-<li>Establishing Connections  <br><br> The set of candidate Local Endpoints and the set of candidate Remote Endpoints are paired, to derive a priority ordered set of Candidate Paths that can potentially be used to establish a Connection.  <br><br> Then, communication is attempted over each candidate path, in priority order.  If there are multiple candidates with the same priority, then connection establishment proceeds simultaneously and uses the transient that wins the race to be established.  Otherwise, connection establishment is sequential, paced at a rate that should not congest the network.  Depending on the chosen transport, this phase might involve racing TCP connections to a server over IPv4 and IPv6 <a href="#RFC6555" class="xref">[RFC6555]</a>, or it could involve a STUN exchange to establish peer-to-peer UDP connectivity <a href="#RFC5245" class="xref">[RFC5245]</a>, or some other means.</li>
+<li>Establishing Connections  <br><br> The set of candidate Local Endpoints and the set of candidate Remote Endpoints are paired, to derive a priority ordered set of Candidate Paths that can potentially be used to establish a Connection.  <br><br> Then, communication is attempted over each candidate path, in priority order.  If there are multiple candidates with the same priority, then connection establishment proceeds simultaneously and uses the transient that wins the race to be established.  Otherwise, connection establishment is sequential, paced at a rate that should not congest the network.  Depending on the chosen transport, this phase might involve racing TCP connections to a server over IPv4 and IPv6 <a href="#RFC8305" class="xref">[RFC8305]</a>, or it could involve a STUN exchange to establish peer-to-peer UDP connectivity <a href="#RFC5245" class="xref">[RFC5245]</a>, or some other means.</li>
 <li>Confirming and Maintaining Connections  <br><br> Once connectivity has been established, unused resources can be released and the chosen path can be confirmed.  This is primarily required when establishing peer-to-peer connectivity, where connections supporting relayed locals that were not required can be closed, and where an associated signalling operation might be needed to inform middleboxes and proxies of the chosen path.  Keep-alive messages may also be sent, as appropriate, to ensure NAT and firewall state is maintained, so the Connection remains operational.</li>
 </ul>
 <p id="rfc.section.10.p.3">To support ICE, or similar protocols, that involve an out-of-band indirect signalling exchange to exchange candidates with the Remote Endpoint, it&#8217;s important to be able to query the set of candidate Local Endpoints, and give the protocol stack a set of candidate Remote Endpoints, before it attempts to establish connections.</p>
@@ -1024,11 +1024,6 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <td class="reference"><b id="I-D.ietf-taps-minset">[I-D.ietf-taps-minset]</b></td>
 <td class="top">
 <a>Welzl, M.</a> and <a>S. Gjessing</a>, "<a href="https://tools.ietf.org/html/draft-ietf-taps-minset-02">A Minimal Set of Transport Services for TAPS Systems</a>", Internet-Draft draft-ietf-taps-minset-02, February 2018.</td>
-</tr>
-<tr>
-<td class="reference"><b id="I-D.ietf-tsvwg-rtcweb-qos">[I-D.ietf-tsvwg-rtcweb-qos]</b></td>
-<td class="top">
-<a>Jones, P.</a>, <a>Dhesikan, S.</a>, <a>Jennings, C.</a> and <a>D. Druta</a>, "<a href="https://tools.ietf.org/html/draft-ietf-tsvwg-rtcweb-qos-18">DSCP Packet Markings for WebRTC QoS</a>", Internet-Draft draft-ietf-tsvwg-rtcweb-qos-18, August 2016.</td>
 </tr>
 <tr>
 <td class="reference"><b id="I-D.pauly-taps-arch">[I-D.pauly-taps-arch]</b></td>
@@ -1082,7 +1077,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <tr>
 <td class="reference"><b id="I-D.ietf-quic-transport">[I-D.ietf-quic-transport]</b></td>
 <td class="top">
-<a>Iyengar, J.</a> and <a>M. Thomson</a>, "<a href="https://tools.ietf.org/html/draft-ietf-quic-transport-09">QUIC: A UDP-Based Multiplexed and Secure Transport</a>", Internet-Draft draft-ietf-quic-transport-09, January 2018.</td>
+<a>Iyengar, J.</a> and <a>M. Thomson</a>, "<a href="https://tools.ietf.org/html/draft-ietf-quic-transport-10">QUIC: A UDP-Based Multiplexed and Secure Transport</a>", Internet-Draft draft-ietf-quic-transport-10, March 2018.</td>
 </tr>
 <tr>
 <td class="reference"><b id="I-D.ietf-tls-tls13">[I-D.ietf-tls-tls13]</b></td>
@@ -1097,11 +1092,6 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <td class="reference"><b id="RFC5245">[RFC5245]</b></td>
 <td class="top">
 <a>Rosenberg, J.</a>, "<a href="https://tools.ietf.org/html/rfc5245">Interactive Connectivity Establishment (ICE): A Protocol for Network Address Translator (NAT) Traversal for Offer/Answer Protocols</a>", RFC 5245, DOI 10.17487/RFC5245, April 2010.</td>
-</tr>
-<tr>
-<td class="reference"><b id="RFC6555">[RFC6555]</b></td>
-<td class="top">
-<a>Wing, D.</a> and <a>A. Yourtchenko</a>, "<a href="https://tools.ietf.org/html/rfc6555">Happy Eyeballs: Success with Dual-Stack Hosts</a>", RFC 6555, DOI 10.17487/RFC6555, April 2012.</td>
 </tr>
 <tr>
 <td class="reference"><b id="Trickle">[Trickle]</b></td>
