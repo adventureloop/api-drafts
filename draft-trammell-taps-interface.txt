@@ -91,19 +91,19 @@ Table of Contents
      6.2.  Passive Open: Listen  . . . . . . . . . . . . . . . . . .  15
      6.3.  Peer-to-Peer Establishment: Rendezvous  . . . . . . . . .  16
      6.4.  Connection Groups . . . . . . . . . . . . . . . . . . . .  17
-   7.  Sending Data  . . . . . . . . . . . . . . . . . . . . . . . .  18
+   7.  Sending Data  . . . . . . . . . . . . . . . . . . . . . . . .  17
      7.1.  Send Parameters . . . . . . . . . . . . . . . . . . . . .  19
-       7.1.1.  Lifetime  . . . . . . . . . . . . . . . . . . . . . .  20
+       7.1.1.  Lifetime  . . . . . . . . . . . . . . . . . . . . . .  19
        7.1.2.  Niceness  . . . . . . . . . . . . . . . . . . . . . .  20
        7.1.3.  Ordered . . . . . . . . . . . . . . . . . . . . . . .  20
        7.1.4.  Idempotent  . . . . . . . . . . . . . . . . . . . . .  20
-       7.1.5.  Corruption Protection Length  . . . . . . . . . . . .  21
+       7.1.5.  Corruption Protection Length  . . . . . . . . . . . .  20
        7.1.6.  Immediate Acknowledgement . . . . . . . . . . . . . .  21
        7.1.7.  Instantaneous Capacity Profile  . . . . . . . . . . .  21
-     7.2.  Sender-side Framing . . . . . . . . . . . . . . . . . . .  22
+     7.2.  Sender-side Framing . . . . . . . . . . . . . . . . . . .  21
    8.  Receiving Data  . . . . . . . . . . . . . . . . . . . . . . .  22
      8.1.  Receiver-side De-framing over Stream Protocols  . . . . .  24
-   9.  Setting and Querying of Connection Properties . . . . . . . .  25
+   9.  Setting and Querying of Connection Properties . . . . . . . .  24
      9.1.  Protocol Properties . . . . . . . . . . . . . . . . . . .  25
    10. Connection Termination  . . . . . . . . . . . . . . . . . . .  27
 
@@ -114,17 +114,17 @@ Trammell, et al.        Expires October 13, 2018                [Page 2]
 Internet-Draft               TAPS Interface                   April 2018
 
 
-   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  28
-   12. Security Considerations . . . . . . . . . . . . . . . . . . .  28
+   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  27
+   12. Security Considerations . . . . . . . . . . . . . . . . . . .  27
    13. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  28
    14. References  . . . . . . . . . . . . . . . . . . . . . . . . .  28
      14.1.  Normative References . . . . . . . . . . . . . . . . . .  28
      14.2.  Informative References . . . . . . . . . . . . . . . . .  29
-   Appendix A.  Additional Properties  . . . . . . . . . . . . . . .  30
+   Appendix A.  Additional Properties  . . . . . . . . . . . . . . .  29
      A.1.  Protocol and Path Selection Properties  . . . . . . . . .  30
-       A.1.1.  Application Intents . . . . . . . . . . . . . . . . .  31
-     A.2.  Protocol Properties . . . . . . . . . . . . . . . . . . .  33
-     A.3.  Send Parameters . . . . . . . . . . . . . . . . . . . . .  33
+       A.1.1.  Application Intents . . . . . . . . . . . . . . . . .  30
+     A.2.  Protocol Properties . . . . . . . . . . . . . . . . . . .  32
+     A.3.  Send Parameters . . . . . . . . . . . . . . . . . . . . .  32
    Appendix B.  Sample API definition in Go  . . . . . . . . . . . .  33
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  33
 
@@ -338,9 +338,6 @@ Trammell, et al.        Expires October 13, 2018                [Page 6]
 Internet-Draft               TAPS Interface                   April 2018
 
 
-   Preconnections, as Connections, can be cloned to establish Connection
-   groups before Connection initiation; see Section 6.4 for details.
-
 5.1.  Specifying Endpoints
 
    The transport services API uses the Local Endpoint and Remote
@@ -386,6 +383,9 @@ Internet-Draft               TAPS Interface                   April 2018
    The Resolve() method is, however, provided to resolve a Local
    Endpoint or a Remote Endpoint in cases where this is required, for
    example with some NAT traversal protocols (see Section 6.3).
+
+
+
 
 
 
@@ -517,12 +517,11 @@ Internet-Draft               TAPS Interface                   April 2018
       multiple times.  See also Section 7.1.4.  This is a strict
       requirement.  The default is to not have this option.
 
-   o  Multiplex Connections: This boolean property specifies that the
-      application would prefer multiple Connections between the same
-      endpoints within a Connection Group to be multiplexed onto a
-      single underlying transport connection where possible, for reasons
-      of efficiency.  This is not a strict requirement.  The default is
-      to not have this option.
+   o  Multistream Connections in Group: This boolean property specifies
+      that the application would prefer multiple Connections within a
+      Connection Group to be provided by streams of a single underlying
+      transport connection where possible.  This is not a strict
+      requirement.  The default is to not have this option.
 
    o  Notification of excessive retransmissions: This boolean property
       specifies whether an application considers it useful to be
@@ -554,6 +553,7 @@ Internet-Draft               TAPS Interface                   April 2018
       preference level for Interface Type may limit path selection in a
       way that is detrimental to connectivity.  The default is to use
       the default interface configured in the system policy.
+
 
 
 
@@ -906,10 +906,7 @@ Internet-Draft               TAPS Interface                   April 2018
 
 6.4.  Connection Groups
 
-   Groups of Preconnections or Connections can be created using the
-   Clone Action:
-
-   Preconnection := Preconnection.Clone()
+   Groups of Connections can be created using the Clone Action:
 
    Connection := Connection.Clone()
 
@@ -922,38 +919,21 @@ Internet-Draft               TAPS Interface                   April 2018
    changing the properties on one Connection in the group changes the
    property for all others.
 
-   Calling Clone on a Preconnection yields a Preconnection with the same
-   parameters, which is entangled with the parent Preconnection: all the
-   Connections created from entangled Preconnections will be entangled
-   as if they had been cloned, and will belong to the same Connection
-   Group.
+   If the underlying Protocol Stack does not support cloning, or cannot
+   create a new stream on the given Connection, then attempts to clone a
+   connection will result in a CloneError:
 
-   Establishing a Connection from a cloned Preconnection will not cause
-   Connections for other entangled Preconnections to be established;
-   each such Connection must be established separately.  Changes to the
-   parameters of a Preconnection entangled with a Preconnection from
-   which a Connection has already been established will fail.  Calling
-   Clone on a Preconnection may be taken by the system an implicit
-   signal that Protocol Stacks supporting multiplexed Connections for
-   efficient Connection Grouping are preferred by the application.
+   Connection -> CloneError<>
 
-   There is only one Protocol Property that is not entangled, i.e., it
-   is a separate per-Connection Property for individual Connections in
-   the group: niceness.  Niceness works as in Section 7.1.2: when
+   There is only one Protocol Property that is not entangled: niceness
+   is kept as a separate per-Connection Property for individual
+   Connections in the group.  Niceness works as in Section 7.1.2: when
    allocating available network capacity among Connections in a
    Connection Group, sends on Connections with higher Niceness values
    will be prioritized over sends on Connections with lower Niceness
    values.  An ideal transport system implementation would assign the
    Connection the capacity share (M-N) x C / M, where N is the
    Connection's Niceness value, M is the maximum Niceness value used by
-
-
-
-Trammell, et al.        Expires October 13, 2018               [Page 17]
-
-Internet-Draft               TAPS Interface                   April 2018
-
-
    all Connections in the group and C is the total available capacity.
    However, the niceness setting is purely advisory, and no guarantees
    are given about capacity allocation and each implementation is free
@@ -965,6 +945,14 @@ Internet-Draft               TAPS Interface                   April 2018
    data.  Data is sent by passing a Message Object and additional
    parameters Section 7.1 to the Send Action on an established
    Connection:
+
+
+
+
+Trammell, et al.        Expires October 13, 2018               [Page 17]
+
+Internet-Draft               TAPS Interface                   April 2018
+
 
    Connection.Send(Message, sendParameters)
 
@@ -1002,14 +990,6 @@ Internet-Draft               TAPS Interface                   April 2018
    i.e., when the data derived from the Message has been passed down or
    through the underlying Protocol Stack and is no longer the
    responsibility of the implementation of this interface.  The exact
-
-
-
-Trammell, et al.        Expires October 13, 2018               [Page 18]
-
-Internet-Draft               TAPS Interface                   April 2018
-
-
    disposition of the Message when the Sent Event occurs is specific to
    the implementation and the constraints on the Protocol Stacks implied
    by the Connection's transport parameters.  The Sent Event contains an
@@ -1022,6 +1002,13 @@ Internet-Draft               TAPS Interface                   April 2018
    that only issues a Send after this Event fires.
 
    Connection -> Expired<msgRef>
+
+
+
+Trammell, et al.        Expires October 13, 2018               [Page 18]
+
+Internet-Draft               TAPS Interface                   April 2018
+
 
    The Expired Event occurs when a previous Send Action expired before
    completion; i.e. when the Message was not sent before its Lifetime
@@ -1057,15 +1044,6 @@ Internet-Draft               TAPS Interface                   April 2018
    Parameters (see Section 5.2).  This allows the specification of
    Protocol Properties that can be overridden on a per-Message basis.
 
-
-
-
-
-Trammell, et al.        Expires October 13, 2018               [Page 19]
-
-Internet-Draft               TAPS Interface                   April 2018
-
-
    Send Parameters may be inconsistent with the properties of the
    Protocol Stacks underlying the Connection on which a given Message is
    sent.  For example, infinite Lifetime is not possible on a Message
@@ -1080,6 +1058,14 @@ Internet-Draft               TAPS Interface                   April 2018
    Lifetime specifies how long a particular Message can wait to be sent
    to the remote endpoint before it is irrelevant and no longer needs to
    be (re-)transmitted.  When a Message's Lifetime is infinite, it must
+
+
+
+Trammell, et al.        Expires October 13, 2018               [Page 19]
+
+Internet-Draft               TAPS Interface                   April 2018
+
+
    be transmitted reliably.  The type and units of Lifetime are
    implementation-specific.
 
@@ -1114,14 +1100,6 @@ Internet-Draft               TAPS Interface                   April 2018
    0-RTT data may cause the remote application to receive the Message
    multiple times.
 
-
-
-
-Trammell, et al.        Expires October 13, 2018               [Page 20]
-
-Internet-Draft               TAPS Interface                   April 2018
-
-
 7.1.5.  Corruption Protection Length
 
    This numeric property specifies the length of the section of the
@@ -1132,6 +1110,17 @@ Internet-Draft               TAPS Interface                   April 2018
    means that no checksum is required, and a special value (e.g. -1) can
    be used to indicate the default.  Only full coverage is guaranteed,
    any other requests are advisory.
+
+
+
+
+
+
+
+Trammell, et al.        Expires October 13, 2018               [Page 20]
+
+Internet-Draft               TAPS Interface                   April 2018
+
 
 7.1.6.  Immediate Acknowledgement
 
@@ -1171,13 +1160,6 @@ Internet-Draft               TAPS Interface                   April 2018
       treatment, to delay sending until lower-cost paths are available,
       and so on.
 
-
-
-Trammell, et al.        Expires October 13, 2018               [Page 21]
-
-Internet-Draft               TAPS Interface                   April 2018
-
-
 7.2.  Sender-side Framing
 
    Sender-side framing allows a caller to provide the interface with a
@@ -1187,6 +1169,14 @@ Internet-Draft               TAPS Interface                   April 2018
    of a Framer Object with a single Action, Frame.  Since the Framer
    depends on the protocol used at the application layer, it is bound to
    the Preconnection during the pre-establishment phase:
+
+
+
+
+Trammell, et al.        Expires October 13, 2018               [Page 21]
+
+Internet-Draft               TAPS Interface                   April 2018
+
 
    Preconnection.FrameWith(Framer)
 
@@ -1226,14 +1216,6 @@ Internet-Draft               TAPS Interface                   April 2018
 
    As with sending, the type of the Message to be passed is dependent on
    the implementation, and on the constraints on the Protocol Stacks
-
-
-
-Trammell, et al.        Expires October 13, 2018               [Page 22]
-
-Internet-Draft               TAPS Interface                   April 2018
-
-
    implied by the Connection's transport parameters.  The Message may
    also contain metadata from protocols in the Protocol Stack; which
    metadata is available is Protocol Stack dependent.  In particular,
@@ -1242,6 +1224,15 @@ Internet-Draft               TAPS Interface                   April 2018
    This information can be used for logging and debugging purposes, and
    for building applications which need access to information about the
    transport internals for their own operation.
+
+
+
+
+
+Trammell, et al.        Expires October 13, 2018               [Page 22]
+
+Internet-Draft               TAPS Interface                   April 2018
+
 
    The Message Object must provide some method to retrieve an octet
    array containing application data, corresponding to a single message
@@ -1281,15 +1272,6 @@ Internet-Draft               TAPS Interface                   April 2018
        message boundary, i.e. the only known message boundary is given
        by termination of the Connection
 
-
-
-
-
-Trammell, et al.        Expires October 13, 2018               [Page 23]
-
-Internet-Draft               TAPS Interface                   April 2018
-
-
    Note that in the absence of message boundary preservation and without
    deframing, the entire Connection is represented as one large message
    of indeterminate length.
@@ -1300,6 +1282,14 @@ Internet-Draft               TAPS Interface                   April 2018
    Protocol Stack that cannot be fully retrieved or deframed, or when
    some other indication is received that reception has failed.  Such
    conditions that irrevocably lead the the termination of the
+
+
+
+Trammell, et al.        Expires October 13, 2018               [Page 23]
+
+Internet-Draft               TAPS Interface                   April 2018
+
+
    Connection are signaled using ConnectionError instead (see
    Section 10).
 
@@ -1336,16 +1326,6 @@ Internet-Draft               TAPS Interface                   April 2018
 
    Message := Deframer.Deframe(OctetStream, ...)
 
-
-
-
-
-
-Trammell, et al.        Expires October 13, 2018               [Page 24]
-
-Internet-Draft               TAPS Interface                   April 2018
-
-
 9.  Setting and Querying of Connection Properties
 
    At any point, the application can set and query the properties of a
@@ -1357,6 +1337,14 @@ Internet-Draft               TAPS Interface                   April 2018
    Connection.SetProperties()
 
    Connection properties include:
+
+
+
+
+Trammell, et al.        Expires October 13, 2018               [Page 24]
+
+Internet-Draft               TAPS Interface                   April 2018
+
 
    o  The status of the Connection, which can be one of the following:
       Establishing, Established, Closing, or Closed.
@@ -1394,14 +1382,6 @@ Internet-Draft               TAPS Interface                   April 2018
    Protocol Properties represent the configuration of the selected
    Protocol Stacks backing a Connection.  Some properties apply
    generically across multiple transport protocols, while other
-
-
-
-Trammell, et al.        Expires October 13, 2018               [Page 25]
-
-Internet-Draft               TAPS Interface                   April 2018
-
-
    properties only apply to specific protocols.  The default settings of
    these properties will vary based on the specific protocols being used
    and the system's configuration.
@@ -1414,6 +1394,14 @@ Internet-Draft               TAPS Interface                   April 2018
 
    o  Relative niceness: This numeric property is similar to the
       Niceness send property (see Section 7.1.2), a non-negative integer
+
+
+
+Trammell, et al.        Expires October 13, 2018               [Page 25]
+
+Internet-Draft               TAPS Interface                   April 2018
+
+
       representing the relative inverse priority of this Connection
       relative to other Connections in the same Connection Group.  It
       has no effect on Connections not part of a Connection Group.  As
@@ -1449,15 +1437,6 @@ Internet-Draft               TAPS Interface                   April 2018
    o  Maximum Message size before fragmentation or segmentation: This
       numeric property, if applicable, represents the maximum Message
       size that can be sent without incurring network-layer
-
-
-
-
-Trammell, et al.        Expires October 13, 2018               [Page 26]
-
-Internet-Draft               TAPS Interface                   April 2018
-
-
       fragmentation and/or transport layer segmentation at the sender.
       This property is read-only.
 
@@ -1471,6 +1450,14 @@ Internet-Draft               TAPS Interface                   April 2018
 
    In order to specify Specific Protocol Properties, Transport System
    implementations may offer applications to attach a set of options to
+
+
+
+Trammell, et al.        Expires October 13, 2018               [Page 26]
+
+Internet-Draft               TAPS Interface                   April 2018
+
+
    the Preconnection Object, associated with a specific protocol.  For
    example, an application could specify a set of TCP Options to use if
    and only if TCP is selected by the system.  Such properties must not
@@ -1506,14 +1493,6 @@ Internet-Draft               TAPS Interface                   April 2018
 
    Connection -> ConnectionError<>
 
-
-
-
-Trammell, et al.        Expires October 13, 2018               [Page 27]
-
-Internet-Draft               TAPS Interface                   April 2018
-
-
 11.  IANA Considerations
 
    RFC-EDITOR: Please remove this section before publication.
@@ -1526,6 +1505,15 @@ Internet-Draft               TAPS Interface                   April 2018
    transport services (TAPS) system.  Part of this API includes
    configuration details for transport security protocols, as discussed
    in Section Section 5.3.  It does not recommend use (or disuse) of
+
+
+
+
+Trammell, et al.        Expires October 13, 2018               [Page 27]
+
+Internet-Draft               TAPS Interface                   April 2018
+
+
    specific algorithms or protocols.  Any API-compatible transport
    security protocol should work in a TAPS system.
 
@@ -1562,14 +1550,6 @@ Internet-Draft               TAPS Interface                   April 2018
               Packet Markings for WebRTC QoS", draft-ietf-tsvwg-rtcweb-
               qos-18 (work in progress), August 2016.
 
-
-
-
-Trammell, et al.        Expires October 13, 2018               [Page 28]
-
-Internet-Draft               TAPS Interface                   April 2018
-
-
    [I-D.ietf-tsvwg-sctp-ndata]
               Stewart, R., Tuexen, M., Loreto, S., and R. Seggelmann,
               "Stream Schedulers and User Message Interleaving for the
@@ -1581,6 +1561,14 @@ Internet-Draft               TAPS Interface                   April 2018
               Perkins, C., Tiesel, P., and C. Wood, "An Architecture for
               Transport Services", draft-pauly-taps-arch-00 (work in
               progress), February 2018.
+
+
+
+
+Trammell, et al.        Expires October 13, 2018               [Page 28]
+
+Internet-Draft               TAPS Interface                   April 2018
+
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -1618,14 +1606,6 @@ Internet-Draft               TAPS Interface                   April 2018
               DOI 10.17487/RFC8095, March 2017,
               <https://www.rfc-editor.org/info/rfc8095>.
 
-
-
-
-Trammell, et al.        Expires October 13, 2018               [Page 29]
-
-Internet-Draft               TAPS Interface                   April 2018
-
-
 Appendix A.  Additional Properties
 
    The interface specified by this document represents the minimal
@@ -1637,6 +1617,15 @@ Appendix A.  Additional Properties
    those in the minimal common interface: Protocol Selection Properties,
    Path Selection Properties, and options on Message send are open sets.
    Implementations of the interface are free to extend these sets to
+
+
+
+
+Trammell, et al.        Expires October 13, 2018               [Page 29]
+
+Internet-Draft               TAPS Interface                   April 2018
+
+
    provide additional expressiveness to applications written on top of
    them.
 
@@ -1670,18 +1659,6 @@ A.1.  Protocol and Path Selection Properties
       is to not have this option.  [EDITOR'S NOTE: For discussion of
       this option, see https://github.com/taps-api/drafts/issues/90]
 
-
-
-
-
-
-
-
-Trammell, et al.        Expires October 13, 2018               [Page 30]
-
-Internet-Draft               TAPS Interface                   April 2018
-
-
 A.1.1.  Application Intents
 
    Application Intents are a group of transport properties expressing
@@ -1695,6 +1672,15 @@ A.1.1.  Application Intents
    Application Intents do not represent Quality of Service requirements,
    a transport system may use them to determine a DSCP value, e.g.
    similar to Table 1 in [I-D.ietf-tsvwg-rtcweb-qos].
+
+
+
+
+
+Trammell, et al.        Expires October 13, 2018               [Page 30]
+
+Internet-Draft               TAPS Interface                   April 2018
+
 
    Application Intents can influence protocol selection, protocol
    configuration, path selection, and endpoint selection.  For example,
@@ -1731,13 +1717,6 @@ A.1.1.1.  Traffic Category
 
    Stream:  Stream of data with steady data rate
 
-
-
-Trammell, et al.        Expires October 13, 2018               [Page 31]
-
-Internet-Draft               TAPS Interface                   April 2018
-
-
    Bulk:  Bulk transfer of large Messages, presumably bandwidth bound
 
    The default is to not assume any particular traffic pattern.  Most
@@ -1750,6 +1729,14 @@ A.1.1.2.  Size to be Sent / Received
 
    This Intent specifies what the application expects the size of a
    transfer to be.  It is a numeric property and given in Bytes.
+
+
+
+
+Trammell, et al.        Expires October 13, 2018               [Page 31]
+
+Internet-Draft               TAPS Interface                   April 2018
+
 
 A.1.1.3.  Duration
 
@@ -1782,18 +1769,6 @@ A.1.1.5.  Cost Preferences
 
    The default is "Balance Cost".
 
-
-
-
-
-
-
-
-Trammell, et al.        Expires October 13, 2018               [Page 32]
-
-Internet-Draft               TAPS Interface                   April 2018
-
-
 A.2.  Protocol Properties
 
    The following protocol properties might be made available in addition
@@ -1811,6 +1786,14 @@ A.3.  Send Parameters
 
    o  Immediate: Immediate is a boolean property.  If true, the caller
       prefers immediacy to efficient capacity usage for this Message.
+
+
+
+Trammell, et al.        Expires October 13, 2018               [Page 32]
+
+Internet-Draft               TAPS Interface                   April 2018
+
+
       For example, this means that the Message should not be bundled
       with other Message into the same transmission by the underlying
       Protocol Stack.
@@ -1836,20 +1819,6 @@ Appendix B.  Sample API definition in Go
 
 Authors' Addresses
 
-
-
-
-
-
-
-
-
-
-Trammell, et al.        Expires October 13, 2018               [Page 33]
-
-Internet-Draft               TAPS Interface                   April 2018
-
-
    Brian Trammell (editor)
    ETH Zurich
    Gloriastrasse 35
@@ -1866,6 +1835,19 @@ Internet-Draft               TAPS Interface                   April 2018
    Norway
 
    Email: michawe@ifi.uio.no
+
+
+
+
+
+
+
+
+
+
+Trammell, et al.        Expires October 13, 2018               [Page 33]
+
+Internet-Draft               TAPS Interface                   April 2018
 
 
    Theresa Enghardt
@@ -1896,16 +1878,6 @@ Internet-Draft               TAPS Interface                   April 2018
    Email: mirja.kuehlewind@tik.ee.ethz.ch
 
 
-
-
-
-
-
-Trammell, et al.        Expires October 13, 2018               [Page 34]
-
-Internet-Draft               TAPS Interface                   April 2018
-
-
    Colin Perkins
    University of Glasgow
    School of Computing Science
@@ -1924,6 +1896,16 @@ Internet-Draft               TAPS Interface                   April 2018
    Email: philipp@inet.tu-berlin.de
 
 
+
+
+
+
+
+Trammell, et al.        Expires October 13, 2018               [Page 34]
+
+Internet-Draft               TAPS Interface                   April 2018
+
+
    Chris Wood
    Apple Inc.
    1 Infinite Loop
@@ -1931,6 +1913,24 @@ Internet-Draft               TAPS Interface                   April 2018
    United States of America
 
    Email: cawood@apple.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
