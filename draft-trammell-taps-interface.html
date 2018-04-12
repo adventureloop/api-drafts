@@ -325,7 +325,7 @@ ul.toc li {
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-trammell-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-04-11" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-04-12" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -349,7 +349,7 @@ ul.toc li {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: October 13, 2018</td>
+<td class="left">Expires: October 14, 2018</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -402,7 +402,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">April 11, 2018</td>
+<td class="right">April 12, 2018</td>
 </tr>
 
     	
@@ -418,7 +418,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on October 13, 2018.</p>
+<p>This Internet-Draft will expire on October 14, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -665,7 +665,7 @@ LocalSpecifier.WithStunServer(address, port, credentials)
 <li>Use 0-RTT session establishment with an idempotent Message: This boolean property specifies whether an application would like to supply a Message to the transport protocol before Connection establishment, which will then be reliably transferred to the other side before or during Connection establishment, potentially multiple times.  See also <a href="#send-idempotent" class="xref">Section 7.1.4</a>.  This is a strict requirement. The default is to not have this option.</li>
 <li>Multistream Connections in Group: This boolean property specifies that the application would prefer multiple Connections within a Connection Group to be provided by streams of a single underlying transport connection where possible. This is not a strict requirement. The default is to not have this option.</li>
 <li>Notification of excessive retransmissions: This boolean property specifies whether an application considers it useful to be informed in case sent data was retransmitted more often than a certain threshold. This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</li>
-<li>Notification of ICMP error message arrival: This boolean property specifies whether an application considers it useful to be informed when an ICMP error message arrives. This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option.</li>
+<li>Notification of ICMP soft error message arrival: This boolean property specifies whether an application considers it useful to be informed when an ICMP error message arrives that does not force termination of a connection. This property applies to Connections and Connection Groups. Received ICMP errors will be available as SoftErrors.  Note that even if a protocol supporting this property is selected, not all ICMP errors will necessarily be delivered, so applications cannot rely on receiving them. This is not a strict requirement. The default is not to have this option.</li>
 <li>Control checksum coverage on sending or receiving: This boolean property specifies whether the application considers it useful to enable / disable / configure a checksum when sending data, or decide whether to require a checksum or not when receiving data.  This property applies to Connections and Connection Groups. This is not a strict requirement, as it signifies a reduction in reliability. The default is full checksum coverage without being able to change it, and requiring a checksum when receiving.</li>
 <li>Interface Type: This enumerated property specifies which kind of access network interface, e.g., WiFi, Ethernet, or LTE, to prefer over others for this Connection, in case they are available. In general, Interface Types should be used only with the <samp>Prefer</samp> and <samp>Prohibit</samp> preference level. Specifically, using the <samp>Require</samp> preference level for Interface Type may limit path selection in a way that is detrimental to connectivity. The default is to use the default interface configured in the system policy.</li>
 <li>Capacity Profile: This enumerated property specifies the application&#8217;s expectation of the dominating traffic pattern for this Connection. The Capacity Profile should only be used with the <samp>Prefer</samp> preference level; other preference levels make no sense for profiles. The following values are valid for Capacity Profile:  <dl>
@@ -1027,6 +1027,10 @@ Connection.Abort()
 <p id="rfc.section.10.p.4">A ConnectionError can inform the application that the other side has aborted the Connection; however, there is no guarantee that an abort will be signaled:</p>
 <pre>
 Connection -&gt; ConnectionError&lt;&gt;
+</pre>
+<p id="rfc.section.10.p.5">A SoftError can inform the application about the receipt of an ICMP error message that does not force termination of the connection, if the underlying protocol stack supports access to soft errors; however, even if the underlying stack supports it, there is no guarantee that a soft error will be signaled.</p>
+<pre>
+Connection -&gt; SoftError&lt;&gt;
 </pre>
 <h1 id="rfc.section.11">
 <a href="#rfc.section.11">11.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a>
