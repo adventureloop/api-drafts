@@ -306,8 +306,7 @@ ul.toc li {
 <link href="#rfc.section.7.1.3" rel="Chapter" title="7.1.3 Ordered">
 <link href="#rfc.section.7.1.4" rel="Chapter" title="7.1.4 Idempotent">
 <link href="#rfc.section.7.1.5" rel="Chapter" title="7.1.5 Corruption Protection Length">
-<link href="#rfc.section.7.1.6" rel="Chapter" title="7.1.6 Immediate Acknowledgement">
-<link href="#rfc.section.7.1.7" rel="Chapter" title="7.1.7 Instantaneous Capacity Profile">
+<link href="#rfc.section.7.1.6" rel="Chapter" title="7.1.6 Transmission Profile">
 <link href="#rfc.section.7.2" rel="Chapter" title="7.2 Sender-side Framing">
 <link href="#rfc.section.8" rel="Chapter" title="8 Receiving Data">
 <link href="#rfc.section.8.1" rel="Chapter" title="8.1 Receiver-side De-framing over Stream Protocols">
@@ -334,7 +333,7 @@ ul.toc li {
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-trammell-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-04-16" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-04-17" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -358,7 +357,7 @@ ul.toc li {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: October 18, 2018</td>
+<td class="left">Expires: October 19, 2018</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -411,7 +410,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">April 16, 2018</td>
+<td class="right">April 17, 2018</td>
 </tr>
 
     	
@@ -427,7 +426,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on October 18, 2018.</p>
+<p>This Internet-Draft will expire on October 19, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -497,9 +496,7 @@ ul.toc li {
 </li>
 <li>7.1.5.   <a href="#rfc.section.7.1.5">Corruption Protection Length</a>
 </li>
-<li>7.1.6.   <a href="#rfc.section.7.1.6">Immediate Acknowledgement</a>
-</li>
-<li>7.1.7.   <a href="#rfc.section.7.1.7">Instantaneous Capacity Profile</a>
+<li>7.1.6.   <a href="#rfc.section.7.1.6">Transmission Profile</a>
 </li>
 </ul><li>7.2.   <a href="#rfc.section.7.2">Sender-side Framing</a>
 </li>
@@ -749,10 +746,10 @@ TransportParameters := Connection.GetTransportParameters()
 <dl>
 <dt>Default:</dt>
 <dd style="margin-left: 8">The application makes no representation about its expected capacity profile. No special optimizations of the tradeoff between delay, delay variation, and bandwidth efficiency should be made when selecting and configuring stacks.</dd>
-<dt>Interactive/Low Latency:</dt>
-<dd style="margin-left: 8">The application is interactive. Response time (latency) should be optimized at the expense of bandwidth efficiency and delay variation. This can be used by the system to disable the coalescing of multiple small Messages into larger packets (Nagle&#8217;s algorithm), to prefer lower-latency paths, signal a preference for lower-latency, higher-loss treatment, and so on.</dd>
+<dt>Low Latency:</dt>
+<dd style="margin-left: 8">Response time (latency) should be optimized at the expense of bandwidth efficiency and delay variation when sending this message. This can be used by the system to disable the coalescing of multiple small Messages into larger packets (Nagle&#8217;s algorithm); to prefer immediate acknowledgment from the peer endpoint when supported by the underlying transport; to signal a preference for lower-latency, higher-loss treatment; and so on.</dd>
 <dt>Constant Rate:</dt>
-<dd style="margin-left: 8">The application expects to send/receive data at a constant rate after Connection establishment. Delay and delay variation should be optimized at the expense of bandwidth efficiency. This implies that the Connection may fail if the desired rate cannot be maintained across the Path. A transport may interpret this capacity profile as preferring a circuit breaker <a href="#RFC8084" class="xref">[RFC8084]</a> to a rate adaptive congestion controller.</dd>
+<dd style="margin-left: 8">The application expects to send/receive data at a constant rate after Connection establishment. Delay and delay variation should be minimized at the expense of bandwidth efficiency. This implies that the Connection may fail if the desired rate cannot be maintained across the Path. A transport may interpret this capacity profile as preferring a circuit breaker <a href="#RFC8084" class="xref">[RFC8084]</a> to a rate adaptive congestion controller.</dd>
 <dt>Scavenger/Bulk:</dt>
 <dd style="margin-left: 8">The application is not interactive. It expects to send/receive a large amount of data, without any urgency. This can be used to select protocol stacks with scavenger transmission control, to signal a preference for less-than-best-effort treatment, and so on.</dd>
 </dl>
@@ -945,23 +942,19 @@ SendParameters.Add(parameter, value)
 </h1>
 <p id="rfc.section.7.1.5.p.1">This numeric property specifies the length of the section of the Message, starting from byte 0, that the application assumes will be received without corruption due to lower layer errors. It is used to specify options for simple integrity protection via checksums. By default, the entire Message is protected by checksum. A value of 0 means that no checksum is required, and a special value (e.g. -1) can be used to indicate the default. Only full coverage is guaranteed, any other requests are advisory.</p>
 <h1 id="rfc.section.7.1.6">
-<a href="#rfc.section.7.1.6">7.1.6.</a> <a href="#send-ackimmed" id="send-ackimmed">Immediate Acknowledgement</a>
+<a href="#rfc.section.7.1.6">7.1.6.</a> <a href="#send-profile" id="send-profile">Transmission Profile</a>
 </h1>
-<p id="rfc.section.7.1.6.p.1">This boolean property specifies, if true, that an application wants this Message to be acknowledged immediately by the receiver. In case of reliable transmission, this informs the transport protocol on the sender side faster that it can remove the Message from its buffer; therefore this property can be useful for latency-critical applications that maintain tight control over the send buffer (see <a href="#sending" class="xref">Section 7</a>).</p>
-<h1 id="rfc.section.7.1.7">
-<a href="#rfc.section.7.1.7">7.1.7.</a> <a href="#instantaneous-capacity-profile" id="instantaneous-capacity-profile">Instantaneous Capacity Profile</a>
-</h1>
-<p id="rfc.section.7.1.7.p.1">This enumerated property specifies the application&#8217;s preferred tradeoffs for sending this Message; it is a per-Message override of the Capacity Profile protocol and path selection property (see <a href="#prop-cap-profile" class="xref">Section 5.2.10</a>).</p>
-<p id="rfc.section.7.1.7.p.2">The following values are valid for Instantaneous Capacity Profile:</p>
+<p id="rfc.section.7.1.6.p.1">This enumerated property specifies the application&#8217;s preferred tradeoffs for sending this Message; it is a per-Message override of the Capacity Profile protocol and path selection property (see <a href="#prop-cap-profile" class="xref">Section 5.2.10</a>).</p>
+<p id="rfc.section.7.1.6.p.2">The following values are valid for Transmission Profile:</p>
 <p></p>
 
 <dl>
 <dt>Default:</dt>
 <dd style="margin-left: 8">No special optimizations of the tradeoff between delay, delay variation, and bandwidth efficiency should be made when sending this message.</dd>
-<dt>Interactive/Low Latency:</dt>
-<dd style="margin-left: 8">Response time (latency) should be optimized at the expense of bandwidth efficiency and delay variation when sending this message.  This can be used by the system to disable the coalescing of multiple small Messages into larger packets (Nagle&#8217;s algorithm), to signal a preference for lower-latency, higher-loss treatment, and so on.</dd>
+<dt>Low Latency:</dt>
+<dd style="margin-left: 8">Response time (latency) should be optimized at the expense of bandwidth efficiency and delay variation when sending this message. This can be used by the system to disable the coalescing of multiple small Messages into larger packets (Nagle&#8217;s algorithm); to prefer immediate acknowledgment from the peer endpoint when supported by the underlying transport; to signal a preference for lower-latency, higher-loss treatment; and so on.</dd>
 <dt>Constant Rate:</dt>
-<dd style="margin-left: 8">Delay and delay variation should be optimized at the expense of bandwidth efficiency.</dd>
+<dd style="margin-left: 8">Delay and delay variation should be minimized at the expense of bandwidth efficiency.</dd>
 <dt>Scavenger/Bulk:</dt>
 <dd style="margin-left: 8">This Message may be sent at the system&#8217;s leisure. This can be used to signal a preference for less-than-best-effort treatment, to delay sending until lower-cost paths are available, and so on.</dd>
 </dl>
