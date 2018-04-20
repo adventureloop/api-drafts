@@ -306,7 +306,7 @@ ul.toc li {
 
   <meta name="dct.creator" content="Pauly, T., Ed., Trammell, B., Ed., Brunstrom, A., Fairhurst, G., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-pauly-taps-arch-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-04-18" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-04-20" />
   <meta name="dct.abstract" content="This document provides an overview of the architecture of Transport Services, a system for exposing the features of transport protocols to applications. This architecture serves as a basis for Application Programming Interfaces (APIs) and implementations that provide flexible transport networking services. It defines the common set of terminology and concepts to be used in more detailed discussion of Transport Services." />
   <meta name="description" content="This document provides an overview of the architecture of Transport Services, a system for exposing the features of transport protocols to applications. This architecture serves as a basis for Application Programming Interfaces (APIs) and implementations that provide flexible transport networking services. It defines the common set of terminology and concepts to be used in more detailed discussion of Transport Services." />
 
@@ -330,7 +330,7 @@ ul.toc li {
 <td class="right">B. Trammell, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: October 20, 2018</td>
+<td class="left">Expires: October 22, 2018</td>
 <td class="right">ETH Zurich</td>
 </tr>
 <tr>
@@ -375,7 +375,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">April 18, 2018</td>
+<td class="right">April 20, 2018</td>
 </tr>
 
     	
@@ -391,7 +391,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on October 20, 2018.</p>
+<p>This Internet-Draft will expire on October 22, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -454,7 +454,7 @@ ul.toc li {
   <h1 id="rfc.section.1">
 <a href="#rfc.section.1">1.</a> <a href="#introduction" id="introduction">Introduction</a>
 </h1>
-<p id="rfc.section.1.p.1">Many APIs to perform transport networking have been deployed, perhaps the most widely known and imitated being the BSD socket() interface. The names and functions between these APIs are not consistent, and vary depending on the protocol being used. For example, sending and receiving on a stream of data is conceptually the same between operating on an unencrypted TCP stream and operating on an encrypted TLS stream over TCP, but applications cannot use the same socket send() and recv() calls on top of both kinds of connections. Similarly, terminology for the implementation of protocols offering transport services vary based on the context of the protocols themselves. This variety can lead to confusion when trying to understand the similarities and differences between protocols, and how applications can use them effectively.</p>
+<p id="rfc.section.1.p.1">Many APIs to perform transport networking have been deployed, perhaps the most widely known and imitated being the BSD socket() interface. The names and functions between these APIs are not consistent, and vary depending on the protocol being used. For example, sending and receiving on a stream of data is conceptually the same between operating on an unencrypted Transmission Control Protocol (TCP) stream and operating on an encrypted Transport Layer Security (TLS) <a href="#I-D.ietf-tls-tls13" class="xref">[I-D.ietf-tls-tls13]</a> stream over TCP, but applications cannot use the same socket send() and recv() calls on top of both kinds of connections.  Similarly, terminology for the implementation of protocols offering transport services vary based on the context of the protocols themselves. This variety can lead to confusion when trying to understand the similarities and differences between protocols, and how applications can use them effectively.</p>
 <p id="rfc.section.1.p.2">The goal of the Transport Services architecture is to provide a common, flexible, and reusable interface for transport protocols. As applications adopt this interface, they will benefit from a wide set of transport features that can evolve over time, and ensure that the system providing the interface can optimize its behavior based on the application requirements and network conditions.</p>
 <p id="rfc.section.1.p.3">This document is developed in parallel with the specification of the Transport Services API <a href="#I-D.trammell-taps-interface" class="xref">[I-D.trammell-taps-interface]</a> and Implementation <a href="#draft-brunstrom-taps-impl" class="xref">[draft-brunstrom-taps-impl]</a> documents.</p>
 <h1 id="rfc.section.2">
@@ -467,7 +467,7 @@ ul.toc li {
 <a href="#rfc.section.3">3.</a> <a href="#design-principles" id="design-principles">Design Principles</a>
 </h1>
 <p id="rfc.section.3.p.1">The goal of the Transport Services architecture is to redefine the interface between applications and transports in a way that allows the transport layer to evolve and improve without fundamentally changing the contract with the application. This requires a careful consideration of how to expose the capabilities of protocols.</p>
-<p id="rfc.section.3.p.2">There are several degrees in which a Transport Services system can offer flexibility to an application: it can provide access to multiple sets of protocols and protocol features, it can use these protocols across multiple paths that may have different performance and functional characteristics, and it can communicate with different Remote Endpoints to optimize performance. Beyond these, if the API for the system remains the same over time, new protocols and features may be added to the system&#8217;s implementation without requiring significant changes in applications for adoption.</p>
+<p id="rfc.section.3.p.2">There are several degrees in which a Transport Services system can offer flexibility to an application: it can provide access to multiple sets of protocols and protocol features, it can use these protocols across multiple paths that may have different performance and functional characteristics, and it can communicate with different Remote Endpoints to optimize performance. Beyond these, if the API for the system remains the same over time, new protocols and features may be added to the system&#8217;s implementation without requiring changes in applications for adoption.</p>
 <p id="rfc.section.3.p.3">The following considerations were used in the design of this architecture.</p>
 <h1 id="rfc.section.3.1">
 <a href="#rfc.section.3.1">3.1.</a> <a href="#common-apis-for-common-features" id="common-apis-for-common-features">Common APIs for Common Features</a>
@@ -702,7 +702,8 @@ ul.toc li {
 <h1 id="rfc.section.6">
 <a href="#rfc.section.6">6.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a>
 </h1>
-<p id="rfc.section.6.p.1">The Transport Services architecture does not recommend use of specific security protocols or algorithms. Its goal is to offer ease of use for existing protocols by providing a generic security-related interface. Each provided interface mimics an existing protocol-specific interface provided by supported security protocols. For example, trust verification callbacks are common parts of TLS APIs. Transport Services APIs will expose similar functionality. Clients must take care to use security APIs appropriately. In cases where clients use said interface to provide sensitive keying material, e.g., access to private keys or copies of pre-shared keys (PSKs), key use must be validated. For example, clients should not use PSK material created for ESP with IETF-QUIC, and clients must not use private keys intended for server authentication as a key for client authentication. Moreover, unlike certain transport features such as TFO or ECN which can fall back to standard configurations, Transport Services systems must not permit fallback for security protocols. For example, if a client requests TLS, yet TLS or the desired version are not available, its connection must fail. Clients are responsible for implementing protocol or version fallback using a Transport Services API if so desired.</p>
+<p id="rfc.section.6.p.1">The Transport Services architecture does not recommend use of specific security protocols or algorithms. Its goal is to offer ease of use for existing protocols by providing a generic security-related interface. Each provided interface mimics an existing protocol-specific interface provided by supported security protocols. For example, trust verification callbacks are common parts of TLS APIs. Transport Services APIs will expose similar functionality.</p>
+<p id="rfc.section.6.p.2">Clients must take care to use security APIs appropriately. In cases where clients use said interface to provide sensitive keying material, e.g., access to private keys or copies of pre-shared keys (PSKs), key use must be validated. For example, clients should not use PSK material created for the Encapsulating Security Protocol (ESP, part of IPsec) <a href="#RFC4303" class="xref">[RFC4303]</a> with QUIC, and clients must not use private keys intended for server authentication as a keys for client authentication. Moreover, unlike certain transport features such as TCP Fast Open (TFO) <a href="#RFC7413" class="xref">[RFC7413]</a> or Explicit Congestion Notification (ECN) <a href="#RFC3168" class="xref">[RFC3168]</a> which can fall back to standard configurations, Transport Services systems must not permit fallback for security protocols. For example, if a client requests TLS, yet TLS or the desired version are not available, its connection must fail. Clients are responsible for implementing protocol or version fallback using a Transport Services API if so desired.</p>
 <h1 id="rfc.section.7">
 <a href="#rfc.section.7">7.</a> <a href="#acknowledgements" id="acknowledgements">Acknowledgements</a>
 </h1>
@@ -715,12 +716,18 @@ ul.toc li {
 <table><tbody>
 <tr>
 <td class="reference"><b id="draft-brunstrom-taps-impl">[draft-brunstrom-taps-impl]</b></td>
-<td class="top">"<a>Implementing Interfaces to Transport Services</a>", n.d..</td>
+<td class="top">
+<a>Anna Brunstrom, .</a> and <a>. Tommy Pauly</a>, "<a>Implementing Interfaces to Transport Services</a>", n.d..</td>
 </tr>
 <tr>
 <td class="reference"><b id="I-D.ietf-taps-minset">[I-D.ietf-taps-minset]</b></td>
 <td class="top">
 <a>Welzl, M.</a> and <a>S. Gjessing</a>, "<a href="https://tools.ietf.org/html/draft-ietf-taps-minset-03">A Minimal Set of Transport Services for TAPS Systems</a>", Internet-Draft draft-ietf-taps-minset-03, March 2018.</td>
+</tr>
+<tr>
+<td class="reference"><b id="I-D.ietf-tls-tls13">[I-D.ietf-tls-tls13]</b></td>
+<td class="top">
+<a>Rescorla, E.</a>, "<a href="https://tools.ietf.org/html/draft-ietf-tls-tls13-28">The Transport Layer Security (TLS) Protocol Version 1.3</a>", Internet-Draft draft-ietf-tls-tls13-28, March 2018.</td>
 </tr>
 <tr>
 <td class="reference"><b id="I-D.pauly-taps-transport-security">[I-D.pauly-taps-transport-security]</b></td>
@@ -731,6 +738,21 @@ ul.toc li {
 <td class="reference"><b id="I-D.trammell-taps-interface">[I-D.trammell-taps-interface]</b></td>
 <td class="top">
 <a>Trammell, B.</a>, <a>Welzl, M.</a>, <a>Enghardt, T.</a>, <a>Fairhurst, G.</a>, <a>Kuehlewind, M.</a>, <a>Perkins, C.</a>, <a>Tiesel, P.</a> and <a>C. Wood</a>, "<a href="https://tools.ietf.org/html/draft-trammell-taps-interface-00">An Abstract Application Layer Interface to Transport Services</a>", Internet-Draft draft-trammell-taps-interface-00, March 2018.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC3168">[RFC3168]</b></td>
+<td class="top">
+<a>Ramakrishnan, K.</a>, <a>Floyd, S.</a> and <a>D. Black</a>, "<a href="https://tools.ietf.org/html/rfc3168">The Addition of Explicit Congestion Notification (ECN) to IP</a>", RFC 3168, DOI 10.17487/RFC3168, September 2001.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC4303">[RFC4303]</b></td>
+<td class="top">
+<a>Kent, S.</a>, "<a href="https://tools.ietf.org/html/rfc4303">IP Encapsulating Security Payload (ESP)</a>", RFC 4303, DOI 10.17487/RFC4303, December 2005.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC7413">[RFC7413]</b></td>
+<td class="top">
+<a>Cheng, Y.</a>, <a>Chu, J.</a>, <a>Radhakrishnan, S.</a> and <a>A. Jain</a>, "<a href="https://tools.ietf.org/html/rfc7413">TCP Fast Open</a>", RFC 7413, DOI 10.17487/RFC7413, December 2014.</td>
 </tr>
 <tr>
 <td class="reference"><b id="RFC8095">[RFC8095]</b></td>
