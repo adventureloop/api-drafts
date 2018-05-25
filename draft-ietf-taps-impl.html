@@ -21,7 +21,7 @@ body {
 }
 
 .title, .filename, h1, h2, h3, h4, h5 {
-  font: 16px "Helvetica Neue","Roboto Condensed","Open Sans",Helvetica,Calibri,sans-serif;
+  font: 16px "Roboto Condensed","Helvetica Neue","Open Sans",Helvetica,Calibri,sans-serif;
   font-size-adjust: 0.5;
   font-weight: bold;
   color: #333;
@@ -337,8 +337,8 @@ ul.toc li {
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
   <meta name="dct.creator" content="Brunstrom, A., Ed., Pauly, T., Ed., Enghardt, T., Grinnemo, K-J., Jones, T., Tiesel, P., Perkins, C., and M. Welzl" />
-  <meta name="dct.identifier" content="urn:ietf:id:draft-brunstrom-taps-impl-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-04-20" />
+  <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-taps-impl-latest" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-05-25" />
   <meta name="dct.abstract" content="The Transport Services architecture " />
   <meta name="description" content="The Transport Services architecture " />
 
@@ -362,7 +362,7 @@ ul.toc li {
 <td class="right">T. Pauly, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: October 22, 2018</td>
+<td class="left">Expires: November 26, 2018</td>
 <td class="right">Apple Inc.</td>
 </tr>
 <tr>
@@ -415,7 +415,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">April 20, 2018</td>
+<td class="right">May 25, 2018</td>
 </tr>
 
     	
@@ -423,7 +423,7 @@ ul.toc li {
   </table>
 
   <p class="title">Implementing Interfaces to Transport Services<br />
-  <span class="filename">draft-brunstrom-taps-impl-latest</span></p>
+  <span class="filename">draft-ietf-taps-impl-latest</span></p>
   
   <h1 id="rfc.abstract"><a href="#rfc.abstract">Abstract</a></h1>
 <p>The Transport Services architecture <a href="#I-D.pauly-taps-arch" class="xref">[I-D.pauly-taps-arch]</a> defines a system that allows applications to use transport networking protocols flexibly. This document serves as a guide to implementation on how to build such a system.</p>
@@ -431,7 +431,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on October 22, 2018.</p>
+<p>This Internet-Draft will expire on November 26, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -862,6 +862,10 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <a href="#rfc.section.5.1.1.2">5.1.1.2.</a> <a href="#send-completion" id="send-completion">Send Completion</a>
 </h1>
 <p id="rfc.section.5.1.1.2.p.1">The application should be notified whenever a Message or partial Message has been consumed by the Protocol Stack, or has failed to send. The meaning of the Message being consumed by the stack may vary depending on the protocol. For a basic datagram protocol like UDP, this may correspond to the time when the packet is sent into the interface driver. For a protocol that buffers data in queues, like TCP, this may correspond to when the data has entered the send buffer.</p>
+<h1 id="rfc.section.5.1.1.3">
+<a href="#rfc.section.5.1.1.3">5.1.1.3.</a> <a href="#batching-sends" id="batching-sends">Batching Sends</a>
+</h1>
+<p id="rfc.section.5.1.1.3.p.1">Since sending a Message may involve a context switch between the application and the transport system, sending patterns that involve multiple small Messages can incur high overhead if each needs to be enqueued separately. To avoid this, the application should have a way to indicate a batch of Send actions, during which time the implementation will hold off on processing Messages until the batch is complete. This can also help context switches when enqueuing data in the interface driver if the operation can be batched.</p>
 <h1 id="rfc.section.5.1.2">
 <a href="#rfc.section.5.1.2">5.1.2.</a> <a href="#receiving-messages" id="receiving-messages">Receiving Messages</a>
 </h1>
@@ -1082,7 +1086,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <tr>
 <td class="reference"><b id="I-D.ietf-quic-transport">[I-D.ietf-quic-transport]</b></td>
 <td class="top">
-<a>Iyengar, J.</a> and <a>M. Thomson</a>, "<a href="https://tools.ietf.org/html/draft-ietf-quic-transport-11">QUIC: A UDP-Based Multiplexed and Secure Transport</a>", Internet-Draft draft-ietf-quic-transport-11, April 2018.</td>
+<a>Iyengar, J.</a> and <a>M. Thomson</a>, "<a href="https://tools.ietf.org/html/draft-ietf-quic-transport-12">QUIC: A UDP-Based Multiplexed and Secure Transport</a>", Internet-Draft draft-ietf-quic-transport-12, May 2018.</td>
 </tr>
 <tr>
 <td class="reference"><b id="I-D.ietf-tls-tls13">[I-D.ietf-tls-tls13]</b></td>
