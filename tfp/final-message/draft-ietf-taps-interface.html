@@ -336,7 +336,7 @@ ul.toc li {
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-05-27" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-05-28" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -360,7 +360,7 @@ ul.toc li {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: November 28, 2018</td>
+<td class="left">Expires: November 29, 2018</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -413,7 +413,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">May 27, 2018</td>
+<td class="right">May 28, 2018</td>
 </tr>
 
     	
@@ -429,7 +429,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on November 28, 2018.</p>
+<p>This Internet-Draft will expire on November 29, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -962,8 +962,8 @@ SendParameters.Add(parameter, value)
 <h1 id="rfc.section.7.1.5">
 <a href="#rfc.section.7.1.5">7.1.5.</a> <a href="#send-final" id="send-final">Final</a>
 </h1>
-<p id="rfc.section.7.1.5.p.1">Final is a boolean property. If true, this Message is the final message that the application will send on a Connection. This allows underlying protocols to indicate to the Remote Endpoint that the Connection has been effectively closed in the sending direction. For example, TCP-based Connections can send a FIN once a Message marked as Final has been completely sent.  Protocols that do not support signalling the end of a Connection in a given direction will ignore this property.</p>
-<p id="rfc.section.7.1.5.p.2">Note that a final Message must always be sorted to the end of a list of Messages.  The final property overrides Niceness and any other property that would re-order Messages. If another Message is sent after a Message marked as final has already been sent on a Connection, the new Message will report an error.</p>
+<p id="rfc.section.7.1.5.p.1">Final is a boolean property. If true, this Message is the last one that the application will send on a Connection. This allows underlying protocols to indicate to the Remote Endpoint that the Connection has been effectively closed in the sending direction. For example, TCP-based Connections can send a FIN once a Message marked as Final has been completely sent.  Protocols that do not support signalling the end of a Connection in a given direction will ignore this property.</p>
+<p id="rfc.section.7.1.5.p.2">Note that a Final Message must always be sorted to the end of a list of Messages.  The Final property overrides Niceness and any other property that would re-order Messages. If another Message is sent after a Message marked as Final has already been sent on a Connection, the new Message will report an error.</p>
 <h1 id="rfc.section.7.1.6">
 <a href="#rfc.section.7.1.6">7.1.6.</a> <a href="#send-checksum" id="send-checksum">Corruption Protection Length</a>
 </h1>
@@ -1043,9 +1043,9 @@ Connection -&gt; ReceiveError&lt;&gt;
 <h1 id="rfc.section.8.1">
 <a href="#rfc.section.8.1">8.1.</a> <a href="#receiving-final-messages" id="receiving-final-messages">Receiving Final Messages</a>
 </h1>
-<p id="rfc.section.8.1.p.1">The application may check a property to determine if a received Message is the final Message on a Connection. For any Message that is marked as final, the application can assume that there will be no more Messages received on the Connection once the Message has been completely delivered. This corresponds to the Final property that may be marked on a sent Message <a href="#send-final" class="xref">Section 7.1.5</a>.</p>
-<p id="rfc.section.8.1.p.2">Final Messages are delivered by protocols that support closing one side of a Connection.  For example, if a Connection using TCP receives a FIN, the application can determine that the stream is complete once the final Message has been marked complete.  Protocols that do not support this functionality, such as UDP, may never deliver a Message marked as final.</p>
-<p id="rfc.section.8.1.p.3">Any calls to <samp>Receive</samp> once the final Message has been delivered will result in errors.</p>
+<p id="rfc.section.8.1.p.1">The application may check a property to determine if a received Message is the Final Message on a Connection. For any Message that is marked as Final, the application can assume that there will be no more Messages received on the Connection once the Message has been completely delivered. This corresponds to the Final property that may be marked on a sent Message <a href="#send-final" class="xref">Section 7.1.5</a>.</p>
+<p id="rfc.section.8.1.p.2">Some transport protocols and peers may not support signaling of the Final property.  Applications therefore should not rely on receiving a Message marked Final to know that the other endpoint is done sending on a connection.</p>
+<p id="rfc.section.8.1.p.3">Any calls to <samp>Receive</samp> once the Final Message has been delivered will result in errors.</p>
 <h1 id="rfc.section.8.2">
 <a href="#rfc.section.8.2">8.2.</a> <a href="#receive-framing" id="receive-framing">Receiver-side De-framing over Stream Protocols</a>
 </h1>
