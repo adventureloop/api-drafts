@@ -286,13 +286,14 @@ ul.toc li {
 <link href="#rfc.section.5.2.1" rel="Chapter" title="5.2.1 Reliable Data Transfer">
 <link href="#rfc.section.5.2.2" rel="Chapter" title="5.2.2 Preservation of data ordering">
 <link href="#rfc.section.5.2.3" rel="Chapter" title="5.2.3 Configure reliability on a per-Message basis">
-<link href="#rfc.section.5.2.4" rel="Chapter" title="5.2.4 Use 0-RTT session establishment with an idempotent Message">
-<link href="#rfc.section.5.2.5" rel="Chapter" title="5.2.5 Multistream Connections in Group">
-<link href="#rfc.section.5.2.6" rel="Chapter" title="5.2.6 Notification of excessive retransmissions">
-<link href="#rfc.section.5.2.7" rel="Chapter" title="5.2.7 Notification of ICMP soft error message arrival">
-<link href="#rfc.section.5.2.8" rel="Chapter" title="5.2.8 Control checksum coverage on sending or receiving">
-<link href="#rfc.section.5.2.9" rel="Chapter" title="5.2.9 Interface Type">
-<link href="#rfc.section.5.2.10" rel="Chapter" title="5.2.10 Capacity Profile">
+<link href="#rfc.section.5.2.4" rel="Chapter" title="5.2.4 Direction of communication">
+<link href="#rfc.section.5.2.5" rel="Chapter" title="5.2.5 Use 0-RTT session establishment with an idempotent Message">
+<link href="#rfc.section.5.2.6" rel="Chapter" title="5.2.6 Multistream Connections in Group">
+<link href="#rfc.section.5.2.7" rel="Chapter" title="5.2.7 Notification of excessive retransmissions">
+<link href="#rfc.section.5.2.8" rel="Chapter" title="5.2.8 Notification of ICMP soft error message arrival">
+<link href="#rfc.section.5.2.9" rel="Chapter" title="5.2.9 Control checksum coverage on sending or receiving">
+<link href="#rfc.section.5.2.10" rel="Chapter" title="5.2.10 Interface Type">
+<link href="#rfc.section.5.2.11" rel="Chapter" title="5.2.11 Capacity Profile">
 <link href="#rfc.section.5.3" rel="Chapter" title="5.3 Specifying Security Parameters and Callbacks">
 <link href="#rfc.section.6" rel="Chapter" title="6 Establishing Connections">
 <link href="#rfc.section.6.1" rel="Chapter" title="6.1 Active Open: Initiate">
@@ -336,7 +337,7 @@ ul.toc li {
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-06-01" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-06-06" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -360,7 +361,7 @@ ul.toc li {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: December 3, 2018</td>
+<td class="left">Expires: December 8, 2018</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -413,7 +414,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">June 01, 2018</td>
+<td class="right">June 06, 2018</td>
 </tr>
 
     	
@@ -429,7 +430,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on December 3, 2018.</p>
+<p>This Internet-Draft will expire on December 8, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -459,19 +460,21 @@ ul.toc li {
 </li>
 <li>5.2.3.   <a href="#rfc.section.5.2.3">Configure reliability on a per-Message basis</a>
 </li>
-<li>5.2.4.   <a href="#rfc.section.5.2.4">Use 0-RTT session establishment with an idempotent Message</a>
+<li>5.2.4.   <a href="#rfc.section.5.2.4">Direction of communication</a>
 </li>
-<li>5.2.5.   <a href="#rfc.section.5.2.5">Multistream Connections in Group</a>
+<li>5.2.5.   <a href="#rfc.section.5.2.5">Use 0-RTT session establishment with an idempotent Message</a>
 </li>
-<li>5.2.6.   <a href="#rfc.section.5.2.6">Notification of excessive retransmissions</a>
+<li>5.2.6.   <a href="#rfc.section.5.2.6">Multistream Connections in Group</a>
 </li>
-<li>5.2.7.   <a href="#rfc.section.5.2.7">Notification of ICMP soft error message arrival</a>
+<li>5.2.7.   <a href="#rfc.section.5.2.7">Notification of excessive retransmissions</a>
 </li>
-<li>5.2.8.   <a href="#rfc.section.5.2.8">Control checksum coverage on sending or receiving</a>
+<li>5.2.8.   <a href="#rfc.section.5.2.8">Notification of ICMP soft error message arrival</a>
 </li>
-<li>5.2.9.   <a href="#rfc.section.5.2.9">Interface Type</a>
+<li>5.2.9.   <a href="#rfc.section.5.2.9">Control checksum coverage on sending or receiving</a>
 </li>
-<li>5.2.10.   <a href="#rfc.section.5.2.10">Capacity Profile</a>
+<li>5.2.10.   <a href="#rfc.section.5.2.10">Interface Type</a>
+</li>
+<li>5.2.11.   <a href="#rfc.section.5.2.11">Capacity Profile</a>
 </li>
 </ul><li>5.3.   <a href="#rfc.section.5.3">Specifying Security Parameters and Callbacks</a>
 </li>
@@ -604,7 +607,7 @@ Action(parameter, parameter, ...) / Event&lt;parameter, parameter, ...&gt;
 <h1 id="rfc.section.4">
 <a href="#rfc.section.4">4.</a> <a href="#api-summary" id="api-summary">API Summary</a>
 </h1>
-<p id="rfc.section.4.p.1">The Transport Services Interface is the basic common abstract application programming interface to the Transport Services Architecture defined in <a href="#I-D.ietf-taps-arch" class="xref">[I-D.ietf-taps-arch]</a>. An application primarily interacts with this interface through two Objects, Preconnections and Connections. A Preconnection represents a set of parameters and constraints on the selection and configuration of paths and protocols to establish a Connection with a remote endpoint. A Connection represents a transport Protocol Stack on which data can be sent to and received from a remote endpoint. Connections can be created from Preconnections in three ways: by initiating the Preconnection (i.e., actively opening, as in a client), through listening on the Preconnection (i.e., passively opening, as in a server), or rendezvousing on the Preconnection (i.e. peer to peer establishment).</p>
+<p id="rfc.section.4.p.1">The Transport Services Interface is the basic common abstract application programming interface to the Transport Services Architecture defined in <a href="#I-D.ietf-taps-arch" class="xref">[I-D.ietf-taps-arch]</a>. An application primarily interacts with this interface through two Objects, Preconnections and Connections. A Preconnection represents a set of parameters and constraints on the selection and configuration of paths and protocols to establish a Connection with a remote endpoint. A Connection represents a transport Protocol Stack on which data can be sent to and/or received from a remote endpoint (i.e., depending on the kind of transport, connections can be bi-directional or unidirectional). Connections can be created from Preconnections in three ways: by initiating the Preconnection (i.e., actively opening, as in a client), through listening on the Preconnection (i.e., passively opening, as in a server), or rendezvousing on the Preconnection (i.e. peer to peer establishment).</p>
 <p id="rfc.section.4.p.2">Once a Connection is established, data can be sent on it in the form of Messages. The interface supports the preservation of message boundaries both via explicit Protocol Stack support, and via application support through a deframing callback which finds message boundaries in a stream. Messages are received asynchronously through a callback registered by the application. Errors and other notifications also happen asynchronously on the Connection.</p>
 <p id="rfc.section.4.p.3">In the following sections, we describe the details of application interaction with Objects through Actions and Events in each phase of a Connection, following the phases described in <a href="#I-D.ietf-taps-arch" class="xref">[I-D.ietf-taps-arch]</a>.</p>
 <h1 id="rfc.section.5">
@@ -727,42 +730,58 @@ TransportParameters := Connection.GetTransportParameters()
 <p id="rfc.section.5.2.3.p.1">Type: Preference</p>
 <p id="rfc.section.5.2.3.p.2">This property specifies whether an application considers it useful to indicate its reliability requirements on a per-Message basis.  This property applies to Connections and Connection Groups. This is not a strict requirement.  The default is to not have this option.</p>
 <h1 id="rfc.section.5.2.4">
-<a href="#rfc.section.5.2.4">5.2.4.</a> <a href="#prop-0rtt" id="prop-0rtt">Use 0-RTT session establishment with an idempotent Message</a>
+<a href="#rfc.section.5.2.4">5.2.4.</a> <a href="#direction-of-communication" id="direction-of-communication">Direction of communication</a>
 </h1>
-<p id="rfc.section.5.2.4.p.1">Type: Preference</p>
-<p id="rfc.section.5.2.4.p.2">This property specifies whether an application would like to supply a Message to the transport protocol before Connection establishment, which will then be reliably transferred to the other side before or during Connection establishment, potentially multiple times.  See also <a href="#send-idempotent" class="xref">Section 7.1.4</a>.  This is a strict requirement. The default is to not have this option.</p>
+<p id="rfc.section.5.2.4.p.1">Type: Enum</p>
+<p id="rfc.section.5.2.4.p.2">This property specifies whether an application wants to use the connection for sending and/or receiving data.  Possible values are:</p>
+<p></p>
+
+<dl>
+<dt>Bidirectional (default):</dt>
+<dd style="margin-left: 8">The connection must support sending and receiving data</dd>
+<dt>unidirectional send:</dt>
+<dd style="margin-left: 8">The connection must support sending data.</dd>
+<dt>unidirectional receive:</dt>
+<dd style="margin-left: 8">The connection must support receiving data</dd>
+</dl>
+<p id="rfc.section.5.2.4.p.4">In case a unidirectional connection is requested, but the system should fall back to bidirectional transport if unidirectional connections are not  supported by the transport protocol.</p>
 <h1 id="rfc.section.5.2.5">
-<a href="#rfc.section.5.2.5">5.2.5.</a> <a href="#prop-multistream" id="prop-multistream">Multistream Connections in Group</a>
+<a href="#rfc.section.5.2.5">5.2.5.</a> <a href="#prop-0rtt" id="prop-0rtt">Use 0-RTT session establishment with an idempotent Message</a>
 </h1>
 <p id="rfc.section.5.2.5.p.1">Type: Preference</p>
-<p id="rfc.section.5.2.5.p.2">This property specifies that the application would prefer multiple Connections within a Connection Group to be provided by streams of a single underlying transport connection where possible. This is not a strict requirement. The default is to not have this option.</p>
+<p id="rfc.section.5.2.5.p.2">This property specifies whether an application would like to supply a Message to the transport protocol before Connection establishment, which will then be reliably transferred to the other side before or during Connection establishment, potentially multiple times.  See also <a href="#send-idempotent" class="xref">Section 7.1.4</a>.  This is a strict requirement. The default is to not have this option.</p>
 <h1 id="rfc.section.5.2.6">
-<a href="#rfc.section.5.2.6">5.2.6.</a> <a href="#prop-retrans-notify" id="prop-retrans-notify">Notification of excessive retransmissions</a>
+<a href="#rfc.section.5.2.6">5.2.6.</a> <a href="#prop-multistream" id="prop-multistream">Multistream Connections in Group</a>
 </h1>
-<p id="rfc.section.5.2.6.p.1">Type: Boolean</p>
-<p id="rfc.section.5.2.6.p.2">This property specifies whether an application considers it useful to be informed in case sent data was retransmitted more often than a certain threshold.  When set to true, the effect is twofold: The application may receive events in case excessive retransmissions.  In addition, the transport system considers this as a preference to use transports stacks that can provide this notification. This is not a strict requirement.  If set to false, no notification of excessive retransmissions will be sent and this transport feature is ignored for protocol selection.</p>
-<p id="rfc.section.5.2.6.p.3">This property applies to Connections and Connection Groups.  The default is to have this option.</p>
+<p id="rfc.section.5.2.6.p.1">Type: Preference</p>
+<p id="rfc.section.5.2.6.p.2">This property specifies that the application would prefer multiple Connections within a Connection Group to be provided by streams of a single underlying transport connection where possible. This is not a strict requirement. The default is to not have this option.</p>
 <h1 id="rfc.section.5.2.7">
-<a href="#rfc.section.5.2.7">5.2.7.</a> <a href="#prop-soft-error" id="prop-soft-error">Notification of ICMP soft error message arrival</a>
+<a href="#rfc.section.5.2.7">5.2.7.</a> <a href="#prop-retrans-notify" id="prop-retrans-notify">Notification of excessive retransmissions</a>
 </h1>
 <p id="rfc.section.5.2.7.p.1">Type: Boolean</p>
-<p id="rfc.section.5.2.7.p.2">This property specifies whether an application considers it useful to be informed when an ICMP error message arrives that does not force termination of a connection.  When set to true, received ICMP errors will be available as SoftErrors.  Note that even if a protocol supporting this property is selected, not all ICMP errors will necessarily be delivered, so applications cannot rely on receiving them.  Setting this option also implies a preference to prefer transports stacks that can provide this notification.  If not set, no events will be sent for ICMP soft error message and this transport feature is ignored for protocol selection.</p>
-<p id="rfc.section.5.2.7.p.3">This property applies to Connections and Connection Groups.  The default is not to have this option.</p>
+<p id="rfc.section.5.2.7.p.2">This property specifies whether an application considers it useful to be informed in case sent data was retransmitted more often than a certain threshold.  When set to true, the effect is twofold: The application may receive events in case excessive retransmissions.  In addition, the transport system considers this as a preference to use transports stacks that can provide this notification. This is not a strict requirement.  If set to false, no notification of excessive retransmissions will be sent and this transport feature is ignored for protocol selection.</p>
+<p id="rfc.section.5.2.7.p.3">This property applies to Connections and Connection Groups.  The default is to have this option.</p>
 <h1 id="rfc.section.5.2.8">
-<a href="#rfc.section.5.2.8">5.2.8.</a> <a href="#prop-checksum-control" id="prop-checksum-control">Control checksum coverage on sending or receiving</a>
+<a href="#rfc.section.5.2.8">5.2.8.</a> <a href="#prop-soft-error" id="prop-soft-error">Notification of ICMP soft error message arrival</a>
 </h1>
-<p id="rfc.section.5.2.8.p.1">Type: Preference</p>
-<p id="rfc.section.5.2.8.p.2">This property specifies whether the application considers it useful to enable / disable / configure a checksum when sending data, or decide whether to require a checksum or not when receiving data.  This property applies to Connections and Connection Groups. This is not a strict requirement, as it signifies a reduction in reliability. The default is full checksum coverage without being able to change it, and requiring a checksum when receiving.</p>
+<p id="rfc.section.5.2.8.p.1">Type: Boolean</p>
+<p id="rfc.section.5.2.8.p.2">This property specifies whether an application considers it useful to be informed when an ICMP error message arrives that does not force termination of a connection.  When set to true, received ICMP errors will be available as SoftErrors.  Note that even if a protocol supporting this property is selected, not all ICMP errors will necessarily be delivered, so applications cannot rely on receiving them.  Setting this option also implies a preference to prefer transports stacks that can provide this notification.  If not set, no events will be sent for ICMP soft error message and this transport feature is ignored for protocol selection.</p>
+<p id="rfc.section.5.2.8.p.3">This property applies to Connections and Connection Groups.  The default is not to have this option.</p>
 <h1 id="rfc.section.5.2.9">
-<a href="#rfc.section.5.2.9">5.2.9.</a> <a href="#prop-intf-type" id="prop-intf-type">Interface Type</a>
+<a href="#rfc.section.5.2.9">5.2.9.</a> <a href="#prop-checksum-control" id="prop-checksum-control">Control checksum coverage on sending or receiving</a>
 </h1>
-<p id="rfc.section.5.2.9.p.1">Type: Tuple (Enumeration, Preference)</p>
-<p id="rfc.section.5.2.9.p.2">This property specifies which kind of access network interface, e.g., WiFi, Ethernet, or LTE, to prefer over others for this Connection, in case they are available. In general, Interface Types should be used only with the <samp>Prefer</samp> and <samp>Prohibit</samp> preference level. Specifically, using the <samp>Require</samp> preference level for Interface Type may limit path selection in a way that is detrimental to connectivity. The default is to use the default interface configured in the system policy.  The valid values for the access network interface kinds are implementation specific.</p>
+<p id="rfc.section.5.2.9.p.1">Type: Preference</p>
+<p id="rfc.section.5.2.9.p.2">This property specifies whether the application considers it useful to enable / disable / configure a checksum when sending data, or decide whether to require a checksum or not when receiving data.  This property applies to Connections and Connection Groups. This is not a strict requirement, as it signifies a reduction in reliability. The default is full checksum coverage without being able to change it, and requiring a checksum when receiving.</p>
 <h1 id="rfc.section.5.2.10">
-<a href="#rfc.section.5.2.10">5.2.10.</a> <a href="#prop-cap-profile" id="prop-cap-profile">Capacity Profile</a>
+<a href="#rfc.section.5.2.10">5.2.10.</a> <a href="#prop-intf-type" id="prop-intf-type">Interface Type</a>
 </h1>
-<p id="rfc.section.5.2.10.p.1">Type: Enumeration</p>
-<p id="rfc.section.5.2.10.p.2">This property specifies the application&#8217;s expectation of the dominating traffic pattern for this Connection.  This implies that the transport system should optimize for the capacity profile specified. This can influence path and protocol selection.  The following values are valid for Capacity Profile:</p>
+<p id="rfc.section.5.2.10.p.1">Type: Tuple (Enumeration, Preference)</p>
+<p id="rfc.section.5.2.10.p.2">This property specifies which kind of access network interface, e.g., WiFi, Ethernet, or LTE, to prefer over others for this Connection, in case they are available. In general, Interface Types should be used only with the <samp>Prefer</samp> and <samp>Prohibit</samp> preference level. Specifically, using the <samp>Require</samp> preference level for Interface Type may limit path selection in a way that is detrimental to connectivity. The default is to use the default interface configured in the system policy.  The valid values for the access network interface kinds are implementation specific.</p>
+<h1 id="rfc.section.5.2.11">
+<a href="#rfc.section.5.2.11">5.2.11.</a> <a href="#prop-cap-profile" id="prop-cap-profile">Capacity Profile</a>
+</h1>
+<p id="rfc.section.5.2.11.p.1">Type: Enumeration</p>
+<p id="rfc.section.5.2.11.p.2">This property specifies the application&#8217;s expectation of the dominating traffic pattern for this Connection.  This implies that the transport system should optimize for the capacity profile specified. This can influence path and protocol selection.  The following values are valid for Capacity Profile:</p>
 <p></p>
 
 <dl>
@@ -971,7 +990,7 @@ SendParameters.Add(parameter, value)
 <h1 id="rfc.section.7.1.7">
 <a href="#rfc.section.7.1.7">7.1.7.</a> <a href="#send-profile" id="send-profile">Transmission Profile</a>
 </h1>
-<p id="rfc.section.7.1.7.p.1">This enumerated property specifies the application&#8217;s preferred tradeoffs for sending this Message; it is a per-Message override of the Capacity Profile protocol and path selection property (see <a href="#prop-cap-profile" class="xref">Section 5.2.10</a>).</p>
+<p id="rfc.section.7.1.7.p.1">This enumerated property specifies the application&#8217;s preferred tradeoffs for sending this Message; it is a per-Message override of the Capacity Profile protocol and path selection property (see <a href="#prop-cap-profile" class="xref">Section 5.2.11</a>).</p>
 <p id="rfc.section.7.1.7.p.2">The following values are valid for Transmission Profile:</p>
 <p></p>
 
@@ -1072,6 +1091,8 @@ Connection.SetProperties()
 
 <ul>
 <li>The status of the Connection, which can be one of the following: Establishing, Established, Closing, or Closed.</li>
+<li>Whether the connection can be used to send data. A connection can not be used for sending if the connection was created unidirectional receive only or if a message with the final property was sent over this connection.</li>
+<li>Whether the connection can be used to receive data. A connection can not be used for reading if the connection was created unidirectional send only or if a message with the final property received was received. The latter is only supported by certain transport protocols, e.g., by TCP as half-closed connection.</li>
 <li>Transport Features of the protocols that conform to the Required and Prohibited Transport Preferences, which might be selected by the transport system during Establishment. These features correspond to the properties given in <a href="#transport-params" class="xref">Section 5.2</a> and can only be queried.</li>
 <li>Transport Features of the Protocol Stacks that were selected and instantiated, once the Connection has been established. These features correspond to the properties given in <a href="#transport-params" class="xref">Section 5.2</a> and can only be queried. Instead of preference levels, these features have boolean values indicating whether or not they were selected. Note that these transport features may not fully reflect the specified parameters given in the pre-establishment phase.  For example, a certain Protocol Selection Property that an application specified as Preferred may not actually be present in the chosen Protocol Stack Instances because none of the currently available transport protocols had this feature.</li>
 <li>Protocol Properties of the Protocol Stack in use (see <a href="#protocol-props" class="xref">Section 9.1</a> below). These can be set or queried. Certain specific procotol queries may be read-only, on a protocol- and property-specific basis.</li>
@@ -1149,7 +1170,7 @@ Connection -&gt; SoftError&lt;&gt;
 <tr>
 <td class="reference"><b id="I-D.ietf-taps-minset">[I-D.ietf-taps-minset]</b></td>
 <td class="top">
-<a>Welzl, M.</a> and <a>S. Gjessing</a>, "<a href="https://tools.ietf.org/html/draft-ietf-taps-minset-03">A Minimal Set of Transport Services for TAPS Systems</a>", Internet-Draft draft-ietf-taps-minset-03, March 2018.</td>
+<a>Welzl, M.</a> and <a>S. Gjessing</a>, "<a href="https://tools.ietf.org/html/draft-ietf-taps-minset-04">A Minimal Set of Transport Services for End Systems</a>", Internet-Draft draft-ietf-taps-minset-04, June 2018.</td>
 </tr>
 <tr>
 <td class="reference"><b id="I-D.ietf-tsvwg-rtcweb-qos">[I-D.ietf-tsvwg-rtcweb-qos]</b></td>
