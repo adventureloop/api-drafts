@@ -295,6 +295,7 @@ ul.toc li {
 <link href="#rfc.section.5.2.10" rel="Chapter" title="5.2.10 Interface Instance or Type">
 <link href="#rfc.section.5.2.11" rel="Chapter" title="5.2.11 Provisioning Domain Instance or Type">
 <link href="#rfc.section.5.2.12" rel="Chapter" title="5.2.12 Capacity Profile">
+<link href="#rfc.section.5.2.13" rel="Chapter" title="5.2.13 Congestion control">
 <link href="#rfc.section.5.3" rel="Chapter" title="5.3 Specifying Security Parameters and Callbacks">
 <link href="#rfc.section.6" rel="Chapter" title="6 Establishing Connections">
 <link href="#rfc.section.6.1" rel="Chapter" title="6.1 Active Open: Initiate">
@@ -479,6 +480,8 @@ ul.toc li {
 </li>
 <li>5.2.12.   <a href="#rfc.section.5.2.12">Capacity Profile</a>
 </li>
+<li>5.2.13.   <a href="#rfc.section.5.2.13">Congestion control</a>
+</li>
 </ul><li>5.3.   <a href="#rfc.section.5.3">Specifying Security Parameters and Callbacks</a>
 </li>
 </ul><li>6.   <a href="#rfc.section.6">Establishing Connections</a>
@@ -656,7 +659,7 @@ LocalSpecifier.WithStunServer(address, port, credentials)
 </pre>
 <p id="rfc.section.5.1.p.2">Implementations may also support additional endpoint representations and provide a single NewEndpoint() call that takes different endpoint representations.</p>
 <p id="rfc.section.5.1.p.3">Multiple endpoint identifiers can be specified for each Local Endpoint and RemoteEndoint.  For example, a Local Endpoint could be configured with two interface names, or a Remote Endpoint could be specified via both IPv4 and IPv6 addresses. These multiple identifiers refer to the same transport endpoint.</p>
-<p id="rfc.section.5.1.p.4">The transport services API will resolve names internally, when the Initiate(), Listen(), or Rendezvous() method is called establish a Connection.  The API does not need the application to resolve names, and premature name resolution can damage performance by limiting the scope for alternate path discovery during Connection establishment.  The Resolve() method is, however, provided to resolve a Local Endpoint or a Remote Endpoint in cases where this is required, for example with some NAT traversal protocols (see <a href="#rendezvous" class="xref">Section 6.3</a>).</p>
+<p id="rfc.section.5.1.p.4">The transport services API will resolve names internally, when the Initiate(), Listen(), or Rendezvous() method is called establish a Connection.  The API does not need the application to resolve names, and premature name resolution can damage performance by limiting the scope for alternate path discovery during Connection establishment.  The Resolve() method is, however, provided to resolve a Local Endpoint or a Remote Endpoint in cases where this is required, for example with some Network Address Translator (NAT) traversal protocols (see <a href="#rendezvous" class="xref">Section 6.3</a>).</p>
 <h1 id="rfc.section.5.2">
 <a href="#rfc.section.5.2">5.2.</a> <a href="#transport-params" id="transport-params">Specifying Transport Parameters</a>
 </h1>
@@ -804,10 +807,15 @@ TransportParameters := Connection.GetTransportParameters()
 <dt>Low Latency:</dt>
 <dd style="margin-left: 8">Response time (latency) should be optimized at the expense of bandwidth efficiency and delay variation when sending this message. This can be used by the system to disable the coalescing of multiple small Messages into larger packets (Nagle&#8217;s algorithm); to prefer immediate acknowledgment from the peer endpoint when supported by the underlying transport; to signal a preference for lower-latency, higher-loss treatment; and so on.</dd>
 <dt>Constant Rate:</dt>
-<dd style="margin-left: 8">The application expects to send/receive data at a constant rate after Connection establishment. Delay and delay variation should be minimized at the expense of bandwidth efficiency. This implies that the Connection may fail if the desired rate cannot be maintained across the Path. A transport may interpret this capacity profile as preferring a circuit breaker <a href="#RFC8084" class="xref">[RFC8084]</a> to a rate adaptive congestion controller.</dd>
+<dd style="margin-left: 8">The application expects to send/receive data at a constant rate after Connection establishment. Delay and delay variation should be minimized at the expense of bandwidth efficiency. This implies that the Connection may fail if the desired rate cannot be maintained across the Path. A transport may interpret this capacity profile as preferring a circuit breaker <a href="#RFC8084" class="xref">[RFC8084]</a> to a rate-adaptive congestion controller.</dd>
 <dt>Scavenger/Bulk:</dt>
-<dd style="margin-left: 8">The application is not interactive. It expects to send/receive a large amount of data, without any urgency. This can be used to select protocol stacks with scavenger transmission control, to signal a preference for less-than-best-effort treatment, and so on.</dd>
+<dd style="margin-left: 8">The application is not interactive. It expects to send/receive a large amount of data, without any urgency. This can, for example, be used to select protocol stacks with scavenger transmission control, to signal a preference for less-than-best-effort treatment, or to assign the traffic to a lower-effort service.</dd>
 </dl>
+<h1 id="rfc.section.5.2.13">
+<a href="#rfc.section.5.2.13">5.2.13.</a> <a href="#prop-cc" id="prop-cc">Congestion control</a>
+</h1>
+<p id="rfc.section.5.2.13.p.1">Type: Preference</p>
+<p id="rfc.section.5.2.13.p.2">This property specifies whether the application would like the Connection to be congestion controlled or not. Note that if a Connection is not congestion controlled, an application using such a Connection should itself perform congestion control in accordance with <a href="#RFC2914" class="xref">[RFC2914]</a>. Also note that reliability is usually combined with congestion control in protocol implementations, rendering &#8220;reliable but not congestion controlled&#8221; a request that is unlikely to succeed.</p>
 <h1 id="rfc.section.5.3">
 <a href="#rfc.section.5.3">5.3.</a> <a href="#security-parameters" id="security-parameters">Specifying Security Parameters and Callbacks</a>
 </h1>
@@ -920,7 +928,7 @@ Preconnection -&gt; RendezvousDone&lt;Connection&gt;
 Preconnection -&gt; RendezvousError&lt;msgRef, error&gt;
 </pre>
 <p id="rfc.section.6.3.p.5">An RendezvousError occurs either when the Preconnection cannot be fulfilled for listening, when the Local Endpoint or Remote Endpoint cannot be resolved, when no transport-layer connection can be established to the Remote Endpoint, or when the application is prohibited from rendezvous by policy.</p>
-<p id="rfc.section.6.3.p.6">When using some NAT traversal protocols, e.g., ICE <a href="#RFC5245" class="xref">[RFC5245]</a>, it is expected that the Local Endpoint will be configured with some method of discovering NAT bindings, e.g., a STUN server. In this case, the Local Endpoint may resolve to a mixture of local and server reflexive addresses. The Resolve() method on the Preconnection can be used to discover these bindings:</p>
+<p id="rfc.section.6.3.p.6">When using some NAT traversal protocols, e.g., Interactive Connectivity Establishment (ICE) <a href="#RFC5245" class="xref">[RFC5245]</a>, it is expected that the Local Endpoint will be configured with some method of discovering NAT bindings, e.g., a Session Traversal Utilities for NAT (STUN) server.  In this case, the Local Endpoint may resolve to a mixture of local and server reflexive addresses. The Resolve() method on the Preconnection can be used to discover these bindings:</p>
 <pre>
 PreconnectionBindings := Preconnection.Resolve()
 </pre>
@@ -937,7 +945,7 @@ Connection := Connection.Clone()
 <pre>
 Connection -&gt; CloneError&lt;&gt;
 </pre>
-<p id="rfc.section.6.4.p.4">There is only one Protocol Property that is not entangled: niceness is kept as a separate per-Connection Property for individual Connections in the group.  Niceness works as in <a href="#send-niceness" class="xref">Section 7.1.2</a>: when allocating available network capacity among Connections in a Connection Group, sends on Connections with higher Niceness values will be prioritized over sends on Connections with lower Niceness values. An ideal transport system implementation would assign the Connection the capacity share (M-N) x C / M, where N is the Connection&#8217;s Niceness value, M is the maximum Niceness value used by all Connections in the group and C is the total available capacity. However, the niceness setting is purely advisory, and no guarantees are given about capacity allocation and each implementation is free to implement exact capacity allocation as it sees fit.</p>
+<p id="rfc.section.6.4.p.4">There is only one Protocol Property that is not entangled: niceness is kept as a separate per-Connection Property for individual Connections in the group.  Niceness works as in <a href="#send-niceness" class="xref">Section 7.1.2</a>: when allocating available network capacity among Connections in a Connection Group, sends on Connections with higher Niceness values will be prioritized over sends on Connections with lower Niceness values. An ideal transport system implementation would assign the Connection the capacity share (M-N) x C / M, where N is the Connection&#8217;s Niceness value, M is the maximum Niceness value used by all Connections in the group and C is the total available capacity. However, the niceness setting is purely advisory, and no guarantees are given about the way capacity is shared.  Each implementation is free to implement a way it shares capacity that it sees fit.</p>
 <h1 id="rfc.section.7">
 <a href="#rfc.section.7">7.</a> <a href="#sending" id="sending">Sending Data</a>
 </h1>
@@ -973,7 +981,7 @@ SendParameters := NewSendParameters()
 SendParameters.Add(parameter, value)
 </pre>
 <p id="rfc.section.7.1.p.3">The Send Parameters share a single namespace with the Transport Parameters (see <a href="#transport-params" class="xref">Section 5.2</a>). This allows the specification of Protocol Properties that can be overridden on a per-Message basis.</p>
-<p id="rfc.section.7.1.p.4">Send Parameters may be inconsistent with the properties of the Protocol Stacks underlying the Connection on which a given Message is sent. For example, infinite Lifetime is not possible on a Message over a Connection not providing reliability. Sending a Message with Send Properties inconsistent with the Transport Preferences on the Connection yields an error.</p>
+<p id="rfc.section.7.1.p.4">Send Parameters may be inconsistent with the properties of the Protocol Stacks underlying the Connection on which a given Message is sent. For example, a Connection must provide reliability to allow setting an infinitie value for the lifetime property of a Message. Sending a Message with Send Properties inconsistent with the Transport Preferences on the Connection yields an error.</p>
 <p id="rfc.section.7.1.p.5">The following send parameters are supported:</p>
 <h1 id="rfc.section.7.1.1">
 <a href="#rfc.section.7.1.1">7.1.1.</a> <a href="#send-lifetime" id="send-lifetime">Lifetime</a>
@@ -982,8 +990,8 @@ SendParameters.Add(parameter, value)
 <h1 id="rfc.section.7.1.2">
 <a href="#rfc.section.7.1.2">7.1.2.</a> <a href="#send-niceness" id="send-niceness">Niceness</a>
 </h1>
-<p id="rfc.section.7.1.2.p.1">Niceness represents an unbounded hierarchy of priorities of Messages, relative to other Messages sent over the same Connection and/or Connection Group (see <a href="#groups" class="xref">Section 6.4</a>). It is most naturally represented as a non-negative integer.  A Message with Niceness 0 will yield to a Message with Niceness 1, which will yield to a Message with Niceness 2, and so on. Niceness may be used as a sender-side scheduling construct only, or be used to specify priorities on the wire for Protocol Stacks supporting prioritization.</p>
-<p id="rfc.section.7.1.2.p.2">Note that this inversion of normal schemes for expressing priority has a convenient property: priority increases as both Niceness and Lifetime decrease.</p>
+<p id="rfc.section.7.1.2.p.1">Niceness is a numeric (non-negative) value that represents an unbounded hierarchy of priorities of Messages, relative to other Messages sent over the same Connection and/or Connection Group (see <a href="#groups" class="xref">Section 6.4</a>).  A Message with Niceness 0 will yield to a Message with Niceness 1, which will yield to a Message with Niceness 2, and so on. Niceness may be used as a sender-side scheduling construct only, or be used to specify priorities on the wire for Protocol Stacks supporting prioritization.</p>
+<p id="rfc.section.7.1.2.p.2">This encoding of the priority has a convenient property that the priority increases as both Niceness and Lifetime decrease.</p>
 <h1 id="rfc.section.7.1.3">
 <a href="#rfc.section.7.1.3">7.1.3.</a> <a href="#send-ordered" id="send-ordered">Ordered</a>
 </h1>
@@ -1012,11 +1020,11 @@ SendParameters.Add(parameter, value)
 <dt>Default:</dt>
 <dd style="margin-left: 8">No special optimizations of the tradeoff between delay, delay variation, and bandwidth efficiency should be made when sending this message.</dd>
 <dt>Low Latency:</dt>
-<dd style="margin-left: 8">Response time (latency) should be optimized at the expense of bandwidth efficiency and delay variation when sending this message. This can be used by the system to disable the coalescing of multiple small Messages into larger packets (Nagle&#8217;s algorithm); to prefer immediate acknowledgment from the peer endpoint when supported by the underlying transport; to signal a preference for lower-latency, higher-loss treatment; and so on.</dd>
+<dd style="margin-left: 8">Response time (latency) should be optimized at the expense of efficiently using the available capacity when sending this message. This can be used by the system to disable the coalescing of multiple small Messages into larger packets (Nagle&#8217;s algorithm); to prefer immediate acknowledgment from the peer endpoint when supported by the underlying transport; to signal a preference for lower-latency, higher-loss treatment; and so on.</dd>
 <dt>Constant Rate:</dt>
-<dd style="margin-left: 8">Delay and delay variation should be minimized at the expense of bandwidth efficiency.</dd>
+<dd style="margin-left: 8">Delay should be minimized at the expense of efficiently using the available capacity.</dd>
 <dt>Scavenger/Bulk:</dt>
-<dd style="margin-left: 8">This Message may be sent at the system&#8217;s leisure. This can be used to signal a preference for less-than-best-effort treatment, to delay sending until lower-cost paths are available, and so on.</dd>
+<dd style="margin-left: 8">This Message may be sent at the system&#8217;s leisure. This can be used to signal a preference for less-than-best-effort treatment, assign the traffic to a lower effort service, delay sending until lower-cost paths are available, and so on.</dd>
 </dl>
 <h1 id="rfc.section.7.2">
 <a href="#rfc.section.7.2">7.2.</a> <a href="#send-batching" id="send-batching">Batching Sends</a>
@@ -1130,6 +1138,7 @@ Connection.SetProperties()
 <li>Maximum Message size before fragmentation or segmentation: This numeric property, if applicable, represents the maximum Message size that can be sent without incurring network-layer fragmentation and/or transport layer segmentation at the sender. This property is read-only.</li>
 <li>Maximum Message size on send: This numeric property represents the maximum Message size that can be sent. This property is read-only.</li>
 <li>Maximum Message size on receive: This numeric property represents the maximum Message size that can be received.  This property is read-only.</li>
+<li>Congestion control: This boolean property informs about the protocol carrying out congestion control or not. This property is read-only.</li>
 </ul>
 <p id="rfc.section.9.1.p.5">In order to specify Specific Protocol Properties, Transport System implementations may offer applications to attach a set of options to the Preconnection Object, associated with a specific protocol. For example, an application could specify a set of TCP Options to use if and only if TCP is selected by the system. Such properties must not be assumed to apply across different protocols. Attempts to set specific protocol properties on a Protocol Stack not containing that specific protocol are simply ignored, and do not raise an error.</p>
 <h1 id="rfc.section.10">
@@ -1219,6 +1228,11 @@ Connection -&gt; SoftError&lt;&gt;
 <td class="reference"><b id="RFC0793">[RFC0793]</b></td>
 <td class="top">
 <a>Postel, J.</a>, "<a href="https://tools.ietf.org/html/rfc793">Transmission Control Protocol</a>", STD 7, RFC 793, DOI 10.17487/RFC0793, September 1981.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC2914">[RFC2914]</b></td>
+<td class="top">
+<a>Floyd, S.</a>, "<a href="https://tools.ietf.org/html/rfc2914">Congestion Control Principles</a>", BCP 41, RFC 2914, DOI 10.17487/RFC2914, September 2000.</td>
 </tr>
 <tr>
 <td class="reference"><b id="RFC5245">[RFC5245]</b></td>
