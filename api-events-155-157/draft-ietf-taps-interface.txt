@@ -129,18 +129,19 @@ Internet-Draft               TAPS Interface                    June 2018
    9.  Setting and Querying of Connection Properties . . . . . . . .  28
      9.1.  Protocol Properties . . . . . . . . . . . . . . . . . . .  29
    10. Connection Termination  . . . . . . . . . . . . . . . . . . .  31
-   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  32
-   12. Security Considerations . . . . . . . . . . . . . . . . . . .  32
-   13. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  32
-   14. References  . . . . . . . . . . . . . . . . . . . . . . . . .  32
-     14.1.  Normative References . . . . . . . . . . . . . . . . . .  33
-     14.2.  Informative References . . . . . . . . . . . . . . . . .  33
-   Appendix A.  Additional Properties  . . . . . . . . . . . . . . .  34
-     A.1.  Protocol and Path Selection Properties  . . . . . . . . .  34
-       A.1.1.  Application Intents . . . . . . . . . . . . . . . . .  35
-     A.2.  Protocol Properties . . . . . . . . . . . . . . . . . . .  37
-     A.3.  Send Parameters . . . . . . . . . . . . . . . . . . . . .  37
-   Appendix B.  Sample API definition in Go  . . . . . . . . . . . .  37
+   11. Ordering of Operations and Events . . . . . . . . . . . . . .  32
+   12. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  32
+   13. Security Considerations . . . . . . . . . . . . . . . . . . .  32
+   14. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  33
+   15. References  . . . . . . . . . . . . . . . . . . . . . . . . .  33
+     15.1.  Normative References . . . . . . . . . . . . . . . . . .  33
+     15.2.  Informative References . . . . . . . . . . . . . . . . .  34
+   Appendix A.  Additional Properties  . . . . . . . . . . . . . . .  35
+     A.1.  Protocol and Path Selection Properties  . . . . . . . . .  35
+       A.1.1.  Application Intents . . . . . . . . . . . . . . . . .  36
+     A.2.  Protocol Properties . . . . . . . . . . . . . . . . . . .  38
+     A.3.  Send Parameters . . . . . . . . . . . . . . . . . . . . .  38
+   Appendix B.  Sample API definition in Go  . . . . . . . . . . . .  38
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  38
 
 1.  Introduction
@@ -160,8 +161,7 @@ Internet-Draft               TAPS Interface                    June 2018
    In the meantime, the nature of Internet access, and the variety of
    Internet transport protocols, is evolving.  The challenges that new
    protocols and access paradigms present to the sockets API and to
-   programming models based on them inspire the design principles of a
-   new approach, which we outline in Section 3.
+
 
 
 
@@ -169,6 +169,9 @@ Trammell, et al.        Expires December 13, 2018               [Page 3]
 
 Internet-Draft               TAPS Interface                    June 2018
 
+
+   programming models based on them inspire the design principles of a
+   new approach, which we outline in Section 3.
 
    As a first step to realizing this design, [I-D.ietf-taps-arch]
    describes a high-level architecture for transport services.  This
@@ -215,9 +218,6 @@ Internet-Draft               TAPS Interface                    June 2018
    could be implemented via callback passing or other asynchronous
    calling conventions.  The method for registering callbacks and
    handlers is left as an implementation detail, with the caveat that
-   the interface for receiving Messages must require the application to
-   invoke the Connection.Receive() Action once per Message to be
-   received (see Section 8).
 
 
 
@@ -225,6 +225,10 @@ Trammell, et al.        Expires December 13, 2018               [Page 4]
 
 Internet-Draft               TAPS Interface                    June 2018
 
+
+   the interface for receiving Messages must require the application to
+   invoke the Connection.Receive() Action once per Message to be
+   received (see Section 8).
 
    This specification treats Events and errors similarly.  Errors, just
    as any other Events, may occur asynchronously in network
@@ -271,16 +275,16 @@ Internet-Draft               TAPS Interface                    June 2018
       take full advantage of new transport protocols supporting these
       features; and
 
-   o  Atomic transmission of data, using application-assisted framing
-      and deframing where the underlying transport does not provide
-      these.
-
 
 
 Trammell, et al.        Expires December 13, 2018               [Page 5]
 
 Internet-Draft               TAPS Interface                    June 2018
 
+
+   o  Atomic transmission of data, using application-assisted framing
+      and deframing where the underlying transport does not provide
+      these.
 
 4.  API Summary
 
@@ -325,10 +329,6 @@ Internet-Draft               TAPS Interface                    June 2018
    Section 5.1), the transport parameters (see Section 5.2), and the
    security parameters (see Section 5.3):
 
-      Preconnection := NewPreconnection(LocalEndpoint,
-                                        RemoteEndpoint,
-                                        TransportParams,
-                                        SecurityParams)
 
 
 
@@ -337,6 +337,11 @@ Trammell, et al.        Expires December 13, 2018               [Page 6]
 
 Internet-Draft               TAPS Interface                    June 2018
 
+
+      Preconnection := NewPreconnection(LocalEndpoint,
+                                        RemoteEndpoint,
+                                        TransportParams,
+                                        SecurityParams)
 
    The Local Endpoint MUST be specified if the Preconnection is used to
    Listen() for incoming Connections, but is OPTIONAL if it is used to
@@ -381,11 +386,6 @@ Internet-Draft               TAPS Interface                    June 2018
    and provide a single NewEndpoint() call that takes different endpoint
    representations.
 
-   Multiple endpoint identifiers can be specified for each Local
-   Endpoint and RemoteEndoint.  For example, a Local Endpoint could be
-   configured with two interface names, or a Remote Endpoint could be
-   specified via both IPv4 and IPv6 addresses.  These multiple
-   identifiers refer to the same transport endpoint.
 
 
 
@@ -393,6 +393,12 @@ Trammell, et al.        Expires December 13, 2018               [Page 7]
 
 Internet-Draft               TAPS Interface                    June 2018
 
+
+   Multiple endpoint identifiers can be specified for each Local
+   Endpoint and RemoteEndoint.  For example, a Local Endpoint could be
+   configured with two interface names, or a Remote Endpoint could be
+   specified via both IPv4 and IPv6 addresses.  These multiple
+   identifiers refer to the same transport endpoint.
 
    The transport services API will resolve names internally, when the
    Initiate(), Listen(), or Rendezvous() method is called establish a
@@ -435,12 +441,6 @@ Internet-Draft               TAPS Interface                    June 2018
    tied to path selection.  This may involve choosing between multiple
    local interfaces that are connected to different access networks.
 
-   The type of most Protocol and Path Selection properties is
-   "preference" and has five different preference levels:
-
-
-
-
 
 
 
@@ -449,6 +449,9 @@ Trammell, et al.        Expires December 13, 2018               [Page 8]
 
 Internet-Draft               TAPS Interface                    June 2018
 
+
+   The type of most Protocol and Path Selection properties is
+   "preference" and has five different preference levels:
 
    +------------+------------------------------------------------------+
    | Preference | Effect                                               |
@@ -494,9 +497,6 @@ Internet-Draft               TAPS Interface                    June 2018
    The Individual parameters are then added to the TransportParameters
    Object.  While Protocol Properties use the "add" call, Transport
    Preferences use special calls for the levels defined in Section 5.2.
-
-
-
 
 
 
@@ -1746,13 +1746,34 @@ Internet-Draft               TAPS Interface                    June 2018
 
    Connection -> SoftError<>
 
-11.  IANA Considerations
+11.  Ordering of Operations and Events
+
+   As this interface is designed to be independent of concurrency model,
+   the details of how exactly actions are handled, and on which threads/
+   callbacks events are dispatched, is an implementation detail.
+   However, the interface does provide the following guarantees about
+   the ordering of operations:
+
+   o  Received<> will never occur on a Connection before a Ready<> event
+      on that Connection, or a ConnectionReceived<> or RendezvousDone<>
+      containing that Connection.
+
+   o  No events or errors will occur on a Connection after a Closed<>
+      event, an InitiateError<> or ConnectionError<> on that connection.
+      To ensure this ordering, neither Closed<> nor ConnectionError<>
+      will occur on a Connection while other events on the Connection
+      are still outstanding.
+
+   o  Sent<> events will occur on a Connection in the order in which the
+      Messages were sent.
+
+12.  IANA Considerations
 
    RFC-EDITOR: Please remove this section before publication.
 
    This document has no Actions for IANA.
 
-12.  Security Considerations
+13.  Security Considerations
 
    This document describes a generic API for interacting with a
    transport services (TAPS) system.  Part of this API includes
@@ -1761,7 +1782,19 @@ Internet-Draft               TAPS Interface                    June 2018
    specific algorithms or protocols.  Any API-compatible transport
    security protocol should work in a TAPS system.
 
-13.  Acknowledgements
+
+
+
+
+
+
+
+Trammell, et al.        Expires December 13, 2018              [Page 32]
+
+Internet-Draft               TAPS Interface                    June 2018
+
+
+14.  Acknowledgements
 
    This work has received funding from the European Union's Horizon 2020
    research and innovation programme under grant agreements No. 644334
@@ -1780,21 +1813,9 @@ Internet-Draft               TAPS Interface                    June 2018
    and Jason Lee for initial work on the Post Sockets interface, from
    which this work has evolved.
 
-14.  References
+15.  References
 
-
-
-
-
-
-
-
-Trammell, et al.        Expires December 13, 2018              [Page 32]
-
-Internet-Draft               TAPS Interface                    June 2018
-
-
-14.1.  Normative References
+15.1.  Normative References
 
    [I-D.ietf-taps-arch]
               Pauly, T., Trammell, B., Brunstrom, A., Fairhurst, G.,
@@ -1818,6 +1839,17 @@ Internet-Draft               TAPS Interface                    June 2018
               Stream Control Transmission Protocol", draft-ietf-tsvwg-
               sctp-ndata-13 (work in progress), September 2017.
 
+
+
+
+
+
+
+Trammell, et al.        Expires December 13, 2018              [Page 33]
+
+Internet-Draft               TAPS Interface                    June 2018
+
+
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
@@ -1827,7 +1859,7 @@ Internet-Draft               TAPS Interface                    June 2018
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/info/rfc8174>.
 
-14.2.  Informative References
+15.2.  Informative References
 
    [I-D.ietf-taps-transport-security]
               Pauly, T., Perkins, C., Rose, K., and C. Wood, "A Survey
@@ -1841,14 +1873,6 @@ Internet-Draft               TAPS Interface                    June 2018
    [RFC2914]  Floyd, S., "Congestion Control Principles", BCP 41,
               RFC 2914, DOI 10.17487/RFC2914, September 2000,
               <https://www.rfc-editor.org/info/rfc2914>.
-
-
-
-
-Trammell, et al.        Expires December 13, 2018              [Page 33]
-
-Internet-Draft               TAPS Interface                    June 2018
-
 
    [RFC5245]  Rosenberg, J., "Interactive Connectivity Establishment
               (ICE): A Protocol for Network Address Translator (NAT)
@@ -1869,6 +1893,18 @@ Internet-Draft               TAPS Interface                    June 2018
               Congestion Control Mechanisms", RFC 8095,
               DOI 10.17487/RFC8095, March 2017,
               <https://www.rfc-editor.org/info/rfc8095>.
+
+
+
+
+
+
+
+
+Trammell, et al.        Expires December 13, 2018              [Page 34]
+
+Internet-Draft               TAPS Interface                    June 2018
+
 
 Appendix A.  Additional Properties
 
@@ -1897,15 +1933,6 @@ A.1.  Protocol and Path Selection Properties
    The following protocol and path selection properties might be made
    available in addition to those specified in Section 5.2:
 
-
-
-
-
-Trammell, et al.        Expires December 13, 2018              [Page 34]
-
-Internet-Draft               TAPS Interface                    June 2018
-
-
    o  Suggest a timeout to the Remote Endpoint: This boolean property
       specifies whether an application considers it useful to propose a
       timeout until the Connection is assumed to be lost.  This property
@@ -1922,6 +1949,18 @@ Internet-Draft               TAPS Interface                    June 2018
       Connection groups.  This is not a strict requirement.  The default
       is to not have this option.  [EDITOR'S NOTE: For discussion of
       this option, see https://github.com/taps-api/drafts/issues/90]
+
+
+
+
+
+
+
+
+Trammell, et al.        Expires December 13, 2018              [Page 35]
+
+Internet-Draft               TAPS Interface                    June 2018
+
 
 A.1.1.  Application Intents
 
@@ -1955,13 +1994,6 @@ A.1.1.  Application Intents
    corresponding Message Properties, similar to the properties in
    Section 7.1.
 
-
-
-Trammell, et al.        Expires December 13, 2018              [Page 35]
-
-Internet-Draft               TAPS Interface                    June 2018
-
-
    Application Intents can be added to this interface as Transport
    Preferences with the "Prefer" preference level.
 
@@ -1978,6 +2010,13 @@ A.1.1.1.  Traffic Category
       bound
 
    Stream:  Stream of data with steady data rate
+
+
+
+Trammell, et al.        Expires December 13, 2018              [Page 36]
+
+Internet-Draft               TAPS Interface                    June 2018
+
 
    Bulk:  Bulk transfer of large Messages, presumably bandwidth bound
 
@@ -2011,13 +2050,6 @@ A.1.1.5.  Cost Preferences
    handle trade-offs between cost and performance or reliability.  This
    Intent can also apply to an individual Messages.
 
-
-
-Trammell, et al.        Expires December 13, 2018              [Page 36]
-
-Internet-Draft               TAPS Interface                    June 2018
-
-
    No Expense:  Avoid transports associated with monetary cost
 
    Optimize Cost:  Prefer inexpensive transports and accept service
@@ -2029,6 +2061,18 @@ Internet-Draft               TAPS Interface                    June 2018
       criteria
 
    The default is "Balance Cost".
+
+
+
+
+
+
+
+
+Trammell, et al.        Expires December 13, 2018              [Page 37]
+
+Internet-Draft               TAPS Interface                    June 2018
+
 
 A.2.  Protocol Properties
 
@@ -2066,19 +2110,25 @@ Appendix B.  Sample API definition in Go
    project/postsocket.  Documentation for this API - an illustration of
    the documentation an application developer would see for an instance
    of this interface - is available online at
-
-
-
-Trammell, et al.        Expires December 13, 2018              [Page 37]
-
-Internet-Draft               TAPS Interface                    June 2018
-
-
    https://godoc.org/github.com/mami-project/postsocket.  This API
    definition will be kept largely in sync with the development of this
    abstract interface definition.
 
 Authors' Addresses
+
+
+
+
+
+
+
+
+
+
+Trammell, et al.        Expires December 13, 2018              [Page 38]
+
+Internet-Draft               TAPS Interface                    June 2018
+
 
    Brian Trammell (editor)
    ETH Zurich
@@ -2117,19 +2167,6 @@ Authors' Addresses
    URI:   http://www.erg.abdn.ac.uk/
 
 
-
-
-
-
-
-
-
-
-Trammell, et al.        Expires December 13, 2018              [Page 38]
-
-Internet-Draft               TAPS Interface                    June 2018
-
-
    Mirja Kuehlewind
    ETH Zurich
    Gloriastrasse 35
@@ -2137,6 +2174,16 @@ Internet-Draft               TAPS Interface                    June 2018
    Switzerland
 
    Email: mirja.kuehlewind@tik.ee.ethz.ch
+
+
+
+
+
+
+
+Trammell, et al.        Expires December 13, 2018              [Page 39]
+
+Internet-Draft               TAPS Interface                    June 2018
 
 
    Colin Perkins
@@ -2181,4 +2228,13 @@ Internet-Draft               TAPS Interface                    June 2018
 
 
 
-Trammell, et al.        Expires December 13, 2018              [Page 39]
+
+
+
+
+
+
+
+
+
+Trammell, et al.        Expires December 13, 2018              [Page 40]
