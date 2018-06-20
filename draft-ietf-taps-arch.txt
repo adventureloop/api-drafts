@@ -5,7 +5,7 @@
 TAPS Working Group                                         T. Pauly, Ed.
 Internet-Draft                                                Apple Inc.
 Intended status: Informational                          B. Trammell, Ed.
-Expires: December 11, 2018                                    ETH Zurich
+Expires: December 22, 2018                                    ETH Zurich
                                                             A. Brunstrom
                                                      Karlstad University
                                                             G. Fairhurst
@@ -16,7 +16,7 @@ Expires: December 11, 2018                                    ETH Zurich
                                                                TU Berlin
                                                                  C. Wood
                                                               Apple Inc.
-                                                           June 09, 2018
+                                                           June 20, 2018
 
 
                  An Architecture for Transport Services
@@ -47,13 +47,13 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on December 11, 2018.
+   This Internet-Draft will expire on December 22, 2018.
 
 
 
 
 
-Pauly, et al.           Expires December 11, 2018               [Page 1]
+Pauly, et al.           Expires December 22, 2018               [Page 1]
 
 Internet-Draft              TAPS Architecture                  June 2018
 
@@ -90,36 +90,36 @@ Table of Contents
        4.1.5.  Event Handling  . . . . . . . . . . . . . . . . . . .  12
        4.1.6.  Termination Actions . . . . . . . . . . . . . . . . .  13
      4.2.  Transport System Implementation Concepts  . . . . . . . .  13
-       4.2.1.  Gathering . . . . . . . . . . . . . . . . . . . . . .  14
-       4.2.2.  Racing  . . . . . . . . . . . . . . . . . . . . . . .  14
-       4.2.3.  Message Framing, Parsing, and Serialization . . . . .  14
-   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  15
+       4.2.1.  Candidate Gathering . . . . . . . . . . . . . . . . .  14
+       4.2.2.  Candidate Racing  . . . . . . . . . . . . . . . . . .  14
+       4.2.3.  Message Framing, Parsing, and Serialization . . . . .  15
+   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  16
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .  16
    7.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  16
-   8.  Informative References  . . . . . . . . . . . . . . . . . . .  16
+   8.  Informative References  . . . . . . . . . . . . . . . . . . .  17
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  18
 
 1.  Introduction
 
    Many APIs to perform transport networking have been deployed, perhaps
-   the most widely known and imitated being the BSD socket() interface.
-   The names and functions between these APIs are not consistent, and
-   vary depending on the protocol being used.  For example, sending and
-   receiving on a stream of data is conceptually the same between
+   the most widely known and imitated being the BSD socket() [POSIX]
+   interface.  The names and functions between these APIs are not
+   consistent, and vary depending on the protocol being used.  For
+   example, sending and receiving on a stream of data is conceptually
 
 
 
-Pauly, et al.           Expires December 11, 2018               [Page 2]
+Pauly, et al.           Expires December 22, 2018               [Page 2]
 
 Internet-Draft              TAPS Architecture                  June 2018
 
 
-   operating on an unencrypted Transmission Control Protocol (TCP)
-   stream and operating on an encrypted Transport Layer Security (TLS)
-   [I-D.ietf-tls-tls13] stream over TCP, but applications cannot use the
-   same socket send() and recv() calls on top of both kinds of
-   connections.  Similarly, terminology for the implementation of
-   protocols offering transport services vary based on the context of
+   the same between operating on an unencrypted Transmission Control
+   Protocol (TCP) stream and operating on an encrypted Transport Layer
+   Security (TLS) [I-D.ietf-tls-tls13] stream over TCP, but applications
+   cannot use the same socket send() and recv() calls on top of both
+   kinds of connections.  Similarly, terminology for the implementation
+   of protocols offering transport services vary based on the context of
    the protocols themselves.  This variety can lead to confusion when
    trying to understand the similarities and differences between
    protocols, and how applications can use them effectively.
@@ -165,7 +165,7 @@ Internet-Draft              TAPS Architecture                  June 2018
 
 
 
-Pauly, et al.           Expires December 11, 2018               [Page 3]
+Pauly, et al.           Expires December 22, 2018               [Page 3]
 
 Internet-Draft              TAPS Architecture                  June 2018
 
@@ -221,7 +221,7 @@ Internet-Draft              TAPS Architecture                  June 2018
 
 
 
-Pauly, et al.           Expires December 11, 2018               [Page 4]
+Pauly, et al.           Expires December 22, 2018               [Page 4]
 
 Internet-Draft              TAPS Architecture                  June 2018
 
@@ -277,7 +277,7 @@ Internet-Draft              TAPS Architecture                  June 2018
 
 
 
-Pauly, et al.           Expires December 11, 2018               [Page 5]
+Pauly, et al.           Expires December 22, 2018               [Page 5]
 
 Internet-Draft              TAPS Architecture                  June 2018
 
@@ -333,14 +333,14 @@ Internet-Draft              TAPS Architecture                  June 2018
 
 
 
-Pauly, et al.           Expires December 11, 2018               [Page 6]
+Pauly, et al.           Expires December 22, 2018               [Page 6]
 
 Internet-Draft              TAPS Architecture                  June 2018
 
 
-     +------------------------------------------------------+
-     |                    Application                       |
-     +-+----------------+------^-------+--------^-----------+
+     +-----------------------------------------------------+
+     |                    Application                      |
+     +-+----------------+------^-------+--------^----------+
        |                |      |       |        |
      pre-               |     data     |      events
      establishment      |   transfer   |        |
@@ -389,18 +389,17 @@ Internet-Draft              TAPS Architecture                  June 2018
 
 
 
-Pauly, et al.           Expires December 11, 2018               [Page 7]
+Pauly, et al.           Expires December 22, 2018               [Page 7]
 
 Internet-Draft              TAPS Architecture                  June 2018
 
 
       any system that provides generic Transport Services, these
-      properties should primarily offer knobs that are applicable to
-      multiple transports.  Properties may have a large impact on the
-      rest of the aspects of the interface: they can modify how
-      establishment occurs, they can influence the expectations around
-      data transfer, and they determine the set of events that will be
-      supported.
+      properties should primarily be defined to apply to multiple
+      transports.  Properties may have a large impact on the rest of the
+      aspects of the interface: they can modify how establishment
+      occurs, they can influence the expectations around data transfer,
+      and they determine the set of events that will be supported.
 
    o  Establishment (Section 4.1.3) focuses on the actions that an
       application takes on the basic objects to prepare for data
@@ -418,7 +417,7 @@ Internet-Draft              TAPS Architecture                  June 2018
       querying state or updating maintenance options.
 
    o  Termination (Section 4.1.6) focuses on the methods by which data
-      transmission is ceased, and state is torn down in the transport.
+      transmission is stopped, and state is torn down in the transport.
 
    The diagram below provides a high-level view of the actions taken
    during the lifetime of a connection.
@@ -445,7 +444,8 @@ Internet-Draft              TAPS Architecture                  June 2018
 
 
 
-Pauly, et al.           Expires December 11, 2018               [Page 8]
+
+Pauly, et al.           Expires December 22, 2018               [Page 8]
 
 Internet-Draft              TAPS Architecture                  June 2018
 
@@ -501,7 +501,7 @@ Internet-Draft              TAPS Architecture                  June 2018
 
 
 
-Pauly, et al.           Expires December 11, 2018               [Page 9]
+Pauly, et al.           Expires December 22, 2018               [Page 9]
 
 Internet-Draft              TAPS Architecture                  June 2018
 
@@ -524,9 +524,10 @@ Internet-Draft              TAPS Architecture                  June 2018
    o  Endpoint: An Endpoint represents one side of a transport
       connection.  Endpoints can be Local Endpoints or Remote Endpoints,
       and respectively represent an identity that the application uses
-      for the source or destination of a connection.  Endpoint can vary
-      in levels of specificity, and can be resolved to more concrete
-      identities.
+      for the source or destination of a connection.  An Endpoint may be
+      specified at various levels, and an Endpoint with wider scope
+      (such as a hostname) can be resolved to more concrete identities
+      (such as IP addresses).
 
    o  Remote Endpoint: The Remote Endpoint represents the application's
       name for a peer that can participate in a transport connection.
@@ -534,34 +535,34 @@ Internet-Draft              TAPS Architecture                  June 2018
       service name/port.
 
    o  Local Endpoint: The Local Endpoint represents the application's
-      name for itself that it wants to use for transport connections.
-      For example, a local IP address and port.
+      name for itself that it uses for transport connections.  For
+      example, a local IP address and port.
 
    o  Path Selection Properties: The Path Selection Properties consist
       of the options that an application may set to influence the
-      selection of paths between itself and the Remote Endpoint.  These
-      options can come in the form of requirements, prohibitions, or
-      preferences.  Examples of options which may influence path
-      selection include the interface type (such as a Wi-Fi Ethernet
-      connection, or a Cellular LTE connection), characteristics of the
-      path that are locally known like Maximum Transmission Unit (MTU)
-      or discovered like Path MTU (PMTU), or predicted based on cached
-      information like expected throughput or latency.
+      selection of paths between the Local Endpoint and the Remote
+      Endpoint.  These options can take the form of requirements,
+      prohibitions, or preferences.  Examples of options that may
+      influence path selection include the interface type (such as a Wi-
+      Fi Ethernet connection, or a Cellular LTE connection),
+      characteristics of the path that are locally known like Maximum
+      Transmission Unit (MTU) or discovered like Path MTU (PMTU), or
+      predicted based on cached information like expected throughput or
+      latency.
 
    o  Protocol Selection Properties: The Protocol Selection Properties
       consist of the options that an application may set to influence
       the selection of transport protocol, or to configure the behavior
-      of generic transport protocol features.  These options come in the
-      form of requirements, prohibitions, and preferences.  Examples
+      of generic transport protocol features.  These options can take
 
 
 
-
-Pauly, et al.           Expires December 11, 2018              [Page 10]
+Pauly, et al.           Expires December 22, 2018              [Page 10]
 
 Internet-Draft              TAPS Architecture                  June 2018
 
 
+      the form of requirements, prohibitions, and preferences.  Examples
       include reliability, service class, multipath support, and fast
       open support.
 
@@ -571,12 +572,12 @@ Internet-Draft              TAPS Architecture                  June 2018
       The presence of such Properties does not necessarily require that
       a specific protocol must be used when a Connection is established,
       but that if this protocol is employed, a particular set of options
-      should be used.
+      should then be used..
 
 4.1.3.  Establishment Actions
 
-   o  Initiate is the primary action that an application can take to
-      create a Connection to a remote endpoint, and prepare any required
+   o  Initiate: The primary action that an application can take to
+      create a Connection to a Remote Endpoint, and prepare any required
       local or remote state to be able to send and/or receive Messages.
       For some protocols, this may initiate a client-to-server style
       handshake; for other protocols, this may just establish local
@@ -584,19 +585,19 @@ Internet-Draft              TAPS Architecture                  June 2018
       resolution of the Remote Endpoint, occurs in response the Initiate
       call.
 
-   o  Listen is the action of marking a Listener as willing to accept
+   o  Listen: The action of marking a Listener as willing to accept
       incoming Connections.  The Listener will then create Connection
       objects as incoming connections are accepted (Section 4.1.5).
 
-   o  Rendezvous is the action of establishing a peer-to-peer connection
-      with a remote endpoint.  It simultaneously attempts to initiate a
-      connection to a remote endpoint whilst listening for an incoming
+   o  Rendezvous: The action of establishing a peer-to-peer connection
+      with a Remote Endpoint.  It simultaneously attempts to initiate a
+      connection to a Remote Endpoint whilst listening for an incoming
       connection from that endpoint.  This corresponds, for example, to
-      a TCP simultaneous open.  The process of identifying options for
-      the connection, such as resolution of the Remote Endpoint, occurs
-      during the Rendezvous call.  If successful, the rendezvous call
-      returns a Connection object to represent the established peer-to-
-      peer connection.
+      a TCP simultaneous open [RFC0793].  The process of identifying
+      options for the connection, such as resolution of the Remote
+      Endpoint, occurs during the Rendezvous call.  If successful, the
+      rendezvous call returns a Connection object to represent the
+      established peer-to-peer connection.
 
 4.1.4.  Data Transfer Objects and Actions
 
@@ -606,29 +607,29 @@ Internet-Draft              TAPS Architecture                  June 2018
       assumed to be ordered within the Message.  If an application does
       not care about the order in which a peer receives two distinct
       spans of bytes, those spans of bytes are considered independent
-      Messages.  Messages may or may not be usable if incomplete or
-      corrupted.  Boundaries of a Message may or may not be understood
-      or transmitted by transport protocols.  Specifically, what one
-      application considers to be two Messages sent on a stream-based
+      Messages.  If a received Message is incomplete or corrupted, it
+      may or may not be usable by certain applications.  Boundaries of a
+      Message may or may not be understood or transmitted by transport
 
 
 
-Pauly, et al.           Expires December 11, 2018              [Page 11]
+Pauly, et al.           Expires December 22, 2018              [Page 11]
 
 Internet-Draft              TAPS Architecture                  June 2018
 
 
-      transport may be treated as a single Message by the application on
-      the other side.
+      protocols.  Specifically, what one application considers to be two
+      Messages sent on a stream-based transport may be treated as a
+      single Message by the application on the other side.
 
-   o  Send is the action to transmit a Message or partial Message over a
+   o  Send: The action to transmit a Message or partial Message over a
       Connection to a Remote Endpoint.  The interface to Send may
       include options specific to how the Message's content is to be
       sent.  Status of the Send operation may be delivered back to the
       application in an event (Section 4.1.5).
 
-   o  Receive is an action that indicates that the application is ready
-      to asynchronously accept a Message over a Connection from a Remote
+   o  Receive: An action that indicates that the application is ready to
+      asynchronously accept a Message over a Connection from a Remote
       Endpoint, while the Message content itself will be delivered in an
       event (Section 4.1.5).  The interface to Receive may include
       options specific to the Message that is to be delivered to the
@@ -668,20 +669,19 @@ Internet-Draft              TAPS Architecture                  June 2018
 
 
 
-
-Pauly, et al.           Expires December 11, 2018              [Page 12]
+Pauly, et al.           Expires December 22, 2018              [Page 12]
 
 Internet-Draft              TAPS Architecture                  June 2018
 
 
 4.1.6.  Termination Actions
 
-   o  Close is the action an application may take on a Connection to
+   o  Close: The action an application may take on a Connection to
       indicate that it no longer intends to send data, is no longer
       willing to receive data, and that the protocol should signal this
       state to the remote endpoint if applicable.
 
-   o  Abort is an action the application may take on a Connection to
+   o  Abort: The action the application may take on a Connection to
       indicate a Close, but with the additional indication that the
       transport system should not attempt to deliver any outstanding
       data.
@@ -690,53 +690,65 @@ Internet-Draft              TAPS Architecture                  June 2018
 
    The Transport System Implementation Concepts define the set of
    objects used internally to a system or library to provide the
-   functionality of transport networking, as required by the abstract
-   interface.
+   functionality required to provide a transport service across a
+   network, as required by the abstract interface.
 
-   o  Connection Group: A Connections Group is a set of Connections that
-      share properties.  For multiplexing transport protocols, the
-      Connection Group defines the set of Connections that can be
-      multiplexed together.
+   o  Connection Group: A set of Connections that share properties.  For
+      multiplexing transport protocols, the Connection Group defines the
+      set of Connections that can be multiplexed together.
 
-   o  Path: A Path represents an available set of properties of a
-      network route on which packets may be sent or received.
+   o  Path: Represents an available set of properties that a Local
+      Endpoint may use to send or receive packets with a Remote
+      Endpoint.
 
-   o  Protocol Instance: A Protocol Instance is a single instance of one
-      protocol, including any state it has necessary to establish
-      connectivity or send and receive Messages.
+   o  Protocol Instance: A single instance of one protocol, including
+      any state it has necessary to establish connectivity or send and
+      receive Messages.
 
-   o  Protocol Stack: A Protocol Stack is a set of Protocol Instances
-      (including relevant application, security, transport, or Internet
-      protocols) that are used together to establish connectivity or
-      send and receive Messages.  A single stack may be simple (a single
-      transport protocol instance over IP), or complex (multiple
-      application protocol streams going through a single security and
-      transport protocol, over IP; or, a multi-path transport protocol
-      over multiple transport sub-flows).
+   o  Protocol Stack: A set of Protocol Instances (including relevant
+      application, security, transport, or Internet protocols) that are
+      used together to establish connectivity or send and receive
+      Messages.  A single stack may be simple (a single transport
+      protocol instance over IP), or complex (multiple application
+      protocol streams going through a single security and transport
+      protocol, over IP; or, a multi-path transport protocol over
+      multiple transport sub-flows).
 
-   o  System Policy: System Policy represents the input from an
-      operating system or other global preferences that can constrain or
-      influence how an implementation will gather candidate paths and
-      protocols (Section 4.2.1) and race the candidates during
-      establishment (Section 4.2.2).  Specific aspects of the System
-      Policy may apply to all Connections, or only certain ones
-      depending on the runtime context and properties of the Connection.
+   o  Candidate Path: One path that is available to an application and
+      conforms to the Path Selection Properties and System Policy.
+      Candidate Paths are identified during the gathering phase
+      (Section 4.2.1) and may be used during the racing phase
+      (Section 4.2.2).
+
+   o  Candidate Protocol Stack: One protocol stack that may be used by
+      an application for a connection, of which there may be several.
 
 
 
-
-Pauly, et al.           Expires December 11, 2018              [Page 13]
+Pauly, et al.           Expires December 22, 2018              [Page 13]
 
 Internet-Draft              TAPS Architecture                  June 2018
 
 
-   o  Cached State: Cached State is the state and history that the
-      implementation keeps for each set of associated endpoints that
-      have been used previously.  This can include DNS results, TLS
-      session state, previous success and quality of transport protocols
-      over certain paths.
+      Candidate Protocol Stacks are identified during the gathering
+      phase (Section 4.2.1) and may be started during the racing phase
+      (Section 4.2.2).
 
-4.2.1.  Gathering
+   o  System Policy: Represents the input from an operating system or
+      other global preferences that can constrain or influence how an
+      implementation will gather candidate paths and protocol stacks
+      (Section 4.2.1) and race the candidates during establishment
+      (Section 4.2.2).  Specific aspects of the System Policy may apply
+      to all Connections, or only certain ones depending on the runtime
+      context and properties of the Connection.
+
+   o  Cached State: The state and history that the implementation keeps
+      for each set of associated endpoints that have been used
+      previously.  This can include DNS results, TLS session state,
+      previous success and quality of transport protocols over certain
+      paths.
+
+4.2.1.  Candidate Gathering
 
    o  Path Selection: Path Selection represents the act of choosing one
       or more paths that are available to use based on the Path
@@ -749,7 +761,7 @@ Internet-Draft              TAPS Architecture                  June 2018
       application, and a Transport Services system's policies and
       heuristics.
 
-4.2.2.  Racing
+4.2.2.  Candidate Racing
 
    o  Protocol Option Racing: Protocol Racing is the act of attempting
       to establish, or scheduling attempts to establish, multiple
@@ -766,6 +778,14 @@ Internet-Draft              TAPS Architecture                  June 2018
       Remote Endpoint and the Local Endpoint, such as IP addresses
       resolved from a DNS hostname.
 
+
+
+
+Pauly, et al.           Expires December 22, 2018              [Page 14]
+
+Internet-Draft              TAPS Architecture                  June 2018
+
+
 4.2.3.  Message Framing, Parsing, and Serialization
 
    While some transports expose a byte stream abstraction, most higher
@@ -778,14 +798,6 @@ Internet-Draft              TAPS Architecture                  June 2018
    than a semantic concern.  Accordingly, the Transport Services
    architecture exposes messages as the primary abstraction.  Protocols
    that deal only in byte streams, such as TCP, represent their data in
-
-
-
-Pauly, et al.           Expires December 11, 2018              [Page 14]
-
-Internet-Draft              TAPS Architecture                  June 2018
-
-
    each direction as a single, long message.  When framing protocols are
    placed on top of byte streams, the messages used in the API represent
    the framed messages within the stream.
@@ -822,6 +834,14 @@ Internet-Draft              TAPS Architecture                  June 2018
    and de-framing messages.  That is, we push message framing down into
    the transport services API, allowing applications to send and receive
    complete messages.  This is backwards compatible with existing
+
+
+
+Pauly, et al.           Expires December 22, 2018              [Page 15]
+
+Internet-Draft              TAPS Architecture                  June 2018
+
+
    protocols and APIs, since the wire format of messages does not
    change, but gives the protocol stack additional information to allow
    it to make better use of modern transport services.
@@ -831,16 +851,6 @@ Internet-Draft              TAPS Architecture                  June 2018
    RFC-EDITOR: Please remove this section before publication.
 
    This document has no actions for IANA.
-
-
-
-
-
-
-Pauly, et al.           Expires December 11, 2018              [Page 15]
-
-Internet-Draft              TAPS Architecture                  June 2018
-
 
 6.  Security Considerations
 
@@ -881,22 +891,18 @@ Internet-Draft              TAPS Architecture                  June 2018
    This work has been supported by the UK Engineering and Physical
    Sciences Research Council under grant EP/R04144X/1.
 
+
+
+Pauly, et al.           Expires December 22, 2018              [Page 16]
+
+Internet-Draft              TAPS Architecture                  June 2018
+
+
    Thanks to Stuart Cheshire, Josh Graessley, David Schinazi, and Eric
    Kinnear for their implementation and design efforts, including Happy
    Eyeballs, that heavily influenced this work.
 
 8.  Informative References
-
-
-
-
-
-
-
-Pauly, et al.           Expires December 11, 2018              [Page 16]
-
-Internet-Draft              TAPS Architecture                  June 2018
-
 
    [I-D.ietf-taps-impl]
               Brunstrom, A., Pauly, T., Enghardt, T., Grinnemo, K.,
@@ -926,10 +932,27 @@ Internet-Draft              TAPS Architecture                  June 2018
               Version 1.3", draft-ietf-tls-tls13-28 (work in progress),
               March 2018.
 
+   [POSIX]    "IEEE Std. 1003.1-2008 Standard for Information Technology
+              -- Portable Operating System Interface (POSIX).  Open
+              group Technical Standard: Base Specifications, Issue 7",
+              n.d..
+
+   [RFC0793]  Postel, J., "Transmission Control Protocol", STD 7,
+              RFC 793, DOI 10.17487/RFC0793, September 1981,
+              <https://www.rfc-editor.org/info/rfc793>.
+
    [RFC3168]  Ramakrishnan, K., Floyd, S., and D. Black, "The Addition
               of Explicit Congestion Notification (ECN) to IP",
               RFC 3168, DOI 10.17487/RFC3168, September 2001,
               <https://www.rfc-editor.org/info/rfc3168>.
+
+
+
+
+Pauly, et al.           Expires December 22, 2018              [Page 17]
+
+Internet-Draft              TAPS Architecture                  June 2018
+
 
    [RFC4303]  Kent, S., "IP Encapsulating Security Payload (ESP)",
               RFC 4303, DOI 10.17487/RFC4303, December 2005,
@@ -944,15 +967,6 @@ Internet-Draft              TAPS Architecture                  June 2018
               Congestion Control Mechanisms", RFC 8095,
               DOI 10.17487/RFC8095, March 2017,
               <https://www.rfc-editor.org/info/rfc8095>.
-
-
-
-
-
-Pauly, et al.           Expires December 11, 2018              [Page 17]
-
-Internet-Draft              TAPS Architecture                  June 2018
-
 
 Authors' Addresses
 
@@ -983,6 +997,19 @@ Authors' Addresses
    Email: anna.brunstrom@kau.se
 
 
+
+
+
+
+
+
+
+
+Pauly, et al.           Expires December 22, 2018              [Page 18]
+
+Internet-Draft              TAPS Architecture                  June 2018
+
+
    Godred Fairhurst
    University of Aberdeen
    Fraser Noble Building
@@ -1000,14 +1027,6 @@ Authors' Addresses
    United Kingdom
 
    Email: csp@csperkins.org
-
-
-
-
-
-Pauly, et al.           Expires December 11, 2018              [Page 18]
-
-Internet-Draft              TAPS Architecture                  June 2018
 
 
    Philipp S. Tiesel
@@ -1042,23 +1061,4 @@ Internet-Draft              TAPS Architecture                  June 2018
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Pauly, et al.           Expires December 11, 2018              [Page 19]
+Pauly, et al.           Expires December 22, 2018              [Page 19]

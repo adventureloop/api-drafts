@@ -291,8 +291,8 @@ ul.toc li {
 <link href="#rfc.section.4.1.5" rel="Chapter" title="4.1.5 Event Handling">
 <link href="#rfc.section.4.1.6" rel="Chapter" title="4.1.6 Termination Actions">
 <link href="#rfc.section.4.2" rel="Chapter" title="4.2 Transport System Implementation Concepts">
-<link href="#rfc.section.4.2.1" rel="Chapter" title="4.2.1 Gathering">
-<link href="#rfc.section.4.2.2" rel="Chapter" title="4.2.2 Racing">
+<link href="#rfc.section.4.2.1" rel="Chapter" title="4.2.1 Candidate Gathering">
+<link href="#rfc.section.4.2.2" rel="Chapter" title="4.2.2 Candidate Racing">
 <link href="#rfc.section.4.2.3" rel="Chapter" title="4.2.3 Message Framing, Parsing, and Serialization">
 <link href="#rfc.section.5" rel="Chapter" title="5 IANA Considerations">
 <link href="#rfc.section.6" rel="Chapter" title="6 Security Considerations">
@@ -301,12 +301,12 @@ ul.toc li {
 <link href="#rfc.authors" rel="Chapter">
 
 
-  <meta name="generator" content="xml2rfc version 2.9.6 - https://tools.ietf.org/tools/xml2rfc" />
+  <meta name="generator" content="xml2rfc version 2.9.8 - https://tools.ietf.org/tools/xml2rfc" />
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
   <meta name="dct.creator" content="Pauly, T., Ed., Trammell, B., Ed., Brunstrom, A., Fairhurst, G., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-taps-arch-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-06-09" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-06-20" />
   <meta name="dct.abstract" content="This document provides an overview of the architecture of Transport Services, a system for exposing the features of transport protocols to applications. This architecture serves as a basis for Application Programming Interfaces (APIs) and implementations that provide flexible transport networking services. It defines the common set of terminology and concepts to be used in more detailed discussion of Transport Services." />
   <meta name="description" content="This document provides an overview of the architecture of Transport Services, a system for exposing the features of transport protocols to applications. This architecture serves as a basis for Application Programming Interfaces (APIs) and implementations that provide flexible transport networking services. It defines the common set of terminology and concepts to be used in more detailed discussion of Transport Services." />
 
@@ -330,7 +330,7 @@ ul.toc li {
 <td class="right">B. Trammell, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: December 11, 2018</td>
+<td class="left">Expires: December 22, 2018</td>
 <td class="right">ETH Zurich</td>
 </tr>
 <tr>
@@ -375,7 +375,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">June 09, 2018</td>
+<td class="right">June 20, 2018</td>
 </tr>
 
     	
@@ -391,7 +391,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on December 11, 2018.</p>
+<p>This Internet-Draft will expire on December 22, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -431,9 +431,9 @@ ul.toc li {
 </li>
 </ul><li>4.2.   <a href="#rfc.section.4.2">Transport System Implementation Concepts</a>
 </li>
-<ul><li>4.2.1.   <a href="#rfc.section.4.2.1">Gathering</a>
+<ul><li>4.2.1.   <a href="#rfc.section.4.2.1">Candidate Gathering</a>
 </li>
-<li>4.2.2.   <a href="#rfc.section.4.2.2">Racing</a>
+<li>4.2.2.   <a href="#rfc.section.4.2.2">Candidate Racing</a>
 </li>
 <li>4.2.3.   <a href="#rfc.section.4.2.3">Message Framing, Parsing, and Serialization</a>
 </li>
@@ -454,7 +454,7 @@ ul.toc li {
   <h1 id="rfc.section.1">
 <a href="#rfc.section.1">1.</a> <a href="#introduction" id="introduction">Introduction</a>
 </h1>
-<p id="rfc.section.1.p.1">Many APIs to perform transport networking have been deployed, perhaps the most widely known and imitated being the BSD socket() interface. The names and functions between these APIs are not consistent, and vary depending on the protocol being used. For example, sending and receiving on a stream of data is conceptually the same between operating on an unencrypted Transmission Control Protocol (TCP) stream and operating on an encrypted Transport Layer Security (TLS) <a href="#I-D.ietf-tls-tls13" class="xref">[I-D.ietf-tls-tls13]</a> stream over TCP, but applications cannot use the same socket send() and recv() calls on top of both kinds of connections.  Similarly, terminology for the implementation of protocols offering transport services vary based on the context of the protocols themselves. This variety can lead to confusion when trying to understand the similarities and differences between protocols, and how applications can use them effectively.</p>
+<p id="rfc.section.1.p.1">Many APIs to perform transport networking have been deployed, perhaps the most widely known and imitated being the BSD socket() <a href="#POSIX" class="xref">[POSIX]</a> interface. The names and functions between these APIs are not consistent, and vary depending on the protocol being used. For example, sending and receiving on a stream of data is conceptually the same between operating on an unencrypted Transmission Control Protocol (TCP) stream and operating on an encrypted Transport Layer Security (TLS) <a href="#I-D.ietf-tls-tls13" class="xref">[I-D.ietf-tls-tls13]</a> stream over TCP, but applications cannot use the same socket send() and recv() calls on top of both kinds of connections.  Similarly, terminology for the implementation of protocols offering transport services vary based on the context of the protocols themselves. This variety can lead to confusion when trying to understand the similarities and differences between protocols, and how applications can use them effectively.</p>
 <p id="rfc.section.1.p.2">The goal of the Transport Services architecture is to provide a common, flexible, and reusable interface for transport protocols. As applications adopt this interface, they will benefit from a wide set of transport features that can evolve over time, and ensure that the system providing the interface can optimize its behavior based on the application requirements and network conditions.</p>
 <p id="rfc.section.1.p.3">This document is developed in parallel with the specification of the Transport Services API <a href="#I-D.ietf-taps-interface" class="xref">[I-D.ietf-taps-interface]</a> and Implementation <a href="#I-D.ietf-taps-impl" class="xref">[I-D.ietf-taps-impl]</a> documents.</p>
 <h1 id="rfc.section.2">
@@ -502,9 +502,9 @@ ul.toc li {
 <div id="rfc.figure.1"></div>
 <div id="fig-abstractions"></div>
 <pre>
-  +------------------------------------------------------+
-  |                    Application                       |
-  +-+----------------+------^-------+--------^-----------+
+  +-----------------------------------------------------+
+  |                    Application                      |
+  +-+----------------+------^-------+--------^----------+
     |                |      |       |        |
   pre-               |     data     |      events
   establishment      |   transfer   |        |
@@ -543,11 +543,11 @@ ul.toc li {
 <p></p>
 
 <ul>
-<li>Pre-Establishment (<a href="#preestablishment" class="xref">Section 4.1.2</a>) encompasses the properties that an application can pass to describe its intent, requirements, prohibitions, and preferences for its networking operations. For any system that provides generic Transport Services, these properties should primarily offer knobs that are applicable to multiple transports. Properties may have a large impact on the rest of the aspects of the interface: they can modify how establishment occurs, they can influence the expectations around data transfer, and they determine the set of events that will be supported.</li>
+<li>Pre-Establishment (<a href="#preestablishment" class="xref">Section 4.1.2</a>) encompasses the properties that an application can pass to describe its intent, requirements, prohibitions, and preferences for its networking operations. For any system that provides generic Transport Services, these properties should primarily be defined to apply to multiple transports. Properties may have a large impact on the rest of the aspects of the interface: they can modify how establishment occurs, they can influence the expectations around data transfer, and they determine the set of events that will be supported.</li>
 <li>Establishment (<a href="#establishment" class="xref">Section 4.1.3</a>) focuses on the actions that an application takes on the basic objects to prepare for data transfer.</li>
 <li>Data Transfer (<a href="#datatransfer" class="xref">Section 4.1.4</a>) consists of how an application represents data to be sent and received, the functions required to send and receive that data, and how the application is notified of the status of its data transfer.</li>
 <li>Event Handling (<a href="#events" class="xref">Section 4.1.5</a>) defines the set of properties about which an application can receive notifications during the lifetime of transport objects. Events can also provide opportunities for the application to interact with the underlying transport by querying state or updating maintenance options.</li>
-<li>Termination (<a href="#termination" class="xref">Section 4.1.6</a>) focuses on the methods by which data transmission is ceased, and state is torn down in the transport.</li>
+<li>Termination (<a href="#termination" class="xref">Section 4.1.6</a>) focuses on the methods by which data transmission is stopped, and state is torn down in the transport.</li>
 </ul>
 <p id="rfc.section.4.1.p.4">The diagram below provides a high-level view of the actions taken during the lifetime of a connection.</p>
 <div id="rfc.figure.2"></div>
@@ -597,12 +597,12 @@ ul.toc li {
 <p></p>
 
 <ul>
-<li>Endpoint: An Endpoint represents one side of a transport connection.  Endpoints can be Local Endpoints or Remote Endpoints, and respectively represent an identity that the application uses for the source or destination of a connection.  Endpoint can vary in levels of specificity, and can be resolved to more concrete identities.</li>
+<li>Endpoint: An Endpoint represents one side of a transport connection.  Endpoints can be Local Endpoints or Remote Endpoints, and respectively represent an identity that the application uses for the source or destination of a connection.  An Endpoint may be specified at various levels, and an Endpoint with wider scope (such as a hostname) can be resolved to more concrete identities (such as IP addresses).</li>
 <li>Remote Endpoint: The Remote Endpoint represents the application&#8217;s name for a peer that can participate in a transport connection. For example, the combination of a DNS name for the peer and a service name/port.</li>
-<li>Local Endpoint: The Local Endpoint represents the application&#8217;s name for itself that it wants to use for transport connections. For example, a local IP address and port.</li>
-<li>Path Selection Properties: The Path Selection Properties consist of the options that an application may set to influence the selection of paths between itself and the Remote Endpoint. These options can come in the form of requirements, prohibitions, or preferences. Examples of options which may influence path selection include the interface type (such as a Wi-Fi Ethernet connection, or a Cellular LTE connection), characteristics of the path that are locally known like Maximum Transmission Unit (MTU) or discovered like Path MTU (PMTU), or predicted based on cached information like expected throughput or latency.</li>
-<li>Protocol Selection Properties: The Protocol Selection Properties consist of the options that an application may set to influence the selection of transport protocol, or to configure the behavior of generic transport protocol features. These options come in the form of requirements, prohibitions, and preferences. Examples include reliability, service class, multipath support, and fast open support.</li>
-<li>Specific Protocol Properties: The Specific Protocol Properties refer to the subset of Protocol Properties options that apply to a single protocol (transport protocol, IP, or security protocol). The presence of such Properties does not necessarily require that a specific protocol must be used when a Connection is established, but that if this protocol is employed, a particular set of options should be used.</li>
+<li>Local Endpoint: The Local Endpoint represents the application&#8217;s name for itself that it uses for transport connections. For example, a local IP address and port.</li>
+<li>Path Selection Properties: The Path Selection Properties consist of the options that an application may set to influence the selection of paths between the Local Endpoint and the Remote Endpoint. These options can take  the form of requirements, prohibitions, or preferences. Examples of options that may influence path selection include the interface type (such as a Wi-Fi Ethernet connection, or a Cellular LTE connection), characteristics of the path that are locally known like Maximum Transmission Unit (MTU) or discovered like Path MTU (PMTU), or predicted based on cached information like expected throughput or latency.</li>
+<li>Protocol Selection Properties: The Protocol Selection Properties consist of the options that an application may set to influence the selection of transport protocol, or to configure the behavior of generic transport protocol features. These options can take the form of requirements, prohibitions, and preferences. Examples include reliability, service class, multipath support, and fast open support.</li>
+<li>Specific Protocol Properties: The Specific Protocol Properties refer to the subset of Protocol Properties options that apply to a single protocol (transport protocol, IP, or security protocol). The presence of such Properties does not necessarily require that a specific protocol must be used when a Connection is established, but that if this protocol is employed, a particular set of options should then be used..</li>
 </ul>
 <h1 id="rfc.section.4.1.3">
 <a href="#rfc.section.4.1.3">4.1.3.</a> <a href="#establishment" id="establishment">Establishment Actions</a>
@@ -610,9 +610,9 @@ ul.toc li {
 <p></p>
 
 <ul>
-<li>Initiate is the primary action that an application can take to create a Connection to a remote endpoint, and prepare any required local or remote state to be able to send and/or receive Messages. For some protocols, this may initiate a client-to-server style handshake; for other protocols, this may just establish local state. The process of identifying options for connecting, such as resolution of the Remote Endpoint, occurs in response the Initiate call.</li>
-<li>Listen is the action of marking a Listener as willing to accept incoming Connections. The Listener will then create Connection objects as incoming connections are accepted (<a href="#events" class="xref">Section 4.1.5</a>).</li>
-<li>Rendezvous is the action of establishing a peer-to-peer connection with a remote endpoint. It simultaneously attempts to initiate a connection to a remote endpoint whilst listening for an incoming connection from that endpoint. This corresponds, for example, to a TCP simultaneous open. The process of identifying options for the connection, such as resolution of the Remote Endpoint, occurs during the Rendezvous call. If successful, the rendezvous call returns a Connection object to represent the established peer-to-peer connection.</li>
+<li>Initiate: The primary action that an application can take to create a Connection to a Remote Endpoint, and prepare any required local or remote state to be able to send and/or receive Messages. For some protocols, this may initiate a client-to-server style handshake; for other protocols, this may just establish local state. The process of identifying options for connecting, such as resolution of the Remote Endpoint, occurs in response the Initiate call.</li>
+<li>Listen: The action of marking a Listener as willing to accept incoming Connections. The Listener will then create Connection objects as incoming connections are accepted (<a href="#events" class="xref">Section 4.1.5</a>).</li>
+<li>Rendezvous: The action of establishing a peer-to-peer connection with a Remote Endpoint. It simultaneously attempts to initiate a connection to a Remote Endpoint whilst listening for an incoming connection from that endpoint. This corresponds, for example, to a TCP simultaneous open <a href="#RFC0793" class="xref">[RFC0793]</a>. The process of identifying options for the connection, such as resolution of the Remote Endpoint, occurs during the Rendezvous call. If successful, the rendezvous call returns a Connection object to represent the established peer-to-peer connection.</li>
 </ul>
 <h1 id="rfc.section.4.1.4">
 <a href="#rfc.section.4.1.4">4.1.4.</a> <a href="#datatransfer" id="datatransfer">Data Transfer Objects and Actions</a>
@@ -620,9 +620,9 @@ ul.toc li {
 <p></p>
 
 <ul>
-<li>Message: A Message object is a unit of data that can be represented as bytes that can be transferred between two endpoints over a transport connection. The bytes within a Message are assumed to be ordered within the Message. If an application does not care about the order in which a peer receives two distinct spans of bytes, those spans of bytes are considered independent Messages. Messages may or may not be usable if incomplete or corrupted. Boundaries of a Message may or may not be understood or transmitted by transport protocols. Specifically, what one application considers to be two Messages sent on a stream-based transport may be treated as a single Message by the application on the other side.</li>
-<li>Send is the action to transmit a Message or partial Message over a Connection to a Remote Endpoint. The interface to Send may include options specific to how the Message&#8217;s content is to be sent. Status of the Send operation may be delivered back to the application in an event (<a href="#events" class="xref">Section 4.1.5</a>).</li>
-<li>Receive is an action that indicates that the application is ready to asynchronously accept a Message over a Connection from a Remote Endpoint, while the Message content itself will be delivered in an event (<a href="#events" class="xref">Section 4.1.5</a>). The interface to Receive may include options specific to the Message that is to be delivered to the application.</li>
+<li>Message: A Message object is a unit of data that can be represented as bytes that can be transferred between two endpoints over a transport connection. The bytes within a Message are assumed to be ordered within the Message. If an application does not care about the order in which a peer receives two distinct spans of bytes, those spans of bytes are considered independent Messages. If a received Message is incomplete or corrupted, it may or may not be usable by certain applications. Boundaries of a Message may or may not be understood or transmitted by transport protocols. Specifically, what one application considers to be two Messages sent on a stream-based transport may be treated as a single Message by the application on the other side.</li>
+<li>Send: The action to transmit a Message or partial Message over a Connection to a Remote Endpoint. The interface to Send may include options specific to how the Message&#8217;s content is to be sent. Status of the Send operation may be delivered back to the application in an event (<a href="#events" class="xref">Section 4.1.5</a>).</li>
+<li>Receive: An action that indicates that the application is ready to asynchronously accept a Message over a Connection from a Remote Endpoint, while the Message content itself will be delivered in an event (<a href="#events" class="xref">Section 4.1.5</a>). The interface to Receive may include options specific to the Message that is to be delivered to the application.</li>
 </ul>
 <h1 id="rfc.section.4.1.5">
 <a href="#rfc.section.4.1.5">4.1.5.</a> <a href="#events" id="events">Event Handling</a>
@@ -644,25 +644,27 @@ ul.toc li {
 <p></p>
 
 <ul>
-<li>Close is the action an application may take on a Connection to indicate that it no longer intends to send data, is no longer willing to receive data, and that the protocol should signal this state to the remote endpoint if applicable.</li>
-<li>Abort is an action the application may take on a Connection to indicate a Close, but with the additional indication that the transport system should not attempt to deliver any outstanding data.</li>
+<li>Close: The action an application may take on a Connection to indicate that it no longer intends to send data, is no longer willing to receive data, and that the protocol should signal this state to the remote endpoint if applicable.</li>
+<li>Abort: The action the application may take on a Connection to indicate a Close, but with the additional indication that the transport system should not attempt to deliver any outstanding data.</li>
 </ul>
 <h1 id="rfc.section.4.2">
 <a href="#rfc.section.4.2">4.2.</a> <a href="#transport-system-implementation-concepts" id="transport-system-implementation-concepts">Transport System Implementation Concepts</a>
 </h1>
-<p id="rfc.section.4.2.p.1">The Transport System Implementation Concepts define the set of objects used internally to a system or library to provide the functionality of transport networking, as required by the abstract interface.</p>
+<p id="rfc.section.4.2.p.1">The Transport System Implementation Concepts define the set of objects used internally to a system or library to provide the functionality required to provide a transport service across a network, as required by the abstract interface.</p>
 <p></p>
 
 <ul>
-<li>Connection Group: A Connections Group is a set of Connections that share properties. For multiplexing transport protocols, the Connection Group defines the set of Connections that can be multiplexed together.</li>
-<li>Path: A Path represents an available set of properties of a network route on which packets may be sent or received.</li>
-<li>Protocol Instance: A Protocol Instance is a single instance of one protocol, including any state it has necessary to establish connectivity or send and receive Messages.</li>
-<li>Protocol Stack: A Protocol Stack is a set of Protocol Instances (including relevant application, security, transport, or Internet protocols) that are used together to establish connectivity or send and receive Messages. A single stack may be simple (a single transport protocol instance over IP), or complex (multiple application protocol streams going through a single security and transport protocol, over IP; or, a multi-path transport protocol over multiple transport sub-flows).</li>
-<li>System Policy: System Policy represents the input from an operating system or other global preferences that can constrain or influence how an implementation will gather candidate paths and protocols (<a href="#gathering" class="xref">Section 4.2.1</a>) and race the candidates during establishment (<a href="#racing" class="xref">Section 4.2.2</a>). Specific aspects of the System Policy may apply to all Connections, or only certain ones depending on the runtime context and properties of the Connection.</li>
-<li>Cached State: Cached State is the state and history that the implementation keeps for each set of associated endpoints that have been used previously. This can include DNS results, TLS session state, previous success and quality of transport protocols over certain paths.</li>
+<li>Connection Group: A set of Connections that share properties. For multiplexing transport protocols, the Connection Group defines the set of Connections that can be multiplexed together.</li>
+<li>Path: Represents an available set of properties that a Local Endpoint may use to send or receive packets with a Remote Endpoint.</li>
+<li>Protocol Instance: A single instance of one protocol, including any state it has necessary to establish connectivity or send and receive Messages.</li>
+<li>Protocol Stack: A set of Protocol Instances (including relevant application, security, transport, or Internet protocols) that are used together to establish connectivity or send and receive Messages. A single stack may be simple (a single transport protocol instance over IP), or complex (multiple application protocol streams going through a single security and transport protocol, over IP; or, a multi-path transport protocol over multiple transport sub-flows).</li>
+<li>Candidate Path: One path that is available to an application and conforms to the Path Selection Properties and System Policy. Candidate Paths are identified during the gathering phase (<a href="#gathering" class="xref">Section 4.2.1</a>) and may be used during the racing phase (<a href="#racing" class="xref">Section 4.2.2</a>).</li>
+<li>Candidate Protocol Stack: One protocol stack that may be used by an application for a connection, of which there may be several. Candidate Protocol Stacks are identified during the gathering phase (<a href="#gathering" class="xref">Section 4.2.1</a>) and may be started during the racing phase (<a href="#racing" class="xref">Section 4.2.2</a>).</li>
+<li>System Policy: Represents the input from an operating system or other global preferences that can constrain or influence how an implementation will gather candidate paths and protocol stacks (<a href="#gathering" class="xref">Section 4.2.1</a>) and race the candidates during establishment (<a href="#racing" class="xref">Section 4.2.2</a>). Specific aspects of the System Policy may apply to all Connections, or only certain ones depending on the runtime context and properties of the Connection.</li>
+<li>Cached State: The state and history that the implementation keeps for each set of associated endpoints that have been used previously. This can include DNS results, TLS session state, previous success and quality of transport protocols over certain paths.</li>
 </ul>
 <h1 id="rfc.section.4.2.1">
-<a href="#rfc.section.4.2.1">4.2.1.</a> <a href="#gathering" id="gathering">Gathering</a>
+<a href="#rfc.section.4.2.1">4.2.1.</a> <a href="#gathering" id="gathering">Candidate Gathering</a>
 </h1>
 <p></p>
 
@@ -671,7 +673,7 @@ ul.toc li {
 <li>Protocol Selection: Protocol Selection represents the act of choosing one or more sets of protocol options that are available to use based on the Protocol Properties provided by the application, and a Transport Services system&#8217;s policies and heuristics.</li>
 </ul>
 <h1 id="rfc.section.4.2.2">
-<a href="#rfc.section.4.2.2">4.2.2.</a> <a href="#racing" id="racing">Racing</a>
+<a href="#rfc.section.4.2.2">4.2.2.</a> <a href="#racing" id="racing">Candidate Racing</a>
 </h1>
 <p></p>
 
@@ -738,6 +740,15 @@ ul.toc li {
 <td class="reference"><b id="I-D.ietf-tls-tls13">[I-D.ietf-tls-tls13]</b></td>
 <td class="top">
 <a>Rescorla, E.</a>, "<a href="https://tools.ietf.org/html/draft-ietf-tls-tls13-28">The Transport Layer Security (TLS) Protocol Version 1.3</a>", Internet-Draft draft-ietf-tls-tls13-28, March 2018.</td>
+</tr>
+<tr>
+<td class="reference"><b id="POSIX">[POSIX]</b></td>
+<td class="top">"<a>IEEE Std. 1003.1-2008 Standard for Information Technology -- Portable Operating System Interface (POSIX).  Open group Technical Standard: Base Specifications, Issue 7</a>", n.d..</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC0793">[RFC0793]</b></td>
+<td class="top">
+<a>Postel, J.</a>, "<a href="https://tools.ietf.org/html/rfc793">Transmission Control Protocol</a>", STD 7, RFC 793, DOI 10.17487/RFC0793, September 1981.</td>
 </tr>
 <tr>
 <td class="reference"><b id="RFC3168">[RFC3168]</b></td>
