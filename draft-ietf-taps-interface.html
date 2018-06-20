@@ -297,6 +297,8 @@ ul.toc li {
 <link href="#rfc.section.5.2.12" rel="Chapter" title="5.2.12 Capacity Profile">
 <link href="#rfc.section.5.2.13" rel="Chapter" title="5.2.13 Congestion control">
 <link href="#rfc.section.5.3" rel="Chapter" title="5.3 Specifying Security Parameters and Callbacks">
+<link href="#rfc.section.5.3.1" rel="Chapter" title="5.3.1 Pre-Connection Parameters">
+<link href="#rfc.section.5.3.2" rel="Chapter" title="5.3.2 Connection Establishment Callbacks">
 <link href="#rfc.section.6" rel="Chapter" title="6 Establishing Connections">
 <link href="#rfc.section.6.1" rel="Chapter" title="6.1 Active Open: Initiate">
 <link href="#rfc.section.6.2" rel="Chapter" title="6.2 Passive Open: Listen">
@@ -488,7 +490,11 @@ ul.toc li {
 </li>
 </ul><li>5.3.   <a href="#rfc.section.5.3">Specifying Security Parameters and Callbacks</a>
 </li>
-</ul><li>6.   <a href="#rfc.section.6">Establishing Connections</a>
+<ul><li>5.3.1.   <a href="#rfc.section.5.3.1">Pre-Connection Parameters</a>
+</li>
+<li>5.3.2.   <a href="#rfc.section.5.3.2">Connection Establishment Callbacks</a>
+</li>
+</ul></ul><li>6.   <a href="#rfc.section.6">Establishing Connections</a>
 </li>
 <ul><li>6.1.   <a href="#rfc.section.6.1">Active Open: Initiate</a>
 </li>
@@ -831,41 +837,48 @@ TransportParameters := Connection.GetTransportParameters()
 <h1 id="rfc.section.5.3">
 <a href="#rfc.section.5.3">5.3.</a> <a href="#security-parameters" id="security-parameters">Specifying Security Parameters and Callbacks</a>
 </h1>
-<p id="rfc.section.5.3.p.1">Common parameters such as TLS ciphersuites are known to implementations. Clients SHOULD use common safe defaults for these values whenever possible. However, as discussed in <a href="#I-D.ietf-taps-transport-security" class="xref">[I-D.ietf-taps-transport-security]</a>, many transport security protocols require specific security parameters and constraints from the client at the time of configuration and actively during a handshake. These configuration parameters are created as follows</p>
+<p id="rfc.section.5.3.p.1">Most security parameters, e.g., TLS ciphersuites, local identity and private key, etc., may be configured statically. Others are dynamically configured during connection establishment.  Thus, we partition security parameters and callbacks based on their place in the lifetime of connection establishment. Similar to transport parameters, both parameters and callbacks are inherited during cloning (see <a href="#groups" class="xref">Section 6.4</a>).</p>
+<h1 id="rfc.section.5.3.1">
+<a href="#rfc.section.5.3.1">5.3.1.</a> <a href="#pre-connection-parameters" id="pre-connection-parameters">Pre-Connection Parameters</a>
+</h1>
+<p id="rfc.section.5.3.1.p.1">Common parameters such as TLS ciphersuites are known to implementations. Clients should use common safe defaults for these values whenever possible. However, as discussed in <a href="#I-D.ietf-taps-transport-security" class="xref">[I-D.ietf-taps-transport-security]</a>, many transport security protocols require specific security parameters and constraints from the client at the time of configuration and actively during a handshake. These configuration parameters are created as follows:</p>
 <pre>
 SecurityParameters := NewSecurityParameters()
 </pre>
-<p id="rfc.section.5.3.p.2">Security configuration parameters and sample usage follow:</p>
+<p id="rfc.section.5.3.1.p.2">Security configuration parameters and sample usage follow:</p>
 <p></p>
 
-<ul><li>Local identity and private keys: Used to perform private key operations and prove one&#8217;s identity to the Remote Endpoint. (Note, if private keys are not available, e.g., since they are stored in HSMs, handshake callbacks MUST be used. See below for details.)</li></ul>
+<ul><li>Local identity and private keys: Used to perform private key operations and prove one&#8217;s identity to the Remote Endpoint. (Note, if private keys are not available, e.g., since they are stored in HSMs, handshake callbacks must be used. See below for details.)</li></ul>
 <pre>
 SecurityParameters.AddIdentity(identity)
 SecurityParameters.AddPrivateKey(privateKey, publicKey)
 </pre>
 <p></p>
 
-<ul><li>Supported algorithms: Used to restrict what parameters are used by underlying transport security protocols.  When not specified, these algorithms SHOULD default to known and safe defaults for the system. Parameters include: ciphersuites, supported groups, and signature algorithms.</li></ul>
+<ul><li>Supported algorithms: Used to restrict what parameters are used by underlying transport security protocols.  When not specified, these algorithms should default to known and safe defaults for the system. Parameters include: ciphersuites, supported groups, and signature algorithms.</li></ul>
 <pre>
-SecurityParameters.AddSupportedGroup(22)    // secp256k1
-SecurityParameters.AddCiphersuite(0xCCA9)   // TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256
-SecurityParameters.AddSignatureAlgorithm(7) // ed25519
+SecurityParameters.AddSupportedGroup(secp256k1)
+SecurityParameters.AddCiphersuite(TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256)
+SecurityParameters.AddSignatureAlgorithm(ed25519)
 </pre>
 <p></p>
 
-<ul><li>Session cache: Used to tune cache capacity, lifetime, re-use, and eviction policies, e.g., LRU or FIFO.</li></ul>
+<ul><li>Session cache management: Used to tune cache capacity, lifetime, re-use, and eviction policies, e.g., LRU or FIFO. Constants and policies for these interfaces are implementation-specific.</li></ul>
 <pre>
-SecurityParameters.SetSessionCacheCapacity(1024)     // 1024 elements
-SecurityParameters.SetSessionCacheLifetime(24*60*60) // 24 hours
-SecurityParameters.SetSessionCacheReuse(1)           // One-time use
+SecurityParameters.SetSessionCacheCapacity(MAX_CACHE_ELEMENTS)
+SecurityParameters.SetSessionCacheLifetime(SECONDS_PER_DAY)
+SecurityParameters.SetSessionCachePolicy(CachePolicyOneTimeUse)
 </pre>
 <p></p>
 
-<ul><li>Pre-shared keying material: Used to install pre-shared keying material established out-of-band. Each pre-shared keying material is associated with some identity that typically identifies its use or has some protocol-specific meaning to the Remote Endpoint.</li></ul>
+<ul><li>Pre-Shared Key import: Used to install pre-shared keying material established out-of-band. Each pre-shared keying material is associated with some identity that typically identifies its use or has some protocol-specific meaning to the Remote Endpoint.</li></ul>
 <pre>
 SecurityParameters.AddPreSharedKey(key, identity)
 </pre>
-<p id="rfc.section.5.3.p.7">Security decisions, especially pertaining to trust, are not static. Thus, once configured, parameters must also be supplied during live handshakes. These are best handled as client-provided callbacks. Security handshake callbacks include:</p>
+<h1 id="rfc.section.5.3.2">
+<a href="#rfc.section.5.3.2">5.3.2.</a> <a href="#connection-establishment-callbacks" id="connection-establishment-callbacks">Connection Establishment Callbacks</a>
+</h1>
+<p id="rfc.section.5.3.2.p.1">Security decisions, especially pertaining to trust, are not static. Once configured, parameters may also be supplied during connection establishment. These are best handled as client-provided callbacks. Security handshake callbacks that may be invoked during connection establishment include:</p>
 <p></p>
 
 <ul><li>Trust verification callback: Invoked when a Remote Endpoint&#8217;s trust must be validated before the handshake protocol can proceed.</li></ul>
@@ -884,7 +897,6 @@ ChallengeCallback := NewCallback({
 })
 SecurityParameters.SetIdentityChallengeCallback(challengeCallback)
 </pre>
-<p id="rfc.section.5.3.p.10">Like transport parameters, security parameters are inherited during cloning (see <a href="#groups" class="xref">Section 6.4</a>).</p>
 <h1 id="rfc.section.6">
 <a href="#rfc.section.6">6.</a> <a href="#establishing-connections" id="establishing-connections">Establishing Connections</a>
 </h1>
