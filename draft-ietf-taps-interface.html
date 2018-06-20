@@ -314,17 +314,21 @@ ul.toc li {
 <link href="#rfc.section.7.2" rel="Chapter" title="7.2 Batching Sends">
 <link href="#rfc.section.7.3" rel="Chapter" title="7.3 Sender-side Framing">
 <link href="#rfc.section.8" rel="Chapter" title="8 Receiving Data">
-<link href="#rfc.section.8.1" rel="Chapter" title="8.1 Receiving Final Messages">
-<link href="#rfc.section.8.2" rel="Chapter" title="8.2 Receiver-side De-framing over Stream Protocols">
+<link href="#rfc.section.8.1" rel="Chapter" title="8.1 Receive Metadata">
+<link href="#rfc.section.8.1.1" rel="Chapter" title="8.1.1 ECN">
+<link href="#rfc.section.8.1.2" rel="Chapter" title="8.1.2 Early Data">
+<link href="#rfc.section.8.2" rel="Chapter" title="8.2 Receiving Final Messages">
+<link href="#rfc.section.8.3" rel="Chapter" title="8.3 Receiver-side De-framing over Stream Protocols">
 <link href="#rfc.section.9" rel="Chapter" title="9 Setting and Querying of Connection Properties">
 <link href="#rfc.section.9.1" rel="Chapter" title="9.1 Protocol Properties">
 <link href="#rfc.section.10" rel="Chapter" title="10 Connection Termination">
-<link href="#rfc.section.11" rel="Chapter" title="11 IANA Considerations">
-<link href="#rfc.section.12" rel="Chapter" title="12 Security Considerations">
-<link href="#rfc.section.13" rel="Chapter" title="13 Acknowledgements">
-<link href="#rfc.references" rel="Chapter" title="14 References">
-<link href="#rfc.references.1" rel="Chapter" title="14.1 Normative References">
-<link href="#rfc.references.2" rel="Chapter" title="14.2 Informative References">
+<link href="#rfc.section.11" rel="Chapter" title="11 Ordering of Operations and Events">
+<link href="#rfc.section.12" rel="Chapter" title="12 IANA Considerations">
+<link href="#rfc.section.13" rel="Chapter" title="13 Security Considerations">
+<link href="#rfc.section.14" rel="Chapter" title="14 Acknowledgements">
+<link href="#rfc.references" rel="Chapter" title="15 References">
+<link href="#rfc.references.1" rel="Chapter" title="15.1 Normative References">
+<link href="#rfc.references.2" rel="Chapter" title="15.2 Informative References">
 <link href="#rfc.appendix.A" rel="Chapter" title="A Additional Properties">
 <link href="#rfc.appendix.A.1" rel="Chapter" title="A.1 Protocol and Path Selection Properties">
 <link href="#rfc.appendix.A.1.1" rel="Chapter" title="A.1.1 Application Intents">
@@ -518,9 +522,15 @@ ul.toc li {
 </li>
 </ul><li>8.   <a href="#rfc.section.8">Receiving Data</a>
 </li>
-<ul><li>8.1.   <a href="#rfc.section.8.1">Receiving Final Messages</a>
+<ul><li>8.1.   <a href="#rfc.section.8.1">Receive Metadata</a>
 </li>
-<li>8.2.   <a href="#rfc.section.8.2">Receiver-side De-framing over Stream Protocols</a>
+<ul><li>8.1.1.   <a href="#rfc.section.8.1.1">ECN</a>
+</li>
+<li>8.1.2.   <a href="#rfc.section.8.1.2">Early Data</a>
+</li>
+</ul><li>8.2.   <a href="#rfc.section.8.2">Receiving Final Messages</a>
+</li>
+<li>8.3.   <a href="#rfc.section.8.3">Receiver-side De-framing over Stream Protocols</a>
 </li>
 </ul><li>9.   <a href="#rfc.section.9">Setting and Querying of Connection Properties</a>
 </li>
@@ -528,17 +538,19 @@ ul.toc li {
 </li>
 </ul><li>10.   <a href="#rfc.section.10">Connection Termination</a>
 </li>
-<li>11.   <a href="#rfc.section.11">IANA Considerations</a>
+<li>11.   <a href="#rfc.section.11">Ordering of Operations and Events</a>
 </li>
-<li>12.   <a href="#rfc.section.12">Security Considerations</a>
+<li>12.   <a href="#rfc.section.12">IANA Considerations</a>
 </li>
-<li>13.   <a href="#rfc.section.13">Acknowledgements</a>
+<li>13.   <a href="#rfc.section.13">Security Considerations</a>
 </li>
-<li>14.   <a href="#rfc.references">References</a>
+<li>14.   <a href="#rfc.section.14">Acknowledgements</a>
 </li>
-<ul><li>14.1.   <a href="#rfc.references.1">Normative References</a>
+<li>15.   <a href="#rfc.references">References</a>
 </li>
-<li>14.2.   <a href="#rfc.references.2">Informative References</a>
+<ul><li>15.1.   <a href="#rfc.references.1">Normative References</a>
+</li>
+<li>15.2.   <a href="#rfc.references.2">Informative References</a>
 </li>
 </ul><li>Appendix A.   <a href="#rfc.appendix.A">Additional Properties</a>
 </li>
@@ -628,7 +640,7 @@ Action(parameter, parameter, ...) / Event&lt;parameter, parameter, ...&gt;
                                      SecurityParams)
 </pre>
 <p id="rfc.section.5.p.3">The Local Endpoint MUST be specified if the Preconnection is used to Listen() for incoming Connections, but is OPTIONAL if it is used to Initiate() connections. The Remote Endpoint MUST be specified in the Preconnection is used to Initiate() Connections, but is OPTIONAL if it is used to Listen() for incoming Connections.  The Local Endpoint and the Remote Endpoint MUST both be specified if a peer-to-peer Rendezvous is to occur based on the Preconnection.</p>
-<p id="rfc.section.5.p.4">Framers (see <a href="#send-framing" class="xref">Section 7.3</a>) and deframers (see <a href="#receive-framing" class="xref">Section 8.2</a>), if necessary, should be bound to the Preconnection during pre-establishment.</p>
+<p id="rfc.section.5.p.4">Framers (see <a href="#send-framing" class="xref">Section 7.3</a>) and deframers (see <a href="#receive-framing" class="xref">Section 8.3</a>), if necessary, should be bound to the Preconnection during pre-establishment.</p>
 <h1 id="rfc.section.5.1">
 <a href="#rfc.section.5.1">5.1.</a> <a href="#endpointspec" id="endpointspec">Specifying Endpoints</a>
 </h1>
@@ -903,14 +915,23 @@ Connection -&gt; InitiateError&lt;&gt;
 Preconnection.Listen()
 </pre>
 <p id="rfc.section.6.2.p.2">Before calling Listen, the caller must have initialized the Preconnection during the pre-establishment phase with a Local Endpoint specifier, as well as all parameters necessary for Protocol Stack selection. A Remote Endpoint may optionally be specified, to constrain what Connections are accepted.  The Listen() Action consumes the Preconnection. Once Listen() has been called, no further parameters may be bound to the Preconnection, and no subsequent establishment call may be made on the Preconnection.</p>
+<p id="rfc.section.6.2.p.3">Listening continues until the global context shuts down, or until the Stop action is performed on the same Preconnection:</p>
+<pre>
+Preconnection.Stop()
+</pre>
+<p id="rfc.section.6.2.p.4">After Stop() is called, the preconnection can be disposed of.</p>
 <pre>
 Preconnection -&gt; ConnectionReceived&lt;Connection&gt;
 </pre>
-<p id="rfc.section.6.2.p.3">The ConnectionReceived Event occurs when a Remote Endpoint has established a transport-layer connection to this Preconnection (for Connection-oriented transport protocols), or when the first Message has been received from the Remote Endpoint (for Connectionless protocols), causing a new Connection to be created. The resulting Connection is contained within the ConnectionReceived event, and is ready to use as soon as it is passed to the application via the event.</p>
+<p id="rfc.section.6.2.p.5">The ConnectionReceived Event occurs when a Remote Endpoint has established a transport-layer connection to this Preconnection (for Connection-oriented transport protocols), or when the first Message has been received from the Remote Endpoint (for Connectionless protocols), causing a new Connection to be created. The resulting Connection is contained within the ConnectionReceived event, and is ready to use as soon as it is passed to the application via the event.</p>
 <pre>
 Preconnection -&gt; ListenError&lt;&gt;
 </pre>
-<p id="rfc.section.6.2.p.4">A ListenError occurs either when the Preconnection cannot be fulfilled for listening, when the Local Endpoint (or Remote Endpoint, if specified) cannot be resolved, or when the application is prohibited from listening by policy.</p>
+<p id="rfc.section.6.2.p.6">A ListenError occurs either when the Preconnection cannot be fulfilled for listening, when the Local Endpoint (or Remote Endpoint, if specified) cannot be resolved, or when the application is prohibited from listening by policy.</p>
+<pre>
+Preconnection -&gt; Stopped&lt;&gt;
+</pre>
+<p id="rfc.section.6.2.p.7">A Stopped event occurs after the Preconnection has stopped listening.</p>
 <h1 id="rfc.section.6.3">
 <a href="#rfc.section.6.3">6.3.</a> <a href="#rendezvous" id="rendezvous">Peer-to-Peer Establishment: Rendezvous</a>
 </h1>
@@ -1045,7 +1066,7 @@ Preconnection.FrameWith(Framer)
 
 OctetArray := Framer.Frame(Message)
 </pre>
-<p id="rfc.section.7.3.p.2">Sender-side framing is a convenience feature of the interface, for parity with receiver-side framing (see <a href="#receive-framing" class="xref">Section 8.2</a>).</p>
+<p id="rfc.section.7.3.p.2">Sender-side framing is a convenience feature of the interface, for parity with receiver-side framing (see <a href="#receive-framing" class="xref">Section 8.3</a>).</p>
 <h1 id="rfc.section.8">
 <a href="#rfc.section.8">8.</a> <a href="#receiving" id="receiving">Receiving Data</a>
 </h1>
@@ -1058,14 +1079,14 @@ Connection.Receive(ReceiveHandler, maxLength)
 <pre>
 Connection -&gt; Received&lt;Message&gt;
 </pre>
-<p id="rfc.section.8.p.4">As with sending, the type of the Message to be passed is dependent on the implementation, and on the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters. The Message may also contain metadata from protocols in the Protocol Stack; which metadata is available is Protocol Stack dependent. In particular, when this information is available, the value of the Explicit Congestion Notification (ECN) field is contained in such metadata.  This information can be used for logging and debugging purposes, and for building applications which need access to information about the transport internals for their own operation.</p>
-<p id="rfc.section.8.p.5">The Message Object must provide some method to retrieve an octet array containing application data, corresponding to a single message within the underlying Protocol Stack&#8217;s framing.  See <a href="#receive-framing" class="xref">Section 8.2</a> for handling framing in situations where the Protocol Stack provides octet-stream transport only.</p>
+<p id="rfc.section.8.p.4">As with sending, the type of the Message to be passed is dependent on the implementation, and on the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters.</p>
+<p id="rfc.section.8.p.5">The Message Object must provide some method to retrieve an octet array containing application data, corresponding to a single message within the underlying Protocol Stack&#8217;s framing.  See <a href="#receive-framing" class="xref">Section 8.3</a> for handling framing in situations where the Protocol Stack provides octet-stream transport only.</p>
 <p id="rfc.section.8.p.6">The Message Object passed to Received is complete and atomic, unless one of the following conditions holds:</p>
 <p></p>
 
 <ul>
 <li>the underlying Protocol Stack supports message boundary preservation, and the size of the Message is larger than the buffers available for a single message;</li>
-<li>the underlying Protocol Stack does not support message boundary preservation, and the deframer (see <a href="#receive-framing" class="xref">Section 8.2</a>) cannot determine the end of the message using the buffer space it has available; or</li>
+<li>the underlying Protocol Stack does not support message boundary preservation, and the deframer (see <a href="#receive-framing" class="xref">Section 8.3</a>) cannot determine the end of the message using the buffer space it has available; or</li>
 <li>the underlying Protocol Stack does not support message boundary preservation, and no deframer was supplied by the application</li>
 </ul>
 <p id="rfc.section.8.p.8">The Message Object passed to Received will indicate one of the following:</p>
@@ -1082,17 +1103,29 @@ Connection -&gt; ReceiveError&lt;&gt;
 </pre>
 <p id="rfc.section.8.p.11">A ReceiveError occurs when data is received by the underlying Protocol Stack that cannot be fully retrieved or deframed, or when some other indication is received that reception has failed. Such conditions that irrevocably lead the the termination of the Connection are signaled using ConnectionError instead (see <a href="#termination" class="xref">Section 10</a>).</p>
 <h1 id="rfc.section.8.1">
-<a href="#rfc.section.8.1">8.1.</a> <a href="#receiving-final-messages" id="receiving-final-messages">Receiving Final Messages</a>
+<a href="#rfc.section.8.1">8.1.</a> <a href="#receive-metadata" id="receive-metadata">Receive Metadata</a>
 </h1>
-<p id="rfc.section.8.1.p.1">The application may check a property to determine if a received Message is the Final Message on a Connection. For any Message that is marked as Final, the application can assume that there will be no more Messages received on the Connection once the Message has been completely delivered. This corresponds to the Final property that may be marked on a sent Message <a href="#send-final" class="xref">Section 7.1.5</a>.</p>
-<p id="rfc.section.8.1.p.2">Some transport protocols and peers may not support signaling of the Final property.  Applications therefore should not rely on receiving a Message marked Final to know that the other endpoint is done sending on a connection.</p>
-<p id="rfc.section.8.1.p.3">Any calls to <samp>Receive</samp> once the Final Message has been delivered will result in errors.</p>
+<p id="rfc.section.8.1.p.1">Each Message may also contain metadata from protocols in the Protocol Stack; which metadata is available is Protocol Stack dependent. The following metadata values are supported:</p>
+<h1 id="rfc.section.8.1.1">
+<a href="#rfc.section.8.1.1">8.1.1.</a> <a href="#receive-ecn" id="receive-ecn">ECN</a>
+</h1>
+<p id="rfc.section.8.1.1.p.1">When available, Message metadata carries the value of the Explicit Congestion Notification (ECN) field. This information can be used for logging and debugging purposes, and for building applications which need access to information about the transport internals for their own operation.</p>
+<h1 id="rfc.section.8.1.2">
+<a href="#rfc.section.8.1.2">8.1.2.</a> <a href="#receive-early" id="receive-early">Early Data</a>
+</h1>
+<p id="rfc.section.8.1.2.p.1">In some cases it may be valuable to know whether data was read as part of early data streams. This is useful if applications need to treat early data separately, e.g., if early data has different security properties than data sent after connection establishment. In the case of TLS 1.3, client early data can be replayed maliciously (see <a href="#I-D.ietf-tls-tls13" class="xref">[I-D.ietf-tls-tls13]</a>). Thus, receivers may wish to perform additional checks for early data to ensure it is idempotent or not replayed. If TLS 1.3 is available and the recipient Message was sent as part of early data, the corresponding metadata carries a flag indicating as such. If early data is enabled, applications should check this metadata field for Messages received during connection establishment and respond accordingly.</p>
 <h1 id="rfc.section.8.2">
-<a href="#rfc.section.8.2">8.2.</a> <a href="#receive-framing" id="receive-framing">Receiver-side De-framing over Stream Protocols</a>
+<a href="#rfc.section.8.2">8.2.</a> <a href="#receiving-final-messages" id="receiving-final-messages">Receiving Final Messages</a>
 </h1>
-<p id="rfc.section.8.2.p.1">The Receive Event is intended to be fired once per application-layer Message sent by the remote endpoint; i.e., it is a desired property of this interface that a Send at one end of a Connection maps to exactly one Receive on the other end. This is possible with Protocol Stacks that provide message boundary preservation, but is not the case over Protocol Stacks that provide a simple octet stream transport.</p>
-<p id="rfc.section.8.2.p.2">For preserving message boundaries over stream transports, this interface provides receiver-side de-framing. This facility is based on the observation that, since many of our current application protocols evolved over TCP, which does not provide message boundary preservation, and since many of these protocols require message boundaries to function, each application layer protocol has defined its own framing. A Deframer allows an application to push this de-framing down into the interface, in order to transform an octet stream into a sequence of Messages.</p>
-<p id="rfc.section.8.2.p.3">Concretely, receiver-side de-framing allows a caller to provide the interface with a function that takes an octet stream, as provided by the underlying Protocol Stack, reads and returns a single Message of an appropriate type for the application and platform, and leaves the octet stream at the start of the next Message to deframe. It consists of a Deframer Object with a single Action, Deframe. Since the Deframer depends on the protocol used at the application layer, it is bound to the Preconnection during the pre-establishment phase:</p>
+<p id="rfc.section.8.2.p.1">The application may check a property to determine if a received Message is the Final Message on a Connection. For any Message that is marked as Final, the application can assume that there will be no more Messages received on the Connection once the Message has been completely delivered. This corresponds to the Final property that may be marked on a sent Message <a href="#send-final" class="xref">Section 7.1.5</a>.</p>
+<p id="rfc.section.8.2.p.2">Some transport protocols and peers may not support signaling of the Final property.  Applications therefore should not rely on receiving a Message marked Final to know that the other endpoint is done sending on a connection.</p>
+<p id="rfc.section.8.2.p.3">Any calls to <samp>Receive</samp> once the Final Message has been delivered will result in errors.</p>
+<h1 id="rfc.section.8.3">
+<a href="#rfc.section.8.3">8.3.</a> <a href="#receive-framing" id="receive-framing">Receiver-side De-framing over Stream Protocols</a>
+</h1>
+<p id="rfc.section.8.3.p.1">The Receive Event is intended to be fired once per application-layer Message sent by the remote endpoint; i.e., it is a desired property of this interface that a Send at one end of a Connection maps to exactly one Receive on the other end. This is possible with Protocol Stacks that provide message boundary preservation, but is not the case over Protocol Stacks that provide a simple octet stream transport.</p>
+<p id="rfc.section.8.3.p.2">For preserving message boundaries over stream transports, this interface provides receiver-side de-framing. This facility is based on the observation that, since many of our current application protocols evolved over TCP, which does not provide message boundary preservation, and since many of these protocols require message boundaries to function, each application layer protocol has defined its own framing. A Deframer allows an application to push this de-framing down into the interface, in order to transform an octet stream into a sequence of Messages.</p>
+<p id="rfc.section.8.3.p.3">Concretely, receiver-side de-framing allows a caller to provide the interface with a function that takes an octet stream, as provided by the underlying Protocol Stack, reads and returns a single Message of an appropriate type for the application and platform, and leaves the octet stream at the start of the next Message to deframe. It consists of a Deframer Object with a single Action, Deframe. Since the Deframer depends on the protocol used at the application layer, it is bound to the Preconnection during the pre-establishment phase:</p>
 <pre>
 Preconnection.DeframeWith(Deframer)
 
@@ -1165,25 +1198,36 @@ Connection -&gt; ConnectionError&lt;&gt;
 Connection -&gt; SoftError&lt;&gt;
 </pre>
 <h1 id="rfc.section.11">
-<a href="#rfc.section.11">11.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a>
+<a href="#rfc.section.11">11.</a> <a href="#ordering-of-operations-and-events" id="ordering-of-operations-and-events">Ordering of Operations and Events</a>
 </h1>
-<p id="rfc.section.11.p.1">RFC-EDITOR: Please remove this section before publication.</p>
-<p id="rfc.section.11.p.2">This document has no Actions for IANA.</p>
+<p id="rfc.section.11.p.1">As this interface is designed to be independent of concurrency model, the details of how exactly actions are handled, and on which threads/callbacks events are dispatched, are implementation dependent. However, the interface does provide the following guarantees about the ordering of operations:</p>
+<p></p>
+
+<ul>
+<li>Received&lt;&gt; will never occur on a Connection before a Ready&lt;&gt; event on that Connection, or a ConnectionReceived&lt;&gt; or RendezvousDone&lt;&gt; containing that Connection.</li>
+<li>No events will occur on a Connection after a Closed&lt;&gt; event, an InitiateError&lt;&gt; or ConnectionError&lt;&gt; on that connection. To ensure this ordering, Closed&lt;&gt; will not occur on a Connection while other events on the Connection are still locally outstanding (i.e., known to the interface and waiting to be dealt with by the application). ConnectionError&lt;&gt; may occur after Closed&lt;&gt;, but the interface must gracefully handle the application ignoring these errors.</li>
+<li>Sent&lt;&gt; events will occur on a Connection in the order in which the Messages were sent (i.e., delivered to the kernel or to the network interface, depending on implementation).</li>
+</ul>
 <h1 id="rfc.section.12">
-<a href="#rfc.section.12">12.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a>
+<a href="#rfc.section.12">12.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a>
 </h1>
-<p id="rfc.section.12.p.1">This document describes a generic API for interacting with a transport services (TAPS) system.  Part of this API includes configuration details for transport security protocols, as discussed in Section <a href="#security-parameters" class="xref">Section 5.3</a>. It does not recommend use (or disuse) of specific algorithms or protocols. Any API-compatible transport security protocol should work in a TAPS system.</p>
+<p id="rfc.section.12.p.1">RFC-EDITOR: Please remove this section before publication.</p>
+<p id="rfc.section.12.p.2">This document has no Actions for IANA.</p>
 <h1 id="rfc.section.13">
-<a href="#rfc.section.13">13.</a> <a href="#acknowledgements" id="acknowledgements">Acknowledgements</a>
+<a href="#rfc.section.13">13.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a>
 </h1>
-<p id="rfc.section.13.p.1">This work has received funding from the European Union&#8217;s Horizon 2020 research and innovation programme under grant agreements No. 644334 (NEAT) and No. 688421 (MAMI).</p>
-<p id="rfc.section.13.p.2">This work has been supported by Leibniz Prize project funds of DFG - German Research Foundation: Gottfried Wilhelm Leibniz-Preis 2011 (FKZ FE 570/4-1).</p>
-<p id="rfc.section.13.p.3">This work has been supported by the UK Engineering and Physical Sciences Research Council under grant EP/R04144X/1.</p>
-<p id="rfc.section.13.p.4">Thanks to Stuart Cheshire, Josh Graessley, David Schinazi, and Eric Kinnear for their implementation and design efforts, including Happy Eyeballs, that heavily influenced this work. Thanks to Laurent Chuat and Jason Lee for initial work on the Post Sockets interface, from which this work has evolved.</p>
+<p id="rfc.section.13.p.1">This document describes a generic API for interacting with a transport services (TAPS) system.  Part of this API includes configuration details for transport security protocols, as discussed in Section <a href="#security-parameters" class="xref">Section 5.3</a>. It does not recommend use (or disuse) of specific algorithms or protocols. Any API-compatible transport security protocol should work in a TAPS system.</p>
+<h1 id="rfc.section.14">
+<a href="#rfc.section.14">14.</a> <a href="#acknowledgements" id="acknowledgements">Acknowledgements</a>
+</h1>
+<p id="rfc.section.14.p.1">This work has received funding from the European Union&#8217;s Horizon 2020 research and innovation programme under grant agreements No. 644334 (NEAT) and No. 688421 (MAMI).</p>
+<p id="rfc.section.14.p.2">This work has been supported by Leibniz Prize project funds of DFG - German Research Foundation: Gottfried Wilhelm Leibniz-Preis 2011 (FKZ FE 570/4-1).</p>
+<p id="rfc.section.14.p.3">This work has been supported by the UK Engineering and Physical Sciences Research Council under grant EP/R04144X/1.</p>
+<p id="rfc.section.14.p.4">Thanks to Stuart Cheshire, Josh Graessley, David Schinazi, and Eric Kinnear for their implementation and design efforts, including Happy Eyeballs, that heavily influenced this work. Thanks to Laurent Chuat and Jason Lee for initial work on the Post Sockets interface, from which this work has evolved.</p>
 <h1 id="rfc.references">
-<a href="#rfc.references">14.</a> References</h1>
+<a href="#rfc.references">15.</a> References</h1>
 <h1 id="rfc.references.1">
-<a href="#rfc.references.1">14.1.</a> Normative References</h1>
+<a href="#rfc.references.1">15.1.</a> Normative References</h1>
 <table><tbody>
 <tr>
 <td class="reference"><b id="I-D.ietf-taps-arch">[I-D.ietf-taps-arch]</b></td>
@@ -1194,6 +1238,11 @@ Connection -&gt; SoftError&lt;&gt;
 <td class="reference"><b id="I-D.ietf-taps-minset">[I-D.ietf-taps-minset]</b></td>
 <td class="top">
 <a>Welzl, M.</a> and <a>S. Gjessing</a>, "<a href="https://tools.ietf.org/html/draft-ietf-taps-minset-04">A Minimal Set of Transport Services for End Systems</a>", Internet-Draft draft-ietf-taps-minset-04, June 2018.</td>
+</tr>
+<tr>
+<td class="reference"><b id="I-D.ietf-tls-tls13">[I-D.ietf-tls-tls13]</b></td>
+<td class="top">
+<a>Rescorla, E.</a>, "<a href="https://tools.ietf.org/html/draft-ietf-tls-tls13-28">The Transport Layer Security (TLS) Protocol Version 1.3</a>", Internet-Draft draft-ietf-tls-tls13-28, March 2018.</td>
 </tr>
 <tr>
 <td class="reference"><b id="I-D.ietf-tsvwg-rtcweb-qos">[I-D.ietf-tsvwg-rtcweb-qos]</b></td>
@@ -1217,7 +1266,7 @@ Connection -&gt; SoftError&lt;&gt;
 </tr>
 </tbody></table>
 <h1 id="rfc.references.2">
-<a href="#rfc.references.2">14.2.</a> Informative References</h1>
+<a href="#rfc.references.2">15.2.</a> Informative References</h1>
 <table><tbody>
 <tr>
 <td class="reference"><b id="I-D.ietf-taps-transport-security">[I-D.ietf-taps-transport-security]</b></td>
