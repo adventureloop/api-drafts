@@ -93,7 +93,7 @@ Table of Contents
        4.2.1.  Candidate Gathering . . . . . . . . . . . . . . . . .  14
        4.2.2.  Candidate Racing  . . . . . . . . . . . . . . . . . .  14
      4.3.  Protocol Stack Equivalence  . . . . . . . . . . . . . . .  15
-       4.3.1.  Transport Security Equivalence  . . . . . . . . . . .  15
+       4.3.1.  Transport Security Equivalence  . . . . . . . . . . .  16
      4.4.  Message Framing, Parsing, and Serialization . . . . . . .  16
    5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  17
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .  17
@@ -804,8 +804,9 @@ Internet-Draft              TAPS Architecture                  June 2018
    functional or security problems.
 
    If two different Protocol Stacks can be safely swapped, or raced in
-   parallel Section 4.2.2, then they are considered to be "equivalent".
-   Equivalent Protocol Stacks must meet the following criteria:
+   parallel (see Section 4.2.2), then they are considered to be
+   "equivalent".  Equivalent Protocol Stacks must meet the following
+   criteria:
 
    1.  Both stacks must offer the same interface to the application for
        connection establishment and data transmission.  For example, if
@@ -827,13 +828,12 @@ Internet-Draft              TAPS Architecture                  June 2018
 
    3.  Both stacks must offer the same security properties.  See the
        security protocol equivalence section below for futher discussion
-       Section 4.3.1.
+       (Section 4.3.1).
 
-4.3.1.  Transport Security Equivalence
 
-   The inclusion of transport security protocols
-   [I-D.ietf-taps-transport-security] in a Protocol Stack adds extra
-   restrictions to Protocol Stack equivalence.  Security features and
+
+
+
 
 
 
@@ -842,6 +842,11 @@ Pauly, et al.           Expires December 24, 2018              [Page 15]
 Internet-Draft              TAPS Architecture                  June 2018
 
 
+4.3.1.  Transport Security Equivalence
+
+   The inclusion of transport security protocols
+   [I-D.ietf-taps-transport-security] in a Protocol Stack adds extra
+   restrictions to Protocol Stack equivalence.  Security features and
    properties, such as cryptographic algorithms, peer authentication,
    and identity privacy vary across security protocols, and across
    versions of security protocols.  Protocol equivalence should not be
@@ -885,11 +890,6 @@ Internet-Draft              TAPS Architecture                  June 2018
 
    o  the ability to manage dependencies between messages, when some
       messages may not be delivered due to either packet loss or missing
-      a deadline, in particular the ability to avoid (re-)sending data
-      that relies on a previous transmission that was never received.
-
-   All require explicit message boundaries, and application-level
-   framing of messages, to be effective.  Once a message is passed to
 
 
 
@@ -898,6 +898,11 @@ Pauly, et al.           Expires December 24, 2018              [Page 16]
 Internet-Draft              TAPS Architecture                  June 2018
 
 
+      a deadline, in particular the ability to avoid (re-)sending data
+      that relies on a previous transmission that was never received.
+
+   All require explicit message boundaries, and application-level
+   framing of messages, to be effective.  Once a message is passed to
    the transport, it can not be cancelled or paused, but prioritization
    as well as lifetime and retransmission management will provide the
    protocol stack with all needed information to send the messages as
@@ -941,11 +946,6 @@ Internet-Draft              TAPS Architecture                  June 2018
    use PSK material created for the Encapsulating Security Protocol
    (ESP, part of IPsec) [RFC4303] with QUIC, and clients must not use
    private keys intended for server authentication as a keys for client
-   authentication.  Moreover, unlike certain transport features such as
-   TCP Fast Open (TFO) [RFC7413] or Explicit Congestion Notification
-   (ECN) [RFC3168] which can fall back to standard configurations,
-   Transport Services systems must not permit fallback for security
-   protocols.  For example, if a client requests TLS, yet TLS or the
 
 
 
@@ -954,6 +954,11 @@ Pauly, et al.           Expires December 24, 2018              [Page 17]
 Internet-Draft              TAPS Architecture                  June 2018
 
 
+   authentication.  Moreover, unlike certain transport features such as
+   TCP Fast Open (TFO) [RFC7413] or Explicit Congestion Notification
+   (ECN) [RFC3168] which can fall back to standard configurations,
+   Transport Services systems must not permit fallback for security
+   protocols.  For example, if a client requests TLS, yet TLS or the
    desired version are not available, its connection must fail.  Clients
    are responsible for implementing protocol or version fallback using a
    Transport Services API if so desired.
@@ -995,11 +1000,6 @@ Internet-Draft              TAPS Architecture                  June 2018
               Services for End Systems", draft-ietf-taps-minset-04 (work
               in progress), June 2018.
 
-   [I-D.ietf-taps-transport-security]
-              Pauly, T., Perkins, C., Rose, K., and C. Wood, "A Survey
-              of Transport Security Protocols", draft-ietf-taps-
-              transport-security-01 (work in progress), May 2018.
-
 
 
 
@@ -1009,6 +1009,11 @@ Pauly, et al.           Expires December 24, 2018              [Page 18]
 
 Internet-Draft              TAPS Architecture                  June 2018
 
+
+   [I-D.ietf-taps-transport-security]
+              Pauly, T., Perkins, C., Rose, K., and C. Wood, "A Survey
+              of Transport Security Protocols", draft-ietf-taps-
+              transport-security-01 (work in progress), May 2018.
 
    [I-D.ietf-tls-tls13]
               Rescorla, E., "The Transport Layer Security (TLS) Protocol
@@ -1052,11 +1057,6 @@ Authors' Addresses
    United States of America
 
    Email: tpauly@apple.com
-
-
-
-
-
 
 
 
