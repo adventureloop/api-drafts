@@ -340,12 +340,12 @@ ul.toc li {
 <link href="#rfc.authors" rel="Chapter">
 
 
-  <meta name="generator" content="xml2rfc version 2.9.8 - https://tools.ietf.org/tools/xml2rfc" />
+  <meta name="generator" content="xml2rfc version 2.9.9 - https://tools.ietf.org/tools/xml2rfc" />
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-06-24" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-06-25" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -369,7 +369,7 @@ ul.toc li {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: December 26, 2018</td>
+<td class="left">Expires: December 27, 2018</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -422,7 +422,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">June 24, 2018</td>
+<td class="right">June 25, 2018</td>
 </tr>
 
     	
@@ -438,7 +438,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on December 26, 2018.</p>
+<p>This Internet-Draft will expire on December 27, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -982,19 +982,19 @@ Connection -&gt; CloneError&lt;&gt;
 <h1 id="rfc.section.7">
 <a href="#rfc.section.7">7.</a> <a href="#sending" id="sending">Sending Data</a>
 </h1>
-<p id="rfc.section.7.p.1">Once a Connection has been established, it can be used for sending data. Data is always sent in association with a Message Object and additional parameters (<a href="#send-params" class="xref">Section 7.1</a>) using the Send Action on an established Connection:</p>
+<p id="rfc.section.7.p.1">Once a Connection has been established, it can be used for sending data. Data is always sent along with with additional Message parameters (<a href="#send-params" class="xref">Section 7.1</a>) using the Send Action on an established Connection:</p>
 <pre>
-Connection.Send(Message, messageData, endOfMessage)
+Connection.Send(messageContext, messageData, endOfMessage)
 </pre>
-<p id="rfc.section.7.p.2">The Message parameter defines a single instance of a message and its parameters.  The interpretation of a Message to be sent is dependent on the implementation, and on the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters.  For example, a Message may be a single datagram for UDP Connections; or an HTTP Request for HTTP Connections. Various Send Parameters can be configured before using a Message to send, which influence the priority and treatment of the Message&#8217;s data upon sending. See <a href="#send-params" class="xref">Section 7.1</a> for a description of each parameter.</p>
+<p id="rfc.section.7.p.2">The messageContext parameter defines a single instance of a message and its parameters.  The interpretation of a Message to be sent is dependent on the implementation, and on the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters.  For example, a Message may be a single datagram for UDP Connections; or an HTTP Request for HTTP Connections. Various Send Parameters can be configured before using a Message to send, which influence the priority and treatment of the Message&#8217;s data upon sending. See <a href="#send-params" class="xref">Section 7.1</a> for a description of each parameter.</p>
 <pre>
-Message := NewMessage()
+messageContext := NewMessage()
 </pre>
 <p id="rfc.section.7.p.3">The messageData parameter contains any octects to be sent for this message.</p>
 <pre>
 messageData := "hello".octets()
 </pre>
-<p id="rfc.section.7.p.4">The endOfMessage parameter is a boolean that indicates whether or not this Send Action completes the Message, or if more messageData is expected.  Applications using protocols with small Message or datagram lengths will generally always mark their Sends as complete. Applications that need to stream data, sometimes due to the data being too large to hold in memory at any one time, will perform multiple Send Actions on the same Message with different portions of messageData. All messageData sent with the same Message object will be treated as an in-order series, until the endOfMessage is marked. Once the end is marked, the Message object may be re-used as a new Message that has the same Send Parameters.</p>
+<p id="rfc.section.7.p.4">The endOfMessage parameter is a boolean that indicates whether or not this Send Action completes the Message, or if more messageData is expected.  Applications using protocols with small Message or datagram lengths will generally always mark their Sends as complete. Applications that need to stream data, sometimes due to the data being too large to hold in memory at any one time, will perform multiple Send Actions on the same Message with different blocks of messageData. All messageData sent with the same Message object will be treated as an in-order series, until the endOfMessage is marked. Once the end is marked, the messageContext object may be re-used as a new Message that has the same Send Parameters.</p>
 <p id="rfc.section.7.p.5">Some transport protocols can deliver arbitrarily sized Messages, but other protocols constrain the maximum Message size. Applications can query the protocol property Maximum Message Size on Send to determine the maximum size allowed for a single Message.</p>
 <p id="rfc.section.7.p.6">If Send is called on a Connection which has not yet been established, an Initiate Action will be implicitly performed simultaneously with the Send.  Used together with the Idempotent property (see <a href="#send-idempotent" class="xref">Section 7.1.4</a>), this can be used to send data during establishment for 0-RTT session resumption on Protocol Stacks that support it.</p>
 <p id="rfc.section.7.p.7">Like all Actions in this interface, the Send Action is asynchronous.</p>
@@ -1014,10 +1014,10 @@ Connection -&gt; SendError&lt;msgRef&gt;
 <h1 id="rfc.section.7.1">
 <a href="#rfc.section.7.1">7.1.</a> <a href="#send-params" id="send-params">Message Send Parameters</a>
 </h1>
-<p id="rfc.section.7.1.p.1">Each Message can be marked with Send Parameters to control how Data associated with the Message will be sent down to the underlying Protocol Stack and transmitted. Note that these properties are per-Message, not per-Send.  All data portions associated with a single Message share properties. For example, it would not make sense to have the beginning of a Message expire, but allow the end of a Message to still be sent.</p>
-<p id="rfc.section.7.1.p.2">Parameters may be added to a Message object before the Message is used for sendings.</p>
+<p id="rfc.section.7.1.p.1">Each Message can be marked with Send Parameters to control how Data associated with the Message will be sent down to the underlying Protocol Stack and transmitted. Note that these properties are per-Message, not per-Send.  All data blocks associated with a single Message share properties. For example, it would not make sense to have the beginning of a Message expire, but allow the end of a Message to still be sent.</p>
+<p id="rfc.section.7.1.p.2">Parameters may be added to a messageContext object before the context is used for sending. Once a messageContext has been used with a Send call, modifying any of its parameters is invalid.</p>
 <pre>
-Message := NewMessage()
+messageContext := NewMessage()
 Message.Add(parameter, value)
 </pre>
 <p id="rfc.section.7.1.p.3">The following Message Send Parameters are supported:</p>
@@ -1041,7 +1041,7 @@ Message.Add(parameter, value)
 <h1 id="rfc.section.7.1.5">
 <a href="#rfc.section.7.1.5">7.1.5.</a> <a href="#send-final" id="send-final">Final</a>
 </h1>
-<p id="rfc.section.7.1.5.p.1">Final is a boolean property. If true, this Message is the last one that the application will send on a Connection. This allows underlying protocols to indicate to the Remote Endpoint that the Connection has been effectively closed in the sending direction. For example, TCP-based Connections can send a FIN once a Message marked as Final has been completely sent.  Protocols that do not support signalling the end of a Connection in a given direction will ignore this property.</p>
+<p id="rfc.section.7.1.5.p.1">Final is a boolean property. If true, this Message is the last one that the application will send on a Connection. This allows underlying protocols to indicate to the Remote Endpoint that the Connection has been effectively closed in the sending direction. For example, TCP-based Connections can send a FIN once a Message marked as Final has been completely sent, indicated by marking endOfMessage. Protocols that do not support signalling the end of a Connection in a given direction will ignore this property.</p>
 <p id="rfc.section.7.1.5.p.2">Note that a Final Message must always be sorted to the end of a list of Messages.  The Final property overrides Niceness and any other property that would re-order Messages. If another Message is sent after a Message marked as Final has already been sent on a Connection, the new Message will report an error.</p>
 <h1 id="rfc.section.7.1.6">
 <a href="#rfc.section.7.1.6">7.1.6.</a> <a href="#send-checksum" id="send-checksum">Corruption Protection Length</a>
@@ -1070,8 +1070,8 @@ Message.Add(parameter, value)
 <p id="rfc.section.7.2.p.1">In order to reduce the overhead of sending multiple small Messages on a Connection, the application may want to batch several Send actions together. This provides a hint to the system that the sending of these Messages should be coalesced when possible, and that sending any of the batched Messages may be delayed until the last Message in the batch is enqueued.</p>
 <pre>
 Connection.Batch(
-    Connection.Send(Message, messageData, endOfMessage)
-    Connection.Send(Message, messageData, endOfMessage)
+    Connection.Send(messageContext, messageData, endOfMessage)
+    Connection.Send(messageContext, messageData, endOfMessage)
 )
 </pre>
 <h1 id="rfc.section.7.3">
@@ -1081,7 +1081,7 @@ Connection.Batch(
 <pre>
 Preconnection.FrameWith(Framer)
 
-OctetArray := Framer.Frame(Message, messageData, endOfMessage)
+OctetArray := Framer.Frame(messageContext, messageData, endOfMessage)
 </pre>
 <p id="rfc.section.7.3.p.2">Sender-side framing is a convenience feature of the interface, for parity with receiver-side framing (see <a href="#receive-framing" class="xref">Section 8.3</a>).</p>
 <h1 id="rfc.section.8">
@@ -1092,14 +1092,14 @@ OctetArray := Framer.Frame(Message, messageData, endOfMessage)
 Connection.Receive(ReceiveHandler, minIncompleteLength, maxLength)
 </pre>
 <p id="rfc.section.8.p.2">Receive takes a ReceiveHandler, which can handle the Received Event and the ReceiveError error. Each call to Receive will result in at most one Received event being sent to the handler, though implementations may provide convenience functions to indicate readiness to receive a larger but finite number of Messages with a single call. This allows an application to provide backpressure to the transport stack when it is temporarily not ready to receive messages.</p>
-<p id="rfc.section.8.p.3">Receive takes an optional minIncompleteLength argument. This value indicates the smallest partial Message data size that should be delivered. By default, this value is infinite, which means that only complete, atomic Messages will be delivered.  If this value is set to some smaller value, the associated ReceiveHandler will be triggered only when at least that many bytes are available, the Message is complete, or the system needs to free up memory.</p>
+<p id="rfc.section.8.p.3">Receive takes an optional minIncompleteLength argument. This value indicates the smallest partial Message data size that should be delivered. By default, this value is infinite, which means that only complete, atomic Messages will be delivered.  If this value is set to some smaller value, the associated ReceiveHandler will be triggered only when at least that many bytes are available, the Message is complete, or the system needs to free up memory. Applications should always check the length of the data delivered to the ReceiveHandler and not assume it will be as long as minIncompleteLength in the case of shorter complete Messages or memory issues.</p>
 <p id="rfc.section.8.p.4">Receive also takes an optional maxLength argument, the maximum size (in bytes of data) Message the application is currently prepared to receive. The default value for maxLength is infinite. If an incoming Message is larger than the minimum of this size and the maximum Message size on receive for the Connection&#8217;s Protocol Stack, it will be received as a partial Message.  Partial Messages are indicated by marking the endOfMessage boolean value as false in the ReceivedHandler. Note that maxLength does not guarantee that the application will receive that many bytes if they are available; the interface may return partial Messages smaller than maxLength according to implementation constraints.</p>
 <pre>
-Connection -&gt; Received&lt;Message, messageData, endOfMessage&gt;
+Connection -&gt; Received&lt;messageContext, messageData, endOfMessage&gt;
 </pre>
 <p id="rfc.section.8.p.5">As with sending, the type of the Message to be passed is dependent on the implementation, and on the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters.</p>
-<p id="rfc.section.8.p.6">The Message Object identifies the logical message received by the transport protocol, and provides methods to access metadata about the received data.  The octets of data associated with this message are delivered as messageData.  Multiple invocations of the ReceivedHandler may devlier data for the same Message until the endOfMessage flag is delivered. See <a href="#receive-framing" class="xref">Section 8.3</a> for handling Message framing in situations where the Protocol Stack provides octet-stream transport only.</p>
-<p id="rfc.section.8.p.7">If the minIncompleteLength was set to be infinite, the Message passed to Received will complete and atomic (that is, endOfMessage will be set), unless one of the following conditions holds:</p>
+<p id="rfc.section.8.p.6">The messageContext identifies the logical message received by the transport protocol, and provides methods to access metadata about the received data.  The octets of data associated with this message are delivered as messageData.  Multiple invocations of the ReceivedHandler may devlier data for the same messageContext until the endOfMessage flag is delivered. See <a href="#receive-framing" class="xref">Section 8.3</a> for handling Message framing in situations where the Protocol Stack provides octet-stream transport only.</p>
+<p id="rfc.section.8.p.7">If the minIncompleteLength was set to be infinite, the Message passed to Received will be complete and atomic (that is, endOfMessage will be set), unless one of the following conditions holds:</p>
 <p></p>
 
 <ul>
@@ -1115,7 +1115,7 @@ Connection -&gt; ReceiveError&lt;&gt;
 <h1 id="rfc.section.8.1">
 <a href="#rfc.section.8.1">8.1.</a> <a href="#receive-metadata" id="receive-metadata">Receive Metadata</a>
 </h1>
-<p id="rfc.section.8.1.p.1">Each Message may also contain metadata from protocols in the Protocol Stack; which metadata is available is Protocol Stack dependent. The following metadata values are supported:</p>
+<p id="rfc.section.8.1.p.1">Each messageContext may also contain metadata from protocols in the Protocol Stack; which metadata is available is Protocol Stack dependent. The following metadata values are supported:</p>
 <h1 id="rfc.section.8.1.1">
 <a href="#rfc.section.8.1.1">8.1.1.</a> <a href="#receive-ecn" id="receive-ecn">ECN</a>
 </h1>
