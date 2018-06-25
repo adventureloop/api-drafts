@@ -314,6 +314,7 @@ ul.toc li {
 <link href="#rfc.section.12.2.1" rel="Chapter" title="12.2.1 Selection Properties">
 <link href="#rfc.section.12.2.2" rel="Chapter" title="12.2.2 Protocol Properties">
 <link href="#rfc.section.12.2.3" rel="Chapter" title="12.2.3 Control Properties">
+<link href="#rfc.section.12.2.4" rel="Chapter" title="12.2.4 Intents">
 <link href="#rfc.section.12.3" rel="Chapter" title="12.3 Mandatory Transport Properties">
 <link href="#rfc.section.12.3.1" rel="Chapter" title="12.3.1 Final">
 <link href="#rfc.section.12.3.2" rel="Chapter" title="12.3.2 Reliable Data Transfer (Connection)">
@@ -350,15 +351,21 @@ ul.toc li {
 <link href="#rfc.references.1" rel="Chapter" title="16.1 Normative References">
 <link href="#rfc.references.2" rel="Chapter" title="16.2 Informative References">
 <link href="#rfc.appendix.A" rel="Chapter" title="A Additional Properties">
-<link href="#rfc.appendix.A.1" rel="Chapter" title="A.1 Protocol and Path Selection Properties">
-<link href="#rfc.appendix.A.1.1" rel="Chapter" title="A.1.1 Application Intents">
-<link href="#rfc.appendix.A.2" rel="Chapter" title="A.2 Protocol Properties">
-<link href="#rfc.appendix.A.3" rel="Chapter" title="A.3 Message Properties">
+<link href="#rfc.appendix.A.1" rel="Chapter" title="A.1 Experimental Transport Properties">
+<link href="#rfc.appendix.A.1.1" rel="Chapter" title="A.1.1 Suggest a timeout to the Remote Endpoint">
+<link href="#rfc.appendix.A.1.2" rel="Chapter" title="A.1.2 Abort timeout to suggest to the Remote Endpoint">
+<link href="#rfc.appendix.A.1.3" rel="Chapter" title="A.1.3 Request not to delay acknowledgment of Message">
+<link href="#rfc.appendix.A.1.4" rel="Chapter" title="A.1.4 Traffic Category">
+<link href="#rfc.appendix.A.1.5" rel="Chapter" title="A.1.5 Size to be Sent or Received">
+<link href="#rfc.appendix.A.1.6" rel="Chapter" title="A.1.6 Duration">
+<link href="#rfc.appendix.A.1.7" rel="Chapter" title="A.1.7 Send or Receive Bit-rate">
+<link href="#rfc.appendix.A.1.8" rel="Chapter" title="A.1.8 Cost Preferences">
+<link href="#rfc.appendix.A.1.9" rel="Chapter" title="A.1.9 Immediate">
 <link href="#rfc.appendix.B" rel="Chapter" title="B Sample API definition in Go">
 <link href="#rfc.authors" rel="Chapter">
 
 
-  <meta name="generator" content="xml2rfc version 2.9.8 - https://tools.ietf.org/tools/xml2rfc" />
+  <meta name="generator" content="xml2rfc version 2.9.9 - https://tools.ietf.org/tools/xml2rfc" />
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
@@ -542,6 +549,8 @@ ul.toc li {
 </li>
 <li>12.2.3.   <a href="#rfc.section.12.2.3">Control Properties</a>
 </li>
+<li>12.2.4.   <a href="#rfc.section.12.2.4">Intents</a>
+</li>
 </ul><li>12.3.   <a href="#rfc.section.12.3">Mandatory Transport Properties</a>
 </li>
 <ul><li>12.3.1.   <a href="#rfc.section.12.3.1">Final</a>
@@ -614,15 +623,27 @@ ul.toc li {
 </li>
 </ul><li>Appendix A.   <a href="#rfc.appendix.A">Additional Properties</a>
 </li>
-<ul><li>A.1.   <a href="#rfc.appendix.A.1">Protocol and Path Selection Properties</a>
+<ul><li>A.1.   <a href="#rfc.appendix.A.1">Experimental Transport Properties</a>
 </li>
-<ul><li>A.1.1.   <a href="#rfc.appendix.A.1.1">Application Intents</a>
+<ul><li>A.1.1.   <a href="#rfc.appendix.A.1.1">Suggest a timeout to the Remote Endpoint</a>
 </li>
-</ul><li>A.2.   <a href="#rfc.appendix.A.2">Protocol Properties</a>
+<li>A.1.2.   <a href="#rfc.appendix.A.1.2">Abort timeout to suggest to the Remote Endpoint</a>
 </li>
-<li>A.3.   <a href="#rfc.appendix.A.3">Message Properties</a>
+<li>A.1.3.   <a href="#rfc.appendix.A.1.3">Request not to delay acknowledgment of Message</a>
 </li>
-</ul><li>Appendix B.   <a href="#rfc.appendix.B">Sample API definition in Go</a>
+<li>A.1.4.   <a href="#rfc.appendix.A.1.4">Traffic Category</a>
+</li>
+<li>A.1.5.   <a href="#rfc.appendix.A.1.5">Size to be Sent or Received</a>
+</li>
+<li>A.1.6.   <a href="#rfc.appendix.A.1.6">Duration</a>
+</li>
+<li>A.1.7.   <a href="#rfc.appendix.A.1.7">Send or Receive Bit-rate</a>
+</li>
+<li>A.1.8.   <a href="#rfc.appendix.A.1.8">Cost Preferences</a>
+</li>
+<li>A.1.9.   <a href="#rfc.appendix.A.1.9">Immediate</a>
+</li>
+</ul></ul><li>Appendix B.   <a href="#rfc.appendix.B">Sample API definition in Go</a>
 </li>
 <li><a href="#rfc.authors">Authors' Addresses</a>
 </li>
@@ -1115,7 +1136,7 @@ Connection -&gt; SoftError&lt;&gt;
 <h1 id="rfc.section.12.1.4">
 <a href="#rfc.section.12.1.4">12.1.4.</a> <a href="#transport-props-preference" id="transport-props-preference">Preference</a>
 </h1>
-<p id="rfc.section.12.1.4.p.1">The Preference Type is a specific instance of the &#8220;Enum&#8221; type and has five different preference levels:</p>
+<p id="rfc.section.12.1.4.p.1">The Preference type is used in most Selection properties on a Preconnection object to constrain Path Selection and Protocol Selection.  It is a specific instance of the &#8220;Enum&#8221; type and has five different preference levels:</p>
 <table cellpadding="3" cellspacing="0" class="tt full center">
 <thead><tr>
 <th class="left">Preference</th>
@@ -1144,7 +1165,7 @@ Connection -&gt; SoftError&lt;&gt;
 </tr>
 </tbody>
 </table>
-<p id="rfc.section.12.1.4.p.2">The Preference type is used in most Selection properties to constrain Path Selection and Protocol Selection.</p>
+<p id="rfc.section.12.1.4.p.2">When used on a Connection, this type becomes a (read-only) Boolean representing whether the selected transport supports the requested feature.</p>
 <h1 id="rfc.section.12.2">
 <a href="#rfc.section.12.2">12.2.</a> <a href="#transport-property-classification" id="transport-property-classification">Transport Property Classification</a>
 </h1>
@@ -1165,6 +1186,11 @@ Connection -&gt; SoftError&lt;&gt;
 <a href="#rfc.section.12.2.3">12.2.3.</a> <a href="#control-properties" id="control-properties">Control Properties</a>
 </h1>
 <p id="rfc.section.12.2.3.p.1">Control properties signals state changes to the transport system.  See <a href="#send-final" class="xref">Section 12.3.1</a> for an example.</p>
+<h1 id="rfc.section.12.2.4">
+<a href="#rfc.section.12.2.4">12.2.4.</a> <a href="#intents" id="intents">Intents</a>
+</h1>
+<p id="rfc.section.12.2.4.p.1">Intents are hints to the transport system that do not directly map to a single protocol/transport feature or behavior of the transport system, but express a presumed application behavior or generic application needs.</p>
+<p id="rfc.section.12.2.4.p.2">The application can expect the transport system to take appropriate actions involving protocol selection, path selection and, setting of protocol flags.  For example, if an application sets the &#8220;Capacity Profile&#8221; to &#8220;bulk&#8221; on a Preconnection, this will likely influence path selection, DSCP flags in the IP header as well as niceness for multi-streaming connections.  When using Intents, the application must not expect consistent behavior across different environments, implementations or versions of the same implementation.</p>
 <h1 id="rfc.section.12.3">
 <a href="#rfc.section.12.3">12.3.</a> <a href="#mandatory-transport-properties" id="mandatory-transport-properties">Mandatory Transport Properties</a>
 </h1>
@@ -1195,7 +1221,7 @@ Connection -&gt; SoftError&lt;&gt;
 <dt>Type:</dt>
 <dd style="margin-left: 8">Preference</dd>
 <dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection</dd>
+<dd style="margin-left: 8">Preconnection, Connection (read only)</dd>
 </dl>
 <p id="rfc.section.12.3.2.p.2">This property specifies whether the application wishes to use a transport protocol that ensures that all data is received on the other side without corruption. This also entails being notified when a Connection is closed or aborted. The default is to enable Reliable Data Transfer.</p>
 <h1 id="rfc.section.12.3.3">
@@ -1209,7 +1235,7 @@ Connection -&gt; SoftError&lt;&gt;
 <dt>Type:</dt>
 <dd style="margin-left: 8">Preference</dd>
 <dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection</dd>
+<dd style="margin-left: 8">Preconnection, Connection (read only)</dd>
 </dl>
 <p id="rfc.section.12.3.3.p.2">This property specifies whether an application considers it useful to indicate its reliability requirements on a per-Message basis. This property applies to Connections and Connection Groups. The default is to not have this option.</p>
 <h1 id="rfc.section.12.3.4">
@@ -1237,7 +1263,7 @@ Connection -&gt; SoftError&lt;&gt;
 <dt>Type:</dt>
 <dd style="margin-left: 8">Preference</dd>
 <dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection</dd>
+<dd style="margin-left: 8">Preconnection, Connection (read only)</dd>
 </dl>
 <p id="rfc.section.12.3.5.p.2">This property specifies whether the application wishes to use a transport protocol that ensures that data is received by the application on the other end in the same order as it was sent. The default is to preserve data ordering.</p>
 <h1 id="rfc.section.12.3.6">
@@ -1261,11 +1287,11 @@ Connection -&gt; SoftError&lt;&gt;
 
 <dl>
 <dt>Classification:</dt>
-<dd style="margin-left: 8">Selection Property</dd>
+<dd style="margin-left: 8">Selection Property, Control Property</dd>
 <dt>Type:</dt>
 <dd style="margin-left: 8">Enumeration</dd>
 <dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection</dd>
+<dd style="margin-left: 8">Preconnection, Connection (read only)</dd>
 </dl>
 <p id="rfc.section.12.3.7.p.2">This property specifies whether an application wants to use the connection for sending and/or receiving data.  Possible values are:</p>
 <p></p>
@@ -1290,7 +1316,7 @@ Connection -&gt; SoftError&lt;&gt;
 <dt>Type:</dt>
 <dd style="margin-left: 8">Preference</dd>
 <dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection</dd>
+<dd style="margin-left: 8">Preconnection, Connection (read only)</dd>
 </dl>
 <p id="rfc.section.12.3.8.p.2">This property specifies whether an application would like to supply a Message to the transport protocol before Connection establishment, which will then be reliably transferred to the other side before or during Connection establishment, potentially multiple times.  See also <a href="#send-idempotent" class="xref">Section 12.3.9</a>. The default is to not have this option.</p>
 <h1 id="rfc.section.12.3.9">
@@ -1319,7 +1345,7 @@ Connection -&gt; SoftError&lt;&gt;
 <dt>Type:</dt>
 <dd style="margin-left: 8">Preference</dd>
 <dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection</dd>
+<dd style="margin-left: 8">Preconnection, Connection (read only)</dd>
 </dl>
 <p id="rfc.section.12.3.10.p.2">This property specifies that the application would prefer multiple Connections within a Connection Group to be provided by streams of a single underlying transport connection where possible. The default is to not have this option.</p>
 <h1 id="rfc.section.12.3.11">
@@ -1329,13 +1355,14 @@ Connection -&gt; SoftError&lt;&gt;
 
 <dl>
 <dt>Classification:</dt>
-<dd style="margin-left: 8">Selection Property</dd>
+<dd style="margin-left: 8">Control Property</dd>
 <dt>Type:</dt>
-<dd style="margin-left: 8">Preference</dd>
+<dd style="margin-left: 8">Boolean</dd>
 <dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection</dd>
+<dd style="margin-left: 8">Preconnection, Connection</dd>
 </dl>
-<p id="rfc.section.12.3.11.p.2">This property specifies whether an application considers it useful to be informed in case sent data was retransmitted more often than a certain threshold. The default is to have this option.</p>
+<p id="rfc.section.12.3.11.p.2">This property specifies whether an application considers it useful to be informed in case sent data was retransmitted more often than a certain threshold.  When set to true, the effect is twofold: The application may receive events in case excessive retransmissions.  In addition, the transport system considers this as a preference to use transports stacks that can provide this notification. This is not a strict requirement.  If set to false, no notification of excessive retransmissions will be sent and this transport feature is ignored for protocol selection.</p>
+<p id="rfc.section.12.3.11.p.3">The default is to have this option.</p>
 <h1 id="rfc.section.12.3.12">
 <a href="#rfc.section.12.3.12">12.3.12.</a> <a href="#retransmission-threshold-before-excessive-retransmission-notification" id="retransmission-threshold-before-excessive-retransmission-notification">Retransmission threshold before excessive retransmission notification</a>
 </h1>
@@ -1343,7 +1370,7 @@ Connection -&gt; SoftError&lt;&gt;
 
 <dl>
 <dt>Classification:</dt>
-<dd style="margin-left: 8">Protocol Property</dd>
+<dd style="margin-left: 8">Control Property</dd>
 <dt>Type:</dt>
 <dd style="margin-left: 8">Integer</dd>
 <dt>Applicability:</dt>
@@ -1357,13 +1384,14 @@ Connection -&gt; SoftError&lt;&gt;
 
 <dl>
 <dt>Classification:</dt>
-<dd style="margin-left: 8">Selection Property</dd>
+<dd style="margin-left: 8">Control Property</dd>
 <dt>Type:</dt>
-<dd style="margin-left: 8">Preference</dd>
+<dd style="margin-left: 8">Boolean</dd>
 <dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection</dd>
+<dd style="margin-left: 8">Preconnection, Connection</dd>
 </dl>
-<p id="rfc.section.12.3.13.p.2">This property specifies whether an application considers it useful to be informed when an ICMP error message arrives that does not force termination of a connection. Note that even if a protocol supporting this property is selected, not all ICMP errors will necessarily be delivered, so applications cannot rely on receiving them. The default is not to have this option.</p>
+<p id="rfc.section.12.3.13.p.2">This property specifies whether an application considers it useful to be informed when an ICMP error message arrives that does not force termination of a connection.  When set to true, received ICMP errors will be available as SoftErrors.  Note that even if a protocol supporting this property is selected, not all ICMP errors will necessarily be delivered, so applications cannot rely on receiving them.  Setting this option also implies a preference to prefer transports stacks that can provide this notification.  If not set, no events will be sent for ICMP soft error message and this transport feature is ignored for protocol selection.</p>
+<p id="rfc.section.12.3.13.p.3">This property applies to Connections and Connection Groups.  The default is not to have this option.</p>
 <h1 id="rfc.section.12.3.14">
 <a href="#rfc.section.12.3.14">12.3.14.</a> <a href="#prop-checksum-control" id="prop-checksum-control">Control checksum coverage on sending or receiving</a>
 </h1>
@@ -1375,7 +1403,7 @@ Connection -&gt; SoftError&lt;&gt;
 <dt>Type:</dt>
 <dd style="margin-left: 8">Preference</dd>
 <dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection</dd>
+<dd style="margin-left: 8">Preconnection, Connection (read only)</dd>
 </dl>
 <p id="rfc.section.12.3.14.p.2">This property specifies whether the application considers it useful to enable, disable, or configure a checksum when sending a Message, or configure whether to require a checksum or not when receiving.  The default is full checksum coverage without the option to configure it, and requiring a checksum when receiving.</p>
 <h1 id="rfc.section.12.3.15">
@@ -1417,7 +1445,7 @@ Connection -&gt; SoftError&lt;&gt;
 <dt>Type:</dt>
 <dd style="margin-left: 8">Tuple (Enumeration, Preference)</dd>
 <dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection</dd>
+<dd style="margin-left: 8">Preconnection, Connection (read only)</dd>
 </dl>
 <p id="rfc.section.12.3.17.p.2">This property allows the application to select which specific network interfaces or categories of interfaces it wants to <samp>Require</samp>, <samp>Prohibit</samp>, <samp>Prefer</samp>, or <samp>Avoid</samp>.</p>
 <p id="rfc.section.12.3.17.p.3">If a system supports discovery of specific interface identifiers, such as <samp>en0</samp> or <samp>eth0</samp> on Unix-style systems, an implemention should allow using these identifiers to define path preferences. Note that marking a specific interface as <samp>Required</samp> strictly limits path selection to a single interface, and leads to less flexible and resilient connection establishment.</p>
@@ -1435,7 +1463,7 @@ Connection -&gt; SoftError&lt;&gt;
 <dt>Type:</dt>
 <dd style="margin-left: 8">Tuple (Enumeration, Preference)</dd>
 <dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection</dd>
+<dd style="margin-left: 8">Preconnection, Connection (read only)</dd>
 </dl>
 <p id="rfc.section.12.3.18.p.2">Similar to interface instances and types <a href="#prop-interface" class="xref">Section 12.3.17</a>, this property allows the application to control path selection by selecting which specific Provisioning Domains or categories of Provisioning Domains it wants to  <samp>Require</samp>, <samp>Prohibit</samp>, <samp>Prefer</samp>, or <samp>Avoid</samp>.  Provisioning Domains define consistent sets of network properties that may be more specific than network interfaces <a href="#RFC7556" class="xref">[RFC7556]</a>.</p>
 <p id="rfc.section.12.3.18.p.3">The identification of a specific Provisioning Domain (PvD) is defined to be implementation- and system-specific, since there is not a portable standard format for a PvD identitfier.  For example, this identifier may be a string name or an integer. As with requiring specific interfaces, requiring a specific PvD strictly limits path selection.</p>
@@ -1447,7 +1475,7 @@ Connection -&gt; SoftError&lt;&gt;
 
 <dl>
 <dt>Classification:</dt>
-<dd style="margin-left: 8">Selection Property, Protocol Property</dd>
+<dd style="margin-left: 8">Intent</dd>
 <dt>Type:</dt>
 <dd style="margin-left: 8">Enumeration</dd>
 <dt>Applicability:</dt>
@@ -1477,7 +1505,7 @@ Connection -&gt; SoftError&lt;&gt;
 <dt>Type:</dt>
 <dd style="margin-left: 8">Preference</dd>
 <dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection</dd>
+<dd style="margin-left: 8">Preconnection, Connection (read only)</dd>
 </dl>
 <p id="rfc.section.12.3.20.p.2">This property specifies whether the application would like the Connection to be congestion controlled or not. Note that if a Connection is not congestion controlled, an application using such a Connection should itself perform congestion control in accordance with <a href="#RFC2914" class="xref">[RFC2914]</a>. Also note that reliability is usually combined with congestion control in protocol implementations, rendering &#8220;reliable but not congestion controlled&#8221; a request that is unlikely to succeed. The default is that the Connection is congestion controlled.</p>
 <h1 id="rfc.section.12.3.21">
@@ -1504,7 +1532,7 @@ Connection -&gt; SoftError&lt;&gt;
 
 <dl>
 <dt>Classification:</dt>
-<dd style="margin-left: 8">Protocol Property (Generic)</dd>
+<dd style="margin-left: 8">Control Property</dd>
 <dt>Type:</dt>
 <dd style="margin-left: 8">Integer</dd>
 <dt>Applicability:</dt>
@@ -1518,7 +1546,7 @@ Connection -&gt; SoftError&lt;&gt;
 
 <dl>
 <dt>Classification:</dt>
-<dd style="margin-left: 8">Protocol Property (Generic)</dd>
+<dd style="margin-left: 8">Protocol Property (Generic) / Control Property (TODO: decide)</dd>
 <dt>Type:</dt>
 <dd style="margin-left: 8">Enum</dd>
 <dt>Applicability:</dt>
@@ -1694,30 +1722,71 @@ Connection -&gt; SoftError&lt;&gt;
 <h1 id="rfc.appendix.A">
 <a href="#rfc.appendix.A">Appendix A.</a> <a href="#appendix-non-consensus" id="appendix-non-consensus">Additional Properties</a>
 </h1>
-<p id="rfc.section.A.p.1">The interface specified by this document represents the minimal common interface to an endpoint in the transport services architecture <a href="#I-D.ietf-taps-arch" class="xref">[I-D.ietf-taps-arch]</a>, based upon that architecture and on the minimal set of transport service features elaborated in <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>. However, the interface has been designed with extension points to allow the implementation of features beyond those in the minimal common interface: Protocol Selection Properties, Path Selection Properties, and options on Message send are open sets. Implementations of the interface are free to extend these sets to provide additional expressiveness to applications written on top of them.</p>
+<p id="rfc.section.A.p.1">The interface specified by this document represents the minimal common interface to an endpoint in the transport services architecture <a href="#I-D.ietf-taps-arch" class="xref">[I-D.ietf-taps-arch]</a>, based upon that architecture and on the minimal set of transport service features elaborated in <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>. However, the interface has been designed with extension points to allow the implementation of features beyond those in the minimal common interface: Protocol Selection Properties, Path Selection Properties, and Message Properties are open sets. Implementations of the interface are free to extend these sets to provide additional expressiveness to applications written on top of them.</p>
 <p id="rfc.section.A.p.2">This appendix enumerates a few additional parameters and properties that could be used to enhance transport protocol and/or path selection, or the transmission of messages given a Protocol Stack that implements them. These are not part of the interface, and may be removed from the final document, but are presented here to support discussion within the TAPS working group as to whether they should be added to a future revision of the base specification.</p>
 <h1 id="rfc.appendix.A.1">
-<a href="#rfc.appendix.A.1">A.1.</a> <a href="#protocol-and-path-selection-properties" id="protocol-and-path-selection-properties">Protocol and Path Selection Properties</a>
+<a href="#rfc.appendix.A.1">A.1.</a> <a href="#experimental-transport-properties" id="experimental-transport-properties">Experimental Transport Properties</a>
 </h1>
-<p id="rfc.section.A.1.p.1">The following protocol and path selection properties might be made available in addition to those specified in <a href="#transport-props" class="xref">Section 12</a>:</p>
+<p id="rfc.section.A.1.p.1">The following Transport Properties might be made available in addition to those specified in <a href="#transport-props" class="xref">Section 12</a>:</p>
+<h1 id="rfc.appendix.A.1.1">
+<a href="#rfc.appendix.A.1.1">A.1.1.</a> <a href="#suggest-a-timeout-to-the-remote-endpoint" id="suggest-a-timeout-to-the-remote-endpoint">Suggest a timeout to the Remote Endpoint</a>
+</h1>
 <p></p>
 
-<ul>
-<li>Suggest a timeout to the Remote Endpoint: This boolean property specifies whether an application considers it useful to propose a timeout until the Connection is assumed to be lost. This property applies to Connections and Connection Groups. This is not a strict requirement. The default is to have this option. [EDITOR&#8217;S NOTE: For discussion of this option, see https://github.com/taps-api/drafts/issues/109]</li>
-<li>Request not to delay acknowledgment of Message: This boolean property specifies whether an application considers it useful to request for Message that its acknowledgment be sent out as early as possible instead of potentially being bundled with other acknowledgments. This property applies to Connections and Connection groups. This is not a strict requirement. The default is to not have this option. [EDITOR&#8217;S NOTE: For discussion of this option, see https://github.com/taps-api/drafts/issues/90]</li>
-</ul>
-<h1 id="rfc.appendix.A.1.1">
-<a href="#rfc.appendix.A.1.1">A.1.1.</a> <a href="#intents" id="intents">Application Intents</a>
+<dl>
+<dt>Classification:</dt>
+<dd style="margin-left: 8">Selection Property</dd>
+<dt>Type:</dt>
+<dd style="margin-left: 8">Preference</dd>
+<dt>Applicability:</dt>
+<dd style="margin-left: 8">Preconnection</dd>
+</dl>
+<p id="rfc.section.A.1.1.p.2">This property specifies whether an application considers it useful to propose a timeout until the Connection is assumed to be lost. The default is to have this option.</p>
+<p id="rfc.section.A.1.1.p.3">[EDITOR&#8217;S NOTE: For discussion of this option, see https://github.com/taps-api/drafts/issues/109]</p>
+<h1 id="rfc.appendix.A.1.2">
+<a href="#rfc.appendix.A.1.2">A.1.2.</a> <a href="#abort-timeout-to-suggest-to-the-remote-endpoint" id="abort-timeout-to-suggest-to-the-remote-endpoint">Abort timeout to suggest to the Remote Endpoint</a>
 </h1>
-<p id="rfc.section.A.1.1.p.1">Application Intents are a group of transport properties expressing what an application wants to achieve, knows, assumes or prefers regarding its communication. They are not strict requirements. In particular, they should not be used to express any Quality of Service expectations that an application might have. Instead, an application should express its intentions and its expected traffic characteristics in order to help the transport system make decisions that best match it, but on a best-effort basis. Even though Application Intents do not represent Quality of Service requirements, a transport system may use them to determine a DSCP value, e.g. similar to Table 1 in <a href="#I-D.ietf-tsvwg-rtcweb-qos" class="xref">[I-D.ietf-tsvwg-rtcweb-qos]</a>.</p>
-<p id="rfc.section.A.1.1.p.2">Application Intents can influence protocol selection, protocol configuration, path selection, and endpoint selection. For example, setting the &#8220;Timeliness&#8221; Intent to &#8220;Interactive&#8221; may lead the transport system to disable the Nagle algorithm for a Connection, while setting the &#8220;Timeliness&#8221; to &#8220;Background&#8221; may lead it to setting the DSCP value to &#8220;scavenger&#8221;. If the &#8220;Size to be Sent&#8221; Intent is set on an individual Message, it may influence path selection.</p>
-<p id="rfc.section.A.1.1.p.3">Specifying Application Intents is not mandatory. An application can specify any combination of Application Intents. If specified, Application Intents are defined as parameters passed to the Preconnection Object, and may influence the Connection established from that Preconnection. If a Connection is cloned to form a Connection Group, and associated Application Intents are cloned along with the other Transport Properties. Some Intents have also corresponding Message Properties, similar to the properties in <a href="#message-props" class="xref">Section 7.1</a>.</p>
-<p id="rfc.section.A.1.1.p.4">Application Intents can be added to this interface as Transport Preferences with the &#8220;Prefer&#8221; preference level.</p>
-<h1 id="rfc.appendix.A.1.1.1">
-<a href="#rfc.appendix.A.1.1.1">A.1.1.1.</a> <a href="#traffic-category" id="traffic-category">Traffic Category</a>
+<p></p>
+
+<dl>
+<dt>Classification:</dt>
+<dd style="margin-left: 8">Protocol Property</dd>
+<dt>Type:</dt>
+<dd style="margin-left: 8">Integer</dd>
+<dt>Applicability:</dt>
+<dd style="margin-left: 8">Preconnection, Connection</dd>
+</dl>
+<p id="rfc.section.A.1.2.p.2">This numeric property specifies the timeout to propose to the Remote Endpoint.  It is given in seconds.</p>
+<p id="rfc.section.A.1.2.p.3">[EDITOR&#8217;S NOTE: For discussion of this property, see https://github.com/taps-api/drafts/issues/109]</p>
+<h1 id="rfc.appendix.A.1.3">
+<a href="#rfc.appendix.A.1.3">A.1.3.</a> <a href="#request-not-to-delay-acknowledgment-of-message" id="request-not-to-delay-acknowledgment-of-message">Request not to delay acknowledgment of Message</a>
 </h1>
-<p id="rfc.section.A.1.1.1.p.1">This Intent specifies what the application expect the dominating traffic pattern to be.</p>
-<p id="rfc.section.A.1.1.1.p.2">Possible Category values are:</p>
+<p></p>
+
+<dl>
+<dt>Classification:</dt>
+<dd style="margin-left: 8">Selection Property</dd>
+<dt>Type:</dt>
+<dd style="margin-left: 8">Preference</dd>
+<dt>Applicability:</dt>
+<dd style="margin-left: 8">Preconnection</dd>
+</dl>
+<p id="rfc.section.A.1.3.p.2">This property specifies whether an application considers it useful to be able to request for a Message that its acknowledgment be sent out as early as possible instead of potentially being bundled with other acknowledgments. The default is to not have this option.</p>
+<p id="rfc.section.A.1.3.p.3">[EDITOR&#8217;S NOTE: For discussion of this option, see https://github.com/taps-api/drafts/issues/90]</p>
+<h1 id="rfc.appendix.A.1.4">
+<a href="#rfc.appendix.A.1.4">A.1.4.</a> <a href="#traffic-category" id="traffic-category">Traffic Category</a>
+</h1>
+<p></p>
+
+<dl>
+<dt>Classification:</dt>
+<dd style="margin-left: 8">Intent</dd>
+<dt>Type:</dt>
+<dd style="margin-left: 8">Enumeration</dd>
+<dt>Applicability:</dt>
+<dd style="margin-left: 8">Preconnection</dd>
+</dl>
+<p id="rfc.section.A.1.4.p.2">This property specifies what the application expect the dominating traffic pattern to be. Possible values are:</p>
 <p></p>
 
 <dl>
@@ -1730,23 +1799,65 @@ Connection -&gt; SoftError&lt;&gt;
 <dt>Bulk:</dt>
 <dd style="margin-left: 8">Bulk transfer of large Messages, presumably bandwidth bound</dd>
 </dl>
-<p id="rfc.section.A.1.1.1.p.4">The default is to not assume any particular traffic pattern. Most categories suggest the use of other intents to further describe the traffic pattern anticipated, e.g., the bulk category suggesting the use of the Message Size intents or the stream category suggesting the Stream Bitrate and Duration intents.</p>
-<h1 id="rfc.appendix.A.1.1.2">
-<a href="#rfc.appendix.A.1.1.2">A.1.1.2.</a> <a href="#size-to-be-sent-received" id="size-to-be-sent-received">Size to be Sent / Received</a>
+<p id="rfc.section.A.1.4.p.4">The default is to not assume any particular traffic pattern. Most categories suggest the use of other intents to further describe the traffic pattern anticipated, e.g., the bulk category suggesting the use of the Message Size intents or the stream category suggesting the Stream Bitrate and Duration intents.</p>
+<h1 id="rfc.appendix.A.1.5">
+<a href="#rfc.appendix.A.1.5">A.1.5.</a> <a href="#size-to-be-sent-or-received" id="size-to-be-sent-or-received">Size to be Sent or Received</a>
 </h1>
-<p id="rfc.section.A.1.1.2.p.1">This Intent specifies what the application expects the size of a transfer to be.  It is a numeric property and given in Bytes.</p>
-<h1 id="rfc.appendix.A.1.1.3">
-<a href="#rfc.appendix.A.1.1.3">A.1.1.3.</a> <a href="#duration" id="duration">Duration</a>
+<p></p>
+
+<dl>
+<dt>Classification:</dt>
+<dd style="margin-left: 8">Intent</dd>
+<dt>Type:</dt>
+<dd style="margin-left: 8">Integer</dd>
+<dt>Applicability:</dt>
+<dd style="margin-left: 8">Preconnection, Message</dd>
+</dl>
+<p id="rfc.section.A.1.5.p.2">This property specifies how many bytes the application expects to send (Size to be Sent) or how many bytes the application expects to receive in response (Size to be Received).</p>
+<h1 id="rfc.appendix.A.1.6">
+<a href="#rfc.appendix.A.1.6">A.1.6.</a> <a href="#duration" id="duration">Duration</a>
 </h1>
-<p id="rfc.section.A.1.1.3.p.1">This Intent specifies what the application expects the lifetime of a transfer to be. It is a numeric property and given in milliseconds.</p>
-<h1 id="rfc.appendix.A.1.1.4">
-<a href="#rfc.appendix.A.1.1.4">A.1.1.4.</a> <a href="#send-receive-bit-rate" id="send-receive-bit-rate">Send / Receive Bit-rate</a>
+<p></p>
+
+<dl>
+<dt>Classification:</dt>
+<dd style="margin-left: 8">Intent</dd>
+<dt>Type:</dt>
+<dd style="margin-left: 8">Integer</dd>
+<dt>Applicability:</dt>
+<dd style="margin-left: 8">Preconnection</dd>
+</dl>
+<p id="rfc.section.A.1.6.p.2">This Intent specifies what the application expects the lifetime of a connection to be. It is given in milliseconds.</p>
+<h1 id="rfc.appendix.A.1.7">
+<a href="#rfc.appendix.A.1.7">A.1.7.</a> <a href="#send-or-receive-bit-rate" id="send-or-receive-bit-rate">Send or Receive Bit-rate</a>
 </h1>
-<p id="rfc.section.A.1.1.4.p.1">This Intent specifies what the application expects the bit-rate of a transfer to be. It is a numeric property and given in Bytes per second.</p>
-<h1 id="rfc.appendix.A.1.1.5">
-<a href="#rfc.appendix.A.1.1.5">A.1.1.5.</a> <a href="#cost-preferences" id="cost-preferences">Cost Preferences</a>
+<p></p>
+
+<dl>
+<dt>Classification:</dt>
+<dd style="margin-left: 8">Intent</dd>
+<dt>Type:</dt>
+<dd style="margin-left: 8">Integer</dd>
+<dt>Applicability:</dt>
+<dd style="margin-left: 8">Preconnection, Message</dd>
+</dl>
+<p id="rfc.section.A.1.7.p.2">This Intent specifies what the application expects the bit-rate of a transfer to be. It is given in Bytes per second.</p>
+<p id="rfc.section.A.1.7.p.3">On a message, this property specifies at what bitrate the application wishes the Message to be sent. A transport system supporting this feature will not exceed the requested Send Bitrate even if flow-control and congestion control allow higher bitrates. This helps to avoid bursty traffic pattern on busy video streaming servers.</p>
+<h1 id="rfc.appendix.A.1.8">
+<a href="#rfc.appendix.A.1.8">A.1.8.</a> <a href="#cost-preferences" id="cost-preferences">Cost Preferences</a>
 </h1>
-<p id="rfc.section.A.1.1.5.p.1">This Intent describes what an application prefers regarding monetary costs, e.g., whether it considers it acceptable to utilize limited data volume. It provides hints to the transport system on how to handle trade-offs between cost and performance or reliability. This Intent can also apply to an individual Messages.</p>
+<p></p>
+
+<dl>
+<dt>Classification:</dt>
+<dd style="margin-left: 8">Intent</dd>
+<dt>Type:</dt>
+<dd style="margin-left: 8">Enumeration</dd>
+<dt>Applicability:</dt>
+<dd style="margin-left: 8">Preconnection, Message</dd>
+</dl>
+<p id="rfc.section.A.1.8.p.2">This property describes what an application prefers regarding monetary costs, e.g., whether it considers it acceptable to utilize limited data volume. It provides hints to the transport system on how to handle trade-offs between cost and performance or reliability.</p>
+<p id="rfc.section.A.1.8.p.3">Possible values are:</p>
 <p></p>
 
 <dl>
@@ -1759,24 +1870,21 @@ Connection -&gt; SoftError&lt;&gt;
 <dt>Ignore Cost:</dt>
 <dd style="margin-left: 8">Ignore cost, choose transport solely based on other criteria</dd>
 </dl>
-<p id="rfc.section.A.1.1.5.p.3">The default is &#8220;Balance Cost&#8221;.</p>
-<h1 id="rfc.appendix.A.2">
-<a href="#rfc.appendix.A.2">A.2.</a> <a href="#protocol-properties" id="protocol-properties">Protocol Properties</a>
+<p id="rfc.section.A.1.8.p.5">The default is &#8220;Balance Cost&#8221;.</p>
+<h1 id="rfc.appendix.A.1.9">
+<a href="#rfc.appendix.A.1.9">A.1.9.</a> <a href="#immediate" id="immediate">Immediate</a>
 </h1>
-<p id="rfc.section.A.2.p.1">The following protocol properties might be made available in addition to those in <a href="#protocol-props" class="xref">Section 12.2.2</a>:</p>
 <p></p>
 
-<ul><li>Abort timeout to suggest to the Remote Endpoint: This numeric property specifies the timeout to propose to the Remote Endpoint. It is given in seconds. [EDITOR&#8217;S NOTE: For discussion of this property, see https://github.com/taps-api/drafts/issues/109]</li></ul>
-<h1 id="rfc.appendix.A.3">
-<a href="#rfc.appendix.A.3">A.3.</a> <a href="#message-properties" id="message-properties">Message Properties</a>
-</h1>
-<p id="rfc.section.A.3.p.1">The following Message Properties might be made available in addition to those specified in <a href="#message-props" class="xref">Section 7.1</a>:</p>
-<p></p>
-
-<ul>
-<li>Immediate: Immediate is a boolean property. If true, the caller prefers immediacy to efficient capacity usage for this Message. For example, this means that the Message should not be bundled with other Message into the same transmission by the underlying Protocol Stack.</li>
-<li>Send Bitrate: This numeric property in Bytes per second specifies at what bitrate the application wishes the Message to be sent. A transport supporting this feature will not exceed the requested Send Bitrate even if flow-control and congestion control allow higher bitrates. This helps to avid bursty traffic pattern on busy video streaming servers.</li>
-</ul>
+<dl>
+<dt>Classification:</dt>
+<dd style="margin-left: 8">Protocol Property (Generic)</dd>
+<dt>Type:</dt>
+<dd style="margin-left: 8">Boolean</dd>
+<dt>Applicability:</dt>
+<dd style="margin-left: 8">Message</dd>
+</dl>
+<p id="rfc.section.A.1.9.p.2">This property specifies whether the caller prefers immediacy to efficient capacity usage for this Message. For example, this means that the Message should not be bundled with other Message into the same transmission by the underlying Protocol Stack.</p>
 <h1 id="rfc.appendix.B">
 <a href="#rfc.appendix.B">Appendix B.</a> <a href="#appendix-api-sketch" id="appendix-api-sketch">Sample API definition in Go</a>
 </h1>
