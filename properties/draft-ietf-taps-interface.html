@@ -1115,7 +1115,7 @@ Connection -&gt; SoftError&lt;&gt;
 <h1 id="rfc.section.12">
 <a href="#rfc.section.12">12.</a> <a href="#transport-props" id="transport-props">Transport Properties</a>
 </h1>
-<p id="rfc.section.12.p.1">Transport Properties allow an application to control most aspects of the transport system.</p>
+<p id="rfc.section.12.p.1">Transport Properties allow an application to control and introspect most aspects of the transport system and transport protocols.</p>
 <p id="rfc.section.12.p.2">Properties are structured in two ways:</p>
 <p></p>
 
@@ -1193,7 +1193,7 @@ Connection -&gt; SoftError&lt;&gt;
 <h1 id="rfc.section.12.2.3">
 <a href="#rfc.section.12.2.3">12.2.3.</a> <a href="#control-props" id="control-props">Control Properties</a>
 </h1>
-<p id="rfc.section.12.2.3.p.1">Control properties signals state changes to the transport system.  See <a href="#send-final" class="xref">Section 12.3.1</a> for an example.</p>
+<p id="rfc.section.12.2.3.p.1">Control properties control the local transport system behavior or request state changes in the local transport system. Depending on the protocols used, setting these properties might also influence the protocol state machine.  See <a href="#send-final" class="xref">Section 12.3.1</a> for an example.</p>
 <h1 id="rfc.section.12.2.4">
 <a href="#rfc.section.12.2.4">12.2.4.</a> <a href="#intents" id="intents">Intents</a>
 </h1>
@@ -1259,7 +1259,7 @@ Connection -&gt; SoftError&lt;&gt;
 <dt>Applicability:</dt>
 <dd style="margin-left: 8">Message</dd>
 </dl>
-<p id="rfc.section.12.3.4.p.2">This property specifies that a message should be sent in such a way that the transport protocol ensures all data is received on the other side without corruption. Reliable Data Transfer can only be used on Messages if the transport protocol supports partial reliability (see <a href="#prop-partially-reliable" class="xref">Section 12.3.3</a>).</p>
+<p id="rfc.section.12.3.4.p.2">This property specifies that a message should be sent in such a way that the transport protocol ensures all data is received on the other side without corruption. Changing the &#180;Reliable Data Transfer&#180; property on Messages is only possible if the transport protocol supports partial reliability (see <a href="#prop-partially-reliable" class="xref">Section 12.3.3</a>).  Therefore, for protocols that always transfer data reliably, this property is always true and for protocols that always transfer data unreliably, this flag is always false. Changing it may generate an error.</p>
 <h1 id="rfc.section.12.3.5">
 <a href="#rfc.section.12.3.5">12.3.5.</a> <a href="#prop-ordering" id="prop-ordering">Preservation of data ordering</a>
 </h1>
@@ -1287,7 +1287,7 @@ Connection -&gt; SoftError&lt;&gt;
 <dt>Applicability:</dt>
 <dd style="margin-left: 8">Message</dd>
 </dl>
-<p id="rfc.section.12.3.6.p.2">This property specifies that a Message should be delivered to the other side after the previous Message which was passed to the same Connection via the Send Action.</p>
+<p id="rfc.section.12.3.6.p.2">This property specifies that a Message should be delivered to the other side after the previous Message which was passed to the same Connection via the Send Action. It us used for protocols that support preservation of data ordering, see <a href="#prop-ordering" class="xref">Section 12.3.5</a>, but allow out-of-order delivery for certain messages.</p>
 <h1 id="rfc.section.12.3.7">
 <a href="#rfc.section.12.3.7">12.3.7.</a> <a href="#direction-of-communication" id="direction-of-communication">Direction of communication</a>
 </h1>
@@ -1334,7 +1334,7 @@ Connection -&gt; SoftError&lt;&gt;
 
 <dl>
 <dt>Classification:</dt>
-<dd style="margin-left: 8">Protocol Property (Generic)</dd>
+<dd style="margin-left: 8">Control Property</dd>
 <dt>Type:</dt>
 <dd style="margin-left: 8">Boolean</dd>
 <dt>Applicability:</dt>
