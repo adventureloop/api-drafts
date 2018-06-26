@@ -322,11 +322,16 @@ ul.toc li {
 <link href="#rfc.section.7.5" rel="Chapter" title="7.5 Batching Sends">
 <link href="#rfc.section.7.6" rel="Chapter" title="7.6 Sender-side Framing">
 <link href="#rfc.section.8" rel="Chapter" title="8 Receiving Data">
-<link href="#rfc.section.8.1" rel="Chapter" title="8.1 Receive Metadata">
-<link href="#rfc.section.8.1.1" rel="Chapter" title="8.1.1 ECN">
-<link href="#rfc.section.8.1.2" rel="Chapter" title="8.1.2 Early Data">
-<link href="#rfc.section.8.2" rel="Chapter" title="8.2 Receiving Final Messages">
-<link href="#rfc.section.8.3" rel="Chapter" title="8.3 Receiver-side De-framing over Stream Protocols">
+<link href="#rfc.section.8.1" rel="Chapter" title="8.1 Enqueuing Receives">
+<link href="#rfc.section.8.2" rel="Chapter" title="8.2 Receive Events">
+<link href="#rfc.section.8.2.1" rel="Chapter" title="8.2.1 Received">
+<link href="#rfc.section.8.2.2" rel="Chapter" title="8.2.2 ReceivedPartial">
+<link href="#rfc.section.8.2.3" rel="Chapter" title="8.2.3 ReceiveError">
+<link href="#rfc.section.8.3" rel="Chapter" title="8.3 Message Receive Context">
+<link href="#rfc.section.8.3.1" rel="Chapter" title="8.3.1 ECN">
+<link href="#rfc.section.8.3.2" rel="Chapter" title="8.3.2 Early Data">
+<link href="#rfc.section.8.3.3" rel="Chapter" title="8.3.3 Receiving Final Messages">
+<link href="#rfc.section.8.4" rel="Chapter" title="8.4 Receiver-side De-framing over Stream Protocols">
 <link href="#rfc.section.9" rel="Chapter" title="9 Setting and Querying of Connection Properties">
 <link href="#rfc.section.9.1" rel="Chapter" title="9.1 Protocol Properties">
 <link href="#rfc.section.10" rel="Chapter" title="10 Connection Termination">
@@ -546,15 +551,25 @@ ul.toc li {
 </li>
 </ul><li>8.   <a href="#rfc.section.8">Receiving Data</a>
 </li>
-<ul><li>8.1.   <a href="#rfc.section.8.1">Receive Metadata</a>
+<ul><li>8.1.   <a href="#rfc.section.8.1">Enqueuing Receives</a>
 </li>
-<ul><li>8.1.1.   <a href="#rfc.section.8.1.1">ECN</a>
+<li>8.2.   <a href="#rfc.section.8.2">Receive Events</a>
 </li>
-<li>8.1.2.   <a href="#rfc.section.8.1.2">Early Data</a>
+<ul><li>8.2.1.   <a href="#rfc.section.8.2.1">Received</a>
 </li>
-</ul><li>8.2.   <a href="#rfc.section.8.2">Receiving Final Messages</a>
+<li>8.2.2.   <a href="#rfc.section.8.2.2">ReceivedPartial</a>
 </li>
-<li>8.3.   <a href="#rfc.section.8.3">Receiver-side De-framing over Stream Protocols</a>
+<li>8.2.3.   <a href="#rfc.section.8.2.3">ReceiveError</a>
+</li>
+</ul><li>8.3.   <a href="#rfc.section.8.3">Message Receive Context</a>
+</li>
+<ul><li>8.3.1.   <a href="#rfc.section.8.3.1">ECN</a>
+</li>
+<li>8.3.2.   <a href="#rfc.section.8.3.2">Early Data</a>
+</li>
+<li>8.3.3.   <a href="#rfc.section.8.3.3">Receiving Final Messages</a>
+</li>
+</ul><li>8.4.   <a href="#rfc.section.8.4">Receiver-side De-framing over Stream Protocols</a>
 </li>
 </ul><li>9.   <a href="#rfc.section.9">Setting and Querying of Connection Properties</a>
 </li>
@@ -664,7 +679,7 @@ Action(parameter, parameter, ...) / Event&lt;parameter, parameter, ...&gt;
                                      SecurityParams)
 </pre>
 <p id="rfc.section.5.p.3">The Local Endpoint MUST be specified if the Preconnection is used to Listen() for incoming Connections, but is OPTIONAL if it is used to Initiate() connections. The Remote Endpoint MUST be specified in the Preconnection is used to Initiate() Connections, but is OPTIONAL if it is used to Listen() for incoming Connections.  The Local Endpoint and the Remote Endpoint MUST both be specified if a peer-to-peer Rendezvous is to occur based on the Preconnection.</p>
-<p id="rfc.section.5.p.4">Framers (see <a href="#send-framing" class="xref">Section 7.6</a>) and deframers (see <a href="#receive-framing" class="xref">Section 8.3</a>), if necessary, should be bound to the Preconnection during pre-establishment.</p>
+<p id="rfc.section.5.p.4">Framers (see <a href="#send-framing" class="xref">Section 7.6</a>) and deframers (see <a href="#receive-framing" class="xref">Section 8.4</a>), if necessary, should be bound to the Preconnection during pre-establishment.</p>
 <h1 id="rfc.section.5.1">
 <a href="#rfc.section.5.1">5.1.</a> <a href="#endpointspec" id="endpointspec">Specifying Endpoints</a>
 </h1>
@@ -1010,12 +1025,13 @@ messageData := "hello".octets()
 Connection.Send(messageData)
 </pre>
 <p id="rfc.section.7.1.p.2">The interpretation of a Message to be sent is dependent on the implementation, and on the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters.  For example, a Message may be a single datagram for UDP Connections; or an HTTP Request for HTTP Connections.</p>
-<p id="rfc.section.7.1.p.3">Some transport protocols can deliver arbitrarily sized Messages, but other protocols constrain the maximum Message size. Applications can query the protocol property Maximum Message Size on Send to determine the maximum size allowed for a single Message.</p>
+<p id="rfc.section.7.1.p.3">Some transport protocols can deliver arbitrarily sized Messages, but other protocols constrain the maximum Message size. Applications can query the protocol property Maximum Message Size on Send to determine the maximum size allowed for a single Message. If a Message is too large to fit in the Maximum Message Size for the Connection, the Send will fail with a SendError event (<a href="#send-error" class="xref">Section 7.2.3</a>). For example, it is invalid to send a Message over a UDP connection that is larger than the available datagram sending size.</p>
 <p id="rfc.section.7.1.p.4">If Send is called on a Connection which has not yet been established, an Initiate Action will be implicitly performed simultaneously with the Send.  Used together with the Idempotent property (see <a href="#send-idempotent" class="xref">Section 7.3.4</a>), this can be used to send data during establishment for 0-RTT session resumption on Protocol Stacks that support it.</p>
 <h1 id="rfc.section.7.2">
 <a href="#rfc.section.7.2">7.2.</a> <a href="#send-events" id="send-events">Send Events</a>
 </h1>
 <p id="rfc.section.7.2.p.1">Like all Actions in this interface, the Send Action is asynchronous. There are several events that can be delivered in response to Sending a Message.</p>
+<p id="rfc.section.7.2.p.2">Note that if partial Sends are used (<a href="#send-partial" class="xref">Section 7.4</a>), there will still be exactly one Send Event delivered for each call to Send. For example, if a Message expired while two requests to Send data for that Message are outstanding, there will be two Expired events delivered.</p>
 <h1 id="rfc.section.7.2.1">
 <a href="#rfc.section.7.2.1">7.2.1.</a> <a href="#sent" id="sent">Sent</a>
 </h1>
@@ -1032,7 +1048,7 @@ Connection -&gt; Expired&lt;msgRef&gt;
 </pre>
 <p id="rfc.section.7.2.2.p.1">The Expired Event occurs when a previous Send Action expired before completion; i.e. when the Message was not sent before its Lifetime (see <a href="#send-lifetime" class="xref">Section 7.3.1</a>) expired. This is separate from SendError, as it is an expected behavior for partially reliable transports. The Expired Event contains an implementation-specific reference to the Message to which it applies.</p>
 <h1 id="rfc.section.7.2.3">
-<a href="#rfc.section.7.2.3">7.2.3.</a> <a href="#senderror" id="senderror">SendError</a>
+<a href="#rfc.section.7.2.3">7.2.3.</a> <a href="#send-error" id="send-error">SendError</a>
 </h1>
 <pre>
 Connection -&gt; SendError&lt;msgRef&gt;
@@ -1132,64 +1148,88 @@ Preconnection.FrameWith(Framer)
 
 OctetArray := Framer.Frame(messageData)
 </pre>
-<p id="rfc.section.7.6.p.2">Sender-side framing is a convenience feature of the interface, for parity with receiver-side framing (see <a href="#receive-framing" class="xref">Section 8.3</a>).</p>
+<p id="rfc.section.7.6.p.2">Sender-side framing is a convenience feature of the interface, for parity with receiver-side framing (see <a href="#receive-framing" class="xref">Section 8.4</a>).</p>
 <h1 id="rfc.section.8">
 <a href="#rfc.section.8">8.</a> <a href="#receiving" id="receiving">Receiving Data</a>
 </h1>
-<p id="rfc.section.8.p.1">Once a Connection is established, Messages may be received on it. The application can indicate that it is ready to receive Messages by calling Receive() on the Connection.</p>
+<p id="rfc.section.8.p.1">Once a Connection is established, it can be used for receiving data. As with sending, data is received in terms of Messages. Receiving is an asynchronous operation, in which each call to Receive enqueues a request to receive new data from the connection. Once data has been received, or an error is encountered, an event will be delivered to complete the Receive request (see <a href="#receive-events" class="xref">Section 8.2</a>).</p>
+<p id="rfc.section.8.p.2">As with sending, the type of the Message to be passed is dependent on the implementation, and on the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters.</p>
+<h1 id="rfc.section.8.1">
+<a href="#rfc.section.8.1">8.1.</a> <a href="#enqueuing-receives" id="enqueuing-receives">Enqueuing Receives</a>
+</h1>
+<p id="rfc.section.8.1.p.1">Receive takes two parameters to specify the length of data that an application is willing to receive, both of which are optional and have default values if not specified.</p>
 <pre>
-Connection.Receive(ReceiveHandler, minIncompleteLength, maxLength)
+Connection.Receive(minIncompleteLength, maxLength)
 </pre>
-<p id="rfc.section.8.p.2">Receive takes a ReceiveHandler, which can handle the Received Event and the ReceiveError error. Each call to Receive will result in at most one Received event being sent to the handler, though implementations may provide convenience functions to indicate readiness to receive a larger but finite number of Messages with a single call. This allows an application to provide backpressure to the transport stack when it is temporarily not ready to receive messages.</p>
-<p id="rfc.section.8.p.3">Receive also takes a minIncompleteLength and maxLength argument, both of which are optional values.</p>
-<p id="rfc.section.8.p.4">The minIncompleteLength value indicates the smallest partial Message data size that should be delivered. By default, this value is infinite, which means that only complete, atomic Messages will be delivered. If this value is set to some smaller value, the associated ReceiveHandler will be triggered only when at least that many bytes are available, the Message is complete, or the system needs to free up memory. Applications should always check the length of the data delivered to the ReceiveHandler and not assume it will be as long as minIncompleteLength in the case of shorter complete Messages or memory issues.</p>
-<p id="rfc.section.8.p.5">The maxLength argument indicates the maximum size (in bytes of data) Message the application is currently prepared to receive. The default value for maxLength is infinite. If an incoming Message is larger than the minimum of this size and the maximum Message size on receive for the Connection&#8217;s Protocol Stack, it will be received as a partial Message.  Partial Messages are indicated by marking the endOfMessage boolean value as false in the ReceivedHandler. Note that maxLength does not guarantee that the application will receive that many bytes if they are available; the interface may return partial Messages smaller than maxLength according to implementation constraints.</p>
+<p id="rfc.section.8.1.p.2">By default, Receive will try to deliver complete Messages in a single event (<a href="#receive-complete" class="xref">Section 8.2.1</a>).</p>
+<p id="rfc.section.8.1.p.3">The application can set a minIncompleteLength value to indicates the smallest partial Message data size in bytes that should be delivered in response to this Receive. By default, this value is infinite, which means that only complete Messages should be delivered.  If this value is set to some smaller value, the associated recieve event will be triggered only when at least that many bytes are available, or the Message is complete with fewer bytes, or the system needs to free up memory. Applications should always check the length of the data delivered to the receive event and not assume it will be as long as minIncompleteLength in the case of shorter complete Messages or memory issues.</p>
+<p id="rfc.section.8.1.p.4">The maxLength argument indicates the maximum size of a Message in bytes the application is currently prepared to receive. The default value for maxLength is infinite. If an incoming Message is larger than the minimum of this size and the maximum Message size on receive for the Connection&#8217;s Protocol Stack, it will be delivered via ReceivedPartial events (<a href="#receive-partial" class="xref">Section 8.2.2</a>).</p>
+<p id="rfc.section.8.1.p.5">Note that maxLength does not guarantee that the application will receive that many bytes if they are available; the interface may return ReceivedPartial events with less data than maxLength according to implementation constraints.</p>
+<h1 id="rfc.section.8.2">
+<a href="#rfc.section.8.2">8.2.</a> <a href="#receive-events" id="receive-events">Receive Events</a>
+</h1>
+<p id="rfc.section.8.2.p.1">Each call to Receive will be paired with a single Receive Event, which can be a success or an error. This allows an application to provide backpressure to the transport stack when it is temporarily not ready to receive messages.</p>
+<h1 id="rfc.section.8.2.1">
+<a href="#rfc.section.8.2.1">8.2.1.</a> <a href="#receive-complete" id="receive-complete">Received</a>
+</h1>
 <pre>
-Connection -&gt; Received&lt;messageContext, messageData, endOfMessage&gt;
+Connection -&gt; Received&lt;messageData, messageContext&gt;
 </pre>
-<p id="rfc.section.8.p.6">As with sending, the type of the Message to be passed is dependent on the implementation, and on the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters.</p>
-<p id="rfc.section.8.p.7">The messageContext identifies the logical message received by the transport protocol, and provides methods to access metadata about the received data.  The octets of data associated with this message are delivered as messageData.  Multiple invocations of the ReceivedHandler may devlier data for the same messageContext until the endOfMessage flag is delivered. See <a href="#receive-framing" class="xref">Section 8.3</a> for handling Message framing in situations where the Protocol Stack provides octet-stream transport only.</p>
-<p id="rfc.section.8.p.8">If the minIncompleteLength was set to be infinite, the Message passed to Received will be complete and atomic (that is, endOfMessage will be set), unless one of the following conditions holds:</p>
+<p id="rfc.section.8.2.1.p.1">A Received event indicates the delivery of a complete Message. It contains two objects, the received bytes as messageData, and the metadata and properties of the received Message as messageContext. See {#receive-context} for details about the received context.</p>
+<p id="rfc.section.8.2.1.p.2">See <a href="#receive-framing" class="xref">Section 8.4</a> for handling Message framing in situations where the Protocol Stack provides octet-stream transport only.</p>
+<h1 id="rfc.section.8.2.2">
+<a href="#rfc.section.8.2.2">8.2.2.</a> <a href="#receive-partial" id="receive-partial">ReceivedPartial</a>
+</h1>
+<pre>
+Connection -&gt; ReceivedPartial&lt;messageData, messageContext, endOfMessage&gt;
+</pre>
+<p id="rfc.section.8.2.2.p.1">If a complete Message cannot be delivered in one event, one part of the Message may be delivered with a ReceivedPartial event. In order to continue to receive more of the same Message, the application must invoke Receive again.</p>
+<p id="rfc.section.8.2.2.p.2">Multiple invocations of ReceivedPartial deliver data for the same Message by passing the same messageContext, until the endOfMessage flag is delivered. All partial blocks of a single Message are delivered in order without gaps. This event does not support delivering discontiguous partial Messages.</p>
+<p id="rfc.section.8.2.2.p.3">If the minIncompleteLength in the Receive request was set to be infinite (indicating a request to receive only complete Messages), the ReceivedPartial event may still be delivered if one of the following conditions is true:</p>
 <p></p>
 
 <ul>
 <li>the underlying Protocol Stack supports message boundary preservation, and the size of the Message is larger than the buffers available for a single message;</li>
-<li>the underlying Protocol Stack does not support message boundary preservation, and the deframer (see <a href="#receive-framing" class="xref">Section 8.3</a>) cannot determine the end of the message using the buffer space it has available; or</li>
+<li>the underlying Protocol Stack does not support message boundary preservation, and the deframer (see <a href="#receive-framing" class="xref">Section 8.4</a>) cannot determine the end of the message using the buffer space it has available; or</li>
 <li>the underlying Protocol Stack does not support message boundary preservation, and no deframer was supplied by the application</li>
 </ul>
-<p id="rfc.section.8.p.10">Note that in the absence of message boundary preservation and without deframing, all bytes received on the Connection are represented as one large message of indeterminate length.</p>
+<p id="rfc.section.8.2.2.p.5">Note that in the absence of message boundary preservation or deframing, all bytes received on the Connection will be represented as one large message of indeterminate length.</p>
+<h1 id="rfc.section.8.2.3">
+<a href="#rfc.section.8.2.3">8.2.3.</a> <a href="#receiveerror" id="receiveerror">ReceiveError</a>
+</h1>
 <pre>
-Connection -&gt; ReceiveError&lt;&gt;
+Connection -&gt; ReceiveError&lt;messageContext&gt;
 </pre>
-<p id="rfc.section.8.p.11">A ReceiveError occurs when data is received by the underlying Protocol Stack that cannot be fully retrieved or deframed, or when some other indication is received that reception has failed. Such conditions that irrevocably lead the the termination of the Connection are signaled using ConnectionError instead (see <a href="#termination" class="xref">Section 10</a>).</p>
-<h1 id="rfc.section.8.1">
-<a href="#rfc.section.8.1">8.1.</a> <a href="#receive-metadata" id="receive-metadata">Receive Metadata</a>
-</h1>
-<p id="rfc.section.8.1.p.1">Each messageContext may also contain metadata from protocols in the Protocol Stack; which metadata is available is Protocol Stack dependent. The following metadata values are supported:</p>
-<h1 id="rfc.section.8.1.1">
-<a href="#rfc.section.8.1.1">8.1.1.</a> <a href="#receive-ecn" id="receive-ecn">ECN</a>
-</h1>
-<p id="rfc.section.8.1.1.p.1">When available, Message metadata carries the value of the Explicit Congestion Notification (ECN) field. This information can be used for logging and debugging purposes, and for building applications which need access to information about the transport internals for their own operation.</p>
-<h1 id="rfc.section.8.1.2">
-<a href="#rfc.section.8.1.2">8.1.2.</a> <a href="#receive-early" id="receive-early">Early Data</a>
-</h1>
-<p id="rfc.section.8.1.2.p.1">In some cases it may be valuable to know whether data was read as part of early data streams. This is useful if applications need to treat early data separately, e.g., if early data has different security properties than data sent after connection establishment. In the case of TLS 1.3, client early data can be replayed maliciously (see <a href="#I-D.ietf-tls-tls13" class="xref">[I-D.ietf-tls-tls13]</a>). Thus, receivers may wish to perform additional checks for early data to ensure it is idempotent or not replayed. If TLS 1.3 is available and the recipient Message was sent as part of early data, the corresponding metadata carries a flag indicating as such. If early data is enabled, applications should check this metadata field for Messages received during connection establishment and respond accordingly.</p>
-<h1 id="rfc.section.8.2">
-<a href="#rfc.section.8.2">8.2.</a> <a href="#receiving-final-messages" id="receiving-final-messages">Receiving Final Messages</a>
-</h1>
-<p id="rfc.section.8.2.p.1">The application may check a property to determine if a received Message is the Final Message on a Connection. For any Message that is marked as Final, the application can assume that there will be no more Messages received on the Connection once the Message has been completely delivered. This corresponds to the Final property that may be marked on a sent Message <a href="#send-final" class="xref">Section 7.3.5</a>.</p>
-<p id="rfc.section.8.2.p.2">Some transport protocols and peers may not support signaling of the Final property.  Applications therefore should not rely on receiving a Message marked Final to know that the other endpoint is done sending on a connection.</p>
-<p id="rfc.section.8.2.p.3">Any calls to <samp>Receive</samp> once the Final Message has been delivered will result in errors.</p>
+<p id="rfc.section.8.2.3.p.1">A ReceiveError occurs when data is received by the underlying Protocol Stack that cannot be fully retrieved or deframed, or when some other indication is received that reception has failed. Such conditions that irrevocably lead the the termination of the Connection are signaled using ConnectionError instead (see <a href="#termination" class="xref">Section 10</a>).</p>
+<p id="rfc.section.8.2.3.p.2">The ReceiveError event passes an optional associated messageContext. This may indicate that a Message that was being partially received previously, but had not completed, encountered and error and will not be completed.</p>
 <h1 id="rfc.section.8.3">
-<a href="#rfc.section.8.3">8.3.</a> <a href="#receive-framing" id="receive-framing">Receiver-side De-framing over Stream Protocols</a>
+<a href="#rfc.section.8.3">8.3.</a> <a href="#receive-context" id="receive-context">Message Receive Context</a>
 </h1>
-<p id="rfc.section.8.3.p.1">The Receive Event is intended to be fired once per application-layer Message sent by the remote endpoint; i.e., it is a desired property of this interface that a Send at one end of a Connection maps to exactly one Receive on the other end. This is possible with Protocol Stacks that provide message boundary preservation, but is not the case over Protocol Stacks that provide a simple octet stream transport.</p>
-<p id="rfc.section.8.3.p.2">For preserving message boundaries over stream transports, this interface provides receiver-side de-framing. This facility is based on the observation that, since many of our current application protocols evolved over TCP, which does not provide message boundary preservation, and since many of these protocols require message boundaries to function, each application layer protocol has defined its own framing. A Deframer allows an application to push this de-framing down into the interface, in order to transform an octet stream into a sequence of Messages.</p>
-<p id="rfc.section.8.3.p.3">Concretely, receiver-side de-framing allows a caller to provide the interface with a function that takes an octet stream, as provided by the underlying Protocol Stack, reads and returns a single Message of an appropriate type for the application and platform, and leaves the octet stream at the start of the next Message to deframe. It consists of a Deframer Object with a single Action, Deframe. Since the Deframer depends on the protocol used at the application layer, it is bound to the Preconnection during the pre-establishment phase:</p>
+<p id="rfc.section.8.3.p.1">Each Received Message Context may contain metadata from protocols in the Protocol Stack; which metadata is available is Protocol Stack dependent. The following metadata values are supported:</p>
+<h1 id="rfc.section.8.3.1">
+<a href="#rfc.section.8.3.1">8.3.1.</a> <a href="#receive-ecn" id="receive-ecn">ECN</a>
+</h1>
+<p id="rfc.section.8.3.1.p.1">When available, Message metadata carries the value of the Explicit Congestion Notification (ECN) field. This information can be used for logging and debugging purposes, and for building applications which need access to information about the transport internals for their own operation.</p>
+<h1 id="rfc.section.8.3.2">
+<a href="#rfc.section.8.3.2">8.3.2.</a> <a href="#receive-early" id="receive-early">Early Data</a>
+</h1>
+<p id="rfc.section.8.3.2.p.1">In some cases it may be valuable to know whether data was read as part of early data streams. This is useful if applications need to treat early data separately, e.g., if early data has different security properties than data sent after connection establishment. In the case of TLS 1.3, client early data can be replayed maliciously (see <a href="#I-D.ietf-tls-tls13" class="xref">[I-D.ietf-tls-tls13]</a>). Thus, receivers may wish to perform additional checks for early data to ensure it is idempotent or not replayed. If TLS 1.3 is available and the recipient Message was sent as part of early data, the corresponding metadata carries a flag indicating as such. If early data is enabled, applications should check this metadata field for Messages received during connection establishment and respond accordingly.</p>
+<h1 id="rfc.section.8.3.3">
+<a href="#rfc.section.8.3.3">8.3.3.</a> <a href="#receiving-final-messages" id="receiving-final-messages">Receiving Final Messages</a>
+</h1>
+<p id="rfc.section.8.3.3.p.1">The Received Message Context can indicate whether or not this Message is the Final Message on a Connection. For any Message that is marked as Final, the application can assume that there will be no more Messages received on the Connection once the Message has been completely delivered. This corresponds to the Final property that may be marked on a sent Message <a href="#send-final" class="xref">Section 7.3.5</a>.</p>
+<p id="rfc.section.8.3.3.p.2">Some transport protocols and peers may not support signaling of the Final property.  Applications therefore should not rely on receiving a Message marked Final to know that the other endpoint is done sending on a connection.</p>
+<p id="rfc.section.8.3.3.p.3">Any calls to Receive once the Final Message has been delivered will result in errors.</p>
+<h1 id="rfc.section.8.4">
+<a href="#rfc.section.8.4">8.4.</a> <a href="#receive-framing" id="receive-framing">Receiver-side De-framing over Stream Protocols</a>
+</h1>
+<p id="rfc.section.8.4.p.1">The Receive Event is intended to be fired once per application-layer Message sent by the remote endpoint; i.e., it is a desired property of this interface that a Send at one end of a Connection maps to exactly one Receive on the other end. This is possible with Protocol Stacks that provide message boundary preservation, but is not the case over Protocol Stacks that provide a simple octet stream transport.</p>
+<p id="rfc.section.8.4.p.2">For preserving message boundaries over stream transports, this interface provides receiver-side de-framing. This facility is based on the observation that, since many of our current application protocols evolved over TCP, which does not provide message boundary preservation, and since many of these protocols require message boundaries to function, each application layer protocol has defined its own framing. A Deframer allows an application to push this de-framing down into the interface, in order to transform an octet stream into a sequence of Messages.</p>
+<p id="rfc.section.8.4.p.3">Concretely, receiver-side de-framing allows a caller to provide the interface with a function that takes an octet stream, as provided by the underlying Protocol Stack, reads and returns a single Message of an appropriate type for the application and platform, and leaves the octet stream at the start of the next Message to deframe. It consists of a Deframer Object with a single Action, Deframe. Since the Deframer depends on the protocol used at the application layer, it is bound to the Preconnection during the pre-establishment phase:</p>
 <pre>
 Preconnection.DeframeWith(Deframer)
 
-{Message, messageData} := Deframer.Deframe(OctetStream, ...)
+{messageData} := Deframer.Deframe(OctetStream, ...)
 </pre>
 <h1 id="rfc.section.9">
 <a href="#rfc.section.9">9.</a> <a href="#introspection" id="introspection">Setting and Querying of Connection Properties</a>
