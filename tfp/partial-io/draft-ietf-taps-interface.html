@@ -1019,7 +1019,7 @@ Connection -&gt; CloneError&lt;&gt;
 <h1 id="rfc.section.7.1">
 <a href="#rfc.section.7.1">7.1.</a> <a href="#send-basic" id="send-basic">Basic Sending</a>
 </h1>
-<p id="rfc.section.7.1.p.1">The most basic form of sending on a connection involves enqueuing a single Data block as a complete Message, with default send parameters. Message data is created as an array of octets.</p>
+<p id="rfc.section.7.1.p.1">The most basic form of sending on a connection involves enqueuing a single Data block as a complete Message, with default send parameters. Message data is created as an array of octets, and the resulting object contains both the byte array and the length of the array.</p>
 <pre>
 messageData := "hello".octets()
 Connection.Send(messageData)
@@ -1176,7 +1176,8 @@ Connection.Receive(minIncompleteLength, maxLength)
 Connection -&gt; Received&lt;messageData, messageContext&gt;
 </pre>
 <p id="rfc.section.8.2.1.p.1">A Received event indicates the delivery of a complete Message. It contains two objects, the received bytes as messageData, and the metadata and properties of the received Message as messageContext. See {#receive-context} for details about the received context.</p>
-<p id="rfc.section.8.2.1.p.2">See <a href="#receive-framing" class="xref">Section 8.4</a> for handling Message framing in situations where the Protocol Stack provides octet-stream transport only.</p>
+<p id="rfc.section.8.2.1.p.2">The messageData object provides access to the bytes that were received for this Message, along with the length of the byte array.</p>
+<p id="rfc.section.8.2.1.p.3">See <a href="#receive-framing" class="xref">Section 8.4</a> for handling Message framing in situations where the Protocol Stack provides octet-stream transport only.</p>
 <h1 id="rfc.section.8.2.2">
 <a href="#rfc.section.8.2.2">8.2.2.</a> <a href="#receive-partial" id="receive-partial">ReceivedPartial</a>
 </h1>
