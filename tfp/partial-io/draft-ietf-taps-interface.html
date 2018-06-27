@@ -356,7 +356,7 @@ ul.toc li {
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-06-26" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-06-27" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -380,7 +380,7 @@ ul.toc li {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: December 28, 2018</td>
+<td class="left">Expires: December 29, 2018</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -433,7 +433,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">June 26, 2018</td>
+<td class="right">June 27, 2018</td>
 </tr>
 
     	
@@ -449,7 +449,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on December 28, 2018.</p>
+<p>This Internet-Draft will expire on December 29, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -1026,7 +1026,7 @@ Connection.Send(messageData)
 </pre>
 <p id="rfc.section.7.1.p.2">The interpretation of a Message to be sent is dependent on the implementation, and on the constraints on the Protocol Stacks implied by the Connection&#8217;s transport parameters.  For example, a Message may be a single datagram for UDP Connections; or an HTTP Request for HTTP Connections.</p>
 <p id="rfc.section.7.1.p.3">Some transport protocols can deliver arbitrarily sized Messages, but other protocols constrain the maximum Message size. Applications can query the protocol property Maximum Message Size on Send to determine the maximum size allowed for a single Message. If a Message is too large to fit in the Maximum Message Size for the Connection, the Send will fail with a SendError event (<a href="#send-error" class="xref">Section 7.2.3</a>). For example, it is invalid to send a Message over a UDP connection that is larger than the available datagram sending size.</p>
-<p id="rfc.section.7.1.p.4">If Send is called on a Connection which has not yet been established, an Initiate Action will be implicitly performed simultaneously with the Send.  Used together with the Idempotent property (see <a href="#send-idempotent" class="xref">Section 7.3.4</a>), this can be used to send data during establishment for 0-RTT session resumption on Protocol Stacks that support it.</p>
+<p id="rfc.section.7.1.p.4">If Send is called on a Connection which has not yet been established, an Initiate Action will be implicitly performed simultaneously with the Send.  Together with the Idempotent property (see <a href="#send-idempotent" class="xref">Section 7.3.4</a>), this can be used to send data during establishment for 0-RTT session resumption on Protocol Stacks that support it.</p>
 <h1 id="rfc.section.7.2">
 <a href="#rfc.section.7.2">7.2.</a> <a href="#send-events" id="send-events">Send Events</a>
 </h1>
@@ -1162,7 +1162,7 @@ OctetArray := Framer.Frame(messageData)
 Connection.Receive(minIncompleteLength, maxLength)
 </pre>
 <p id="rfc.section.8.1.p.2">By default, Receive will try to deliver complete Messages in a single event (<a href="#receive-complete" class="xref">Section 8.2.1</a>).</p>
-<p id="rfc.section.8.1.p.3">The application can set a minIncompleteLength value to indicates the smallest partial Message data size in bytes that should be delivered in response to this Receive. By default, this value is infinite, which means that only complete Messages should be delivered.  If this value is set to some smaller value, the associated recieve event will be triggered only when at least that many bytes are available, or the Message is complete with fewer bytes, or the system needs to free up memory. Applications should always check the length of the data delivered to the receive event and not assume it will be as long as minIncompleteLength in the case of shorter complete Messages or memory issues.</p>
+<p id="rfc.section.8.1.p.3">The application can set a minIncompleteLength value to indicates the smallest partial Message data size in bytes that should be delivered in response to this Receive. By default, this value is infinite, which means that only complete Messages should be delivered.  If this value is set to some smaller value, the associated receive event will be triggered only when at least that many bytes are available, or the Message is complete with fewer bytes, or the system needs to free up memory. Applications should always check the length of the data delivered to the receive event and not assume it will be as long as minIncompleteLength in the case of shorter complete Messages or memory issues.</p>
 <p id="rfc.section.8.1.p.4">The maxLength argument indicates the maximum size of a Message in bytes the application is currently prepared to receive. The default value for maxLength is infinite. If an incoming Message is larger than the minimum of this size and the maximum Message size on receive for the Connection&#8217;s Protocol Stack, it will be delivered via ReceivedPartial events (<a href="#receive-partial" class="xref">Section 8.2.2</a>).</p>
 <p id="rfc.section.8.1.p.5">Note that maxLength does not guarantee that the application will receive that many bytes if they are available; the interface may return ReceivedPartial events with less data than maxLength according to implementation constraints.</p>
 <h1 id="rfc.section.8.2">
