@@ -390,7 +390,7 @@ ul.toc li {
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-06-27" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-06-28" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -414,7 +414,7 @@ ul.toc li {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: December 29, 2018</td>
+<td class="left">Expires: December 30, 2018</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -467,7 +467,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">June 27, 2018</td>
+<td class="right">June 28, 2018</td>
 </tr>
 
     	
@@ -483,7 +483,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on December 29, 2018.</p>
+<p>This Internet-Draft will expire on December 30, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -1045,37 +1045,45 @@ Connection.Send(messageData, messageContext)
 <p id="rfc.section.7.3.p.5">Properties may be added to a messageContext object only before the context is used for sending. Once a messageContext has been used with a Send call, modifying any of its properties is invalid.</p>
 <p id="rfc.section.7.3.p.6">Message Properties may be inconsistent with the properties of the Protocol Stacks underlying the Connection on which a given Message is sent. For example, a Connection must provide reliability to allow setting an infinitie value for the lifetime property of a Message. Sending a Message with Message Properties inconsistent with the Selection Properties of the Connection yields an error.</p>
 <p id="rfc.section.7.3.p.7">The following Message Context Properties are supported:</p>
+<p id="rfc.section.7.3.p.8">[TODO: De-Duplicate with Properties in <a href="#transport-props" class="xref">Section 12</a>, find consensus on which Section to put them]</p>
 <h1 id="rfc.section.7.3.1">
 <a href="#rfc.section.7.3.1">7.3.1.</a> <a href="#lifetime" id="lifetime">Lifetime</a>
 </h1>
-<p id="rfc.section.7.3.1.p.1">Lifetime specifies how long a particular Message can wait to be sent to the remote endpoint before it is irrelevant and no longer needs to be (re-)transmitted. When a Message&#8217;s Lifetime is infinite, it must be transmitted reliably. The type and units of Lifetime are implementation-specific.</p>
+<p id="rfc.section.7.3.1.p.1">[TODO: De-Duplicate with <a href="#send-lifetime" class="xref">Section 12.3.28</a>]</p>
+<p id="rfc.section.7.3.1.p.2">Lifetime specifies how long a particular Message can wait to be sent to the remote endpoint before it is irrelevant and no longer needs to be (re-)transmitted. When a Message&#8217;s Lifetime is infinite, it must be transmitted reliably. The type and units of Lifetime are implementation-specific.</p>
 <h1 id="rfc.section.7.3.2">
 <a href="#rfc.section.7.3.2">7.3.2.</a> <a href="#niceness" id="niceness">Niceness</a>
 </h1>
-<p id="rfc.section.7.3.2.p.1">Niceness is a numeric (non-negative) value that represents an unbounded hierarchy of priorities of Messages, relative to other Messages sent over the same Connection and/or Connection Group (see <a href="#groups" class="xref">Section 6.4</a>).  A Message with Niceness 0 will yield to a Message with Niceness 1, which will yield to a Message with Niceness 2, and so on. Niceness may be used as a sender-side scheduling construct only, or be used to specify priorities on the wire for Protocol Stacks supporting prioritization.</p>
-<p id="rfc.section.7.3.2.p.2">This encoding of the priority has a convenient property that the priority increases as both Niceness and Lifetime decrease.</p>
+<p id="rfc.section.7.3.2.p.1">[TODO: De-Duplicate with <a href="#send-niceness" class="xref">Section 12.3.21</a>]</p>
+<p id="rfc.section.7.3.2.p.2">Niceness is a numeric (non-negative) value that represents an unbounded hierarchy of priorities of Messages, relative to other Messages sent over the same Connection and/or Connection Group (see <a href="#groups" class="xref">Section 6.4</a>).  A Message with Niceness 0 will yield to a Message with Niceness 1, which will yield to a Message with Niceness 2, and so on. Niceness may be used as a sender-side scheduling construct only, or be used to specify priorities on the wire for Protocol Stacks supporting prioritization.</p>
+<p id="rfc.section.7.3.2.p.3">This encoding of the priority has a convenient property that the priority increases as both Niceness and Lifetime decrease.</p>
 <h1 id="rfc.section.7.3.3">
 <a href="#rfc.section.7.3.3">7.3.3.</a> <a href="#ordered" id="ordered">Ordered</a>
 </h1>
-<p id="rfc.section.7.3.3.p.1">Ordered is a boolean property. If true, this Message should be delivered after the last Message passed to the same Connection via the Send Action; if false, this Message may be delivered out of order.</p>
+<p id="rfc.section.7.3.3.p.1">[TODO: De-Duplicate with <a href="#send-ordered" class="xref">Section 12.3.6</a>]</p>
+<p id="rfc.section.7.3.3.p.2">Ordered is a boolean property. If true, this Message should be delivered after the last Message passed to the same Connection via the Send Action; if false, this Message may be delivered out of order.</p>
 <h1 id="rfc.section.7.3.4">
 <a href="#rfc.section.7.3.4">7.3.4.</a> <a href="#idempotent" id="idempotent">Idempotent</a>
 </h1>
-<p id="rfc.section.7.3.4.p.1">Idempotent is a boolean property. If true, the application-layer entity in the Message is safe to send to the remote endpoint more than once for a single Send Action. It is used to mark data safe for certain 0-RTT establishment techniques, where retransmission of the 0-RTT data may cause the remote application to receive the Message multiple times.</p>
+<p id="rfc.section.7.3.4.p.1">[TODO: De-Duplicate with <a href="#send-idempotent" class="xref">Section 12.3.9</a>]</p>
+<p id="rfc.section.7.3.4.p.2">Idempotent is a boolean property. If true, the application-layer entity in the Message is safe to send to the remote endpoint more than once for a single Send Action. It is used to mark data safe for certain 0-RTT establishment techniques, where retransmission of the 0-RTT data may cause the remote application to receive the Message multiple times.</p>
 <h1 id="rfc.section.7.3.5">
 <a href="#rfc.section.7.3.5">7.3.5.</a> <a href="#final" id="final">Final</a>
 </h1>
-<p id="rfc.section.7.3.5.p.1">Final is a boolean property. If true, this Message is the last one that the application will send on a Connection. This allows underlying protocols to indicate to the Remote Endpoint that the Connection has been effectively closed in the sending direction. For example, TCP-based Connections can send a FIN once a Message marked as Final has been completely sent, indicated by marking endOfMessage. Protocols that do not support signalling the end of a Connection in a given direction will ignore this property.</p>
-<p id="rfc.section.7.3.5.p.2">Note that a Final Message must always be sorted to the end of a list of Messages.  The Final property overrides Niceness and any other property that would re-order Messages. If another Message is sent after a Message marked as Final has already been sent on a Connection, the new Message will report an error.</p>
+<p id="rfc.section.7.3.5.p.1">[TODO: De-Duplicate with <a href="#send-final" class="xref">Section 12.3.1</a>]</p>
+<p id="rfc.section.7.3.5.p.2">Final is a boolean property. If true, this Message is the last one that the application will send on a Connection. This allows underlying protocols to indicate to the Remote Endpoint that the Connection has been effectively closed in the sending direction. For example, TCP-based Connections can send a FIN once a Message marked as Final has been completely sent, indicated by marking endOfMessage. Protocols that do not support signalling the end of a Connection in a given direction will ignore this property.</p>
+<p id="rfc.section.7.3.5.p.3">Note that a Final Message must always be sorted to the end of a list of Messages.  The Final property overrides Niceness and any other property that would re-order Messages. If another Message is sent after a Message marked as Final has already been sent on a Connection, the new Message will report an error.</p>
 <h1 id="rfc.section.7.3.6">
 <a href="#rfc.section.7.3.6">7.3.6.</a> <a href="#corruption-protection-length" id="corruption-protection-length">Corruption Protection Length</a>
 </h1>
-<p id="rfc.section.7.3.6.p.1">This numeric property specifies the length of the section of the Message, starting from byte 0, that the application assumes will be received without corruption due to lower layer errors. It is used to specify options for simple integrity protection via checksums. By default, the entire Message is protected by checksum. A value of 0 means that no checksum is required, and a special value (e.g. -1) can be used to indicate the default. Only full coverage is guaranteed, any other requests are advisory.</p>
+<p id="rfc.section.7.3.6.p.1">[TODO: De-Duplicate with <a href="#send-checksum" class="xref">Section 12.3.15</a>]</p>
+<p id="rfc.section.7.3.6.p.2">This numeric property specifies the length of the section of the Message, starting from byte 0, that the application assumes will be received without corruption due to lower layer errors. It is used to specify options for simple integrity protection via checksums. By default, the entire Message is protected by checksum. A value of 0 means that no checksum is required, and a special value (e.g. -1) can be used to indicate the default. Only full coverage is guaranteed, any other requests are advisory.</p>
 <h1 id="rfc.section.7.3.7">
 <a href="#rfc.section.7.3.7">7.3.7.</a> <a href="#send-profile" id="send-profile">Transmission Profile</a>
 </h1>
-<p id="rfc.section.7.3.7.p.1">This enumerated property specifies the application&#8217;s preferred tradeoffs for sending this Message; it is a per-Message override of the Capacity Profile protocol and path selection property (see <a href="#prop-cap-profile" class="xref">Section 12.3.19</a>).</p>
-<p id="rfc.section.7.3.7.p.2">The following values are valid for Transmission Profile:</p>
+<p id="rfc.section.7.3.7.p.1">[TODO: De-Duplicate with <a href="#prop-cap-profile" class="xref">Section 12.3.19</a>]</p>
+<p id="rfc.section.7.3.7.p.2">This enumerated property specifies the application&#8217;s preferred tradeoffs for sending this Message; it is a per-Message override of the Capacity Profile protocol and path selection property (see <a href="#prop-cap-profile" class="xref">Section 12.3.19</a>).</p>
+<p id="rfc.section.7.3.7.p.3">The following values are valid for Transmission Profile:</p>
 <p></p>
 
 <dl>
