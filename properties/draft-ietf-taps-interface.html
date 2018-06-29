@@ -297,7 +297,7 @@ ul.toc li {
 <link href="#rfc.section.7.2.1" rel="Chapter" title="7.2.1 Sent">
 <link href="#rfc.section.7.2.2" rel="Chapter" title="7.2.2 Expired">
 <link href="#rfc.section.7.2.3" rel="Chapter" title="7.2.3 SendError">
-<link href="#rfc.section.7.3" rel="Chapter" title="7.3 Message Context Properties">
+<link href="#rfc.section.7.3" rel="Chapter" title="7.3 Message Context Parameters">
 <link href="#rfc.section.7.3.1" rel="Chapter" title="7.3.1 Lifetime">
 <link href="#rfc.section.7.3.2" rel="Chapter" title="7.3.2 Niceness">
 <link href="#rfc.section.7.3.3" rel="Chapter" title="7.3.3 Ordered">
@@ -535,7 +535,7 @@ ul.toc li {
 </li>
 <li>7.2.3.   <a href="#rfc.section.7.2.3">SendError</a>
 </li>
-</ul><li>7.3.   <a href="#rfc.section.7.3">Message Context Properties</a>
+</ul><li>7.3.   <a href="#rfc.section.7.3">Message Context Parameters</a>
 </li>
 <ul><li>7.3.1.   <a href="#rfc.section.7.3.1">Lifetime</a>
 </li>
@@ -1030,9 +1030,9 @@ Connection -&gt; SendError&lt;msgRef&gt;
 </pre>
 <p id="rfc.section.7.2.3.p.1">A SendError occurs when a Message could not be sent due to an error condition: an attempt to send a Message which is too large for the system and Protocol Stack to handle, some failure of the underlying Protocol Stack, or a set of Message Properties not consistent with the Connection&#8217;s transport properties. The SendError contains an implementation-specific reference to the Message to which it applies.</p>
 <h1 id="rfc.section.7.3">
-<a href="#rfc.section.7.3">7.3.</a> <a href="#message-props" id="message-props">Message Context Properties</a>
+<a href="#rfc.section.7.3">7.3.</a> <a href="#message-props" id="message-props">Message Context Parameters</a>
 </h1>
-<p id="rfc.section.7.3.p.1">Applications may need to annotate the Messages they send with extra information to control how data is scheduled and processed by the transport protocols in the Connection. A MessageContext object contains properties for sending Messages, and can be passed to the Send Action. Note that these properties are per-Message, not per-Send if partial Messages are sent (<a href="#send-partial" class="xref">Section 7.4</a>). All data blocks associated with a single Message share properties. For example, it would not make sense to have the beginning of a Message expire, but allow the end of a Message to still be sent.</p>
+<p id="rfc.section.7.3.p.1">Applications may need to annotate the Messages they send with extra information to control how data is scheduled and processed by the transport protocols in the Connection. A MessageContext object contains parameters for sending Messages, and can be passed to the Send Action. Some of these parameters are properties as defined in <a href="#transport-props" class="xref">Section 12</a>. Note that these properties are per-Message, not per-Send if partial Messages are sent (<a href="#send-partial" class="xref">Section 7.4</a>). All data blocks associated with a single Message share properties. For example, it would not make sense to have the beginning of a Message expire, but allow the end of a Message to still be sent.</p>
 <pre>
 messageData := "hello".octets()
 messageContext := NewMessageContext()
@@ -1042,9 +1042,9 @@ Connection.Send(messageData, messageContext)
 <p id="rfc.section.7.3.p.2">The simpler form of Send that does not take any MessageContext is equivalent to passing a default MessageContext with not values added.</p>
 <p id="rfc.section.7.3.p.3">Message Properties share a single namespace with Transport Properties (see <a href="#transport-props" class="xref">Section 12</a>). This allows the specification of per-Connection Protocol Properties that can be overridden on a per-Message basis.</p>
 <p id="rfc.section.7.3.p.4">If an application wants to override Message Properties for a specific message, it can acquire an empty messageContext Object and add all desired Message Properties to that Object. It can then reuse the same messageContext Object for sending multiple Messages with the same properties.</p>
-<p id="rfc.section.7.3.p.5">Properties may be added to a messageContext object only before the context is used for sending. Once a messageContext has been used with a Send call, modifying any of its properties is invalid.</p>
+<p id="rfc.section.7.3.p.5">Parameters may be added to a messageContext object only before the context is used for sending. Once a messageContext has been used with a Send call, modifying any of its parameters is invalid.</p>
 <p id="rfc.section.7.3.p.6">Message Properties may be inconsistent with the properties of the Protocol Stacks underlying the Connection on which a given Message is sent. For example, a Connection must provide reliability to allow setting an infinitie value for the lifetime property of a Message. Sending a Message with Message Properties inconsistent with the Selection Properties of the Connection yields an error.</p>
-<p id="rfc.section.7.3.p.7">The following Message Context Properties are supported:</p>
+<p id="rfc.section.7.3.p.7">The following Message Context Parameters are supported:</p>
 <p id="rfc.section.7.3.p.8">[TODO: De-Duplicate with Properties in <a href="#transport-props" class="xref">Section 12</a>, find consensus on which Section to put them]</p>
 <h1 id="rfc.section.7.3.1">
 <a href="#rfc.section.7.3.1">7.3.1.</a> <a href="#lifetime" id="lifetime">Lifetime</a>
@@ -1392,18 +1392,8 @@ Connection -&gt; SoftError&lt;&gt;
 <h1 id="rfc.section.12.3.1">
 <a href="#rfc.section.12.3.1">12.3.1.</a> <a href="#send-final" id="send-final">Final</a>
 </h1>
-<p></p>
-
-<dl>
-<dt>Classification:</dt>
-<dd style="margin-left: 8">Control Property [TODO: Discuss]</dd>
-<dt>Type:</dt>
-<dd style="margin-left: 8">Boolean</dd>
-<dt>Applicability:</dt>
-<dd style="margin-left: 8">Message</dd>
-</dl>
-<p id="rfc.section.12.3.1.p.2">If true, this property specifies that this Message is the last one that the application will send on a Connection. This allows underlying protocols to indicate to the Remote Endpoint that the Connection has been effectively closed in the sending direction. For example, TCP-based Connections can send a FIN once a Message marked as Final has been completely sent.  Protocols that do not support signaling the end of a Connection in a given direction will ignore this property.</p>
-<p id="rfc.section.12.3.1.p.3">Note that a Final Message must always be sent after any other outstanding Messages on the same connection.  The Final property overrides Niceness and any other property that would re-order Messages. If an application tries to send another Message after a Message marked as Final has already been sent on the same Connection, the new Message will report an error.</p>
+<p id="rfc.section.12.3.1.p.1">See <a href="#final" class="xref">Section 7.3.5</a>.</p>
+<p id="rfc.section.12.3.1.p.2">[TODO: Decide whether this is a property or a parameter]</p>
 <h1 id="rfc.section.12.3.2">
 <a href="#rfc.section.12.3.2">12.3.2.</a> <a href="#prop-reliable" id="prop-reliable">Reliable Data Transfer (Connection)</a>
 </h1>
