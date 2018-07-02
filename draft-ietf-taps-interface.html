@@ -818,7 +818,7 @@ LocalSpecifier.WithStunServer(address, port, credentials)
 </h1>
 <p id="rfc.section.5.2.p.1">A Preconnection Object holds properties reflecting the application&#8217;s requirements and preferences for the transport. These include Selection Properties (Protocol and Path Selection Properties), as well as Generic and Specific Protocol Properties for configuration of the detailed operation of the selected Protocol Stacks.</p>
 <p id="rfc.section.5.2.p.2">The protocol(s) and path(s) selected as candidates during Connection establishment are determined by a set of properties. Since there could be paths over which some transport protocols are unable to operate, or remote endpoints that support only specific network addresses or transports, transport protocol selection is necessarily tied to path selection. This may involve choosing between multiple local interfaces that are connected to different access networks.</p>
-<p id="rfc.section.5.2.p.3">Internally, the transport system will first exclude all protocols and paths that match a Prohibit, then only keep candidates that match a Require, then sort candidates according to Preferred properties, and then use Avoided properties as a tiebreaker.  In case of conflicts between Protocol and Path Selection Properties, Path Selection Properties take precedence.  For example, if an application indicates a preference for a specific path, but also a preference for a protocol not available on this path, the transport system will try the path first, so the Protocol Selection Property might not have an effect.</p>
+<p id="rfc.section.5.2.p.3">Internally, the transport system will first exclude all protocols and paths that match a Prohibit, then exclude all protocols and paths that do not match a Require, then sort candidates according to Preferred properties, and then use Avoided properties as a tiebreaker. In case of conflicts between Protocol and Path Selection Properties, Path Selection Properties take precedence. For example, if an application indicates a preference for a specific path, but also a preference for a protocol not available on this path, the transport system will try the path first, so the Protocol Selection Property might not have an effect.</p>
 <p id="rfc.section.5.2.p.4">All Transport Properties used in the pre-establishment phase are collected in a TransportProperties Object that is passed to the Preconnection Object.</p>
 <pre>
 TransportProperties := NewTransportProperties()
@@ -959,21 +959,22 @@ Preconnection -&gt; Stopped&lt;&gt;
 <pre>
 Preconnection.Rendezvous()
 </pre>
-<p id="rfc.section.6.3.p.2">The Preconnection Object must be specified with both a Local Endpoint and a Remote Endpoint, and also the transport properties and security parameters needed for Protocol Stack selection.  The Rendezvous() Action causes the Preconnection to listen on the Local Endpoint for an incoming Connection from the Remote Endpoint, while simultaneously trying to establish a Connection from the Local Endpoint to the Remote Endpoint.  This corresponds to a TCP simultaneous open, for example.</p>
-<p id="rfc.section.6.3.p.3">The Rendezvous() Action consumes the Preconnection. Once Rendezvous() has been called, no further properties may be added to the Preconnection, and no subsequent establishment call may be made on the Preconnection.</p>
+<p id="rfc.section.6.3.p.2">The Preconnection Object must be specified with both a Local Endpoint and a Remote Endpoint, and also the transport properties and security parameters needed for Protocol Stack selection.</p>
+<p id="rfc.section.6.3.p.3">The Rendezvous() Action causes the Preconnection to listen on the Local Endpoint for an incoming Connection from the Remote Endpoint, while simultaneously trying to establish a Connection from the Local Endpoint to the Remote Endpoint. This corresponds to a TCP simultaneous open, for example.</p>
+<p id="rfc.section.6.3.p.4">The Rendezvous() Action consumes the Preconnection. Once Rendezvous() has been called, no further properties may be added to the Preconnection, and no subsequent establishment call may be made on the Preconnection.</p>
 <pre>
 Preconnection -&gt; RendezvousDone&lt;Connection&gt;
 </pre>
-<p id="rfc.section.6.3.p.4">The RendezvousDone&lt;&gt; Event occurs when a Connection is established with the Remote Endpoint. For Connection-oriented transports, this occurs when the transport-layer connection is established; for Connectionless transports, it occurs when the first Message is received from the Remote Endpoint. The resulting Connection is contained within the RendezvousDone&lt;&gt; Event, and is ready to use as soon as it is passed to the application via the Event.</p>
+<p id="rfc.section.6.3.p.5">The RendezvousDone&lt;&gt; Event occurs when a Connection is established with the Remote Endpoint. For Connection-oriented transports, this occurs when the transport-layer connection is established; for Connectionless transports, it occurs when the first Message is received from the Remote Endpoint. The resulting Connection is contained within the RendezvousDone&lt;&gt; Event, and is ready to use as soon as it is passed to the application via the Event.</p>
 <pre>
 Preconnection -&gt; RendezvousError&lt;msgRef, error&gt;
 </pre>
-<p id="rfc.section.6.3.p.5">An RendezvousError occurs either when the Preconnection cannot be fulfilled for listening, when the Local Endpoint or Remote Endpoint cannot be resolved, when no transport-layer connection can be established to the Remote Endpoint, or when the application is prohibited from rendezvous by policy.</p>
-<p id="rfc.section.6.3.p.6">When using some NAT traversal protocols, e.g., Interactive Connectivity Establishment (ICE) <a href="#RFC5245" class="xref">[RFC5245]</a>, it is expected that the Local Endpoint will be configured with some method of discovering NAT bindings, e.g., a Session Traversal Utilities for NAT (STUN) server.  In this case, the Local Endpoint may resolve to a mixture of local and server reflexive addresses. The Resolve() method on the Preconnection can be used to discover these bindings:</p>
+<p id="rfc.section.6.3.p.6">An RendezvousError occurs either when the Preconnection cannot be fulfilled for listening, when the Local Endpoint or Remote Endpoint cannot be resolved, when no transport-layer connection can be established to the Remote Endpoint, or when the application is prohibited from rendezvous by policy.</p>
+<p id="rfc.section.6.3.p.7">When using some NAT traversal protocols, e.g., Interactive Connectivity Establishment (ICE) <a href="#RFC5245" class="xref">[RFC5245]</a>, it is expected that the Local Endpoint will be configured with some method of discovering NAT bindings, e.g., a Session Traversal Utilities for NAT (STUN) server.  In this case, the Local Endpoint may resolve to a mixture of local and server reflexive addresses. The Resolve() method on the Preconnection can be used to discover these bindings:</p>
 <pre>
 PreconnectionBindings := Preconnection.Resolve()
 </pre>
-<p id="rfc.section.6.3.p.7">The Resolve() call returns a list of Preconnection Objects, that represent the concrete addresses, local and server reflexive, on which a Rendezvous() for the Preconnection will listen for incoming Connections. This list can be passed to a peer via a signalling protocol, such as SIP or WebRTC, to configure the remote.</p>
+<p id="rfc.section.6.3.p.8">The Resolve() call returns a list of Preconnection Objects, that represent the concrete addresses, local and server reflexive, on which a Rendezvous() for the Preconnection will listen for incoming Connections. This list can be passed to a peer via a signalling protocol, such as SIP <a href="#RFC3261" class="xref">[RFC3261]</a> or WebRTC <a href="#RFC7478" class="xref">[RFC7478]</a>, to configure the remote.</p>
 <h1 id="rfc.section.6.4">
 <a href="#rfc.section.6.4">6.4.</a> <a href="#groups" id="groups">Connection Groups</a>
 </h1>
@@ -1013,7 +1014,7 @@ Connection.Send(messageData)
 <pre>
 Connection -&gt; Sent&lt;msgRef&gt;
 </pre>
-<p id="rfc.section.7.2.1.p.1">The Sent Event occurs when a previous Send Action has completed, i.e., when the data derived from the Message has been passed down or through the underlying Protocol Stack and is no longer the responsibility of the implementation of this interface. The exact disposition of the Message when the Sent Event occurs is specific to the implementation and the constraints on the Protocol Stacks implied by the Connection&#8217;s Transport Properties. The Sent Event contains an implementation-specific reference to the Message to which it applies.</p>
+<p id="rfc.section.7.2.1.p.1">The Sent Event occurs when a previous Send Action has completed, i.e., when the data derived from the Message has been passed down or through the underlying Protocol Stack and is no longer the responsibility of the implementation of this interface. The exact disposition of the Message (i.e., whether it has actually been transmitted, moved into a buffer on the network interface, moved into a kernel buffer, and so on) when the Sent Event occurs is implementation-specific. The Sent Event contains an implementation-specific reference to the Message to which it applies.</p>
 <p id="rfc.section.7.2.1.p.2">Sent Events allow an application to obtain an understanding of the amount of buffering it creates. That is, if an application calls the Send Action multiple times without waiting for a Sent Event, it has created more buffer inside the transport system than an application that only issues a Send after this Event fires.</p>
 <h1 id="rfc.section.7.2.2">
 <a href="#rfc.section.7.2.2">7.2.2.</a> <a href="#expired" id="expired">Expired</a>
@@ -1891,9 +1892,19 @@ Connection -&gt; SoftError&lt;&gt;
 <a>Floyd, S.</a>, "<a href="https://tools.ietf.org/html/rfc2914">Congestion Control Principles</a>", BCP 41, RFC 2914, DOI 10.17487/RFC2914, September 2000.</td>
 </tr>
 <tr>
+<td class="reference"><b id="RFC3261">[RFC3261]</b></td>
+<td class="top">
+<a>Rosenberg, J.</a>, <a>Schulzrinne, H.</a>, <a>Camarillo, G.</a>, <a>Johnston, A.</a>, <a>Peterson, J.</a>, <a>Sparks, R.</a>, <a>Handley, M.</a> and <a>E. Schooler</a>, "<a href="https://tools.ietf.org/html/rfc3261">SIP: Session Initiation Protocol</a>", RFC 3261, DOI 10.17487/RFC3261, June 2002.</td>
+</tr>
+<tr>
 <td class="reference"><b id="RFC5245">[RFC5245]</b></td>
 <td class="top">
 <a>Rosenberg, J.</a>, "<a href="https://tools.ietf.org/html/rfc5245">Interactive Connectivity Establishment (ICE): A Protocol for Network Address Translator (NAT) Traversal for Offer/Answer Protocols</a>", RFC 5245, DOI 10.17487/RFC5245, April 2010.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC7478">[RFC7478]</b></td>
+<td class="top">
+<a>Holmberg, C.</a>, <a>Hakansson, S.</a> and <a>G. Eriksson</a>, "<a href="https://tools.ietf.org/html/rfc7478">Web Real-Time Communication Use Cases and Requirements</a>", RFC 7478, DOI 10.17487/RFC7478, March 2015.</td>
 </tr>
 <tr>
 <td class="reference"><b id="RFC7556">[RFC7556]</b></td>
