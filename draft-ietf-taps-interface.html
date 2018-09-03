@@ -785,7 +785,7 @@ Action(parameter, parameter, ...) / Event&lt;parameter, parameter, ...&gt;
                                      TransportProperties,
                                      SecurityParams)
 </pre>
-<p id="rfc.section.5.p.3">The Local Endpoint MUST be specified if the Preconnection is used to Listen() for incoming Connections, but is OPTIONAL if it is used to Initiate() connections. The Remote Endpoint MUST be specified in the Preconnection is used to Initiate() Connections, but is OPTIONAL if it is used to Listen() for incoming Connections.  The Local Endpoint and the Remote Endpoint MUST both be specified if a peer-to-peer Rendezvous is to occur based on the Preconnection.</p>
+<p id="rfc.section.5.p.3">The Local Endpoint MUST be specified if the Preconnection is used to Listen() for incoming Connections, but is OPTIONAL if it is used to Initiate() connections. The Remote Endpoint MUST be specified if the Preconnection is used to Initiate() Connections, but is OPTIONAL if it is used to Listen() for incoming Connections.  The Local Endpoint and the Remote Endpoint MUST both be specified if a peer-to-peer Rendezvous is to occur based on the Preconnection.</p>
 <p id="rfc.section.5.p.4">Framers (see <a href="#send-framing" class="xref">Section 7.6</a>) and deframers (see <a href="#receive-framing" class="xref">Section 8.4</a>), if necessary, should be bound to the Preconnection during pre-establishment.</p>
 <h1 id="rfc.section.5.1">
 <a href="#rfc.section.5.1">5.1.</a> <a href="#endpointspec" id="endpointspec">Specifying Endpoints</a>
@@ -846,8 +846,8 @@ TransportProperties.Prohibit(property)
 TransportProperties := Connection.GetTransportProperties()
 </pre>
 <p><a href="#transport-props" class="xref">Section 12</a> provides a list of Transport Properties.</p>
-<p id="rfc.section.5.2.p.9">Note that most properties are only considered for Connection establishment and can not be changed after a Connection is established; however, they can be queried. See <a href="#introspection" class="xref">Section 9</a>.</p>
-<p id="rfc.section.5.2.p.10">A Connection gets its Transport Properties either by being explicitly configured via a Preconnection, or by inheriting them from an antecedent via cloning; see <a href="#groups" class="xref">Section 6.4</a> for more.</p>
+<p id="rfc.section.5.2.p.9">Note that many properties are only considered for Connection establishment and can not be changed after a Connection is established; however, they can be queried. See <a href="#introspection" class="xref">Section 9</a>.</p>
+<p id="rfc.section.5.2.p.10">A Connection gets its Transport Properties either by being explicitly configured via a Preconnection, by configuration after establishment, or by inheriting them from an antecedent via cloning; see <a href="#groups" class="xref">Section 6.4</a> for more.</p>
 <h1 id="rfc.section.5.3">
 <a href="#rfc.section.5.3">5.3.</a> <a href="#security-parameters" id="security-parameters">Specifying Security Parameters and Callbacks</a>
 </h1>
@@ -862,7 +862,7 @@ SecurityParameters := NewSecurityParameters()
 <p id="rfc.section.5.3.1.p.2">Security configuration parameters and sample usage follow:</p>
 <p></p>
 
-<ul><li>Local identity and private keys: Used to perform private key operations and prove one&#8217;s identity to the Remote Endpoint. (Note, if private keys are not available, e.g., since they are stored in HSMs, handshake callbacks must be used. See below for details.)</li></ul>
+<ul><li>Local identity and private keys: Used to perform private key operations and prove one&#8217;s identity to the Remote Endpoint. (Note, if private keys are not available, e.g., since they are stored in hardware security modules (HSMs), handshake callbacks must be used. See below for details.)</li></ul>
 <pre>
 SecurityParameters.AddIdentity(identity)
 SecurityParameters.AddPrivateKey(privateKey, publicKey)
@@ -988,14 +988,14 @@ PreconnectionBindings := Preconnection.Resolve()
 <pre>
 Connection := Connection.Clone()
 </pre>
-<p id="rfc.section.6.4.p.2">Calling Clone on a Connection yields a group of two Connections: the parent Connection on which Clone was called, and the resulting cloned Connection. These connections are &#8220;entangled&#8221; with each other, and become part of a Connection group. Calling Clone on any of these two Connections adds a third Connection to the group, and so on. Connections in a Connection Group share all Protocol Properties that are not applicable to a Message.</p>
+<p id="rfc.section.6.4.p.2">Calling Clone on a Connection yields a group of two Connections: the parent Connection on which Clone was called, and the resulting cloned Connection. These connections are &#8220;entangled&#8221; with each other, and become part of a Connection Group. Calling Clone on any of these two Connections adds a third Connection to the Connection Group, and so on. Connections in a Connection Group share all Protocol Properties that are not applicable to a Message.</p>
 <p id="rfc.section.6.4.p.3">Changing one of these Protocol Properties on one Connection in the group changes it for all others. Per-Message Protocol Properties, however, are not entangled.  For example, changing &#8220;Timeout for aborting Connection&#8221; (see <a href="#timeout" class="xref">Section 12.3.22</a>) on one Connection in a group will automatically change this Protocol Property for all Connections in the group in the same way. However, changing &#8220;Lifetime&#8221; (see <a href="#send-lifetime" class="xref">Section 12.3.28</a>) of a Message will only affect a single Message on a single Connection, entangled or not.</p>
 <p id="rfc.section.6.4.p.4">If the underlying protocol supports multi-streaming, it is natural to use this functionality to implement Clone. In that case, entangled Connections are multiplexed together, giving them similar treatment not only inside endpoints but also across the end-to-end Internet path.</p>
 <p id="rfc.section.6.4.p.5">If the underlying Protocol Stack does not support cloning, or cannot create a new stream on the given Connection, then attempts to clone a connection will result in a CloneError:</p>
 <pre>
 Connection -&gt; CloneError&lt;&gt;
 </pre>
-<p id="rfc.section.6.4.p.6">The Protocol Property &#8220;Niceness&#8221; operates on entangled Connections as in <a href="#send-niceness" class="xref">Section 12.3.21</a>: when allocating available network capacity among Connections in a Connection Group, sends on Connections with higher Niceness values will be prioritized over sends on Connections with lower Niceness values. An ideal transport system implementation would assign the Connection the capacity share (M-N) x C / M, where N is the Connection&#8217;s Niceness value, M is the maximum Niceness value used by all Connections in the group and C is the total available capacity. However, the niceness setting is purely advisory, and no guarantees are given about the way capacity is shared.  Each implementation is free to implement a way it shares capacity that it sees fit.</p>
+<p id="rfc.section.6.4.p.6">The Protocol Property &#8220;Niceness&#8221; operates on entangled Connections as in <a href="#send-niceness" class="xref">Section 12.3.21</a>: when allocating available network capacity among Connections in a Connection Group, sends on Connections with higher Niceness values will be prioritized over sends on Connections with lower Niceness values. An ideal transport system implementation would assign each Connection the capacity share (M-N) x C / M, where N is the Connection&#8217;s Niceness value, M is the maximum Niceness value used by all Connections in the group and C is the total available capacity. However, the Niceness setting is purely advisory, and no guarantees are given about the way capacity is shared.  Each implementation is free to implement a way to share capacity that it sees fit.</p>
 <h1 id="rfc.section.7">
 <a href="#rfc.section.7">7.</a> <a href="#sending" id="sending">Sending Data</a>
 </h1>
@@ -1023,7 +1023,7 @@ Connection.Send(messageData)
 Connection -&gt; Sent&lt;msgRef&gt;
 </pre>
 <p id="rfc.section.7.2.1.p.1">The Sent Event occurs when a previous Send Action has completed, i.e., when the data derived from the Message has been passed down or through the underlying Protocol Stack and is no longer the responsibility of the implementation of this interface. The exact disposition of the Message (i.e., whether it has actually been transmitted, moved into a buffer on the network interface, moved into a kernel buffer, and so on) when the Sent Event occurs is implementation-specific. The Sent Event contains an implementation-specific reference to the Message to which it applies.</p>
-<p id="rfc.section.7.2.1.p.2">Sent Events allow an application to obtain an understanding of the amount of buffering it creates. That is, if an application calls the Send Action multiple times without waiting for a Sent Event, it has created more buffer inside the transport system than an application that only issues a Send after this Event fires.</p>
+<p id="rfc.section.7.2.1.p.2">Sent Events allow an application to obtain an understanding of the amount of buffering it creates. That is, if an application calls the Send Action multiple times without waiting for a Sent Event, it has created more buffer inside the transport system than an application that always waits for the Sent Event before calling the next Send Action.</p>
 <h1 id="rfc.section.7.2.2">
 <a href="#rfc.section.7.2.2">7.2.2.</a> <a href="#expired" id="expired">Expired</a>
 </h1>
@@ -1041,14 +1041,14 @@ Connection -&gt; SendError&lt;msgRef&gt;
 <h1 id="rfc.section.7.3">
 <a href="#rfc.section.7.3">7.3.</a> <a href="#message-props" id="message-props">Message Context Parameters</a>
 </h1>
-<p id="rfc.section.7.3.p.1">Applications may need to annotate the Messages they send with extra information to control how data is scheduled and processed by the transport protocols in the Connection. A MessageContext object contains parameters for sending Messages, and can be passed to the Send Action. Some of these parameters are properties as defined in <a href="#transport-props" class="xref">Section 12</a>. Note that these properties are per-Message, not per-Send if partial Messages are sent (<a href="#send-partial" class="xref">Section 7.4</a>). All data blocks associated with a single Message share properties. For example, it would not make sense to have the beginning of a Message expire, but allow the end of a Message to still be sent.</p>
+<p id="rfc.section.7.3.p.1">Applications may need to annotate the Messages they send with extra information to control how data is scheduled and processed by the transport protocols in the Connection. A messageContext object contains parameters for sending Messages, and can be passed to the Send Action. Some of these parameters are properties as defined in <a href="#transport-props" class="xref">Section 12</a>. Note that these properties are per-Message, not per-Send if partial Messages are sent (<a href="#send-partial" class="xref">Section 7.4</a>). All data blocks associated with a single Message share properties. For example, it would not make sense to have the beginning of a Message expire, but allow the end of a Message to still be sent.</p>
 <pre>
 messageData := "hello".octets()
 messageContext := NewMessageContext()
 messageContext.add(parameter, value)
 Connection.Send(messageData, messageContext)
 </pre>
-<p id="rfc.section.7.3.p.2">The simpler form of Send that does not take any MessageContext is equivalent to passing a default MessageContext with not values added.</p>
+<p id="rfc.section.7.3.p.2">The simpler form of Send that does not take any messageContext is equivalent to passing a default messageContext with not values added.</p>
 <p id="rfc.section.7.3.p.3">Message Properties share a single namespace with Transport Properties (see <a href="#transport-props" class="xref">Section 12</a>). This allows the specification of per-Connection Protocol Properties that can be overridden on a per-Message basis.</p>
 <p id="rfc.section.7.3.p.4">If an application wants to override Message Properties for a specific message, it can acquire an empty messageContext Object and add all desired Message Properties to that Object. It can then reuse the same messageContext Object for sending multiple Messages with the same properties.</p>
 <p id="rfc.section.7.3.p.5">Parameters may be added to a messageContext object only before the context is used for sending. Once a messageContext has been used with a Send call, modifying any of its parameters is invalid.</p>
@@ -1065,7 +1065,7 @@ Connection.Send(messageData, messageContext)
 </h1>
 <p id="rfc.section.7.3.2.p.1">[TODO: De-Duplicate with <a href="#send-niceness" class="xref">Section 12.3.21</a>]</p>
 <p id="rfc.section.7.3.2.p.2">Niceness is a numeric (non-negative) value that represents an unbounded hierarchy of priorities of Messages, relative to other Messages sent over the same Connection and/or Connection Group (see <a href="#groups" class="xref">Section 6.4</a>).  A Message with Niceness 0 will yield to a Message with Niceness 1, which will yield to a Message with Niceness 2, and so on. Niceness may be used as a sender-side scheduling construct only, or be used to specify priorities on the wire for Protocol Stacks supporting prioritization.</p>
-<p id="rfc.section.7.3.2.p.3">This encoding of the priority has a convenient property that the priority increases as both Niceness and Lifetime decrease.</p>
+<p id="rfc.section.7.3.2.p.3">This encoding of the priority has a convenient property that the priority increases as both Niceness and Lifetime decrease.  [Michael: Can we remove this? It is weird because there is no mention of decreasing Lifetime being interpreted as a higher priority anywhere.]</p>
 <h1 id="rfc.section.7.3.3">
 <a href="#rfc.section.7.3.3">7.3.3.</a> <a href="#ordered" id="ordered">Ordered</a>
 </h1>
@@ -1081,12 +1081,12 @@ Connection.Send(messageData, messageContext)
 </h1>
 <p id="rfc.section.7.3.5.p.1">[TODO: De-Duplicate with <a href="#send-final" class="xref">Section 12.3.1</a>]</p>
 <p id="rfc.section.7.3.5.p.2">Final is a boolean property. If true, this Message is the last one that the application will send on a Connection. This allows underlying protocols to indicate to the Remote Endpoint that the Connection has been effectively closed in the sending direction. For example, TCP-based Connections can send a FIN once a Message marked as Final has been completely sent, indicated by marking endOfMessage. Protocols that do not support signalling the end of a Connection in a given direction will ignore this property.</p>
-<p id="rfc.section.7.3.5.p.3">Note that a Final Message must always be sorted to the end of a list of Messages.  The Final property overrides Niceness and any other property that would re-order Messages. If another Message is sent after a Message marked as Final has already been sent on a Connection, the new Message will report an error.</p>
+<p id="rfc.section.7.3.5.p.3">Note that a Final Message must always be sorted to the end of a list of Messages.  The Final property overrides Niceness and any other property that would re-order Messages. If another Message is sent after a Message marked as Final has already been sent on a Connection, the Send Action for the new Message will cause a SendError Event.</p>
 <h1 id="rfc.section.7.3.6">
 <a href="#rfc.section.7.3.6">7.3.6.</a> <a href="#corruption-protection-length" id="corruption-protection-length">Corruption Protection Length</a>
 </h1>
 <p id="rfc.section.7.3.6.p.1">[TODO: De-Duplicate with <a href="#send-checksum" class="xref">Section 12.3.15</a>]</p>
-<p id="rfc.section.7.3.6.p.2">This numeric property specifies the length of the section of the Message, starting from byte 0, that the application assumes will be received without corruption due to lower layer errors. It is used to specify options for simple integrity protection via checksums. By default, the entire Message is protected by checksum. A value of 0 means that no checksum is required, and a special value (e.g. -1) can be used to indicate the default. Only full coverage is guaranteed, any other requests are advisory.</p>
+<p id="rfc.section.7.3.6.p.2">This numeric property specifies the length of the section of the Message, starting from byte 0, that the application requires to be delivered without corruption due to lower layer errors. It is used to specify options for simple integrity protection via checksums. By default, the entire Message is protected by checksum. A value of 0 means that no checksum is required, and a special value (e.g. -1) can be used to indicate the default. Only full coverage is guaranteed, any other requests are advisory.</p>
 <h1 id="rfc.section.7.3.7">
 <a href="#rfc.section.7.3.7">7.3.7.</a> <a href="#send-profile" id="send-profile">Transmission Profile</a>
 </h1>
@@ -1105,7 +1105,7 @@ Connection.Send(messageData, messageContext)
 <a href="#rfc.section.7.4">7.4.</a> <a href="#send-partial" id="send-partial">Partial Sends</a>
 </h1>
 <p id="rfc.section.7.4.p.1">It is not always possible for an application to send all data associated with a Message in a single Send Action. The Message data may be too large for the application to hold in memory at one time, or the length of the Message may be unknown or unbounded.</p>
-<p id="rfc.section.7.4.p.2">Partial Message sending is supported by passing an endOfMessage boolean parameter to the Send Action. This value is always true by default, and the simpler forms of send are equivalent to passing true for endOfMessage.</p>
+<p id="rfc.section.7.4.p.2">Partial Message sending is supported by passing an endOfMessage boolean parameter to the Send Action. This value is always true by default, and the simpler forms of Send are equivalent to passing true for endOfMessage.</p>
 <p id="rfc.section.7.4.p.3">The following example sends a Message in two separate calls to Send.</p>
 <pre>
 messageContext := NewMessageContext()
@@ -1192,8 +1192,8 @@ Connection -&gt; ReceivedPartial&lt;messageData, messageContext, endOfMessage&gt
 <pre>
 Connection -&gt; ReceiveError&lt;messageContext&gt;
 </pre>
-<p id="rfc.section.8.2.3.p.1">A ReceiveError occurs when data is received by the underlying Protocol Stack that cannot be fully retrieved or deframed, or when some other indication is received that reception has failed. Such conditions that irrevocably lead the the termination of the Connection are signaled using ConnectionError instead (see <a href="#termination" class="xref">Section 10</a>).</p>
-<p id="rfc.section.8.2.3.p.2">The ReceiveError event passes an optional associated messageContext. This may indicate that a Message that was being partially received previously, but had not completed, encountered and error and will not be completed.</p>
+<p id="rfc.section.8.2.3.p.1">A ReceiveError occurs when data is received by the underlying Protocol Stack that cannot be fully retrieved or deframed, or when some other indication is received that reception has failed. Such conditions that irrevocably lead to the termination of the Connection are signaled using ConnectionError instead (see <a href="#termination" class="xref">Section 10</a>).</p>
+<p id="rfc.section.8.2.3.p.2">The ReceiveError event passes an optional associated messageContext. This may indicate that a Message that was being partially received previously, but had not completed, encountered an error and will not be completed.</p>
 <h1 id="rfc.section.8.3">
 <a href="#rfc.section.8.3">8.3.</a> <a href="#receive-context" id="receive-context">Message Receive Context</a>
 </h1>
@@ -1205,7 +1205,7 @@ Connection -&gt; ReceiveError&lt;messageContext&gt;
 <h1 id="rfc.section.8.3.2">
 <a href="#rfc.section.8.3.2">8.3.2.</a> <a href="#receive-early" id="receive-early">Early Data</a>
 </h1>
-<p id="rfc.section.8.3.2.p.1">In some cases it may be valuable to know whether data was read as part of early data streams. This is useful if applications need to treat early data separately, e.g., if early data has different security properties than data sent after connection establishment. In the case of TLS 1.3, client early data can be replayed maliciously (see <a href="#I-D.ietf-tls-tls13" class="xref">[I-D.ietf-tls-tls13]</a>). Thus, receivers may wish to perform additional checks for early data to ensure it is idempotent or not replayed. If TLS 1.3 is available and the recipient Message was sent as part of early data, the corresponding metadata carries a flag indicating as such. If early data is enabled, applications should check this metadata field for Messages received during connection establishment and respond accordingly.</p>
+<p id="rfc.section.8.3.2.p.1">In some cases it may be valuable to know whether data was read as part of early data transfer (before connection establishment has finished). This is useful if applications need to treat early data separately, e.g., if early data has different security properties than data sent after connection establishment. In the case of TLS 1.3, client early data can be replayed maliciously (see <a href="#I-D.ietf-tls-tls13" class="xref">[I-D.ietf-tls-tls13]</a>). Thus, receivers may wish to perform additional checks for early data to ensure it is idempotent or not replayed. If TLS 1.3 is available and the recipient Message was sent as part of early data, the corresponding metadata carries a flag indicating as such. If early data is enabled, applications should check this metadata field for Messages received during connection establishment and respond accordingly.</p>
 <h1 id="rfc.section.8.3.3">
 <a href="#rfc.section.8.3.3">8.3.3.</a> <a href="#receiving-final-messages" id="receiving-final-messages">Receiving Final Messages</a>
 </h1>
@@ -1238,8 +1238,8 @@ Connection.SetProperty(property, value)
 
 <ul>
 <li>The status of the connection, which can be one of the following: Establishing, Established, Closing, or Closed.</li>
-<li>Whether the connection can be used to send data. A connection can not be used for sending if the connection was created with the Selection Property &#8220;Unidirectional Receive&#8221; or if a Message marked as &#8220;Final&#8221; was sent over this connection, see <a href="#send-final" class="xref">Section 12.3.1</a>.</li>
-<li>Whether the connection can be used to receive data. A connection can not be used for reading if the connection was created with the Selection Property &#8220;Unidirectional: Send&#8221; or if a Message marked as &#8220;Final&#8221; was received, see <a href="#receiving-final-messages" class="xref">Section 8.3.3</a>. The latter is only supported by certain transport protocols, e.g., by TCP as half-closed connection.</li>
+<li>Whether the connection can be used to send data. A connection can not be used for sending if the connection was created with the Selection Property &#8220;Direction of Communication&#8221; set to &#8220;unidirectional receive&#8221; or if a Message marked as &#8220;Final&#8221; was sent over this connection, see <a href="#send-final" class="xref">Section 12.3.1</a>.</li>
+<li>Whether the connection can be used to receive data. A connection can not be used for reading if the connection was created with the Selection Property &#8220;Direction of Communication&#8221; set to &#8220;unidirectional send&#8221; or if a Message marked as &#8220;Final&#8221; was received, see <a href="#receiving-final-messages" class="xref">Section 8.3.3</a>. The latter is only supported by certain transport protocols, e.g., by TCP as half-closed connection.</li>
 <li>For Connections that are Establishing: Transport Properties that the application specified on the Preconnection, see <a href="#connection-props" class="xref">Section 5.2</a>.  Selection Properties of a Connection can only be queried, not set.</li>
 <li>For Connections that are Established, Closing, or Closed (TODO: double-check if closed belongs here): Transport Properties of the actual protocols that were selected and instantiated. These features correspond to the properties given in <a href="#transport-props" class="xref">Section 12</a> and include Selection Properties and Protocol Properties.  <ul>
 <li>Selection Properties indicate whether or not the Connection has or offers a certain Selection Property. Note that the actually instantiated protocol stack may not match all Protocol Selection Properties that the application specified on the Preconnection.  For example, a certain Protocol Selection Property that an application specified as Preferred may not actually be present in the chosen protocol stack because none of the currently available transport protocols had this feature. Selection Properties of a Connection can only be queried.</li>
@@ -1255,7 +1255,7 @@ Connection.SetProperty(property, value)
 <pre>
 Connection.Close()
 </pre>
-<p id="rfc.section.10.p.2">The Closed Event can inform the application that the Remote Endpoint has closed the Connection; however, there is no guarantee that a remote close will be signaled.</p>
+<p id="rfc.section.10.p.2">The Closed Event can inform the application that the Remote Endpoint has closed the Connection; however, there is no guarantee that a remote Close will indeed be signaled.</p>
 <pre>
 Connection -&gt; Closed&lt;&gt;
 </pre>
@@ -1263,7 +1263,7 @@ Connection -&gt; Closed&lt;&gt;
 <pre>
 Connection.Abort()
 </pre>
-<p id="rfc.section.10.p.4">A ConnectionError can inform the application that the other side has aborted the Connection; however, there is no guarantee that an abort will be signaled:</p>
+<p id="rfc.section.10.p.4">A ConnectionError can inform the application that the other side has aborted the Connection; however, there is no guarantee that an Abort will indeed be signaled.</p>
 <pre>
 Connection -&gt; ConnectionError&lt;&gt;
 </pre>
@@ -1274,7 +1274,7 @@ Connection -&gt; SoftError&lt;&gt;
 <h1 id="rfc.section.11">
 <a href="#rfc.section.11">11.</a> <a href="#ordering-of-operations-and-events" id="ordering-of-operations-and-events">Ordering of Operations and Events</a>
 </h1>
-<p id="rfc.section.11.p.1">As this interface is designed to be independent of concurrency model, the details of how exactly actions are handled, and on which threads/callbacks events are dispatched, are implementation dependent. However, the interface does provide the following guarantees about the ordering of operations:</p>
+<p id="rfc.section.11.p.1">As this interface is designed to be independent of an implementation&#8217;s concurrency model, the details of how exactly actions are handled, and on which threads/callbacks events are dispatched, are implementation dependent. However, the interface does provide the following guarantees about the ordering of operations:</p>
 <p></p>
 
 <ul>
@@ -1358,7 +1358,7 @@ Connection -&gt; SoftError&lt;&gt;
 
 <ul>
 <li>Whether properties affect protocols exposed through the transport system (Protocol Properties) or the transport system itself (Control Properties)</li>
-<li>Whether properties have a clearly defined behavior that is likely to be invariant across implementations and environments (Protocol Properties and Control Properties) or whether the properties are interpreted by the transport system to provide a best effort service that matches the applications needs as well as possible (Intents).</li>
+<li>Whether properties have a clearly defined behavior that is likely to be invariant across implementations and environments (Protocol Properties and Control Properties) or whether the properties are interpreted by the transport system to provide a best effort service that matches the application needs as closely as possible (Intents).</li>
 </ul>
 <p></p>
 
@@ -1393,7 +1393,7 @@ Connection -&gt; SoftError&lt;&gt;
 </h1>
 <p id="rfc.section.12.2.4.p.1">[TODO: Discuss]</p>
 <p id="rfc.section.12.2.4.p.2">Intents are hints to the transport system that do not directly map to a single protocol/transport feature or behavior of the transport system, but express a presumed application behavior or generic application needs.</p>
-<p id="rfc.section.12.2.4.p.3">The application can expect the transport system to take appropriate actions involving protocol selection, path selection and, setting of protocol flags.  For example, if an application sets the &#8220;Capacity Profile&#8221; to &#8220;bulk&#8221; on a Preconnection, this will likely influence path selection, DSCP flags in the IP header as well as niceness for multi-streaming connections.  When using Intents, the application must not expect consistent behavior across different environments, implementations or versions of the same implementation.</p>
+<p id="rfc.section.12.2.4.p.3">The application can expect the transport system to take appropriate actions involving protocol selection, path selection and setting of protocol flags.  For example, if an application sets the &#8220;Capacity Profile&#8221; to &#8220;bulk&#8221; on a Preconnection, this will likely influence path selection, DSCP flags in the IP header as well as Niceness for multi-streaming connections.  When using Intents, the application must not expect consistent behavior across different environments, implementations or versions of the same implementation.</p>
 <h1 id="rfc.section.12.3">
 <a href="#rfc.section.12.3">12.3.</a> <a href="#mandatory-transport-properties" id="mandatory-transport-properties">Mandatory Transport Properties</a>
 </h1>
@@ -1444,7 +1444,7 @@ Connection -&gt; SoftError&lt;&gt;
 <dt>Applicability:</dt>
 <dd style="margin-left: 8">Message</dd>
 </dl>
-<p id="rfc.section.12.3.4.p.2">This property specifies that a message should be sent in such a way that the transport protocol ensures all data is received on the other side without corruption. Changing the &#180;Reliable Data Transfer&#180; property on Messages is only possible if the transport protocol supports partial reliability (see <a href="#prop-partially-reliable" class="xref">Section 12.3.3</a>).  Therefore, for protocols that always transfer data reliably, this property is always true and for protocols that always transfer data unreliably, this flag is always false. Changing it may generate an error.</p>
+<p id="rfc.section.12.3.4.p.2">This property specifies that a message should be sent in such a way that the transport protocol ensures all data is received on the other side without corruption. Changing the &#180;Reliable Data Transfer&#180; property on Messages is only possible if the transport protocol supports partial reliability (see <a href="#prop-partially-reliable" class="xref">Section 12.3.3</a>).  Therefore, for protocols that always transfer data reliably, this property is always true and for protocols that always transfer data unreliably, this property is always false. Changing it may generate an error.</p>
 <h1 id="rfc.section.12.3.5">
 <a href="#rfc.section.12.3.5">12.3.5.</a> <a href="#prop-ordering" id="prop-ordering">Preservation of data ordering</a>
 </h1>
@@ -1644,7 +1644,7 @@ Connection -&gt; SoftError&lt;&gt;
 <p id="rfc.section.12.3.17.p.3">If a system supports discovery of specific interface identifiers, such as <samp>en0</samp> or <samp>eth0</samp> on Unix-style systems, an implemention should allow using these identifiers to define path preferences. Note that marking a specific interface as <samp>Required</samp> strictly limits path selection to a single interface, and leads to less flexible and resilient connection establishment.</p>
 <p id="rfc.section.12.3.17.p.4">The set of valid interface types is implementation- and system-specific. For example, on a mobile device, there may be <samp>Wi-Fi</samp> and <samp>Cellular</samp> interface types available; whereas on a desktop computer, there may be <samp>Wi-Fi</samp> and <samp>Wired Ethernet</samp> interface types available. Implementations should provide all types that are supported on some system to all systems, in order to allow applications to write generic code.  For example, if a single implementation is used on both mobile devices and desktop devices, it should define the <samp>Cellular</samp> interface type for both systems, since an application may want to always <samp>Prohibit Cellular</samp>. Note that marking a specific interface type as <samp>Required</samp> limits path selection to a small set of interfaces, and leads to less flexible and resilient connection establishment.</p>
 <p id="rfc.section.12.3.17.p.5">The set of interface types is expected to change over time as new access technologies become available.</p>
-<p id="rfc.section.12.3.17.p.6">Interface types should not be treated as a proxy for properties of interfaces such as metered or unmetered network access. If an application needs to prohibit metered interfaces, this should be specified via Provisioning Domain attributes <a href="#prop-pvd" class="xref">Section 12.3.18</a> or another specific property.</p>
+<p id="rfc.section.12.3.17.p.6">Interface types should not be treated as a proxy for properties of interfaces such as metered or unmetered network access. If an application needs to prohibit metered interfaces, this should be specified via Provisioning Domain attributes (see <a href="#prop-pvd" class="xref">Section 12.3.18</a>) or another specific property.</p>
 <h1 id="rfc.section.12.3.18">
 <a href="#rfc.section.12.3.18">12.3.18.</a> <a href="#prop-pvd" id="prop-pvd">Provisioning Domain Instance or Type</a>
 </h1>
@@ -1658,9 +1658,9 @@ Connection -&gt; SoftError&lt;&gt;
 <dt>Applicability:</dt>
 <dd style="margin-left: 8">Preconnection, Connection (read only)</dd>
 </dl>
-<p id="rfc.section.12.3.18.p.2">Similar to interface instances and types <a href="#prop-interface" class="xref">Section 12.3.17</a>, this property allows the application to control path selection by selecting which specific Provisioning Domains or categories of Provisioning Domains it wants to  <samp>Require</samp>, <samp>Prohibit</samp>, <samp>Prefer</samp>, or <samp>Avoid</samp>.  Provisioning Domains define consistent sets of network properties that may be more specific than network interfaces <a href="#RFC7556" class="xref">[RFC7556]</a>.</p>
+<p id="rfc.section.12.3.18.p.2">Similar to interface instances and types (see <a href="#prop-interface" class="xref">Section 12.3.17</a>), this property allows the application to control path selection by selecting which specific Provisioning Domains or categories of Provisioning Domains it wants to  <samp>Require</samp>, <samp>Prohibit</samp>, <samp>Prefer</samp>, or <samp>Avoid</samp>.  Provisioning Domains define consistent sets of network properties that may be more specific than network interfaces <a href="#RFC7556" class="xref">[RFC7556]</a>.</p>
 <p id="rfc.section.12.3.18.p.3">The identification of a specific Provisioning Domain (PvD) is defined to be implementation- and system-specific, since there is not a portable standard format for a PvD identitfier.  For example, this identifier may be a string name or an integer. As with requiring specific interfaces, requiring a specific PvD strictly limits path selection.</p>
-<p id="rfc.section.12.3.18.p.4">Categories or types of PvDs are also defined to be implementation- and system-specific.  These may be useful to identify a service that is provided by a PvD. For example, if an application wants to use a PvD that provides a Voice-Over-IP service on a Cellular network, it can use the relevant PvD type to require some PvD that provides this service, without needing to look up a particular instance. While this does restrict path selection, it is more broad than requiring specific PvD instances or interface instances, and should be preferred over those options.</p>
+<p id="rfc.section.12.3.18.p.4">Categories or types of PvDs are also defined to be implementation- and system-specific.  These may be useful to identify a service that is provided by a PvD. For example, if an application wants to use a PvD that provides a Voice-Over-IP service on a Cellular network, it can use the relevant PvD type to require some PvD that provides this service, without needing to look up a particular instance. While this does restrict path selection, it is broader than requiring specific PvD instances or interface instances, and should be preferred over these options.</p>
 <h1 id="rfc.section.12.3.19">
 <a href="#rfc.section.12.3.19">12.3.19.</a> <a href="#prop-cap-profile" id="prop-cap-profile">Capacity Profile</a>
 </h1>
@@ -1679,7 +1679,7 @@ Connection -&gt; SoftError&lt;&gt;
 
 <dl>
 <dt>Default:</dt>
-<dd style="margin-left: 8">The application makes no representation about its expected capacity profile. No special optimizations of the tradeoff between delay, delay variation, and bandwidth efficiency should be made when selecting and configuring stacks.</dd>
+<dd style="margin-left: 8">The application makes no request about its expected capacity profile. No special optimizations of the tradeoff between delay, delay variation, and bandwidth efficiency should be made when selecting and configuring stacks.</dd>
 <dt>Low Latency:</dt>
 <dd style="margin-left: 8">Response time (latency) should be optimized at the expense of bandwidth efficiency and delay variation when sending this message. This can be used by the system to disable the coalescing of multiple small Messages into larger packets (Nagle&#8217;s algorithm); to prefer immediate acknowledgment from the peer endpoint when supported by the underlying transport; to signal a preference for lower-latency, higher-loss treatment; and so on.</dd>
 <dt>Constant Rate:</dt>
@@ -1832,7 +1832,7 @@ Connection -&gt; SoftError&lt;&gt;
 <h1 id="rfc.section.14">
 <a href="#rfc.section.14">14.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a>
 </h1>
-<p id="rfc.section.14.p.1">This document describes a generic API for interacting with a transport services (TAPS) system.  Part of this API includes configuration details for transport security protocols, as discussed in Section <a href="#security-parameters" class="xref">Section 5.3</a>. It does not recommend use (or disuse) of specific algorithms or protocols. Any API-compatible transport security protocol should work in a TAPS system.</p>
+<p id="rfc.section.14.p.1">This document describes a generic API for interacting with a transport services (TAPS) system.  Part of this API includes configuration details for transport security protocols, as discussed in <a href="#security-parameters" class="xref">Section 5.3</a>. It does not recommend use (or disuse) of specific algorithms or protocols. Any API-compatible transport security protocol should work in a TAPS system.</p>
 <h1 id="rfc.section.15">
 <a href="#rfc.section.15">15.</a> <a href="#acknowledgements" id="acknowledgements">Acknowledgements</a>
 </h1>
@@ -1997,7 +1997,7 @@ Connection -&gt; SoftError&lt;&gt;
 <dt>Applicability:</dt>
 <dd style="margin-left: 8">Preconnection</dd>
 </dl>
-<p id="rfc.section.A.1.4.p.2">This property specifies what the application expect the dominating traffic pattern to be. Possible values are:</p>
+<p id="rfc.section.A.1.4.p.2">This property specifies what the application expects the dominating traffic pattern to be. Possible values are:</p>
 <p></p>
 
 <dl>
@@ -2038,7 +2038,7 @@ Connection -&gt; SoftError&lt;&gt;
 <dt>Applicability:</dt>
 <dd style="margin-left: 8">Preconnection</dd>
 </dl>
-<p id="rfc.section.A.1.6.p.2">This Intent specifies what the application expects the lifetime of a connection to be. It is given in milliseconds.</p>
+<p id="rfc.section.A.1.6.p.2">This Intent specifies what the application expects the lifetime of a Connection to be. It is given in milliseconds.</p>
 <h1 id="rfc.appendix.A.1.7">
 <a href="#rfc.appendix.A.1.7">A.1.7.</a> <a href="#send-or-receive-bit-rate" id="send-or-receive-bit-rate">Send or Receive Bit-rate</a>
 </h1>
@@ -2053,7 +2053,7 @@ Connection -&gt; SoftError&lt;&gt;
 <dd style="margin-left: 8">Preconnection, Message</dd>
 </dl>
 <p id="rfc.section.A.1.7.p.2">This Intent specifies what the application expects the bit-rate of a transfer to be. It is given in Bytes per second.</p>
-<p id="rfc.section.A.1.7.p.3">On a message, this property specifies at what bitrate the application wishes the Message to be sent. A transport system supporting this feature will not exceed the requested Send Bitrate even if flow-control and congestion control allow higher bitrates. This helps to avoid bursty traffic pattern on busy video streaming servers.</p>
+<p id="rfc.section.A.1.7.p.3">On a Message, this property specifies at what bitrate the application wishes the Message to be sent. A transport system supporting this feature will not exceed the requested Send Bitrate even if flow-control and congestion control allow higher bitrates. This helps to avoid a bursty traffic pattern on busy streaming video servers.</p>
 <h1 id="rfc.appendix.A.1.8">
 <a href="#rfc.appendix.A.1.8">A.1.8.</a> <a href="#cost-preferences" id="cost-preferences">Cost Preferences</a>
 </h1>
@@ -2095,7 +2095,7 @@ Connection -&gt; SoftError&lt;&gt;
 <dt>Applicability:</dt>
 <dd style="margin-left: 8">Message</dd>
 </dl>
-<p id="rfc.section.A.1.9.p.2">This property specifies whether the caller prefers immediacy to efficient capacity usage for this Message. For example, this means that the Message should not be bundled with other Message into the same transmission by the underlying Protocol Stack.</p>
+<p id="rfc.section.A.1.9.p.2">This property specifies whether the caller prefers immediacy to efficient capacity usage for this Message. For example, this means that the Message should not be bundled with other Messages into the same transmission by the underlying Protocol Stack.</p>
 <h1 id="rfc.appendix.B">
 <a href="#rfc.appendix.B">Appendix B.</a> <a href="#appendix-api-sketch" id="appendix-api-sketch">Sample API definition in Go</a>
 </h1>
