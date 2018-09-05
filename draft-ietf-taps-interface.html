@@ -325,7 +325,7 @@ ul.toc li {
 <link href="#rfc.section.8.3.2" rel="Chapter" title="8.3.2 Early Data">
 <link href="#rfc.section.8.3.3" rel="Chapter" title="8.3.3 Receiving Final Messages">
 <link href="#rfc.section.8.4" rel="Chapter" title="8.4 Receiver-side De-framing over Stream Protocols">
-<link href="#rfc.section.9" rel="Chapter" title="9 Setting and Querying Connection Properties">
+<link href="#rfc.section.9" rel="Chapter" title="9 Managing Connections: Setting Properties and Obtaining Information">
 <link href="#rfc.section.10" rel="Chapter" title="10 Connection Termination">
 <link href="#rfc.section.11" rel="Chapter" title="11 Ordering of Operations and Events">
 <link href="#rfc.section.12" rel="Chapter" title="12 Transport Properties">
@@ -587,7 +587,7 @@ ul.toc li {
 </li>
 </ul><li>8.4.   <a href="#rfc.section.8.4">Receiver-side De-framing over Stream Protocols</a>
 </li>
-</ul><li>9.   <a href="#rfc.section.9">Setting and Querying Connection Properties</a>
+</ul><li>9.   <a href="#rfc.section.9">Managing Connections: Setting Properties and Obtaining Information</a>
 </li>
 <li>10.   <a href="#rfc.section.10">Connection Termination</a>
 </li>
@@ -1243,30 +1243,29 @@ Preconnection.DeframeWith(Deframer)
 {messageData} := Deframer.Deframe(OctetStream, ...)
 </pre>
 <h1 id="rfc.section.9">
-<a href="#rfc.section.9">9.</a> <a href="#introspection" id="introspection">Setting and Querying Connection Properties</a>
+<a href="#rfc.section.9">9.</a> <a href="#introspection" id="introspection">Managing Connections: Setting Properties and Obtaining Information</a>
 </h1>
-<p id="rfc.section.9.p.1">At any point, the application can query Connection Properties.  It can also set per-connection Protocol Properties.</p>
-<pre>
-ConnectionProperties := Connection.GetProperties()
-</pre>
-<pre>
-Connection.SetProperty(property, value)
-</pre>
-<p id="rfc.section.9.p.2">Depending on the status of the connection, the queried Connection Properties will include different information:</p>
+<p id="rfc.section.9.p.1">The application can set per-connection Protocol Properties (see <a href="#protocol-props" class="xref">Section 12.2.2</a>).  Certain Procotol Properties may be read-only, on a protocol- and property-specific basis.  ~~~ Connection.SetProperty(property, value) ~~~</p>
+<p id="rfc.section.9.p.2">At any point, the application can query Connection Properties.  ~~~ ConnectionProperties := Connection.GetProperties() ~~~</p>
+<p id="rfc.section.9.p.3">Depending on the status of the connection, the queried Connection Properties will include different information:</p>
 <p></p>
 
 <ul>
 <li>The status of the connection, which can be one of the following: Establishing, Established, Closing, or Closed.</li>
 <li>Whether the connection can be used to send data. A connection can not be used for sending if the connection was created with the Selection Property &#8220;Direction of Communication&#8221; set to &#8220;unidirectional receive&#8221; or if a Message marked as &#8220;Final&#8221; was sent over this connection, see <a href="#send-final" class="xref">Section 12.3.1</a>.</li>
 <li>Whether the connection can be used to receive data. A connection can not be used for reading if the connection was created with the Selection Property &#8220;Direction of Communication&#8221; set to &#8220;unidirectional send&#8221; or if a Message marked as &#8220;Final&#8221; was received, see <a href="#receiving-final-messages" class="xref">Section 8.3.3</a>. The latter is only supported by certain transport protocols, e.g., by TCP as half-closed connection.</li>
-<li>For Connections that are Establishing: Transport Properties that the application specified on the Preconnection, see <a href="#connection-props" class="xref">Section 5.2</a>.  Selection Properties of a Connection can only be queried, not set.</li>
+<li>For Connections that are Establishing: Transport Properties that the application specified on the Preconnection, see <a href="#connection-props" class="xref">Section 5.2</a>.</li>
 <li>For Connections that are Established, Closing, or Closed (TODO: double-check if closed belongs here): Transport Properties of the actual protocols that were selected and instantiated. These features correspond to the properties given in <a href="#transport-props" class="xref">Section 12</a> and include Selection Properties and Protocol Properties.  <ul>
-<li>Selection Properties indicate whether or not the Connection has or offers a certain Selection Property. Note that the actually instantiated protocol stack may not match all Protocol Selection Properties that the application specified on the Preconnection.  For example, a certain Protocol Selection Property that an application specified as Preferred may not actually be present in the chosen protocol stack because none of the currently available transport protocols had this feature. Selection Properties of a Connection can only be queried.</li>
-<li>Protocol Properties of the protocol stack in use (see <a href="#protocol-props" class="xref">Section 12.2.2</a> below). These can be queried and set. Certain specific Procotol Properties may be read-only, on a protocol- and property-specific basis.</li>
+<li>Selection Properties indicate whether or not the Connection has or offers a certain Selection Property. Note that the actually instantiated protocol stack may not match all Protocol Selection Properties that the application specified on the Preconnection.  For example, a certain Protocol Selection Property that an application specified as Preferred may not actually be present in the chosen protocol stack because none of the currently available transport protocols had this feature.</li>
+<li>Protocol Properties of the protocol stack in use (see <a href="#protocol-props" class="xref">Section 12.2.2</a>).</li>
 </ul>
 </li>
-<li>For Connections that are Established, properties of the path(s) in use. These properties can be derived from the local provisioning domain <a href="#RFC7556" class="xref">[RFC7556]</a>, measurements by the Protocol Stack, or other sources. They can only be queried.</li>
+<li>For Connections that are Established, properties of the path(s) in use. These properties can be derived from the local provisioning domain <a href="#RFC7556" class="xref">[RFC7556]</a>, measurements by the Protocol Stack, or other sources.</li>
 </ul>
+<p id="rfc.section.9.p.5">Slightly different from &#8220;querying&#8221;, a SoftError Event can also occur, informing the application about the receipt of an ICMP error message related to the Connection. This will only happen if the underlying protocol stack supports access to soft errors; however, even if the underlying stack supports it, there is no guarantee that a soft error will be signaled.</p>
+<pre>
+Connection -&gt; SoftError&lt;&gt;
+</pre>
 <h1 id="rfc.section.10">
 <a href="#rfc.section.10">10.</a> <a href="#termination" id="termination">Connection Termination</a>
 </h1>
@@ -1285,10 +1284,6 @@ Connection.Abort()
 <p id="rfc.section.10.p.4">A ConnectionError can inform the application that the other side has aborted the Connection; however, there is no guarantee that an Abort will indeed be signaled.</p>
 <pre>
 Connection -&gt; ConnectionError&lt;&gt;
-</pre>
-<p id="rfc.section.10.p.5">A SoftError can inform the application about the receipt of an ICMP error message that does not force termination of the connection, if the underlying protocol stack supports access to soft errors; however, even if the underlying stack supports it, there is no guarantee that a soft error will be signaled.</p>
-<pre>
-Connection -&gt; SoftError&lt;&gt;
 </pre>
 <h1 id="rfc.section.11">
 <a href="#rfc.section.11">11.</a> <a href="#ordering-of-operations-and-events" id="ordering-of-operations-and-events">Ordering of Operations and Events</a>

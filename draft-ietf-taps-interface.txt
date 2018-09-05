@@ -129,11 +129,12 @@ Internet-Draft               TAPS Interface               September 2018
        8.3.2.  Early Data  . . . . . . . . . . . . . . . . . . . . .  27
        8.3.3.  Receiving Final Messages  . . . . . . . . . . . . . .  27
      8.4.  Receiver-side De-framing over Stream Protocols  . . . . .  28
-   9.  Setting and Querying Connection Properties  . . . . . . . . .  28
+   9.  Managing Connections: Setting Properties and Obtaining
+       Information . . . . . . . . . . . . . . . . . . . . . . . . .  28
    10. Connection Termination  . . . . . . . . . . . . . . . . . . .  30
    11. Ordering of Operations and Events . . . . . . . . . . . . . .  30
    12. Transport Properties  . . . . . . . . . . . . . . . . . . . .  31
-     12.1.  Transport Property Types . . . . . . . . . . . . . . . .  32
+     12.1.  Transport Property Types . . . . . . . . . . . . . . . .  31
        12.1.1.  Boolean  . . . . . . . . . . . . . . . . . . . . . .  32
        12.1.2.  Enumeration  . . . . . . . . . . . . . . . . . . . .  32
        12.1.3.  Integer  . . . . . . . . . . . . . . . . . . . . . .  32
@@ -161,7 +162,6 @@ Internet-Draft               TAPS Interface               September 2018
        12.3.13. Notification of ICMP soft error message arrival  . .  39
        12.3.14. Control checksum coverage on sending or receiving  .  39
        12.3.15. Corruption Protection Length . . . . . . . . . . . .  39
-       12.3.16. Required minimum coverage of the checksum for
 
 
 
@@ -170,6 +170,7 @@ Trammell, et al.          Expires March 9, 2019                 [Page 3]
 Internet-Draft               TAPS Interface               September 2018
 
 
+       12.3.16. Required minimum coverage of the checksum for
                 receiving  . . . . . . . . . . . . . . . . . . . . .  40
        12.3.17. Interface Instance or Type . . . . . . . . . . . . .  40
        12.3.18. Provisioning Domain Instance or Type . . . . . . . .  41
@@ -217,7 +218,6 @@ Internet-Draft               TAPS Interface               September 2018
    wars of the 1980s.  SOCK_STREAM is tied to the Transmission Control
    Protocol (TCP), specified in 1981 [RFC0793].  TCP has scaled
    remarkably well over the past three and a half decades, but its total
-   ubiquity has hidden an uncomfortable fact: the network is not really
 
 
 
@@ -226,6 +226,7 @@ Trammell, et al.          Expires March 9, 2019                 [Page 4]
 Internet-Draft               TAPS Interface               September 2018
 
 
+   ubiquity has hidden an uncomfortable fact: the network is not really
    a file, and stream abstractions are too simplistic for many modern
    application programming models.
 
@@ -273,7 +274,6 @@ Internet-Draft               TAPS Interface               September 2018
    Actions associated with no Object are Actions on the abstract
    interface itself; they are equivalent to Actions on a per-application
    global context.
-
 
 
 
@@ -1550,18 +1550,18 @@ Internet-Draft               TAPS Interface               September 2018
 
    {messageData} := Deframer.Deframe(OctetStream, ...)
 
-9.  Setting and Querying Connection Properties
+9.  Managing Connections: Setting Properties and Obtaining Information
 
-   At any point, the application can query Connection Properties.  It
-   can also set per-connection Protocol Properties.
+   The application can set per-connection Protocol Properties (see
+   Section 12.2.2).  Certain Procotol Properties may be read-only, on a
+   protocol- and property-specific basis.  ~~~
+   Connection.SetProperty(property, value) ~~~
 
-   ConnectionProperties := Connection.GetProperties()
-
-   Connection.SetProperty(property, value)
+   At any point, the application can query Connection Properties.  ~~~
+   ConnectionProperties := Connection.GetProperties() ~~~
 
    Depending on the status of the connection, the queried Connection
    Properties will include different information:
-
 
 
 
@@ -1589,7 +1589,6 @@ Internet-Draft               TAPS Interface               September 2018
 
    o  For Connections that are Establishing: Transport Properties that
       the application specified on the Preconnection, see Section 5.2.
-      Selection Properties of a Connection can only be queried, not set.
 
    o  For Connections that are Established, Closing, or Closed (TODO:
       double-check if closed belongs here): Transport Properties of the
@@ -1605,19 +1604,20 @@ Internet-Draft               TAPS Interface               September 2018
          Property that an application specified as Preferred may not
          actually be present in the chosen protocol stack because none
          of the currently available transport protocols had this
-         feature.  Selection Properties of a Connection can only be
-         queried.
+         feature.
 
       *  Protocol Properties of the protocol stack in use (see
-         Section 12.2.2 below).  These can be queried and set.  Certain
-         specific Procotol Properties may be read-only, on a protocol-
-         and property-specific basis.
+         Section 12.2.2).
 
    o  For Connections that are Established, properties of the path(s) in
       use.  These properties can be derived from the local provisioning
       domain [RFC7556], measurements by the Protocol Stack, or other
-      sources.  They can only be queried.
+      sources.
 
+   Slightly different from "querying", a SoftError Event can also occur,
+   informing the application about the receipt of an ICMP error message
+   related to the Connection.  This will only happen if the underlying
+   protocol stack supports access to soft errors; however, even if the
 
 
 
@@ -1625,6 +1625,11 @@ Trammell, et al.          Expires March 9, 2019                [Page 29]
 
 Internet-Draft               TAPS Interface               September 2018
 
+
+   underlying stack supports it, there is no guarantee that a soft error
+   will be signaled.
+
+   Connection -> SoftError<>
 
 10.  Connection Termination
 
@@ -1654,14 +1659,6 @@ Internet-Draft               TAPS Interface               September 2018
 
    Connection -> ConnectionError<>
 
-   A SoftError can inform the application about the receipt of an ICMP
-   error message that does not force termination of the connection, if
-   the underlying protocol stack supports access to soft errors;
-   however, even if the underlying stack supports it, there is no
-   guarantee that a soft error will be signaled.
-
-   Connection -> SoftError<>
-
 11.  Ordering of Operations and Events
 
    As this interface is designed to be independent of an
@@ -1675,6 +1672,9 @@ Internet-Draft               TAPS Interface               September 2018
       on that Connection, or a ConnectionReceived<> or RendezvousDone<>
       containing that Connection.
 
+   o  No events will occur on a Connection after a Closed<> event, an
+      InitiateError<> or ConnectionError<> on that connection.  To
+
 
 
 Trammell, et al.          Expires March 9, 2019                [Page 30]
@@ -1682,8 +1682,6 @@ Trammell, et al.          Expires March 9, 2019                [Page 30]
 Internet-Draft               TAPS Interface               September 2018
 
 
-   o  No events will occur on a Connection after a Closed<> event, an
-      InitiateError<> or ConnectionError<> on that connection.  To
       ensure this ordering, Closed<> will not occur on a Connection
       while other events on the Connection are still locally outstanding
       (i.e., known to the interface and waiting to be dealt with by the
@@ -1726,7 +1724,9 @@ Internet-Draft               TAPS Interface               September 2018
    early as possible, to help ensure that inconsistencies are caught
    early in the development process.
 
+12.1.  Transport Property Types
 
+   Each Transport Property takes a value of a property-specific type.
 
 
 
@@ -1737,10 +1737,6 @@ Trammell, et al.          Expires March 9, 2019                [Page 31]
 
 Internet-Draft               TAPS Interface               September 2018
 
-
-12.1.  Transport Property Types
-
-   Each Transport Property takes a value of a property-specific type.
 
 12.1.1.  Boolean
 
@@ -1787,16 +1783,16 @@ Internet-Draft               TAPS Interface               September 2018
    |            | property, fail otherwise                             |
    +------------+------------------------------------------------------+
 
+   When used on a Connection, this type becomes a (read-only) Boolean
+   representing whether the selected transport supports the requested
+   feature.
+
 
 
 Trammell, et al.          Expires March 9, 2019                [Page 32]
 
 Internet-Draft               TAPS Interface               September 2018
 
-
-   When used on a Connection, this type becomes a (read-only) Boolean
-   representing whether the selected transport supports the requested
-   feature.
 
 12.2.  Transport Property Classification
 
@@ -1843,6 +1839,10 @@ Internet-Draft               TAPS Interface               September 2018
    Require or Prohibit) or influences (Prefer, Ignore, Avoid) the
    selection of transport protocols and paths used.
 
+   An implementation of this interface must provide sensible defaults
+   for Selection Properties.  The defaults given for each property below
+   represent a configuration that can be implemented over TCP.  An
+
 
 
 Trammell, et al.          Expires March 9, 2019                [Page 33]
@@ -1850,9 +1850,6 @@ Trammell, et al.          Expires March 9, 2019                [Page 33]
 Internet-Draft               TAPS Interface               September 2018
 
 
-   An implementation of this interface must provide sensible defaults
-   for Selection Properties.  The defaults given for each property below
-   represent a configuration that can be implemented over TCP.  An
    alternate set of default Protocol Selection Properties would
    represent a configuration that can be implemented over UDP.
 
@@ -1896,6 +1893,9 @@ Internet-Draft               TAPS Interface               September 2018
    request state changes in the local transport system.  Depending on
    the protocols used, setting these properties might also influence the
    protocol state machine.  See Section 12.3.1 for an example.
+
+
+
 
 
 
