@@ -1126,7 +1126,8 @@ Internet-Draft               TAPS Interface               September 2018
    Action.  If false, the Message may be delivered to the receiving
    application out of order.  This property is used for protocols that
    support preservation of data ordering, see Section 12.3.5, but allow
-   out-of-order delivery for certain messages.
+   out-of-order delivery for certain messages.  It is ignored on the
+   first Message that is sent on a Connection.
 
 7.3.4.  Idempotent
 
@@ -1168,8 +1169,7 @@ Internet-Draft               TAPS Interface               September 2018
    options for simple integrity protection via checksums.  By default,
    the entire Message is protected by a checksum.  A value of 0 means
    that no checksum is required, and a special value (e.g. -1) can be
-   used to indicate the default.  Only full coverage is guaranteed, any
-   other requests are advisory.
+
 
 
 
@@ -1177,6 +1177,9 @@ Trammell, et al.         Expires March 10, 2019                [Page 21]
 
 Internet-Draft               TAPS Interface               September 2018
 
+
+   used to indicate the default.  Only full coverage is guaranteed, any
+   other requests are advisory.
 
 7.3.7.  Reliable Data Transfer (Message)
 
@@ -1222,10 +1225,7 @@ Internet-Draft               TAPS Interface               September 2018
    may be too large for the application to hold in memory at one time,
    or the length of the Message may be unknown or unbounded.
 
-   Partial Message sending is supported by passing an endOfMessage
-   boolean parameter to the Send Action.  This value is always true by
-   default, and the simpler forms of Send are equivalent to passing true
-   for endOfMessage.
+
 
 
 
@@ -1233,6 +1233,11 @@ Trammell, et al.         Expires March 10, 2019                [Page 22]
 
 Internet-Draft               TAPS Interface               September 2018
 
+
+   Partial Message sending is supported by passing an endOfMessage
+   boolean parameter to the Send Action.  This value is always true by
+   default, and the simpler forms of Send are equivalent to passing true
+   for endOfMessage.
 
    The following example sends a Message in two separate calls to Send.
 
@@ -1278,17 +1283,16 @@ Internet-Draft               TAPS Interface               September 2018
 
    Connection := Preconnection.InitiateWithIdempotentSend(messageData)
 
-   With a message context (as in Section 7.3):
-
-Connection := Preconnection.InitiateWithIdempotentSend(messageData, messageContext)
-
-
 
 
 Trammell, et al.         Expires March 10, 2019                [Page 23]
 
 Internet-Draft               TAPS Interface               September 2018
 
+
+   With a message context (as in Section 7.3):
+
+Connection := Preconnection.InitiateWithIdempotentSend(messageData, messageContext)
 
    The message passed to InitiateWithIdempotentSend() is, as suggested
    by the name, considered to be idempotent (see Section 7.3.4)
@@ -1333,10 +1337,6 @@ Internet-Draft               TAPS Interface               September 2018
    As with sending, data is received in terms of Messages.  Receiving is
    an asynchronous operation, in which each call to Receive enqueues a
    request to receive new data from the connection.  Once data has been
-   received, or an error is encountered, an event will be delivered to
-   complete the Receive request (see Section 8.2).
-
-
 
 
 
@@ -1345,6 +1345,9 @@ Trammell, et al.         Expires March 10, 2019                [Page 24]
 
 Internet-Draft               TAPS Interface               September 2018
 
+
+   received, or an error is encountered, an event will be delivered to
+   complete the Receive request (see Section 8.2).
 
    As with sending, the type of the Message to be passed is dependent on
    the implementation, and on the constraints on the Protocol Stacks
@@ -1390,9 +1393,6 @@ Internet-Draft               TAPS Interface               September 2018
 
    Each call to Receive will be paired with a single Receive Event,
    which can be a success or an error.  This allows an application to
-   provide backpressure to the transport stack when it is temporarily
-   not ready to receive messages.
-
 
 
 
@@ -1401,6 +1401,9 @@ Trammell, et al.         Expires March 10, 2019                [Page 25]
 
 Internet-Draft               TAPS Interface               September 2018
 
+
+   provide backpressure to the transport stack when it is temporarily
+   not ready to receive messages.
 
 8.2.1.  Received
 
@@ -1447,9 +1450,6 @@ Connection -> ReceivedPartial<messageData, messageContext, endOfMessage>
 
    o  the underlying Protocol Stack does not support message boundary
       preservation, and no deframer was supplied by the application
-
-
-
 
 
 
