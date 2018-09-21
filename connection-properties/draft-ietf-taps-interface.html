@@ -395,12 +395,11 @@ ul.toc li {
 <link href="#rfc.appendix.A.1" rel="Chapter" title="A.1 Experimental Transport Properties">
 <link href="#rfc.appendix.A.1.1" rel="Chapter" title="A.1.1 Suggest a timeout to the Remote Endpoint">
 <link href="#rfc.appendix.A.1.2" rel="Chapter" title="A.1.2 Abort timeout to suggest to the Remote Endpoint">
-<link href="#rfc.appendix.A.1.3" rel="Chapter" title="A.1.3 Request not to delay acknowledgment of Message">
-<link href="#rfc.appendix.A.1.4" rel="Chapter" title="A.1.4 Traffic Category">
-<link href="#rfc.appendix.A.1.5" rel="Chapter" title="A.1.5 Size to be Sent or Received">
-<link href="#rfc.appendix.A.1.6" rel="Chapter" title="A.1.6 Duration">
-<link href="#rfc.appendix.A.1.7" rel="Chapter" title="A.1.7 Send or Receive Bit-rate">
-<link href="#rfc.appendix.A.1.8" rel="Chapter" title="A.1.8 Cost Preferences">
+<link href="#rfc.appendix.A.1.3" rel="Chapter" title="A.1.3 Traffic Category">
+<link href="#rfc.appendix.A.1.4" rel="Chapter" title="A.1.4 Size to be Sent or Received">
+<link href="#rfc.appendix.A.1.5" rel="Chapter" title="A.1.5 Duration">
+<link href="#rfc.appendix.A.1.6" rel="Chapter" title="A.1.6 Send or Receive Bit-rate">
+<link href="#rfc.appendix.A.1.7" rel="Chapter" title="A.1.7 Cost Preferences">
 <link href="#rfc.appendix.B" rel="Chapter" title="B Sample API definition in Go">
 <link href="#rfc.authors" rel="Chapter">
 
@@ -741,17 +740,15 @@ ul.toc li {
 </li>
 <li>A.1.2.   <a href="#rfc.appendix.A.1.2">Abort timeout to suggest to the Remote Endpoint</a>
 </li>
-<li>A.1.3.   <a href="#rfc.appendix.A.1.3">Request not to delay acknowledgment of Message</a>
+<li>A.1.3.   <a href="#rfc.appendix.A.1.3">Traffic Category</a>
 </li>
-<li>A.1.4.   <a href="#rfc.appendix.A.1.4">Traffic Category</a>
+<li>A.1.4.   <a href="#rfc.appendix.A.1.4">Size to be Sent or Received</a>
 </li>
-<li>A.1.5.   <a href="#rfc.appendix.A.1.5">Size to be Sent or Received</a>
+<li>A.1.5.   <a href="#rfc.appendix.A.1.5">Duration</a>
 </li>
-<li>A.1.6.   <a href="#rfc.appendix.A.1.6">Duration</a>
+<li>A.1.6.   <a href="#rfc.appendix.A.1.6">Send or Receive Bit-rate</a>
 </li>
-<li>A.1.7.   <a href="#rfc.appendix.A.1.7">Send or Receive Bit-rate</a>
-</li>
-<li>A.1.8.   <a href="#rfc.appendix.A.1.8">Cost Preferences</a>
+<li>A.1.7.   <a href="#rfc.appendix.A.1.7">Cost Preferences</a>
 </li>
 </ul></ul><li>Appendix B.   <a href="#rfc.appendix.B">Sample API definition in Go</a>
 </li>
@@ -780,6 +777,12 @@ Object := Action()
 </pre>
 <p></p>
 
+<ul><li>An Action creates an array of Objects:</li></ul>
+<pre>
+[]Object := Action()
+</pre>
+<p></p>
+
 <ul><li>An Action is performed on an Object:</li></ul>
 <pre>
 Object.Action()
@@ -796,10 +799,10 @@ Object -&gt; Event&lt;&gt;
 <pre>
 Action(parameter, parameter, ...) / Event&lt;parameter, parameter, ...&gt;
 </pre>
-<p id="rfc.section.2.p.7">Actions associated with no Object are Actions on the abstract interface itself; they are equivalent to Actions on a per-application global context.</p>
-<p id="rfc.section.2.p.8">How these abstract concepts map into concrete implementations of this API in a given language on a given platform is largely dependent on the features of the language and the platform. Actions could be implemented as functions or method calls, for instance, and Events could be implemented via callback passing or other asynchronous calling conventions. The method for registering callbacks and handlers is left as an implementation detail, with the caveat that the interface for receiving Messages must require the application to invoke the Connection.Receive() Action once per Message to be received (see <a href="#receiving" class="xref">Section 8</a>).</p>
-<p id="rfc.section.2.p.9">This specification treats Events and errors similarly. Errors, just as any other Events, may occur asynchronously in network applications. However, it is recommended that implementations of this interface also return errors immediately, according to the error handling idioms of the implementation platform, for errors which can be immediately detected, such as inconsistency in Transport Properties.</p>
-<p id="rfc.section.2.p.10">The key words &#8220;MUST&#8221;, &#8220;MUST NOT&#8221;, &#8220;REQUIRED&#8221;, &#8220;SHALL&#8221;, &#8220;SHALL NOT&#8221;, &#8220;SHOULD&#8221;, &#8220;SHOULD NOT&#8221;, &#8220;RECOMMENDED&#8221;, &#8220;NOT RECOMMENDED&#8221;, &#8220;MAY&#8221;, and &#8220;OPTIONAL&#8221; in this document are to be interpreted as described in BCP 14 <a href="#RFC2119" class="xref">[RFC2119]</a> <a href="#RFC8174" class="xref">[RFC8174]</a> when, and only when, they appear in all capitals, as shown here.</p>
+<p id="rfc.section.2.p.8">Actions associated with no Object are Actions on the abstract interface itself; they are equivalent to Actions on a per-application global context.</p>
+<p id="rfc.section.2.p.9">How these abstract concepts map into concrete implementations of this API in a given language on a given platform is largely dependent on the features of the language and the platform. Actions could be implemented as functions or method calls, for instance, and Events could be implemented via callback passing or other asynchronous calling conventions. The method for registering callbacks and handlers is left as an implementation detail, with the caveat that the interface for receiving Messages must require the application to invoke the Connection.Receive() Action once per Message to be received (see <a href="#receiving" class="xref">Section 8</a>).</p>
+<p id="rfc.section.2.p.10">This specification treats Events and errors similarly. Errors, just as any other Events, may occur asynchronously in network applications. However, it is recommended that implementations of this interface also return errors immediately, according to the error handling idioms of the implementation platform, for errors which can be immediately detected, such as inconsistency in Transport Properties.</p>
+<p id="rfc.section.2.p.11">The key words &#8220;MUST&#8221;, &#8220;MUST NOT&#8221;, &#8220;REQUIRED&#8221;, &#8220;SHALL&#8221;, &#8220;SHALL NOT&#8221;, &#8220;SHOULD&#8221;, &#8220;SHOULD NOT&#8221;, &#8220;RECOMMENDED&#8221;, &#8220;NOT RECOMMENDED&#8221;, &#8220;MAY&#8221;, and &#8220;OPTIONAL&#8221; in this document are to be interpreted as described in BCP 14 <a href="#RFC2119" class="xref">[RFC2119]</a> <a href="#RFC8174" class="xref">[RFC8174]</a> when, and only when, they appear in all capitals, as shown here.</p>
 <h1 id="rfc.section.3">
 <a href="#rfc.section.3">3.</a> <a href="#principles" id="principles">Interface Design Principles</a>
 </h1>
@@ -817,7 +820,7 @@ Action(parameter, parameter, ...) / Event&lt;parameter, parameter, ...&gt;
 <a href="#rfc.section.4">4.</a> <a href="#api-summary" id="api-summary">API Summary</a>
 </h1>
 <p id="rfc.section.4.p.1">The Transport Services Interface is the basic common abstract application programming interface to the Transport Services Architecture defined in <a href="#I-D.ietf-taps-arch" class="xref">[I-D.ietf-taps-arch]</a>. An application primarily interacts with this interface through two Objects, Preconnections and Connections. A Preconnection represents a set of properties and constraints on the selection and configuration of paths and protocols to establish a Connection with a remote endpoint. A Connection represents a transport Protocol Stack on which data can be sent to and/or received from a remote endpoint (i.e., depending on the kind of transport, connections can be bi-directional or unidirectional). Connections can be created from Preconnections in three ways: by initiating the Preconnection (i.e., actively opening, as in a client), through listening on the Preconnection (i.e., passively opening, as in a server), or rendezvousing on the Preconnection (i.e. peer to peer establishment).</p>
-<p id="rfc.section.4.p.2">Once a Connection is established, data can be sent on it in the form of Messages. The interface supports the preservation of message boundaries both via explicit Protocol Stack support, and via application support through a deframing callback which finds message boundaries in a stream. Messages are received asynchronously through a callback registered by the application. Errors and other notifications also happen asynchronously on the Connection.</p>
+<p id="rfc.section.4.p.2">Once a Connection is established, data can be sent on it in the form of Messages. The interface supports the preservation of message boundaries both via explicit Protocol Stack support, and via application support through a deframing callback which finds message boundaries in a stream. Messages are received asynchronously through a callback registered by the application.  Errors and other notifications also happen asynchronously on the Connection.</p>
 <p id="rfc.section.4.p.3">In the following sections, we describe the details of application interaction with Objects through Actions and Events in each phase of a Connection, following the phases described in <a href="#I-D.ietf-taps-arch" class="xref">[I-D.ietf-taps-arch]</a>.</p>
 <h1 id="rfc.section.5">
 <a href="#rfc.section.5">5.</a> <a href="#pre-establishment-phase" id="pre-establishment-phase">Pre-Establishment Phase</a>
@@ -1023,11 +1026,11 @@ Preconnection -&gt; RendezvousDone&lt;Connection&gt;
 Preconnection -&gt; RendezvousError&lt;msgRef, error&gt;
 </pre>
 <p id="rfc.section.6.3.p.6">An RendezvousError occurs either when the Preconnection cannot be fulfilled for listening, when the Local Endpoint or Remote Endpoint cannot be resolved, when no transport-layer connection can be established to the Remote Endpoint, or when the application is prohibited from rendezvous by policy.</p>
-<p id="rfc.section.6.3.p.7">When using some NAT traversal protocols, e.g., Interactive Connectivity Establishment (ICE) <a href="#RFC5245" class="xref">[RFC5245]</a>, it is expected that the Local Endpoint will be configured with some method of discovering NAT bindings, e.g., a Session Traversal Utilities for NAT (STUN) server.  In this case, the Local Endpoint may resolve to a mixture of local and server reflexive addresses. The Resolve() action on the Preconnection can be used to discover these bindings:</p>
+<p id="rfc.section.6.3.p.7">When using some NAT traversal protocols, e.g., Interactive Connectivity Establishment (ICE) <a href="#RFC5245" class="xref">[RFC5245]</a>, it is expected that the Local Endpoint will be configured with some method of discovering NAT bindings, e.g., a Session Traversal Utilities for NAT (STUN) server. In this case, the Local Endpoint may resolve to a mixture of local and server reflexive addresses. The Resolve() action on the Preconnection can be used to discover these bindings:</p>
 <pre>
-PreconnectionBindings := Preconnection.Resolve()
+[]Preconnection := Preconnection.Resolve()
 </pre>
-<p id="rfc.section.6.3.p.8">The Resolve() call returns a list of Preconnection Objects, that represent the concrete addresses, local and server reflexive, on which a Rendezvous() for the Preconnection will listen for incoming Connections. This list can be passed to a peer via a signalling protocol, such as SIP <a href="#RFC3261" class="xref">[RFC3261]</a> or WebRTC <a href="#RFC7478" class="xref">[RFC7478]</a>, to configure the remote.</p>
+<p id="rfc.section.6.3.p.8">The Resolve() call returns a list of Preconnection Objects, that represent the concrete addresses, local and server reflexive, on which a Rendezvous() for the Preconnection will listen for incoming Connections. These resolved Preconnections will share all other Properties with the Preconnection from which they are derived, though some Properties may be made more-specific by the resolution process. This list can be passed to a peer via a signalling protocol, such as SIP <a href="#RFC3261" class="xref">[RFC3261]</a> or WebRTC <a href="#RFC7478" class="xref">[RFC7478]</a>, to configure the remote.</p>
 <h1 id="rfc.section.6.4">
 <a href="#rfc.section.6.4">6.4.</a> <a href="#groups" id="groups">Connection Groups</a>
 </h1>
@@ -2002,22 +2005,7 @@ Connection -&gt; ConnectionError&lt;&gt;
 <p id="rfc.section.A.1.2.p.2">This numeric property specifies the timeout to propose to the Remote Endpoint.  It is given in seconds.</p>
 <p id="rfc.section.A.1.2.p.3">[EDITOR&#8217;S NOTE: For discussion of this property, see https://github.com/taps-api/drafts/issues/109]</p>
 <h1 id="rfc.appendix.A.1.3">
-<a href="#rfc.appendix.A.1.3">A.1.3.</a> <a href="#request-not-to-delay-acknowledgment-of-message" id="request-not-to-delay-acknowledgment-of-message">Request not to delay acknowledgment of Message</a>
-</h1>
-<p></p>
-
-<dl>
-<dt>Classification:</dt>
-<dd style="margin-left: 8">Selection Property</dd>
-<dt>Type:</dt>
-<dd style="margin-left: 8">Preference</dd>
-<dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection</dd>
-</dl>
-<p id="rfc.section.A.1.3.p.2">This property specifies whether an application considers it useful to be able to request for a Message that its acknowledgment be sent out as early as possible instead of potentially being bundled with other acknowledgments. The default is to not have this option.</p>
-<p id="rfc.section.A.1.3.p.3">[EDITOR&#8217;S NOTE: For discussion of this option, see https://github.com/taps-api/drafts/issues/90]</p>
-<h1 id="rfc.appendix.A.1.4">
-<a href="#rfc.appendix.A.1.4">A.1.4.</a> <a href="#traffic-category" id="traffic-category">Traffic Category</a>
+<a href="#rfc.appendix.A.1.3">A.1.3.</a> <a href="#traffic-category" id="traffic-category">Traffic Category</a>
 </h1>
 <p></p>
 
@@ -2029,7 +2017,7 @@ Connection -&gt; ConnectionError&lt;&gt;
 <dt>Applicability:</dt>
 <dd style="margin-left: 8">Preconnection</dd>
 </dl>
-<p id="rfc.section.A.1.4.p.2">This property specifies what the application expects the dominating traffic pattern to be. Possible values are:</p>
+<p id="rfc.section.A.1.3.p.2">This property specifies what the application expects the dominating traffic pattern to be. Possible values are:</p>
 <p></p>
 
 <dl>
@@ -2042,9 +2030,9 @@ Connection -&gt; ConnectionError&lt;&gt;
 <dt>Bulk:</dt>
 <dd style="margin-left: 8">Bulk transfer of large Messages, presumably bandwidth bound</dd>
 </dl>
-<p id="rfc.section.A.1.4.p.4">The default is to not assume any particular traffic pattern. Most categories suggest the use of other intents to further describe the traffic pattern anticipated, e.g., the bulk category suggesting the use of the Message Size intents or the stream category suggesting the Stream Bitrate and Duration intents.</p>
-<h1 id="rfc.appendix.A.1.5">
-<a href="#rfc.appendix.A.1.5">A.1.5.</a> <a href="#size-to-be-sent-or-received" id="size-to-be-sent-or-received">Size to be Sent or Received</a>
+<p id="rfc.section.A.1.3.p.4">The default is to not assume any particular traffic pattern. Most categories suggest the use of other intents to further describe the traffic pattern anticipated, e.g., the bulk category suggesting the use of the Message Size intents or the stream category suggesting the Stream Bitrate and Duration intents.</p>
+<h1 id="rfc.appendix.A.1.4">
+<a href="#rfc.appendix.A.1.4">A.1.4.</a> <a href="#size-to-be-sent-or-received" id="size-to-be-sent-or-received">Size to be Sent or Received</a>
 </h1>
 <p></p>
 
@@ -2056,9 +2044,9 @@ Connection -&gt; ConnectionError&lt;&gt;
 <dt>Applicability:</dt>
 <dd style="margin-left: 8">Preconnection, Message</dd>
 </dl>
-<p id="rfc.section.A.1.5.p.2">This property specifies how many bytes the application expects to send (Size to be Sent) or how many bytes the application expects to receive in response (Size to be Received).</p>
-<h1 id="rfc.appendix.A.1.6">
-<a href="#rfc.appendix.A.1.6">A.1.6.</a> <a href="#duration" id="duration">Duration</a>
+<p id="rfc.section.A.1.4.p.2">This property specifies how many bytes the application expects to send (Size to be Sent) or how many bytes the application expects to receive in response (Size to be Received).</p>
+<h1 id="rfc.appendix.A.1.5">
+<a href="#rfc.appendix.A.1.5">A.1.5.</a> <a href="#duration" id="duration">Duration</a>
 </h1>
 <p></p>
 
@@ -2070,9 +2058,9 @@ Connection -&gt; ConnectionError&lt;&gt;
 <dt>Applicability:</dt>
 <dd style="margin-left: 8">Preconnection</dd>
 </dl>
-<p id="rfc.section.A.1.6.p.2">This Intent specifies what the application expects the lifetime of a Connection to be. It is given in milliseconds.</p>
-<h1 id="rfc.appendix.A.1.7">
-<a href="#rfc.appendix.A.1.7">A.1.7.</a> <a href="#send-or-receive-bit-rate" id="send-or-receive-bit-rate">Send or Receive Bit-rate</a>
+<p id="rfc.section.A.1.5.p.2">This Intent specifies what the application expects the lifetime of a Connection to be. It is given in milliseconds.</p>
+<h1 id="rfc.appendix.A.1.6">
+<a href="#rfc.appendix.A.1.6">A.1.6.</a> <a href="#send-or-receive-bit-rate" id="send-or-receive-bit-rate">Send or Receive Bit-rate</a>
 </h1>
 <p></p>
 
@@ -2084,10 +2072,10 @@ Connection -&gt; ConnectionError&lt;&gt;
 <dt>Applicability:</dt>
 <dd style="margin-left: 8">Preconnection, Message</dd>
 </dl>
-<p id="rfc.section.A.1.7.p.2">This Intent specifies what the application expects the bit-rate of a transfer to be. It is given in Bytes per second.</p>
-<p id="rfc.section.A.1.7.p.3">On a Message, this property specifies at what bitrate the application wishes the Message to be sent. A transport system supporting this feature will not exceed the requested Send Bitrate even if flow-control and congestion control allow higher bitrates. This helps to avoid a bursty traffic pattern on busy streaming video servers.</p>
-<h1 id="rfc.appendix.A.1.8">
-<a href="#rfc.appendix.A.1.8">A.1.8.</a> <a href="#cost-preferences" id="cost-preferences">Cost Preferences</a>
+<p id="rfc.section.A.1.6.p.2">This Intent specifies what the application expects the bit-rate of a transfer to be. It is given in Bytes per second.</p>
+<p id="rfc.section.A.1.6.p.3">On a Message, this property specifies at what bitrate the application wishes the Message to be sent. A transport system supporting this feature will not exceed the requested Send Bitrate even if flow-control and congestion control allow higher bitrates. This helps to avoid a bursty traffic pattern on busy streaming video servers.</p>
+<h1 id="rfc.appendix.A.1.7">
+<a href="#rfc.appendix.A.1.7">A.1.7.</a> <a href="#cost-preferences" id="cost-preferences">Cost Preferences</a>
 </h1>
 <p></p>
 
@@ -2099,8 +2087,8 @@ Connection -&gt; ConnectionError&lt;&gt;
 <dt>Applicability:</dt>
 <dd style="margin-left: 8">Preconnection, Message</dd>
 </dl>
-<p id="rfc.section.A.1.8.p.2">This property describes what an application prefers regarding monetary costs, e.g., whether it considers it acceptable to utilize limited data volume. It provides hints to the transport system on how to handle trade-offs between cost and performance or reliability.</p>
-<p id="rfc.section.A.1.8.p.3">Possible values are:</p>
+<p id="rfc.section.A.1.7.p.2">This property describes what an application prefers regarding monetary costs, e.g., whether it considers it acceptable to utilize limited data volume. It provides hints to the transport system on how to handle trade-offs between cost and performance or reliability.</p>
+<p id="rfc.section.A.1.7.p.3">Possible values are:</p>
 <p></p>
 
 <dl>
@@ -2113,7 +2101,7 @@ Connection -&gt; ConnectionError&lt;&gt;
 <dt>Ignore Cost:</dt>
 <dd style="margin-left: 8">Ignore cost, choose transport solely based on other criteria</dd>
 </dl>
-<p id="rfc.section.A.1.8.p.5">The default is &#8220;Balance Cost&#8221;.</p>
+<p id="rfc.section.A.1.7.p.5">The default is &#8220;Balance Cost&#8221;.</p>
 <h1 id="rfc.appendix.B">
 <a href="#rfc.appendix.B">Appendix B.</a> <a href="#appendix-api-sketch" id="appendix-api-sketch">Sample API definition in Go</a>
 </h1>
