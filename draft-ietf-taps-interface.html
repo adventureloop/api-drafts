@@ -327,6 +327,19 @@ ul.toc li {
 <link href="#rfc.section.8.3.3" rel="Chapter" title="8.3.3 Receiving Final Messages">
 <link href="#rfc.section.8.4" rel="Chapter" title="8.4 Receiver-side De-framing over Stream Protocols">
 <link href="#rfc.section.9" rel="Chapter" title="9 Managing Connections: Setting Properties and Obtaining Information">
+<link href="#rfc.section.9.1" rel="Chapter" title="9.1 Connection Properties">
+<link href="#rfc.section.9.1.1" rel="Chapter" title="9.1.1 Notification of excessive retransmissions">
+<link href="#rfc.section.9.1.2" rel="Chapter" title="9.1.2 Retransmission threshold before excessive retransmission notification">
+<link href="#rfc.section.9.1.3" rel="Chapter" title="9.1.3 Notification of ICMP soft error message arrival">
+<link href="#rfc.section.9.1.4" rel="Chapter" title="9.1.4 Required minimum coverage of the checksum for receiving">
+<link href="#rfc.section.9.1.5" rel="Chapter" title="9.1.5 Niceness (Connection)">
+<link href="#rfc.section.9.1.6" rel="Chapter" title="9.1.6 Timeout for aborting Connection">
+<link href="#rfc.section.9.1.7" rel="Chapter" title="9.1.7 Connection group transmission scheduler">
+<link href="#rfc.section.9.1.8" rel="Chapter" title="9.1.8 Maximum message size concurrent with Connection establishment">
+<link href="#rfc.section.9.1.9" rel="Chapter" title="9.1.9 Maximum Message size before fragmentation or segmentation">
+<link href="#rfc.section.9.1.10" rel="Chapter" title="9.1.10 Maximum Message size on send">
+<link href="#rfc.section.9.1.11" rel="Chapter" title="9.1.11 Maximum Message size on receive">
+<link href="#rfc.section.9.2" rel="Chapter" title="9.2 Soft Errors">
 <link href="#rfc.section.10" rel="Chapter" title="10 Connection Termination">
 <link href="#rfc.section.11" rel="Chapter" title="11 Ordering of Operations and Events">
 <link href="#rfc.section.12" rel="Chapter" title="12 Transport Properties">
@@ -338,7 +351,7 @@ ul.toc li {
 <link href="#rfc.section.12.2" rel="Chapter" title="12.2 Transport Property Classification">
 <link href="#rfc.section.12.2.1" rel="Chapter" title="12.2.1 Selection Properties">
 <link href="#rfc.section.12.2.2" rel="Chapter" title="12.2.2 Protocol Properties">
-<link href="#rfc.section.12.2.3" rel="Chapter" title="12.2.3 Control Properties">
+<link href="#rfc.section.12.2.3" rel="Chapter" title="12.2.3 Message Properties">
 <link href="#rfc.section.12.2.4" rel="Chapter" title="12.2.4 Intents">
 <link href="#rfc.section.12.3" rel="Chapter" title="12.3 Mandatory Transport Properties">
 <link href="#rfc.section.12.3.1" rel="Chapter" title="12.3.1 Final">
@@ -396,7 +409,7 @@ ul.toc li {
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-09-20" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-09-21" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -420,7 +433,7 @@ ul.toc li {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: March 24, 2019</td>
+<td class="left">Expires: March 25, 2019</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -473,7 +486,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">September 20, 2018</td>
+<td class="right">September 21, 2018</td>
 </tr>
 
     	
@@ -489,7 +502,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on March 24, 2019.</p>
+<p>This Internet-Draft will expire on March 25, 2019.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -591,7 +604,33 @@ ul.toc li {
 </li>
 </ul><li>9.   <a href="#rfc.section.9">Managing Connections: Setting Properties and Obtaining Information</a>
 </li>
-<li>10.   <a href="#rfc.section.10">Connection Termination</a>
+<ul><li>9.1.   <a href="#rfc.section.9.1">Connection Properties</a>
+</li>
+<ul><li>9.1.1.   <a href="#rfc.section.9.1.1">Notification of excessive retransmissions</a>
+</li>
+<li>9.1.2.   <a href="#rfc.section.9.1.2">Retransmission threshold before excessive retransmission notification</a>
+</li>
+<li>9.1.3.   <a href="#rfc.section.9.1.3">Notification of ICMP soft error message arrival</a>
+</li>
+<li>9.1.4.   <a href="#rfc.section.9.1.4">Required minimum coverage of the checksum for receiving</a>
+</li>
+<li>9.1.5.   <a href="#rfc.section.9.1.5">Niceness (Connection)</a>
+</li>
+<li>9.1.6.   <a href="#rfc.section.9.1.6">Timeout for aborting Connection</a>
+</li>
+<li>9.1.7.   <a href="#rfc.section.9.1.7">Connection group transmission scheduler</a>
+</li>
+<li>9.1.8.   <a href="#rfc.section.9.1.8">Maximum message size concurrent with Connection establishment</a>
+</li>
+<li>9.1.9.   <a href="#rfc.section.9.1.9">Maximum Message size before fragmentation or segmentation</a>
+</li>
+<li>9.1.10.   <a href="#rfc.section.9.1.10">Maximum Message size on send</a>
+</li>
+<li>9.1.11.   <a href="#rfc.section.9.1.11">Maximum Message size on receive</a>
+</li>
+</ul><li>9.2.   <a href="#rfc.section.9.2">Soft Errors</a>
+</li>
+</ul><li>10.   <a href="#rfc.section.10">Connection Termination</a>
 </li>
 <li>11.   <a href="#rfc.section.11">Ordering of Operations and Events</a>
 </li>
@@ -613,7 +652,7 @@ ul.toc li {
 </li>
 <li>12.2.2.   <a href="#rfc.section.12.2.2">Protocol Properties</a>
 </li>
-<li>12.2.3.   <a href="#rfc.section.12.2.3">Control Properties</a>
+<li>12.2.3.   <a href="#rfc.section.12.2.3">Message Properties</a>
 </li>
 <li>12.2.4.   <a href="#rfc.section.12.2.4">Intents</a>
 </li>
@@ -1000,7 +1039,7 @@ Preconnection -&gt; RendezvousError&lt;msgRef, error&gt;
 Connection := Connection.Clone()
 </pre>
 <p id="rfc.section.6.4.p.2">Calling Clone on a Connection yields a group of two Connections: the parent Connection on which Clone was called, and the resulting cloned Connection. These connections are &#8220;entangled&#8221; with each other, and become part of a Connection Group. Calling Clone on any of these two Connections adds a third Connection to the Connection Group, and so on. Connections in a Connection Group share all Protocol Properties that are not applicable to a Message.</p>
-<p id="rfc.section.6.4.p.3">Changing one of these Protocol Properties on one Connection in the group changes it for all others. Per-Message Protocol Properties, however, are not entangled.  For example, changing &#8220;Timeout for aborting Connection&#8221; (see <a href="#timeout" class="xref">Section 12.3.23</a>) on one Connection in a group will automatically change this Protocol Property for all Connections in the group in the same way. However, changing &#8220;Lifetime&#8221; (see <a href="#msg-lifetime" class="xref">Section 7.3.1</a>) of a Message will only affect a single Message on a single Connection, entangled or not.</p>
+<p id="rfc.section.6.4.p.3">Changing one of these Protocol Properties on one Connection in the group changes it for all others. Per-Message Protocol Properties, however, are not entangled.  For example, changing &#8220;Timeout for aborting Connection&#8221; (see <a href="#conn-timeout" class="xref">Section 9.1.6</a>) on one Connection in a group will automatically change this Protocol Property for all Connections in the group in the same way. However, changing &#8220;Lifetime&#8221; (see <a href="#msg-lifetime" class="xref">Section 7.3.1</a>) of a Message will only affect a single Message on a single Connection, entangled or not.</p>
 <p id="rfc.section.6.4.p.4">If the underlying protocol supports multi-streaming, it is natural to use this functionality to implement Clone. In that case, entangled Connections are multiplexed together, giving them similar treatment not only inside endpoints but also across the end-to-end Internet path.</p>
 <p id="rfc.section.6.4.p.5">If the underlying Protocol Stack does not support cloning, or cannot create a new stream on the given Connection, then attempts to clone a connection will result in a CloneError:</p>
 <pre>
@@ -1297,9 +1336,13 @@ Preconnection.DeframeWith(Deframer)
 <h1 id="rfc.section.9">
 <a href="#rfc.section.9">9.</a> <a href="#introspection" id="introspection">Managing Connections: Setting Properties and Obtaining Information</a>
 </h1>
-<p id="rfc.section.9.p.1">The application can set per-connection Protocol Properties (see <a href="#protocol-props" class="xref">Section 12.2.2</a>).  Certain Procotol Properties may be read-only, on a protocol- and property-specific basis.  ~~~ Connection.SetProperty(property, value) ~~~</p>
-<p id="rfc.section.9.p.2">At any point, the application can query Connection Properties.  ~~~ ConnectionProperties := Connection.GetProperties() ~~~</p>
-<p id="rfc.section.9.p.3">Depending on the status of the connection, the queried Connection Properties will include different information:</p>
+<h1 id="rfc.section.9.1">
+<a href="#rfc.section.9.1">9.1.</a> <a href="#connection-properties" id="connection-properties">Connection Properties</a>
+</h1>
+<p id="rfc.section.9.1.p.1">The application can set per-connection Properties.  Certain Connection Properties may be read-only, on a protocol- and property-specific basis.  ~~~ Connection.SetProperty(property, value) ~~~</p>
+<p id="rfc.section.9.1.p.2">At any point, the application can query Connection Properties.  ~~~ ConnectionProperties := Connection.GetProperties() ~~~</p>
+<p id="rfc.section.9.1.p.3">Depending on the status of the connection, the queried Connection Properties will include different information:</p>
+<p id="rfc.section.9.1.p.4">[TODO: turn this list into actual properties or move up into the explaining text]</p>
 <p></p>
 
 <ul>
@@ -1314,7 +1357,122 @@ Preconnection.DeframeWith(Deframer)
 </li>
 <li>For Connections that are Established, properties of the path(s) in use. These properties can be derived from the local provisioning domain <a href="#RFC7556" class="xref">[RFC7556]</a>, measurements by the Protocol Stack, or other sources.</li>
 </ul>
-<p id="rfc.section.9.p.5">Slightly different from &#8220;querying&#8221;, a SoftError Event can also occur, informing the application about the receipt of an ICMP error message related to the Connection. This will only happen if the underlying protocol stack supports access to soft errors; however, even if the underlying stack supports it, there is no guarantee that a soft error will be signaled.</p>
+<h1 id="rfc.section.9.1.1">
+<a href="#rfc.section.9.1.1">9.1.1.</a> <a href="#conn-retrans-notify" id="conn-retrans-notify">Notification of excessive retransmissions</a>
+</h1>
+<p></p>
+
+<dl>
+<dt>Type:</dt>
+<dd style="margin-left: 8">Boolean</dd>
+</dl>
+<p id="rfc.section.9.1.1.p.2">This property specifies whether an application considers it useful to be informed in case sent data was retransmitted more often than a certain threshold.  When set to true, the effect is twofold: The application may receive events in case excessive retransmissions.  In addition, the transport system considers this as a preference to use transports stacks that can provide this notification. This is not a strict requirement.  If set to false, no notification of excessive retransmissions will be sent and this transport feature is ignored for protocol selection.</p>
+<p id="rfc.section.9.1.1.p.3">The default is to have this option.</p>
+<h1 id="rfc.section.9.1.2">
+<a href="#rfc.section.9.1.2">9.1.2.</a> <a href="#conn-excss-retransmit" id="conn-excss-retransmit">Retransmission threshold before excessive retransmission notification</a>
+</h1>
+<p></p>
+
+<dl>
+<dt>Type:</dt>
+<dd style="margin-left: 8">Integer</dd>
+</dl>
+<p id="rfc.section.9.1.2.p.2">This property specifies after how many retransmissions to inform the application about &#8220;Excessive Retransmissions&#8221;.</p>
+<h1 id="rfc.section.9.1.3">
+<a href="#rfc.section.9.1.3">9.1.3.</a> <a href="#conn-soft-error" id="conn-soft-error">Notification of ICMP soft error message arrival</a>
+</h1>
+<p></p>
+
+<dl>
+<dt>Type:</dt>
+<dd style="margin-left: 8">Boolean</dd>
+</dl>
+<p id="rfc.section.9.1.3.p.2">This property specifies whether an application considers it useful to be informed when an ICMP error message arrives that does not force termination of a connection.  When set to true, received ICMP errors will be available as SoftErrors.  Note that even if a protocol supporting this property is selected, not all ICMP errors will necessarily be delivered, so applications cannot rely on receiving them.  Setting this option also implies a preference to prefer transports stacks that can provide this notification.  If not set, no events will be sent for ICMP soft error message and this transport feature is ignored for protocol selection.</p>
+<p id="rfc.section.9.1.3.p.3">This property applies to Connections and Connection Groups.  The default is not to have this option.</p>
+<h1 id="rfc.section.9.1.4">
+<a href="#rfc.section.9.1.4">9.1.4.</a> <a href="#conn-recv-checksum" id="conn-recv-checksum">Required minimum coverage of the checksum for receiving</a>
+</h1>
+<p></p>
+
+<dl>
+<dt>Type:</dt>
+<dd style="margin-left: 8">Integer</dd>
+</dl>
+<p id="rfc.section.9.1.4.p.2">This property specifies the part of the received data that needs to be covered by a checksum. It is given in Bytes. A value of 0 means that no checksum is required, and a special value (e.g., -1) indicates full checksum coverage.</p>
+<h1 id="rfc.section.9.1.5">
+<a href="#rfc.section.9.1.5">9.1.5.</a> <a href="#conn-niceness" id="conn-niceness">Niceness (Connection)</a>
+</h1>
+<p></p>
+
+<dl>
+<dt>Type:</dt>
+<dd style="margin-left: 8">Integer</dd>
+</dl>
+<p id="rfc.section.9.1.5.p.2">This Property is a non-negative integer representing the relative inverse priority of this Connection relative to other Connections in the same Connection Group. It has no effect on Connections not part of a Connection Group. As noted in <a href="#groups" class="xref">Section 6.4</a>, this property is not entangled when Connections are cloned.</p>
+<h1 id="rfc.section.9.1.6">
+<a href="#rfc.section.9.1.6">9.1.6.</a> <a href="#conn-timeout" id="conn-timeout">Timeout for aborting Connection</a>
+</h1>
+<p></p>
+
+<dl>
+<dt>Type:</dt>
+<dd style="margin-left: 8">Integer</dd>
+</dl>
+<p id="rfc.section.9.1.6.p.2">This property specifies how long to wait before aborting a Connection during establishment, or before deciding that a Connection has failed after establishment. It is given in seconds.</p>
+<h1 id="rfc.section.9.1.7">
+<a href="#rfc.section.9.1.7">9.1.7.</a> <a href="#conn-scheduler" id="conn-scheduler">Connection group transmission scheduler</a>
+</h1>
+<p></p>
+
+<dl>
+<dt>Type:</dt>
+<dd style="margin-left: 8">Enum</dd>
+</dl>
+<p id="rfc.section.9.1.7.p.2">This property specifies which scheduler should be used among Connections within a Connection Group, see <a href="#groups" class="xref">Section 6.4</a>. The set of schedulers can be taken from <a href="#I-D.ietf-tsvwg-sctp-ndata" class="xref">[I-D.ietf-tsvwg-sctp-ndata]</a>.</p>
+<h1 id="rfc.section.9.1.8">
+<a href="#rfc.section.9.1.8">9.1.8.</a> <a href="#size-idempotent" id="size-idempotent">Maximum message size concurrent with Connection establishment</a>
+</h1>
+<p></p>
+
+<dl>
+<dt>Type:</dt>
+<dd style="margin-left: 8">Integer (read only)</dd>
+</dl>
+<p id="rfc.section.9.1.8.p.2">This property represents the maximum Message size that can be sent before or during Connection establishment, see also <a href="#msg-idempotent" class="xref">Section 7.3.4</a>.  It is given in Bytes.</p>
+<h1 id="rfc.section.9.1.9">
+<a href="#rfc.section.9.1.9">9.1.9.</a> <a href="#conn-max-msg-notfrag" id="conn-max-msg-notfrag">Maximum Message size before fragmentation or segmentation</a>
+</h1>
+<p></p>
+
+<dl>
+<dt>Type:</dt>
+<dd style="margin-left: 8">Integer (read only)</dd>
+</dl>
+<p id="rfc.section.9.1.9.p.2">This property, if applicable, represents the maximum Message size that can be sent without incurring network-layer fragmentation or transport layer segmentation at the sender.</p>
+<h1 id="rfc.section.9.1.10">
+<a href="#rfc.section.9.1.10">9.1.10.</a> <a href="#conn-max-msg-send" id="conn-max-msg-send">Maximum Message size on send</a>
+</h1>
+<p></p>
+
+<dl>
+<dt>Type:</dt>
+<dd style="margin-left: 8">Integer (read only)</dd>
+</dl>
+<p id="rfc.section.9.1.10.p.2">This property represents the maximum Message size that can be sent.</p>
+<h1 id="rfc.section.9.1.11">
+<a href="#rfc.section.9.1.11">9.1.11.</a> <a href="#conn-max-msg-recv" id="conn-max-msg-recv">Maximum Message size on receive</a>
+</h1>
+<p></p>
+
+<dl>
+<dt>Type:</dt>
+<dd style="margin-left: 8">Integer (read only)</dd>
+</dl>
+<p id="rfc.section.9.1.11.p.2">This numeric property represents the maximum Message size that can be received.</p>
+<h1 id="rfc.section.9.2">
+<a href="#rfc.section.9.2">9.2.</a> <a href="#soft-errors" id="soft-errors">Soft Errors</a>
+</h1>
+<p id="rfc.section.9.2.p.1">Slightly different from &#8220;querying&#8221;, a SoftError Event can also occur, informing the application about the receipt of an ICMP error message related to the Connection. This will only happen if the underlying protocol stack supports access to soft errors; however, even if the underlying stack supports it, there is no guarantee that a soft error will be signaled.</p>
 <pre>
 Connection -&gt; SoftError&lt;&gt;
 </pre>
@@ -1351,16 +1509,10 @@ Connection -&gt; ConnectionError&lt;&gt;
 <h1 id="rfc.section.12">
 <a href="#rfc.section.12">12.</a> <a href="#transport-props" id="transport-props">Transport Properties</a>
 </h1>
-<p id="rfc.section.12.p.1">Having discussed Transport Properties in <a href="#connection-props" class="xref">Section 5.2</a> and listed a number of Message Properties (&#8220;Ordered&#8221;, &#8220;Idempotent&#8221; etc.) in <a href="#message-props" class="xref">Section 7.3</a>, we now provide a complete overview of a transport system&#8217;s defined Transport Properties.</p>
-<p id="rfc.section.12.p.2">Properties are structured in two ways:</p>
-<p></p>
-
-<ul>
-<li>By how they influence the transport system, which leads to a classification into &#8220;Selection Properties&#8221;, &#8220;Protocol Properties&#8221;, &#8220;Control Properties&#8221; and &#8220;Intents&#8221;.</li>
-<li>By the object they can be applied to: Preconnections, see <a href="#connection-props" class="xref">Section 5.2</a>, Connections, see <a href="#introspection" class="xref">Section 9</a>, and Messages, see <a href="#message-props" class="xref">Section 7.3</a>.</li>
-</ul>
-<p id="rfc.section.12.p.4">Because some properties can be applied or queried on multiple objects, all Transport Properties are organized within a single namespace.</p>
-<p id="rfc.section.12.p.5">Note that it is possible for a set of specified Transport Properties to be internally inconsistent, or to be inconsistent with the later use of the API by the application. Application developers can reduce inconsistency by only using the most stringent preference levels when failure to meet the property would break the application&#8217;s functionality. For example, they can set the Selection Property &#8220;Reliable Data Transfer&#8221;, which is a core assumption of many application protocols, as Required. However, since this comes at the cost of flexibility of the transport system, such strict choices should be made with care.  Implementations of this interface should also raise any detected errors in configuration as early as possible, to help ensure that inconsistencies are caught early in the development process.</p>
+<p id="rfc.section.12.p.1">Having discussed Selection Properties in <a href="#selection-props" class="xref">Section 12.2.1</a>, Connection Properties <a href="#connection-props" class="xref">Section 5.2</a>, and Message Properties (<a href="#message-props" class="xref">Section 7.3</a>), we now provide a complete overview of a transport system&#8217;s defined Transport Properties.</p>
+<p id="rfc.section.12.p.2">Transport Properties are structured by the phase and object they are applied: - Selection Properties apply to Preconnections - see <a href="#selection-props" class="xref">Section 12.2.1</a> - Connections Properties apply to Connections - see <a href="#connection-props" class="xref">Section 5.2</a> - Messages Properties apply to Messages - see <a href="#message-props" class="xref">Section 7.3</a></p>
+<p id="rfc.section.12.p.3">All Transport Properties are organized within a single namespace.  This enables setting them as defaults in earlier stages and querying them in later stages: - Connections Properties can be set on Preconnections - Message Properties can be set on Preconnections and Connections - The effect of Selection Properties can be queried on Connections and Messages.</p>
+<p id="rfc.section.12.p.4">Note that it is possible for a set of specified Transport Properties to be internally inconsistent, or to be inconsistent with the later use of the API by the application. Application developers can reduce inconsistency by only using the most stringent preference levels when failure to meet the property would break the application&#8217;s functionality. For example, they can set the Selection Property &#8220;Reliable Data Transfer&#8221;, which is a core assumption of many application protocols, as Required. However, since this comes at the cost of flexibility of the transport system, such strict choices should be made with care.  Implementations of this interface should also raise any detected errors in configuration as early as possible, to help ensure that inconsistencies are caught early in the development process.</p>
 <h1 id="rfc.section.12.1">
 <a href="#rfc.section.12.1">12.1.</a> <a href="#transport-props-types" id="transport-props-types">Transport Property Types</a>
 </h1>
@@ -1413,13 +1565,7 @@ Connection -&gt; ConnectionError&lt;&gt;
 <h1 id="rfc.section.12.2">
 <a href="#rfc.section.12.2">12.2.</a> <a href="#transport-props-classes" id="transport-props-classes">Transport Property Classification</a>
 </h1>
-<p id="rfc.section.12.2.p.1">Transport Properties &#8211; whether they apply to connections, preconnections, or messages &#8211; differ in the way they affect the transport system and protocols exposed through the transport system.  The classification proposed below emphasizes two aspects of how properties affect the transport system, so applications know what to expect:</p>
-<p></p>
-
-<ul>
-<li>Whether properties affect protocols exposed through the transport system (Protocol Properties) or the transport system itself (Control Properties)</li>
-<li>Whether properties have a clearly defined behavior that is likely to be invariant across implementations and environments (Protocol Properties and Control Properties) or whether the properties are interpreted by the transport system to provide a best effort service that matches the application needs as closely as possible (Intents).</li>
-</ul>
+<p id="rfc.section.12.2.p.1">[TODO: This section is mostly obsolete due to our consensus on how to structure properties &#8211; double-check whether text needs to be moved and delete this section afterwards]</p>
 <h1 id="rfc.section.12.2.1">
 <a href="#rfc.section.12.2.1">12.2.1.</a> <a href="#selection-props" id="selection-props">Selection Properties</a>
 </h1>
@@ -1434,7 +1580,7 @@ Connection -&gt; ConnectionError&lt;&gt;
 <p id="rfc.section.12.2.2.p.3">In order to specify Specific Protocol Properties, transport system implementations may offer applications to attach a set of options to the Preconnection Object, associated with a specific protocol. For example, an application could specify a set of TCP Options to use if and only if TCP is selected by the system. Such properties must not be assumed to apply across different protocols. Attempts to set specific protocol properties on a protocol stack not containing that specific protocol are simply ignored, and do not raise an error.</p>
 <p id="rfc.section.12.2.2.p.4">Note that many protocol properties have a corresponding selection property which asks for a protocol providing a specific transport feature that is controlled by the protocol property.</p>
 <h1 id="rfc.section.12.2.3">
-<a href="#rfc.section.12.2.3">12.2.3.</a> <a href="#control-props" id="control-props">Control Properties</a>
+<a href="#rfc.section.12.2.3">12.2.3.</a> <a href="#control-props" id="control-props">Message Properties</a>
 </h1>
 <p id="rfc.section.12.2.3.p.1">[TODO: Discuss]</p>
 <p id="rfc.section.12.2.3.p.2">Control properties manage the local transport system behavior or request state changes in the local transport system. Depending on the protocols used, setting these properties might also influence the protocol state machine.  See <a href="#send-final" class="xref">Section 12.3.1</a> for an example.</p>
@@ -1560,49 +1706,17 @@ Connection -&gt; ConnectionError&lt;&gt;
 </dl>
 <p id="rfc.section.12.3.10.p.2">This property specifies that the application would prefer multiple Connections within a Connection Group to be provided by streams of a single underlying transport connection where possible. The default is to not have this option.</p>
 <h1 id="rfc.section.12.3.11">
-<a href="#rfc.section.12.3.11">12.3.11.</a> <a href="#prop-retrans-notify" id="prop-retrans-notify">Notification of excessive retransmissions</a>
+<a href="#rfc.section.12.3.11">12.3.11.</a> <a href="#notification-of-excessive-retransmissions" id="notification-of-excessive-retransmissions">Notification of excessive retransmissions</a>
 </h1>
-<p></p>
-
-<dl>
-<dt>Classification:</dt>
-<dd style="margin-left: 8">Control Property [TODO: Discuss]</dd>
-<dt>Type:</dt>
-<dd style="margin-left: 8">Boolean</dd>
-<dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection, Connection</dd>
-</dl>
-<p id="rfc.section.12.3.11.p.2">This property specifies whether an application considers it useful to be informed in case sent data was retransmitted more often than a certain threshold.  When set to true, the effect is twofold: The application may receive events in case excessive retransmissions.  In addition, the transport system considers this as a preference to use transports stacks that can provide this notification. This is not a strict requirement.  If set to false, no notification of excessive retransmissions will be sent and this transport feature is ignored for protocol selection.</p>
-<p id="rfc.section.12.3.11.p.3">The default is to have this option.</p>
+<p id="rfc.section.12.3.11.p.1">Boolean Connection Property - see <a href="#conn-retrans-notify" class="xref">Section 9.1.1</a>.</p>
 <h1 id="rfc.section.12.3.12">
 <a href="#rfc.section.12.3.12">12.3.12.</a> <a href="#retransmission-threshold-before-excessive-retransmission-notification" id="retransmission-threshold-before-excessive-retransmission-notification">Retransmission threshold before excessive retransmission notification</a>
 </h1>
-<p></p>
-
-<dl>
-<dt>Classification:</dt>
-<dd style="margin-left: 8">Control Property [TODO: Discuss]</dd>
-<dt>Type:</dt>
-<dd style="margin-left: 8">Integer</dd>
-<dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection, Connection</dd>
-</dl>
-<p id="rfc.section.12.3.12.p.2">This property specifies after how many retransmissions to inform the application about &#8220;Excessive Retransmissions&#8221;.</p>
+<p id="rfc.section.12.3.12.p.1">Integer Connection Property - see <a href="#conn-excss-retransmit" class="xref">Section 9.1.2</a></p>
 <h1 id="rfc.section.12.3.13">
-<a href="#rfc.section.12.3.13">12.3.13.</a> <a href="#prop-soft-error" id="prop-soft-error">Notification of ICMP soft error message arrival</a>
+<a href="#rfc.section.12.3.13">12.3.13.</a> <a href="#notification-of-icmp-soft-error-message-arrival" id="notification-of-icmp-soft-error-message-arrival">Notification of ICMP soft error message arrival</a>
 </h1>
-<p></p>
-
-<dl>
-<dt>Classification:</dt>
-<dd style="margin-left: 8">Control Property [TODO: Discuss]</dd>
-<dt>Type:</dt>
-<dd style="margin-left: 8">Boolean</dd>
-<dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection, Connection</dd>
-</dl>
-<p id="rfc.section.12.3.13.p.2">This property specifies whether an application considers it useful to be informed when an ICMP error message arrives that does not force termination of a connection.  When set to true, received ICMP errors will be available as SoftErrors.  Note that even if a protocol supporting this property is selected, not all ICMP errors will necessarily be delivered, so applications cannot rely on receiving them.  Setting this option also implies a preference to prefer transports stacks that can provide this notification.  If not set, no events will be sent for ICMP soft error message and this transport feature is ignored for protocol selection.</p>
-<p id="rfc.section.12.3.13.p.3">This property applies to Connections and Connection Groups.  The default is not to have this option.</p>
+<p id="rfc.section.12.3.13.p.1">Boolean Connection Property - see <a href="#conn-soft-error" class="xref">Section 9.1.3</a></p>
 <h1 id="rfc.section.12.3.14">
 <a href="#rfc.section.12.3.14">12.3.14.</a> <a href="#prop-checksum-control" id="prop-checksum-control">Control checksum coverage on sending or receiving</a>
 </h1>
@@ -1624,17 +1738,7 @@ Connection -&gt; ConnectionError&lt;&gt;
 <h1 id="rfc.section.12.3.16">
 <a href="#rfc.section.12.3.16">12.3.16.</a> <a href="#required-minimum-coverage-of-the-checksum-for-receiving" id="required-minimum-coverage-of-the-checksum-for-receiving">Required minimum coverage of the checksum for receiving</a>
 </h1>
-<p></p>
-
-<dl>
-<dt>Classification:</dt>
-<dd style="margin-left: 8">Protocol Property (Generic)</dd>
-<dt>Type:</dt>
-<dd style="margin-left: 8">Integer</dd>
-<dt>Applicability:</dt>
-<dd style="margin-left: 8">Connection</dd>
-</dl>
-<p id="rfc.section.12.3.16.p.2">This property specifies the part of the received data that needs to be covered by a checksum. It is given in Bytes. A value of 0 means that no checksum is required, and a special value (e.g., -1) indicates full checksum coverage.</p>
+<p id="rfc.section.12.3.16.p.1">Integer Connection Property - see <a href="#conn-recv-checksum" class="xref">Section 9.1.4</a></p>
 <h1 id="rfc.section.12.3.17">
 <a href="#rfc.section.12.3.17">12.3.17.</a> <a href="#prop-interface" id="prop-interface">Interface Instance or Type</a>
 </h1>
@@ -1710,109 +1814,39 @@ Connection -&gt; ConnectionError&lt;&gt;
 </dl>
 <p id="rfc.section.12.3.20.p.2">This property specifies whether the application would like the Connection to be congestion controlled or not. Note that if a Connection is not congestion controlled, an application using such a Connection should itself perform congestion control in accordance with <a href="#RFC2914" class="xref">[RFC2914]</a>. Also note that reliability is usually combined with congestion control in protocol implementations, rendering &#8220;reliable but not congestion controlled&#8221; a request that is unlikely to succeed. The default is that the Connection is congestion controlled.</p>
 <h1 id="rfc.section.12.3.21">
-<a href="#rfc.section.12.3.21">12.3.21.</a> <a href="#conn-niceness" id="conn-niceness">Niceness (Connection)</a>
+<a href="#rfc.section.12.3.21">12.3.21.</a> <a href="#niceness-connection" id="niceness-connection">Niceness (Connection)</a>
 </h1>
-<p></p>
-
-<dl>
-<dt>Classification:</dt>
-<dd style="margin-left: 8">Protocol Property (Generic)</dd>
-<dt>Type:</dt>
-<dd style="margin-left: 8">Integer</dd>
-<dt>Applicability:</dt>
-<dd style="margin-left: 8">Connection</dd>
-</dl>
-<p id="rfc.section.12.3.21.p.2">This Property is a non-negative integer representing the relative inverse priority of this Connection relative to other Connections in the same Connection Group. It has no effect on Connections not part of a Connection Group. As noted in <a href="#groups" class="xref">Section 6.4</a>, this property is not entangled when Connections are cloned.</p>
+<p id="rfc.section.12.3.21.p.1">Integer Connection Property - see <a href="#conn-niceness" class="xref">Section 9.1.5</a></p>
 <h1 id="rfc.section.12.3.22">
 <a href="#rfc.section.12.3.22">12.3.22.</a> <a href="#niceness-message" id="niceness-message">Niceness (Message)</a>
 </h1>
-<p id="rfc.section.12.3.22.p.1">[TODO: Discuss: should we remove this? Whether we need this or the other depends on how we want to implement multi-streaming. We don&#8217;t need both, so we should make a decision.]</p>
+<p id="rfc.section.12.3.22.p.1">[TODO: Discuss: should we remove this? Whether we need this or the other depends on how we want to implement multi-streaming. We don&#8217;t need both, so we should make a decision. @mwelzl &#8211; These are really two different things @philsbln]</p>
 <p id="rfc.section.12.3.22.p.2">Integer Message Property - see <a href="#msg-niceness" class="xref">Section 7.3.2</a>.</p>
-<p id="rfc.section.12.3.22.p.3">Note that this property is not a per-message override of the connection Niceness - see <a href="#conn-niceness" class="xref">Section 12.3.21</a>.  Both Niceness properties may interact, but can be used independently and be realized by different mechanisms.</p>
+<p id="rfc.section.12.3.22.p.3">Note that this property is not a per-message override of the connection Niceness - see <a href="#conn-niceness" class="xref">Section 9.1.5</a>.  Both Niceness properties may interact, but can be used independently and be realized by different mechanisms.</p>
 <h1 id="rfc.section.12.3.23">
-<a href="#rfc.section.12.3.23">12.3.23.</a> <a href="#timeout" id="timeout">Timeout for aborting Connection</a>
+<a href="#rfc.section.12.3.23">12.3.23.</a> <a href="#timeout-for-aborting-connection" id="timeout-for-aborting-connection">Timeout for aborting Connection</a>
 </h1>
-<p></p>
-
-<dl>
-<dt>Classification:</dt>
-<dd style="margin-left: 8">Control Property [TODO: Discuss]</dd>
-<dt>Type:</dt>
-<dd style="margin-left: 8">Integer</dd>
-<dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection, Connection</dd>
-</dl>
-<p id="rfc.section.12.3.23.p.2">This property specifies how long to wait before aborting a Connection during establishment, or before deciding that a Connection has failed after establishment. It is given in seconds.</p>
+<p id="rfc.section.12.3.23.p.1">Integer Connection Property - see <a href="#conn-timeout" class="xref">Section 9.1.6</a></p>
 <h1 id="rfc.section.12.3.24">
 <a href="#rfc.section.12.3.24">12.3.24.</a> <a href="#connection-group-transmission-scheduler" id="connection-group-transmission-scheduler">Connection group transmission scheduler</a>
 </h1>
-<p></p>
-
-<dl>
-<dt>Classification:</dt>
-<dd style="margin-left: 8">Protocol Property (Generic) / Control Property [TODO: Discuss]</dd>
-<dt>Type:</dt>
-<dd style="margin-left: 8">Enum</dd>
-<dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection, Connection</dd>
-</dl>
-<p id="rfc.section.12.3.24.p.2">This property specifies which scheduler should be used among Connections within a Connection Group, see <a href="#groups" class="xref">Section 6.4</a>. The set of schedulers can be taken from <a href="#I-D.ietf-tsvwg-sctp-ndata" class="xref">[I-D.ietf-tsvwg-sctp-ndata]</a>.</p>
+<p id="rfc.section.12.3.24.p.1">Enum Connection Property - see <a href="#conn-scheduler" class="xref">Section 9.1.7</a></p>
 <h1 id="rfc.section.12.3.25">
-<a href="#rfc.section.12.3.25">12.3.25.</a> <a href="#size-idempotent" id="size-idempotent">Maximum message size concurrent with Connection establishment</a>
+<a href="#rfc.section.12.3.25">12.3.25.</a> <a href="#maximum-message-size-concurrent-with-connection-establishment" id="maximum-message-size-concurrent-with-connection-establishment">Maximum message size concurrent with Connection establishment</a>
 </h1>
-<p></p>
-
-<dl>
-<dt>Classification:</dt>
-<dd style="margin-left: 8">Protocol Property (Generic)</dd>
-<dt>Type:</dt>
-<dd style="margin-left: 8">Integer</dd>
-<dt>Applicability:</dt>
-<dd style="margin-left: 8">Connection (read only)</dd>
-</dl>
-<p id="rfc.section.12.3.25.p.2">This property represents the maximum Message size that can be sent before or during Connection establishment, see also <a href="#msg-idempotent" class="xref">Section 7.3.4</a>.  It is given in Bytes. This property is read-only.</p>
+<p id="rfc.section.12.3.25.p.1">Integer Connection Property (read-only) - see <a href="#size-idempotent" class="xref">Section 9.1.8</a></p>
 <h1 id="rfc.section.12.3.26">
 <a href="#rfc.section.12.3.26">12.3.26.</a> <a href="#maximum-message-size-before-fragmentation-or-segmentation" id="maximum-message-size-before-fragmentation-or-segmentation">Maximum Message size before fragmentation or segmentation</a>
 </h1>
-<p></p>
-
-<dl>
-<dt>Classification:</dt>
-<dd style="margin-left: 8">Protocol Property (Generic)</dd>
-<dt>Type:</dt>
-<dd style="margin-left: 8">Integer</dd>
-<dt>Applicability:</dt>
-<dd style="margin-left: 8">Connection (read only)</dd>
-</dl>
-<p id="rfc.section.12.3.26.p.2">This property, if applicable, represents the maximum Message size that can be sent without incurring network-layer fragmentation or transport layer segmentation at the sender. This property is read-only.</p>
+<p id="rfc.section.12.3.26.p.1">Integer Connection Property (read-only) - see <a href="#conn-max-msg-notfrag" class="xref">Section 9.1.9</a></p>
 <h1 id="rfc.section.12.3.27">
 <a href="#rfc.section.12.3.27">12.3.27.</a> <a href="#maximum-message-size-on-send" id="maximum-message-size-on-send">Maximum Message size on send</a>
 </h1>
-<p></p>
-
-<dl>
-<dt>Classification:</dt>
-<dd style="margin-left: 8">Protocol Property (Generic)</dd>
-<dt>Type:</dt>
-<dd style="margin-left: 8">Integer</dd>
-<dt>Applicability:</dt>
-<dd style="margin-left: 8">Connection (read only)</dd>
-</dl>
-<p id="rfc.section.12.3.27.p.2">This property represents the maximum Message size that can be sent. This property is read-only.</p>
+<p id="rfc.section.12.3.27.p.1">Integer Connection Property (read-only) - see <a href="#conn-max-msg-send" class="xref">Section 9.1.10</a></p>
 <h1 id="rfc.section.12.3.28">
 <a href="#rfc.section.12.3.28">12.3.28.</a> <a href="#maximum-message-size-on-receive" id="maximum-message-size-on-receive">Maximum Message size on receive</a>
 </h1>
-<p></p>
-
-<dl>
-<dt>Classification:</dt>
-<dd style="margin-left: 8">Protocol Property (Generic)</dd>
-<dt>Type:</dt>
-<dd style="margin-left: 8">Integer</dd>
-<dt>Applicability:</dt>
-<dd style="margin-left: 8">Connection (read only)</dd>
-</dl>
-<p id="rfc.section.12.3.28.p.2">This numeric property represents the maximum Message size that can be received.  This property is read-only.</p>
+<p id="rfc.section.12.3.28.p.1">Integer Connection Property (read-only) - see <a href="#conn-max-msg-recv" class="xref">Section 9.1.11</a></p>
 <h1 id="rfc.section.12.3.29">
 <a href="#rfc.section.12.3.29">12.3.29.</a> <a href="#lifetime" id="lifetime">Lifetime</a>
 </h1>
