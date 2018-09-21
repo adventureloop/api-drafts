@@ -405,12 +405,12 @@ ul.toc li {
 <link href="#rfc.authors" rel="Chapter">
 
 
-  <meta name="generator" content="xml2rfc version 2.10.0 - https://tools.ietf.org/tools/xml2rfc" />
+  <meta name="generator" content="xml2rfc version 2.10.2 - https://tools.ietf.org/tools/xml2rfc" />
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-09-12" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-09-21" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -434,7 +434,7 @@ ul.toc li {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: March 16, 2019</td>
+<td class="left">Expires: March 25, 2019</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -487,7 +487,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">September 12, 2018</td>
+<td class="right">September 21, 2018</td>
 </tr>
 
     	
@@ -503,7 +503,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on March 16, 2019.</p>
+<p>This Internet-Draft will expire on March 25, 2019.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -1506,8 +1506,8 @@ Connection -&gt; ConnectionError&lt;&gt;
 <h1 id="rfc.section.12">
 <a href="#rfc.section.12">12.</a> <a href="#transport-props" id="transport-props">Transport Properties</a>
 </h1>
-<p id="rfc.section.12.p.1">Having discussed Selection Properties in <a href="#connection-props" class="xref">Section 5.2</a>, Connection Properties <a href="#connection-props" class="xref">Section 5.2</a> and,  Message Properties (<a href="#message-props" class="xref">Section 7.3</a>), we now provide a complete overview of a transport system&#8217;s defined Transport Properties.</p>
-<p id="rfc.section.12.p.2">Transport Properties are structured by the context they can apply on: - Selection Properties apply to Preconnections - see <a href="#selection-props" class="xref">Section 12.2.1</a> - Connections Properties apply to Connections - see <a href="#connection-props" class="xref">Section 5.2</a> - Messages Properties apply to Messages - see <a href="#message-props" class="xref">Section 7.3</a></p>
+<p id="rfc.section.12.p.1">Having discussed Selection Properties in <a href="#selection-props" class="xref">Section 12.2.1</a>, Connection Properties <a href="#connection-props" class="xref">Section 5.2</a>, and Message Properties (<a href="#message-props" class="xref">Section 7.3</a>), we now provide a complete overview of a transport system&#8217;s defined Transport Properties.</p>
+<p id="rfc.section.12.p.2">Transport Properties are structured by the phase and object they are applied: - Selection Properties apply to Preconnections - see <a href="#selection-props" class="xref">Section 12.2.1</a> - Connections Properties apply to Connections - see <a href="#connection-props" class="xref">Section 5.2</a> - Messages Properties apply to Messages - see <a href="#message-props" class="xref">Section 7.3</a></p>
 <p id="rfc.section.12.p.3">All Transport Properties are organized within a single namespace.  This enables setting them as defaults in earlier stages and querying them in later stages: - Connections Properties can be set on Preconnections - Message Properties can be set on Preconnections and Connections - The effect of Selection Properties can be queried on Connections and Messages.</p>
 <p id="rfc.section.12.p.4">Note that it is possible for a set of specified Transport Properties to be internally inconsistent, or to be inconsistent with the later use of the API by the application. Application developers can reduce inconsistency by only using the most stringent preference levels when failure to meet the property would break the application&#8217;s functionality. For example, they can set the Selection Property &#8220;Reliable Data Transfer&#8221;, which is a core assumption of many application protocols, as Required. However, since this comes at the cost of flexibility of the transport system, such strict choices should be made with care.  Implementations of this interface should also raise any detected errors in configuration as early as possible, to help ensure that inconsistencies are caught early in the development process.</p>
 <h1 id="rfc.section.12.1">
@@ -1563,7 +1563,6 @@ Connection -&gt; ConnectionError&lt;&gt;
 <a href="#rfc.section.12.2">12.2.</a> <a href="#transport-props-classes" id="transport-props-classes">Transport Property Classification</a>
 </h1>
 <p id="rfc.section.12.2.p.1">[TODO: This section is mostly obsolete due to our consensus on how to structure properties &#8211; double-check whether text needs to be moved and delete this section afterwards]</p>
-<p id="rfc.section.12.2.p.2">Transport Properties are classified by the the objects that are</p>
 <h1 id="rfc.section.12.2.1">
 <a href="#rfc.section.12.2.1">12.2.1.</a> <a href="#selection-props" id="selection-props">Selection Properties</a>
 </h1>
@@ -1710,7 +1709,7 @@ Connection -&gt; ConnectionError&lt;&gt;
 <h1 id="rfc.section.12.3.12">
 <a href="#rfc.section.12.3.12">12.3.12.</a> <a href="#retransmission-threshold-before-excessive-retransmission-notification" id="retransmission-threshold-before-excessive-retransmission-notification">Retransmission threshold before excessive retransmission notification</a>
 </h1>
-<p id="rfc.section.12.3.12.p.1">Interger Connection Property - see <a href="#conn-excss-retransmit" class="xref">Section 9.1.2</a></p>
+<p id="rfc.section.12.3.12.p.1">Integer Connection Property - see <a href="#conn-excss-retransmit" class="xref">Section 9.1.2</a></p>
 <h1 id="rfc.section.12.3.13">
 <a href="#rfc.section.12.3.13">12.3.13.</a> <a href="#notification-of-icmp-soft-error-message-arrival" id="notification-of-icmp-soft-error-message-arrival">Notification of ICMP soft error message arrival</a>
 </h1>
@@ -1886,7 +1885,7 @@ Connection -&gt; ConnectionError&lt;&gt;
 <tr>
 <td class="reference"><b id="I-D.ietf-taps-minset">[I-D.ietf-taps-minset]</b></td>
 <td class="top">
-<a>Welzl, M.</a> and <a>S. Gjessing</a>, "<a href="https://tools.ietf.org/html/draft-ietf-taps-minset-08">A Minimal Set of Transport Services for End Systems</a>", Internet-Draft draft-ietf-taps-minset-08, September 2018.</td>
+<a>Welzl, M.</a> and <a>S. Gjessing</a>, "<a href="https://tools.ietf.org/html/draft-ietf-taps-minset-10">A Minimal Set of Transport Services for End Systems</a>", Internet-Draft draft-ietf-taps-minset-10, September 2018.</td>
 </tr>
 <tr>
 <td class="reference"><b id="I-D.ietf-tls-tls13">[I-D.ietf-tls-tls13]</b></td>
