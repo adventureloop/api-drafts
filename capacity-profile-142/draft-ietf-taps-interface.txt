@@ -2365,20 +2365,20 @@ Internet-Draft               TAPS Interface                 October 2018
    Default: : The application makes no representation about its expected
    capacity profile.  No special optimizations of the tradeoff between
    delay, delay variation, and bandwidth efficiency should be made when
-   selecting and configuring transport protocol stacks.  When the
-   underlying transport protocol stack(s) support per-connection DSCP
-   signaling, transmitted traffic SHOULD carry the DSCP Default
-   Forwarding [RFC2474] PHB; when the Connection is multiplexed, the
-   guidelines in section 6 of [RFC7657] apply.
+   selecting and configuring transport protocol stacks.  Transport
+   system implementations that map the requested capacity profile onto
+   per-connection DSCP signaling without multiplexing SHOULD assign the
+   DSCP Default Forwarding [RFC2474] PHB; when the Connection is
+   multiplexed, the guidelines in section 6 of [RFC7657] apply.
 
    Scavenger/Bulk: : The application is not interactive.  It expects to
    send and/or receive data without any urgency.  This can, for example,
    be used to select protocol stacks with scavenger transmission control
-   and/or to assign the traffic to a lower-effort service.  When the
-   underlying transport protocol stack(s) support per-connection DSCP
-   signaling, transmitted traffic SHOULD carry the DSCP Less than Best
-   Effort [LE-PHB] PHB; when the Connection is multiplexed, the
-   guidelines in section 6 of [RFC7657] apply.
+   and/or to assign the traffic to a lower-effort service.  Transport
+   system implementations that map the requested capacity profile onto
+   per-connection DSCP signaling without multiplexing SHOULD assign the
+   DSCP Less than Best Effort [LE-PHB] PHB; when the Connection is
+   multiplexed, the guidelines in section 6 of [RFC7657] apply.
 
    Low Latency/Interactive: : The application is interactive, and
    prefers loss to latency.  Response time should be optimized at the
@@ -2386,20 +2386,20 @@ Internet-Draft               TAPS Interface                 October 2018
    this connection.  This can be used by the system to disable the
    coalescing of multiple small Messages into larger packets (Nagle's
    algorithm); to prefer immediate acknowledgment from the peer endpoint
-   when supported by the underlying transport; and so on.  When the
-   underlying transport protocol stack(s) support per-connection DSCP
-   signaling, transmitted traffic SHOULD carry the DSCP Expedited
-   Forwarding [RFC3246] PHB; when the Connection is multiplexed, the
-   guidelines in section 6 of [RFC7657] apply.
+   when supported by the underlying transport; and so on.  Transport
+   system implementations that map the requested capacity profile onto
+   per-connection DSCP signaling without multiplexing SHOULD assign the
+   DSCP Expedited Forwarding [RFC3246] PHB; when the Connection is
+   multiplexed, the guidelines in section 6 of [RFC7657] apply.
 
    Low Latency/Non-Interactive: : The application prefers loss to
    latency but is not interactive.  Response time should be optimized at
    the expense of bandwidth efficiency and delay variation when sending
-   on this connection.  When the underlying transport protocol stack(s)
-   support per-connection DSCP signaling, transmitted traffic SHOULD
-   carry a DSCP Assured Forwarding (AF21,AF22,AF23,AF24) [RFC2597] PHB;
-   when the Connection is multiplexed, the guidelines in section 6 of
-   [RFC7657] apply.
+   on this connection.Transport system implementations that map the
+   requested capacity profile onto per-connection DSCP signaling without
+   multiplexing SHOULD assign a DSCP Assured Forwarding
+   (AF21,AF22,AF23,AF24) [RFC2597] PHB; when the Connection is
+   multiplexed, the guidelines in section 6 of [RFC7657] apply.
 
 
 
@@ -2416,11 +2416,12 @@ Internet-Draft               TAPS Interface                 October 2018
    efficiency.  This implies that the Connection may fail if the desired
    rate cannot be maintained across the Path.  A transport may interpret
    this capacity profile as preferring a circuit breaker [RFC8084] to a
-   rate-adaptive congestion controller.  When the underlying transport
-   protocol stack(s) support per-connection DSCP signaling, transmitted
-   traffic SHOULD carry a DSCP Assured Forwarding (AF31,AF32,AF33,AF34)
-   [RFC2597] PHB; when the Connection is multiplexed, the guidelines in
-   section 6 of [RFC7657] apply.
+   rate-adaptive congestion controller.  Transport system
+   implementations that map the requested capacity profile onto per-
+   connection DSCP signaling without multiplexing SHOULD assign a DSCP
+   Assured Forwarding (AF31,AF32,AF33,AF34) [RFC2597] PHB; when the
+   Connection is multiplexed, the guidelines in section 6 of [RFC7657]
+   apply.
 
    High Throughput Data: : [EDITOR'S NOTE: Gorry wants this, but bht has
    no idea how to implement it beyond DSCP AF1n [RFC2597].  Cut, or
@@ -2456,8 +2457,7 @@ Internet-Draft               TAPS Interface                 October 2018
 
    Integer Message Property - see Section 7.3.2.
 
-   Note that this property is not a per-message override of the
-   connection Niceness - see Section 9.1.5.  Both Niceness properties
+
 
 
 
@@ -2466,6 +2466,8 @@ Trammell, et al.         Expires April 11, 2019                [Page 44]
 Internet-Draft               TAPS Interface                 October 2018
 
 
+   Note that this property is not a per-message override of the
+   connection Niceness - see Section 9.1.5.  Both Niceness properties
    may interact, but can be used independently and be realized by
    different mechanisms.
 
@@ -2510,8 +2512,6 @@ Internet-Draft               TAPS Interface                 October 2018
    RFC-EDITOR: Please remove this section before publication.
 
    This document has no Actions for IANA.
-
-
 
 
 
