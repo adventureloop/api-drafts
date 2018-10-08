@@ -341,7 +341,7 @@ ul.toc li {
 <link href="#rfc.section.9.1.11" rel="Chapter" title="9.1.11 Maximum Message size on receive">
 <link href="#rfc.section.9.2" rel="Chapter" title="9.2 Soft Errors">
 <link href="#rfc.section.10" rel="Chapter" title="10 Connection Termination">
-<link href="#rfc.section.11" rel="Chapter" title="11 Ordering of Operations and Events">
+<link href="#rfc.section.11" rel="Chapter" title="11 Connection State and Ordering of Operations and Events">
 <link href="#rfc.section.12" rel="Chapter" title="12 Transport Properties">
 <link href="#rfc.section.12.1" rel="Chapter" title="12.1 Transport Property Types">
 <link href="#rfc.section.12.1.1" rel="Chapter" title="12.1.1 Boolean">
@@ -404,12 +404,12 @@ ul.toc li {
 <link href="#rfc.authors" rel="Chapter">
 
 
-  <meta name="generator" content="xml2rfc version 2.10.2 - https://tools.ietf.org/tools/xml2rfc" />
+  <meta name="generator" content="xml2rfc version 2.11.0 - https://tools.ietf.org/tools/xml2rfc" />
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-09-21" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-10-08" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -433,7 +433,7 @@ ul.toc li {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: March 25, 2019</td>
+<td class="left">Expires: April 11, 2019</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -486,7 +486,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">September 21, 2018</td>
+<td class="right">October 08, 2018</td>
 </tr>
 
     	
@@ -502,7 +502,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on March 25, 2019.</p>
+<p>This Internet-Draft will expire on April 11, 2019.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -632,7 +632,7 @@ ul.toc li {
 </li>
 </ul><li>10.   <a href="#rfc.section.10">Connection Termination</a>
 </li>
-<li>11.   <a href="#rfc.section.11">Ordering of Operations and Events</a>
+<li>11.   <a href="#rfc.section.11">Connection State and Ordering of Operations and Events</a>
 </li>
 <li>12.   <a href="#rfc.section.12">Transport Properties</a>
 </li>
@@ -1346,12 +1346,12 @@ Preconnection.DeframeWith(Deframer)
 <p></p>
 
 <ul>
-<li>The status of the connection, which can be one of the following: Establishing, Established, Closing, or Closed.</li>
+<li>The connection state, which can be one of the following: Establishing, Established, Closing, or Closed.</li>
 <li>Whether the connection can be used to send data. A connection can not be used for sending if the connection was created with the Selection Property &#8220;Direction of Communication&#8221; set to &#8220;unidirectional receive&#8221; or if a Message marked as &#8220;Final&#8221; was sent over this connection, see <a href="#send-final" class="xref">Section 12.3.1</a>.</li>
 <li>Whether the connection can be used to receive data. A connection can not be used for reading if the connection was created with the Selection Property &#8220;Direction of Communication&#8221; set to &#8220;unidirectional send&#8221; or if a Message marked as &#8220;Final&#8221; was received, see <a href="#receiving-final-messages" class="xref">Section 8.3.3</a>. The latter is only supported by certain transport protocols, e.g., by TCP as half-closed connection.</li>
 <li>For Connections that are Establishing: Transport Properties that the application specified on the Preconnection, see <a href="#connection-props" class="xref">Section 5.2</a>.</li>
-<li>For Connections that are Established, Closing, or Closed (TODO: double-check if closed belongs here): Transport Properties of the actual protocols that were selected and instantiated. These features correspond to the properties given in <a href="#transport-props" class="xref">Section 12</a> and include Selection Properties and Protocol Properties.  <ul>
-<li>Selection Properties indicate whether or not the Connection has or offers a certain Selection Property. Note that the actually instantiated protocol stack may not match all Protocol Selection Properties that the application specified on the Preconnection.  For example, a certain Protocol Selection Property that an application specified as Preferred may not actually be present in the chosen protocol stack because none of the currently available transport protocols had this feature.</li>
+<li>For Connections that are Established, Closing, or Closed: Transport Properties of the actual protocols that were selected and instantiated. These features correspond to the properties given in <a href="#transport-props" class="xref">Section 12</a> and include Selection Properties and Protocol Properties.  <ul>
+<li>Selection Properties indicate whether or not the Connection has or offers a certain Selection Property. Note that the actually instantiated protocol stack may not match all Protocol Selection Properties that the application specified on the Preconnection. For example, a certain Protocol Selection Property that an application specified as Preferred may not actually be present in the chosen protocol stack because none of the currently available transport protocols had this feature.</li>
 <li>Protocol Properties of the protocol stack in use (see <a href="#protocol-props" class="xref">Section 12.2.2</a>).</li>
 </ul>
 </li>
@@ -1496,15 +1496,27 @@ Connection.Abort()
 Connection -&gt; ConnectionError&lt;&gt;
 </pre>
 <h1 id="rfc.section.11">
-<a href="#rfc.section.11">11.</a> <a href="#ordering-of-operations-and-events" id="ordering-of-operations-and-events">Ordering of Operations and Events</a>
+<a href="#rfc.section.11">11.</a> <a href="#connection-state-and-ordering-of-operations-and-events" id="connection-state-and-ordering-of-operations-and-events">Connection State and Ordering of Operations and Events</a>
 </h1>
-<p id="rfc.section.11.p.1">As this interface is designed to be independent of an implementation&#8217;s concurrency model, the details of how exactly actions are handled, and on which threads/callbacks events are dispatched, are implementation dependent. However, the interface does provide the following guarantees about the ordering of operations:</p>
+<p id="rfc.section.11.p.1">As this interface is designed to be independent of an implementation&#8217;s concurrency model, the details of how exactly actions are handled, and on which threads/callbacks events are dispatched, are implementation dependent.</p>
+<p id="rfc.section.11.p.2">Each transition of connection state is associated with one of more events:</p>
 <p></p>
 
 <ul>
-<li>Received&lt;&gt; will never occur on a Connection before a Ready&lt;&gt; event on that Connection, or a ConnectionReceived&lt;&gt; or RendezvousDone&lt;&gt; containing that Connection.</li>
-<li>No events will occur on a Connection after a Closed&lt;&gt; event, an InitiateError&lt;&gt; or ConnectionError&lt;&gt; on that connection. To ensure this ordering, Closed&lt;&gt; will not occur on a Connection while other events on the Connection are still locally outstanding (i.e., known to the interface and waiting to be dealt with by the application). ConnectionError&lt;&gt; may occur after Closed&lt;&gt;, but the interface must gracefully handle the application ignoring these errors.</li>
+<li>Ready&lt;&gt; occurs when a Connection created with Initiate() or InitiateWithIdempotentData() transitions to Established state.</li>
+<li>ConnectionReceived&lt;&gt; occurs when a Connection created with Listen() transitions to Established state.</li>
+<li>RendezvousDone&lt;&gt; occurs when a Connection created with Rendezvous() transitions to Established state.</li>
+<li>Closed&lt;&gt; occurs when a Connection transitions to Closed state without error.</li>
+<li>InitiateError&lt;&gt; occurs when a Connection created with Initiate() transitions from Establishing state to Closed state due to an error.</li>
+<li>ConnectionError&lt;&gt; occurs when a Connection transitions to Closed state due to an error in all other circumstances.</li>
+</ul>
+<p id="rfc.section.11.p.4">The interface provides the following guarantees about the ordering of operations:</p>
+<p></p>
+
+<ul>
 <li>Sent&lt;&gt; events will occur on a Connection in the order in which the Messages were sent (i.e., delivered to the kernel or to the network interface, depending on implementation).</li>
+<li>Received&lt;&gt; will never occur on a Connection before it is Established; i.e.  before a Ready&lt;&gt; event on that Connection, or a ConnectionReceived&lt;&gt; or RendezvousDone&lt;&gt; containing that Connection.</li>
+<li>No events will occur on a Connection after it is Closed; i.e., after a Closed&lt;&gt; event, an InitiateError&lt;&gt; or ConnectionError&lt;&gt; on that connection. To ensure this ordering, Closed&lt;&gt; will not occur on a Connection while other events on the Connection are still locally outstanding (i.e., known to the interface and waiting to be dealt with by the application). ConnectionError&lt;&gt; may occur after Closed&lt;&gt;, but the interface must gracefully handle all cases where application ignores these errors.</li>
 </ul>
 <h1 id="rfc.section.12">
 <a href="#rfc.section.12">12.</a> <a href="#transport-props" id="transport-props">Transport Properties</a>
@@ -1888,7 +1900,7 @@ Connection -&gt; ConnectionError&lt;&gt;
 <tr>
 <td class="reference"><b id="I-D.ietf-taps-minset">[I-D.ietf-taps-minset]</b></td>
 <td class="top">
-<a>Welzl, M.</a> and <a>S. Gjessing</a>, "<a href="https://tools.ietf.org/html/draft-ietf-taps-minset-10">A Minimal Set of Transport Services for End Systems</a>", Internet-Draft draft-ietf-taps-minset-10, September 2018.</td>
+<a>Welzl, M.</a> and <a>S. Gjessing</a>, "<a href="https://tools.ietf.org/html/draft-ietf-taps-minset-11">A Minimal Set of Transport Services for End Systems</a>", Internet-Draft draft-ietf-taps-minset-11, September 2018.</td>
 </tr>
 <tr>
 <td class="reference"><b id="I-D.ietf-tls-tls13">[I-D.ietf-tls-tls13]</b></td>
