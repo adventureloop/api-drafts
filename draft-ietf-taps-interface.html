@@ -409,7 +409,7 @@ ul.toc li {
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-10-08" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-10-09" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -433,7 +433,7 @@ ul.toc li {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: April 11, 2019</td>
+<td class="left">Expires: April 12, 2019</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -486,7 +486,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">October 08, 2018</td>
+<td class="right">October 09, 2018</td>
 </tr>
 
     	
@@ -502,7 +502,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on April 11, 2019.</p>
+<p>This Internet-Draft will expire on April 12, 2019.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -1792,25 +1792,19 @@ Connection -&gt; ConnectionError&lt;&gt;
 
 <dl>
 <dt>Classification:</dt>
-<dd style="margin-left: 8">Intent [TODO: Discuss]</dd>
+<dd style="margin-left: 8">Selection Property</dd>
 <dt>Type:</dt>
 <dd style="margin-left: 8">Enumeration</dd>
 <dt>Applicability:</dt>
 <dd style="margin-left: 8">Preconnection, Connection, Message</dd>
 </dl>
-<p id="rfc.section.12.3.19.p.2">This property specifies the application&#8217;s expectation of the dominating traffic pattern for this Connection.  This implies that the transport system should optimize for the capacity profile specified. This can influence path and protocol selection.  The following values are valid for the Capacity Profile:</p>
-<p></p>
-
-<dl>
-<dt>Default:</dt>
-<dd style="margin-left: 8">The application makes no request about its expected capacity profile. No special optimizations of the tradeoff between delay, delay variation, and bandwidth efficiency should be made when selecting and configuring stacks.</dd>
-<dt>Low Latency:</dt>
-<dd style="margin-left: 8">Response time (latency) should be optimized at the expense of bandwidth efficiency and delay variation when sending this message. This can be used by the system to disable the coalescing of multiple small Messages into larger packets (Nagle&#8217;s algorithm); to prefer immediate acknowledgment from the peer endpoint when supported by the underlying transport; to signal a preference for lower-latency, higher-loss treatment; and so on.</dd>
-<dt>Constant Rate:</dt>
-<dd style="margin-left: 8">The application expects to send/receive data at a constant rate after Connection establishment. Delay and delay variation should be minimized at the expense of bandwidth efficiency. This implies that the Connection may fail if the desired rate cannot be maintained across the Path. A transport may interpret this capacity profile as preferring a circuit breaker <a href="#RFC8084" class="xref">[RFC8084]</a> to a rate-adaptive congestion controller.</dd>
-<dt>Scavenger/Bulk:</dt>
-<dd style="margin-left: 8">The application is not interactive. It expects to send/receive a large amount of data, without any urgency. This can, for example, be used to select protocol stacks with scavenger transmission control, to signal a preference for less-than-best-effort treatment, or to assign the traffic to a lower-effort service.</dd>
-</dl>
+<p id="rfc.section.12.3.19.p.2">This property specifies the desired network treatment for traffic sent by the application and the tradeoffs the application is prepared to make in path and protocol selection to receive that desired treatment. When the capacity profile is set to a value other than Default, the transport system should select paths and profiles to optimize for the capacity profile specified. The following values are valid for the Capacity Profile:</p>
+<p id="rfc.section.12.3.19.p.3">Default: : The application makes no representation about its expected capacity profile. No special optimizations of the tradeoff between delay, delay variation, and bandwidth efficiency should be made when selecting and configuring transport protocol stacks. Transport system implementations that map the requested capacity profile onto per-connection DSCP signaling without multiplexing SHOULD assign the DSCP Default Forwarding <a href="#RFC2474" class="xref">[RFC2474]</a> PHB; when the Connection is multiplexed, the guidelines in section 6 of <a href="#RFC7657" class="xref">[RFC7657]</a> apply.</p>
+<p id="rfc.section.12.3.19.p.4">Scavenger: : The application is not interactive. It expects to send and/or receive data without any urgency. This can, for example, be used to select protocol stacks with scavenger transmission control and/or to assign the traffic to a lower-effort service. Transport system implementations that map the requested capacity profile onto per-connection DSCP signaling without multiplexing SHOULD assign the DSCP Less than Best Effort <a href="#LE-PHB" class="xref">[LE-PHB]</a> PHB; when the Connection is multiplexed, the guidelines in section 6 of <a href="#RFC7657" class="xref">[RFC7657]</a> apply.</p>
+<p id="rfc.section.12.3.19.p.5">Low Latency/Interactive: : The application is interactive, and prefers loss to latency. Response time should be optimized at the expense of bandwidth efficiency and delay variation when sending on this connection. This can be used by the system to disable the coalescing of multiple small Messages into larger packets (Nagle&#8217;s algorithm); to prefer immediate acknowledgment from the peer endpoint when supported by the underlying transport; and so on.  Transport system implementations that map the requested capacity profile onto per-connection DSCP signaling without multiplexing SHOULD assign the DSCP Expedited Forwarding <a href="#RFC3246" class="xref">[RFC3246]</a> PHB; when the Connection is multiplexed, the guidelines in section 6 of <a href="#RFC7657" class="xref">[RFC7657]</a> apply.</p>
+<p id="rfc.section.12.3.19.p.6">Low Latency/Non-Interactive: : The application prefers loss to latency but is not interactive. Response time should be optimized at the expense of bandwidth efficiency and delay variation when sending on this connection.Transport system implementations that map the requested capacity profile onto per-connection DSCP signaling without multiplexing SHOULD assign a DSCP Assured Forwarding (AF21,AF22,AF23,AF24) <a href="#RFC2597" class="xref">[RFC2597]</a> PHB; when the Connection is multiplexed, the guidelines in section 6 of <a href="#RFC7657" class="xref">[RFC7657]</a> apply.</p>
+<p id="rfc.section.12.3.19.p.7">Constant-Rate Streaming: : The application expects to send/receive data at a constant rate after Connection establishment. Delay and delay variation should be minimized at the expense of bandwidth efficiency. This implies that the Connection may fail if the desired rate cannot be maintained across the Path.  A transport may interpret this capacity profile as preferring a circuit breaker <a href="#RFC8084" class="xref">[RFC8084]</a> to a rate-adaptive congestion controller. Transport system implementations that map the requested capacity profile onto per-connection DSCP signaling without multiplexing SHOULD assign a DSCP Assured Forwarding (AF31,AF32,AF33,AF34) <a href="#RFC2597" class="xref">[RFC2597]</a> PHB; when the Connection is multiplexed, the guidelines in section 6 of <a href="#RFC7657" class="xref">[RFC7657]</a> apply.</p>
+<p id="rfc.section.12.3.19.p.8">High Throughput Data: : The application expects to send/receive data at the maximum rate allowed by its congestion controller over a relatively long period of time. Transport system implementations that map the requested capacity profile onto per-connection DSCP signaling without multiplexing SHOULD assign a DSCP Assured Forwarding (AF11,AF12,AF13,AF14) <a href="#RFC2597" class="xref">[RFC2597]</a> PHB per section 4.8 of <a href="#RFC4594" class="xref">[RFC4594]</a>. When the Connection is multiplexed, the guidelines in section 6 of <a href="#RFC7657" class="xref">[RFC7657]</a> apply.</p>
 <h1 id="rfc.section.12.3.20">
 <a href="#rfc.section.12.3.20">12.3.20.</a> <a href="#prop-cc" id="prop-cc">Congestion control</a>
 </h1>
@@ -1937,9 +1931,24 @@ Connection -&gt; ConnectionError&lt;&gt;
 <a>Pauly, T.</a>, <a>Perkins, C.</a>, <a>Rose, K.</a> and <a>C. Wood</a>, "<a href="https://tools.ietf.org/html/draft-ietf-taps-transport-security-02">A Survey of Transport Security Protocols</a>", Internet-Draft draft-ietf-taps-transport-security-02, June 2018.</td>
 </tr>
 <tr>
+<td class="reference"><b id="LE-PHB">[LE-PHB]</b></td>
+<td class="top">
+<a>Bless, R.</a>, "<a href="https://tools.ietf.org/html/draft-ietf-tsvwg-le-phb-05">A Lower Effort Per-Hop Behavior (LE PHB)</a>", Internet-Draft draft-ietf-tsvwg-le-phb-05, July 2018.</td>
+</tr>
+<tr>
 <td class="reference"><b id="RFC0793">[RFC0793]</b></td>
 <td class="top">
 <a>Postel, J.</a>, "<a href="https://tools.ietf.org/html/rfc793">Transmission Control Protocol</a>", STD 7, RFC 793, DOI 10.17487/RFC0793, September 1981.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC2474">[RFC2474]</b></td>
+<td class="top">
+<a>Nichols, K.</a>, <a>Blake, S.</a>, <a>Baker, F.</a> and <a>D. Black</a>, "<a href="https://tools.ietf.org/html/rfc2474">Definition of the Differentiated Services Field (DS Field) in the IPv4 and IPv6 Headers</a>", RFC 2474, DOI 10.17487/RFC2474, December 1998.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC2597">[RFC2597]</b></td>
+<td class="top">
+<a>Heinanen, J.</a>, <a>Baker, F.</a>, <a>Weiss, W.</a> and <a>J. Wroclawski</a>, "<a href="https://tools.ietf.org/html/rfc2597">Assured Forwarding PHB Group</a>", RFC 2597, DOI 10.17487/RFC2597, June 1999.</td>
 </tr>
 <tr>
 <td class="reference"><b id="RFC2914">[RFC2914]</b></td>
@@ -1947,9 +1956,19 @@ Connection -&gt; ConnectionError&lt;&gt;
 <a>Floyd, S.</a>, "<a href="https://tools.ietf.org/html/rfc2914">Congestion Control Principles</a>", BCP 41, RFC 2914, DOI 10.17487/RFC2914, September 2000.</td>
 </tr>
 <tr>
+<td class="reference"><b id="RFC3246">[RFC3246]</b></td>
+<td class="top">
+<a>Davie, B.</a>, <a>Charny, A.</a>, <a>Bennet, J.</a>, <a>Benson, K.</a>, <a>Le Boudec, J.</a>, <a>Courtney, W.</a>, <a>Davari, S.</a>, <a>Firoiu, V.</a> and <a>D. Stiliadis</a>, "<a href="https://tools.ietf.org/html/rfc3246">An Expedited Forwarding PHB (Per-Hop Behavior)</a>", RFC 3246, DOI 10.17487/RFC3246, March 2002.</td>
+</tr>
+<tr>
 <td class="reference"><b id="RFC3261">[RFC3261]</b></td>
 <td class="top">
 <a>Rosenberg, J.</a>, <a>Schulzrinne, H.</a>, <a>Camarillo, G.</a>, <a>Johnston, A.</a>, <a>Peterson, J.</a>, <a>Sparks, R.</a>, <a>Handley, M.</a> and <a>E. Schooler</a>, "<a href="https://tools.ietf.org/html/rfc3261">SIP: Session Initiation Protocol</a>", RFC 3261, DOI 10.17487/RFC3261, June 2002.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC4594">[RFC4594]</b></td>
+<td class="top">
+<a>Babiarz, J.</a>, <a>Chan, K.</a> and <a>F. Baker</a>, "<a href="https://tools.ietf.org/html/rfc4594">Configuration Guidelines for DiffServ Service Classes</a>", RFC 4594, DOI 10.17487/RFC4594, August 2006.</td>
 </tr>
 <tr>
 <td class="reference"><b id="RFC5245">[RFC5245]</b></td>
@@ -1965,6 +1984,11 @@ Connection -&gt; ConnectionError&lt;&gt;
 <td class="reference"><b id="RFC7556">[RFC7556]</b></td>
 <td class="top">
 <a>Anipko, D.</a>, "<a href="https://tools.ietf.org/html/rfc7556">Multiple Provisioning Domain Architecture</a>", RFC 7556, DOI 10.17487/RFC7556, June 2015.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC7657">[RFC7657]</b></td>
+<td class="top">
+<a>Black, D.</a> and <a>P. Jones</a>, "<a href="https://tools.ietf.org/html/rfc7657">Differentiated Services (Diffserv) and Real-Time Communication</a>", RFC 7657, DOI 10.17487/RFC7657, November 2015.</td>
 </tr>
 <tr>
 <td class="reference"><b id="RFC8084">[RFC8084]</b></td>
