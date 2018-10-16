@@ -2989,11 +2989,16 @@ Internet-Draft               TAPS Interface                 October 2018
       "Timeout for aborting Connection" property, using a time value in
       seconds.
 
-   "Timeout event when data could not be delivered for too long":  TODO
-      (have we defined this event?)
+   "Timeout event when data could not be delivered for too long":  TODO:
+      this should probably be covered by the "ConnectionError" Event,
+      but the text above it currently reads: "...can inform the
+      application that the other side has aborted the Connection".  In
+      this case, it is the local side.
 
-   Suggest timeout to the peer:  "Abort timeout to suggest to the Remote
-      Endpoint" property.
+   Suggest timeout to the peer:  "Suggest a timeout to the Remote
+      Endpoint" and "Abort timeout to suggest to the Remote Endpoint"
+      Selection property.  [EDITOR'S NOTE: For discussion of this
+      option, see https://github.com/taps-api/drafts/issues/109].
 
    Notification of Excessive Retransmissions (early warning below
    abortion threshold):
@@ -3012,12 +3017,7 @@ Internet-Draft               TAPS Interface                 October 2018
    when sending":
       "Corruption Protection Length" property (value 0 to disable).
 
-   "Specify minimum checksum coverage required by receiver" and "Disable
-    checksum requirement when receiving":
-      "Required minimum coverage of the checksum for receiving" property
-      (value 0 to disable).
 
-   Specify DF field:  "Singular Transmission" Message property.
 
 
 
@@ -3025,6 +3025,17 @@ Trammell, et al.         Expires April 19, 2019                [Page 54]
 
 Internet-Draft               TAPS Interface                 October 2018
 
+
+   "Specify minimum checksum coverage required by receiver" and "Disable
+    checksum requirement when receiving":
+      "Required minimum coverage of the checksum for receiving" property
+      (value 0 to disable).
+
+   "Specify DF" field and "Request not to bundle messages:"  The
+      "Singular Transmission" Message property combines both of these
+      requests, i.e. if a request not to bundle messages is made, this
+      also turns off DF in case of protocols that allow this (only UDP
+      and UDP-Lite, which cannot bundle messages anyway).
 
    Get max. transport-message size that may be sent using a non-
    fragmented IP packet from the configured interface:
@@ -3063,6 +3074,14 @@ Internet-Draft               TAPS Interface                 October 2018
    message":
       Reliability is controlled via the "Reliable Data Transfer
       (Message)" Message property.  Transmitting data without delimiters
+
+
+
+Trammell, et al.         Expires April 19, 2019                [Page 55]
+
+Internet-Draft               TAPS Interface                 October 2018
+
+
       is done by not using a Framer.  The choice of congestion control
       is provided via the "Congestion control" property.
 
@@ -3074,17 +3093,10 @@ Internet-Draft               TAPS Interface                 October 2018
       The two transport features are controlled via the Message property
       "Ordered".
 
-
-
-
-Trammell, et al.         Expires April 19, 2019                [Page 55]
-
-Internet-Draft               TAPS Interface                 October 2018
-
-
-   Request not to bundle messages:  TODO
-
-   Request not to delay the acknowledgement (SACK) of a message:  TODO
+   Request not to delay the acknowledgement (SACK) of a message:  Should
+      the protocol support it, this is one of the transport features the
+      transport system can use when an application uses the Capacity
+      Profile Property with value "Low Latency/Interactive".
 
    Receive data (with no message delimiting):  "Received" Event without
       using a Deframer.
@@ -3116,18 +3128,6 @@ Authors' Addresses
    Email: ietf@trammell.ch
 
 
-   Michael Welzl (editor)
-   University of Oslo
-   PO Box 1080 Blindern
-   0316  Oslo
-   Norway
-
-   Email: michawe@ifi.uio.no
-
-
-
-
-
 
 
 
@@ -3136,6 +3136,15 @@ Authors' Addresses
 Trammell, et al.         Expires April 19, 2019                [Page 56]
 
 Internet-Draft               TAPS Interface                 October 2018
+
+
+   Michael Welzl (editor)
+   University of Oslo
+   PO Box 1080 Blindern
+   0316  Oslo
+   Norway
+
+   Email: michawe@ifi.uio.no
 
 
    Theresa Enghardt
@@ -3175,15 +3184,6 @@ Internet-Draft               TAPS Interface                 October 2018
    Email: csp@csperkins.org
 
 
-   Philipp S. Tiesel
-   TU Berlin
-   Marchstrasse 23
-   10587 Berlin
-   Germany
-
-   Email: philipp@inet.tu-berlin.de
-
-
 
 
 
@@ -3194,6 +3194,15 @@ Trammell, et al.         Expires April 19, 2019                [Page 57]
 Internet-Draft               TAPS Interface                 October 2018
 
 
+   Philipp S. Tiesel
+   TU Berlin
+   Marchstrasse 23
+   10587 Berlin
+   Germany
+
+   Email: philipp@inet.tu-berlin.de
+
+
    Chris Wood
    Apple Inc.
    1 Infinite Loop
@@ -3201,15 +3210,6 @@ Internet-Draft               TAPS Interface                 October 2018
    United States of America
 
    Email: cawood@apple.com
-
-
-
-
-
-
-
-
-
 
 
 
