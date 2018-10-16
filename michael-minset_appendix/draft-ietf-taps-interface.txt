@@ -2953,15 +2953,15 @@ Appendix C.  Relationship to the Minimal Set of Transport Services for
 
    [EDITOR'S NOTE: This is early text.  In the future, this section will
    contain backward references, which we currently avoid because things
-   are still being moved around and names / categorization etc. are
+   are still being moved around and names / categories etc. are
    changing.  Also, clearly, the intention is for the full minset to be
    reflected by the API at some point.]
 
-   [EDITOR'S NOTE: The categories below reflect the categorization in
-   [I-D.ietf-taps-minset], not in the current document.  They will be
-   removed in a future version.]
+   Connect:  "Initiate" Action.
 
-   Establishment:
+   Listen:  "Listen" Action.
+
+
 
 
 
@@ -2969,8 +2969,6 @@ Trammell, et al.         Expires April 19, 2019                [Page 53]
 
 Internet-Draft               TAPS Interface                 October 2018
 
-
-   Connect:  "Initiate" Action.
 
    Specify number of attempts and/or timeout for the first establishment
     message:
@@ -2984,40 +2982,42 @@ Internet-Draft               TAPS Interface                 October 2018
 
    Hand over a message to reliably transfer during connection
    establishment:
+      TODO.
 
-   Listen:
+   "Change timeout for aborting connection (using retransmit limit or
+   time value)":
+      "Timeout for aborting Connection" property, using a time value in
+      seconds.
 
-   Maintenance:  Change timeout for aborting connection (using
-      retransmit limit time value)
+   "Timeout event when data could not be delivered for too long":  TODO
+      (have we defined this event?)
 
-      Suggest timeout to the peer
+   Suggest timeout to the peer:  "Abort timeout to suggest to the Remote
+      Endpoint" property.
 
-      Notification of Excessive Retransmissions (early warning below
-      abortion threshold)
+   Notification of Excessive Retransmissions (early warning below
+   abortion threshold):
+      "Notification of excessive retransmissions" property.
 
-      Notification of ICMP error message arrival
+   Notification of ICMP error message arrival:  "Notification of ICMP
+      soft error message arrival" property.
 
-      Choose a scheduler to operate between streams of an association
+   Choose a scheduler to operate between streams of an association:
+      "Connection group transmission scheduler" property.
 
-      Configure priority or weight for a scheduler
+   Configure priority or weight for a scheduler:  "Niceness
+      (Connection)" property.
 
-      Disable checksum when sending
+   "Specify checksum coverage used by the sender" and "Disable checksum
+   when sending":
+      "Corruption Protection Length" property (value 0 to disable).
 
-      Disable checksum requirement when receiving
+   "Specify minimum checksum coverage required by receiver" and "Disable
+    checksum requirement when receiving":
+      "Required minimum coverage of the checksum for receiving" property
+      (value 0 to disable).
 
-      Specify checksum coverage used by the sender
-
-      Specify minimum checksum coverage required by receiver
-
-   Specify DF field:  "Singular Transmission" property.
-
-   Get max. transport-message size that may be sent using a non-
-   fragmented IP packet from the configured interface:
-      "Maximum Message size before fragmentation or segmentation"
-      property.
-
-   Get max. transport-message size that may be received from the
-   configured interface:
+   Specify DF field:  "Singular Transmission" Message property.
 
 
 
@@ -3026,9 +3026,17 @@ Trammell, et al.         Expires April 19, 2019                [Page 54]
 Internet-Draft               TAPS Interface                 October 2018
 
 
+   Get max. transport-message size that may be sent using a non-
+   fragmented IP packet from the configured interface:
+      "Maximum Message size before fragmentation or segmentation"
+      property.
+
+   Get max. transport-message size that may be received from the
+   configured interface:
       "Maximum Message size on receive" property.
 
-      Obtain ECN field:
+   Obtain ECN field:  "ECN" is a defined metadata value as part of the
+      Message Receive Context.
 
    "Specify DSCP field", "Disable Nagle algorithm", "Enable and
    configure a 'Low Extra Delay Background Transfer'":
@@ -3036,43 +3044,35 @@ Internet-Draft               TAPS Interface                 October 2018
       transport features are collectively offered via the "Capacity
       profile" property.
 
-   Termination:  Close after reliably delivering all remaining data,
-      causing an event informing the application on the other side
+   Close after reliably delivering all remaining data, causing an event
+   informing the application on the other side:
+      This is offered by the "Close" Action with slightly changed
+      semantics in line with the discussion in Section 5.2 of
+      [I-D.ietf-taps-minset].
 
-      Abort without delivering remaining data, causing an event
-      informing the application on the other side
+   "Abort without delivering remaining data, causing an event informing
+   the application on the other side" and "Abort without delivering
+   remaining data, not causing an event informing the application on the
+    other side":
+      This is offered by the "Abort" action without promising that this
+      is signaled to the other side.  If it is, a "ConnectionError"
+      Event will fire at the peer.
 
-      Abort without delivering remaining data, not causing an event
-      informing the application on the other side
+   "Reliably transfer data, with congestion control", "Reliably transfer
+    a message, with congestion control" and "Unreliably transfer a
+   message":
+      Reliability is controlled via the "Reliable Data Transfer
+      (Message)" Message property.  Transmitting data without delimiters
+      is done by not using a Framer.  The choice of congestion control
+      is provided via the "Congestion control" property.
 
-      Timeout event when data could not be delivered for too long
+   Configurable Message Reliability:  The "Lifetime" Message Property
+      implements a time-based way to configure message reliability.
 
-   Sending Data:  Reliably transfer data, with congestion control
-
-      Reliably transfer a message, with congestion control
-
-      Unreliably transfer a message
-
-      Configurable Message Reliability
-
-      Ordered message delivery (potentially slower than unordered)
-
-      Unordered message delivery (potentially faster than ordered)
-
-      Request not to bundle messages
-
-      Request not to delay the acknowledgement (SACK) of a message
-
-   Receiving Data:  Receive data (with no message delimiting)
-
-   Receive a message:  "Received" Event.  Section 5.1 of
-      [I-D.ietf-taps-minset] discusses how messages can be obtained from
-      a bytestream in case of implementation over TCP.  Here, this is
-      dealt with by Framers and Deframers.
-
-   Information about partial message arrival:  "ReceivedPartial" Event.
-
-   Errors:
+   "Ordered message delivery (potentially slower than unordered)" and
+   "Unordered message delivery (potentially faster than ordered)":
+      The two transport features are controlled via the Message property
+      "Ordered".
 
 
 
@@ -3082,15 +3082,28 @@ Trammell, et al.         Expires April 19, 2019                [Page 55]
 Internet-Draft               TAPS Interface                 October 2018
 
 
-   Failures that are associated with a specific call to in the "Sending
-   Data" category.
-      Notification of send failures
+   Request not to bundle messages:  TODO
+
+   Request not to delay the acknowledgement (SACK) of a message:  TODO
+
+   Receive data (with no message delimiting):  "Received" Event without
+      using a Deframer.
+
+   Receive a message:  "Received" Event.  Section 5.1 of
+      [I-D.ietf-taps-minset] discusses how messages can be obtained from
+      a bytestream in case of implementation over TCP.  Here, this is
+      dealt with by Framers and Deframers.
+
+   Information about partial message arrival:  "ReceivedPartial" Event.
+
+   Notification of send failures:  "Expired" and "SendError" Events.
 
    Notification that the stack has no more user data to send:
-      Applications can obtain this information via the Sent Event.
+      Applications can obtain this information via the "Sent" Event.
 
-      Notification to a receiver that a partial message delivery has
-      been aborted
+   Notification to a receiver that a partial message delivery has been
+   aborted:
+      "ReceiveError" Event.
 
 Authors' Addresses
 
@@ -3112,6 +3125,19 @@ Authors' Addresses
    Email: michawe@ifi.uio.no
 
 
+
+
+
+
+
+
+
+
+Trammell, et al.         Expires April 19, 2019                [Page 56]
+
+Internet-Draft               TAPS Interface                 October 2018
+
+
    Theresa Enghardt
    TU Berlin
    Marchstrasse 23
@@ -3129,13 +3155,6 @@ Authors' Addresses
 
    Email: gorry@erg.abdn.ac.uk
    URI:   http://www.erg.abdn.ac.uk/
-
-
-
-
-Trammell, et al.         Expires April 19, 2019                [Page 56]
-
-Internet-Draft               TAPS Interface                 October 2018
 
 
    Mirja Kuehlewind
@@ -3165,6 +3184,16 @@ Internet-Draft               TAPS Interface                 October 2018
    Email: philipp@inet.tu-berlin.de
 
 
+
+
+
+
+
+Trammell, et al.         Expires April 19, 2019                [Page 57]
+
+Internet-Draft               TAPS Interface                 October 2018
+
+
    Chris Wood
    Apple Inc.
    1 Infinite Loop
@@ -3189,4 +3218,31 @@ Internet-Draft               TAPS Interface                 October 2018
 
 
 
-Trammell, et al.         Expires April 19, 2019                [Page 57]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Trammell, et al.         Expires April 19, 2019                [Page 58]
