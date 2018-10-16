@@ -337,7 +337,7 @@ ul.toc li {
 <link href="#rfc.section.8.3.2" rel="Chapter" title="8.3.2 Early Data">
 <link href="#rfc.section.8.3.3" rel="Chapter" title="8.3.3 Receiving Final Messages">
 <link href="#rfc.section.8.4" rel="Chapter" title="8.4 Receiver-side De-framing over Stream Protocols">
-<link href="#rfc.section.9" rel="Chapter" title="9 Configuring and Querying Connection Properties">
+<link href="#rfc.section.9" rel="Chapter" title="9 Managing Connections">
 <link href="#rfc.section.9.1" rel="Chapter" title="9.1 Generic Connection Properties">
 <link href="#rfc.section.9.1.1" rel="Chapter" title="9.1.1 Notification of excessive retransmissions">
 <link href="#rfc.section.9.1.2" rel="Chapter" title="9.1.2 Retransmission threshold before excessive retransmission notification">
@@ -594,7 +594,7 @@ ul.toc li {
 </li>
 </ul><li>8.4.   <a href="#rfc.section.8.4">Receiver-side De-framing over Stream Protocols</a>
 </li>
-</ul><li>9.   <a href="#rfc.section.9">Configuring and Querying Connection Properties</a>
+</ul><li>9.   <a href="#rfc.section.9">Managing Connections</a>
 </li>
 <ul><li>9.1.   <a href="#rfc.section.9.1">Generic Connection Properties</a>
 </li>
@@ -736,7 +736,7 @@ Action(parameter, parameter, ...) / Event&lt;parameter, parameter, ...&gt;
 <a href="#rfc.section.4.1">4.1.</a> <a href="#transport-properties" id="transport-properties">Transport Properties</a>
 </h1>
 <p id="rfc.section.4.1.p.1">Each application using the Transport Services Interface declares its preferences for how the transport service should operate using properties at each stage of the lifetime of a connection. During pre-establishment, Selection Properties <a href="#selection-props" class="xref">Section 5.2</a> are used to specify which paths and protocol stacks can be used and are preferred by the application, and Connection Properties <a href="#connection-props" class="xref">Section 9.1</a> can be used to fine-tune the eventually established connection. These Connection Properties can also be used to monitor and fine-tune established connections. The behavior of the selected protocol stack(s) when sending Messages is controlled by Message Context Properties <a href="#message-props" class="xref">Section 7.3</a>.</p>
-<p id="rfc.section.4.1.p.2">Collectively, Selection, Connection, and Message Context Properties can be referred to as Transport Properties. All Transport Properties, regardless of the phase in which they are used, are organized within a single namespace. This enables setting them as defaults in earlier stages and querying them in later stages: - Connections Properties can be set on Preconnections - Message Properties can be set on Preconnections and Connections - The effect of Selection Properties can be queried on Connections and Messages.</p>
+<p id="rfc.section.4.1.p.2">Collectively, Selection, Connection, and Message Context Properties can be referred to as Transport Properties. All Transport Properties, regardless of the phase in which they are used, are organized within a single namespace. This enables setting them as defaults in earlier stages and querying them in later stages: - Connection Properties can be set on Preconnections - Message Properties can be set on Preconnections and Connections - The effect of Selection Properties can be queried on Connections and Messages</p>
 <p id="rfc.section.4.1.p.3">Transport Properties can have one of a set of data types:</p>
 <p></p>
 
@@ -825,16 +825,16 @@ LocalSpecifier.WithStunServer(address, port, credentials)
 </tr>
 </tbody>
 </table>
-<p id="rfc.section.5.2.p.4">Internally, the transport system will first exclude all protocols and paths that match a Prohibit, then exclude all protocols and paths that do not match a Require, then sort candidates according to Preferred properties, and then use Avoided properties as a tiebreaker.</p>
-<p id="rfc.section.5.2.p.5">Both Selection and Connection Properties can be added to a Preconnection to configure the selection process, and to further configure the eventually selected protocol stack(s). They are collected into a TransportProperties object to be passed into a Preconnection object</p>
+<p id="rfc.section.5.2.p.4">Internally, the transport system will first exclude all protocols and paths that match a Prohibit, then exclude all protocols and paths that do not match a Require, then sort candidates according to Preferred properties, and then use Avoided properties as a tiebreaker. Selection Properties which select paths take preference over those which select protocols. For example, if an application indicates a preference for a specific path by specifying an interface, but also a preference for a protocol not available on this path, the transport system will try the path first, ignoring the preference.</p>
+<p id="rfc.section.5.2.p.5">Both Selection and Connection Properties can be added to a Preconnection to configure the selection process, and to further configure the eventually selected protocol stack(s). They are collected into a TransportProperties object to be passed into a Preconnection object:</p>
 <pre>
 TransportProperties := NewTransportProperties()
 </pre>
-<p id="rfc.section.5.2.p.6">Individual properties are then added to the TransportProperties Object.</p>
+<p id="rfc.section.5.2.p.6">Individual properties are then added to the TransportProperties Object:</p>
 <pre>
 TransportProperties.Add(property, value)
 </pre>
-<p id="rfc.section.5.2.p.7">Selection Properties can be added to a TransportProperties object using special actions for each preference level i.e, <samp>TransportProperties.Add(some_property, avoid)</samp> is equivalent to <samp>TransportProperties.Avoid(some_property)</samp></p>
+<p id="rfc.section.5.2.p.7">Selection Properties can be added to a TransportProperties object using special actions for each preference level i.e, <samp>TransportProperties.Add(some_property, avoid)</samp> is equivalent to <samp>TransportProperties.Avoid(some_property)</samp>:</p>
 <pre>
 TransportProperties.Require(property)
 TransportProperties.Prefer(property)
@@ -847,7 +847,7 @@ TransportProperties.Prohibit(property)
 TransportProperties := Connection.GetTransportProperties()
 </pre>
 <p id="rfc.section.5.2.p.9">A Connection gets its Transport Properties either by being explicitly configured via a Preconnection, by configuration after establishment, or by inheriting them from an antecedent via cloning; see <a href="#groups" class="xref">Section 6.4</a> for more.</p>
-<p><a href="#connection-props" class="xref">Section 9.1</a> provides a list of Connection Properties, while Selection Properties are listed in the subsections below. . Note that many properties are only considered during establishment, and can not be changed after a Connection is established; however, they can be queried. Querying a Selection Property after establishment yields the value Required for properties of the selected protocol and path, Avoid for properties avoided during selection, and Ignore for all other properties.</p>
+<p><a href="#connection-props" class="xref">Section 9.1</a> provides a list of Connection Properties, while Selection Properties are listed in the subsections below. Note that many properties are only considered during establishment, and can not be changed after a Connection is established; however, they can be queried. Querying a Selection Property after establishment yields the value Required for properties of the selected protocol and path, Avoid for properties avoided during selection, and Ignore for all other properties.</p>
 <p id="rfc.section.5.2.p.11">An implementation of this interface must provide sensible defaults for Selection Properties. The recommended defaults given for each property below represent a configuration that can be implemented over TCP. An alternate set of default Protocol Selection Properties would represent a configuration that can be implemented over UDP.</p>
 <h1 id="rfc.section.5.2.1">
 <a href="#rfc.section.5.2.1">5.2.1.</a> <a href="#prop-reliable" id="prop-reliable">Reliable Data Transfer (Connection)</a>
@@ -1340,12 +1340,13 @@ Preconnection.DeframeWith(Deframer)
 {messageData} := Deframer.Deframe(OctetStream, ...)
 </pre>
 <h1 id="rfc.section.9">
-<a href="#rfc.section.9">9.</a> <a href="#introspection" id="introspection">Configuring and Querying Connection Properties</a>
+<a href="#rfc.section.9">9.</a> <a href="#introspection" id="introspection">Managing Connections</a>
 </h1>
-<p id="rfc.section.9.p.1">Connection Properties represent the configuration and state of the selected Protocol Stack(s) backing a Connection. These Connection Properties may be Generic, applying regardless of transport protocol, or Specific, applicable to a single implementation of a single transport protocol stack. Generic Connection Properties are defined in <a href="#connection-props" class="xref">Section 9.1</a> below. Specific Protocol Properties are defined in a transport- and implementation-specific way, and must not be assumed to apply across different protocols. Attempts to set Specific Protocol Properties on a protocol stack not containing that specific protocol are simply ignored, and do not raise an error; however, too much reliance by an application on Specific Protocol Properties may significantly reduce the flexibility of a transport services implementation.</p>
-<p id="rfc.section.9.p.2">The application can set and query Connection Properties on a per-Connection basis. Connection Properties that are not read-only can be set during pre-establishment (see <a href="#selection-props" class="xref">Section 5.2</a>), as well as on connections directly using the SetProperty action: ~~~ Connection.SetProperty(property, value) ~~~</p>
-<p id="rfc.section.9.p.3">At any point, the application can query Connection Properties.  ~~~ ConnectionProperties := Connection.GetProperties() ~~~</p>
-<p id="rfc.section.9.p.4">Depending on the status of the connection, the queried Connection Properties will include different information:</p>
+<p id="rfc.section.9.p.1">After establishment, connections can be configured and queried using Connection Properties, and asynchronous information may be available about the state of the connection via Soft Errors.</p>
+<p id="rfc.section.9.p.2">Connection Properties represent the configuration and state of the selected Protocol Stack(s) backing a Connection. These Connection Properties may be Generic, applying regardless of transport protocol, or Specific, applicable to a single implementation of a single transport protocol stack. Generic Connection Properties are defined in <a href="#connection-props" class="xref">Section 9.1</a> below. Specific Protocol Properties are defined in a transport- and implementation-specific way, and must not be assumed to apply across different protocols. Attempts to set Specific Protocol Properties on a protocol stack not containing that specific protocol are simply ignored, and do not raise an error; however, too much reliance by an application on Specific Protocol Properties may significantly reduce the flexibility of a transport services implementation.</p>
+<p id="rfc.section.9.p.3">The application can set and query Connection Properties on a per-Connection basis. Connection Properties that are not read-only can be set during pre-establishment (see <a href="#selection-props" class="xref">Section 5.2</a>), as well as on connections directly using the SetProperty action: ~~~ Connection.SetProperty(property, value) ~~~</p>
+<p id="rfc.section.9.p.4">At any point, the application can query Connection Properties.  ~~~ ConnectionProperties := Connection.GetProperties() ~~~</p>
+<p id="rfc.section.9.p.5">Depending on the status of the connection, the queried Connection Properties will include different information:</p>
 <p></p>
 
 <ul>
