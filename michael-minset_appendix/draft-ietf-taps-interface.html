@@ -2161,7 +2161,99 @@ Connection -&gt; ConnectionError&lt;&gt;
 <h1 id="rfc.appendix.C">
 <a href="#rfc.appendix.C">Appendix C.</a> <a href="#relationship-to-the-minimal-set-of-transport-services-for-end-systems" id="relationship-to-the-minimal-set-of-transport-services-for-end-systems">Relationship to the Minimal Set of Transport Services for End Systems</a>
 </h1>
-<p><a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a> identifies a minimal set of transport services that end systems should offer. These services make all transport features offered by TCP, MPTCP, UDP, UDP-Lite, SCTP and LEDBAT available that 1) require interaction with the application, and 2) do not get in the way of a possible implementation over TCP or, with limitations, UDP. The following text explains how this minimal set is reflected in the present API.</p>
+<p><a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a> identifies a minimal set of transport services that end systems should offer. These services make all transport features offered by TCP, MPTCP, UDP, UDP-Lite, SCTP and LEDBAT available that 1) require interaction with the application, and 2) do not get in the way of a possible implementation over TCP or, with limitations, UDP. The following text explains how this minimal set is reflected in the present API. For brevity, this uses the list in Section 4.1 of <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>, updated according to the discussion in Section 5 of <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>.</p>
+<p id="rfc.section.C.p.2">[EDITOR&#8217;S NOTE: This is early text. In the future, this section will contain backward references, which we currently avoid because things are still being moved around and names / categorization etc. are changing. Also, clearly, the intention is for the full minset to be reflected by the API at some point.]</p>
+<p id="rfc.section.C.p.3">[EDITOR&#8217;S NOTE: The categories below reflect the categorization in <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>, not in the current document. They will be removed in a future version.]</p>
+<p id="rfc.section.C.p.4">Establishment:</p>
+<p></p>
+
+<dl>
+<dt>Connect:</dt>
+<dd style="margin-left: 8">&#8220;Initiate&#8221; Action.</dd>
+<dt>Specify number of attempts and/or timeout for the first establishment message:</dt>
+<dd style="margin-left: 8">TODO.</dd>
+<dt>Disable MPTCP:</dt>
+<dd style="margin-left: 8">TODO.</dd>
+<dt>Hand over a message to reliably transfer (possibly multiple times) before connection establishment:</dt>
+<dd style="margin-left: 8">&#8220;InitiateWithIdempotentSend&#8221; Action.</dd>
+</dl>
+<p id="rfc.section.C.p.6">Hand over a message to reliably transfer during connection establishment:</p>
+<p id="rfc.section.C.p.7">Listen:</p>
+<p></p>
+
+<dl>
+<dt>Maintenance:</dt>
+<dd style="margin-left: 8">Change timeout for aborting connection (using retransmit limit time value)</dd>
+<dt></dt>
+<dd style="margin-left: 8">Suggest timeout to the peer</dd>
+<dt></dt>
+<dd style="margin-left: 8">Notification of Excessive Retransmissions (early warning below abortion threshold)</dd>
+<dt></dt>
+<dd style="margin-left: 8">Notification of ICMP error message arrival</dd>
+<dt></dt>
+<dd style="margin-left: 8">Choose a scheduler to operate between streams of an association</dd>
+<dt></dt>
+<dd style="margin-left: 8">Configure priority or weight for a scheduler</dd>
+<dt></dt>
+<dd style="margin-left: 8">Disable checksum when sending</dd>
+<dt></dt>
+<dd style="margin-left: 8">Disable checksum requirement when receiving</dd>
+<dt></dt>
+<dd style="margin-left: 8">Specify checksum coverage used by the sender</dd>
+<dt></dt>
+<dd style="margin-left: 8">Specify minimum checksum coverage required by receiver</dd>
+<dt>Specify DF field:</dt>
+<dd style="margin-left: 8">&#8220;Singular Transmission&#8221; property.</dd>
+<dt>Get max. transport-message size that may be sent using a non-fragmented IP packet from the configured interface:</dt>
+<dd style="margin-left: 8">&#8220;Maximum Message size before fragmentation or segmentation&#8221; property.</dd>
+<dt>Get max. transport-message size that may be received from the configured interface:</dt>
+<dd style="margin-left: 8">&#8220;Maximum Message size on receive&#8221; property.</dd>
+<dt></dt>
+<dd style="margin-left: 8">Obtain ECN field:</dd>
+<dt>&#8220;Specify DSCP field&#8221;, &#8220;Disable Nagle algorithm&#8221;, &#8220;Enable and configure a &#8216;Low Extra Delay Background Transfer&#8217;&#8221;:</dt>
+<dd style="margin-left: 8">As suggested in Section 5.5 of <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>, these transport features are collectively offered via the &#8220;Capacity profile&#8221; property.</dd>
+<dt>Termination:</dt>
+<dd style="margin-left: 8">Close after reliably delivering all remaining data, causing an event informing the application on the other side</dd>
+<dt></dt>
+<dd style="margin-left: 8">Abort without delivering remaining data, causing an event informing the application on the other side</dd>
+<dt></dt>
+<dd style="margin-left: 8">Abort without delivering remaining data, not causing an event informing the application on the other side</dd>
+<dt></dt>
+<dd style="margin-left: 8">Timeout event when data could not be delivered for too long</dd>
+<dt>Sending Data:</dt>
+<dd style="margin-left: 8">Reliably transfer data, with congestion control</dd>
+<dt></dt>
+<dd style="margin-left: 8">Reliably transfer a message, with congestion control</dd>
+<dt></dt>
+<dd style="margin-left: 8">Unreliably transfer a message</dd>
+<dt></dt>
+<dd style="margin-left: 8">Configurable Message Reliability</dd>
+<dt></dt>
+<dd style="margin-left: 8">Ordered message delivery (potentially slower than unordered)</dd>
+<dt></dt>
+<dd style="margin-left: 8">Unordered message delivery (potentially faster than ordered)</dd>
+<dt></dt>
+<dd style="margin-left: 8">Request not to bundle messages</dd>
+<dt></dt>
+<dd style="margin-left: 8">Request not to delay the acknowledgement (SACK) of a message</dd>
+<dt>Receiving Data:</dt>
+<dd style="margin-left: 8">Receive data (with no message delimiting)</dd>
+<dt>Receive a message:</dt>
+<dd style="margin-left: 8">&#8220;Received&#8221; Event. Section 5.1 of <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a> discusses how messages can be obtained from a bytestream in case of implementation over TCP. Here, this is dealt with by Framers and Deframers.</dd>
+<dt>Information about partial message arrival:</dt>
+<dd style="margin-left: 8">&#8220;ReceivedPartial&#8221; Event.</dd>
+</dl>
+<p id="rfc.section.C.p.9">Errors:</p>
+<p></p>
+
+<dl>
+<dt>Failures that are associated with a specific call to in the &#8220;Sending Data&#8221; category.</dt>
+<dd style="margin-left: 8">Notification of send failures</dd>
+<dt>Notification that the stack has no more user data to send:</dt>
+<dd style="margin-left: 8">Applications can obtain this information via the Sent Event.</dd>
+<dt></dt>
+<dd style="margin-left: 8">Notification to a receiver that a partial message delivery has been aborted</dd>
+</dl>
 <h1 id="rfc.authors"><a href="#rfc.authors">Authors' Addresses</a></h1>
 <div class="avoidbreak">
   <address class="vcard">
