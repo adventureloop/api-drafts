@@ -103,7 +103,7 @@ Table of Contents
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .  20
    7.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  21
    8.  Informative References  . . . . . . . . . . . . . . . . . . .  21
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  22
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  23
 
 
 
@@ -116,20 +116,21 @@ Internet-Draft              TAPS Architecture               October 2018
 
 1.  Introduction
 
-   Many APIs to perform transport networking have been deployed, perhaps
-   the most widely known and imitated being the BSD socket() [POSIX]
-   interface.  The names and functions between these APIs are not
-   consistent, and vary depending on the protocol being used.  For
-   example, sending and receiving on a stream of data is conceptually
-   the same between operating on an unencrypted Transmission Control
-   Protocol (TCP) stream and operating on an encrypted Transport Layer
-   Security (TLS) [I-D.ietf-tls-tls13] stream over TCP, but applications
-   cannot use the same socket send() and recv() calls on top of both
-   kinds of connections.  Similarly, terminology for the implementation
-   of protocols offering transport services vary based on the context of
-   the protocols themselves.  This variety can lead to confusion when
-   trying to understand the similarities and differences between
-   protocols, and how applications can use them effectively.
+   Many application programming interfaces (APIs) to perform transport
+   networking have been deployed, perhaps the most widely known and
+   imitated being the BSD socket() [POSIX] interface.  The names and
+   functions between these APIs are not consistent, and vary depending
+   on the protocol being used.  For example, sending and receiving on a
+   stream of data is conceptually the same between operating on an
+   unencrypted Transmission Control Protocol (TCP) stream and operating
+   on an encrypted Transport Layer Security (TLS) [I-D.ietf-tls-tls13]
+   stream over TCP, but applications cannot use the same socket send()
+   and recv() calls on top of both kinds of connections.  Similarly,
+   terminology for the implementation of protocols offering transport
+   services vary based on the context of the protocols themselves.  This
+   variety can lead to confusion when trying to understand the
+   similarities and differences between protocols, and how applications
+   can use them effectively.
 
    The goal of the Transport Services architecture is to provide a
    common, flexible, and reusable interface for transport protocols.  As
@@ -149,7 +150,6 @@ Internet-Draft              TAPS Architecture               October 2018
    socket API, which provides the interface to the implementations of
    UDP and TCP (typically implemented in the system's kernel), which in
    turn send data over the available network layer interfaces.
-
 
 
 
@@ -358,10 +358,11 @@ Internet-Draft              TAPS Architecture               October 2018
    multiple sets of protocols and protocol features, it can use these
    protocols across multiple paths that may have different performance
    and functional characteristics, and it can communicate with different
-   Remote Endpoints to optimize performance.  Beyond these, if the API
-   for the system remains the same over time, new protocols and features
-   may be added to the system's implementation without requiring changes
-   in applications for adoption.
+   Remote Endpoints to optimize performance, robustness to failure, or
+   some other metric.  Beyond these, if the API for the system remains
+   the same over time, new protocols and features may be added to the
+   system's implementation without requiring changes in applications for
+   adoption.
 
    The following considerations were used in the design of this
    architecture.
@@ -381,11 +382,10 @@ Internet-Draft              TAPS Architecture               October 2018
 
 3.2.  Access to Specialized Features
 
-   Since applications will often need to control fine-grained details of
-   transport protocols to optimize their behavior and ensure
-   compatibility with remote peers, a Transport Services system also
-   needs to allow more specialized protocol features to be used.  The
-
+   There are applications that will need to control fine-grained details
+   of transport protocols to optimize their behavior and ensure
+   compatibility with remote peers,. A Transport Services system will
+   therefore also needs to allow more specialized protocol features to
 
 
 
@@ -394,17 +394,17 @@ Pauly, et al.            Expires April 19, 2019                 [Page 7]
 Internet-Draft              TAPS Architecture               October 2018
 
 
-   interface for these specialized options should be exposed differently
-   from the common options to ensure flexibility.
+   be used.  The interface for these specialized options should be
+   exposed differently from the common options to ensure flexibility.
 
-   A specialized feature may be required by an application only when
+   A specialized feature could be required by an application only when
    using a specific protocol, and not when using others.  For example,
-   if an application is using UDP, it may require control over the
+   if an application is using UDP, it could require control over the
    checksum or fragmentation behavior for UDP; if it used a protocol to
    frame its data over a byte stream like TCP, it would not need these
    options.  In such cases, the API should expose the features in such a
    way that they take effect when a particular protocol is selected, but
-   do not imply that only that protocol may be used if there are
+   do not imply that only that protocol could be used if there are
    equivalent options.
 
    Other specialized features, however, may be strictly required by an
@@ -437,11 +437,11 @@ Internet-Draft              TAPS Architecture               October 2018
    UDP transport, but it is possible that some very constrained devices
    might not have, for example, a full TCP implementation.
 
-   In order to preserve flexibility and compatibility with future
-   protocols, top-level features in the Transport Services API should
-   avoid referencing particular transport protocols.  Mappings of these
-   API features in the Implementation document, on the other hand, must
-   explain the ramifications of each feature on existing protocols.  It
+   To preserve flexibility and compatibility with future protocols, top-
+   level features in the Transport Services API should avoid referencing
+   particular transport protocols.  The mappings of these API features
+   to specific implementations of each feature is explained in the
+   [TAPS-IMPL], which also explain the implications of the feature
 
 
 
@@ -450,12 +450,13 @@ Pauly, et al.            Expires April 19, 2019                 [Page 8]
 Internet-Draft              TAPS Architecture               October 2018
 
 
-   is expected that the Implementation document will be updated and
-   supplemented as new protocols and protocol features are developed.
+   provided by existing protocols.  It is expected that this document
+   will be updated and supplemented as new protocols and protocol
+   features are developed.
 
    It is important to note that neither the Transport Services API nor
    the Implementation document defines new protocols that require any
-   changes on remote hosts.  The Transport Services system must be
+   changes to a remote host.  The Transport Services system must be
    deployable on one side only, as a way to allow an application to make
    better use of available capabilities on a system and protocol
    features that may be supported by peers across the network.
@@ -478,7 +479,6 @@ Internet-Draft              TAPS Architecture               October 2018
 
    The following diagram summarizes the top-level concepts in the
    architecture and how they relate to one another.
-
 
 
 
@@ -1216,6 +1216,24 @@ Internet-Draft              TAPS Architecture               October 2018
               DOI 10.17487/RFC8095, March 2017,
               <https://www.rfc-editor.org/info/rfc8095>.
 
+   [TAPS-IMPL]
+              Brunstrom, A., Pauly, T., Enghardt, T., Grinnemo, K.,
+              Jones, T., Tiesel, P., Perkins, C., and M. Welzl,
+              "Implementing Interfaces to Transport Services", draft-
+              ietf-taps-impl-01 (work in progress), July 2018.
+
+
+
+
+
+
+
+
+Pauly, et al.            Expires April 19, 2019                [Page 22]
+
+Internet-Draft              TAPS Architecture               October 2018
+
+
 Authors' Addresses
 
    Tommy Pauly (editor)
@@ -1225,13 +1243,6 @@ Authors' Addresses
    United States of America
 
    Email: tpauly@apple.com
-
-
-
-
-Pauly, et al.            Expires April 19, 2019                [Page 22]
-
-Internet-Draft              TAPS Architecture               October 2018
 
 
    Brian Trammell (editor)
@@ -1271,6 +1282,14 @@ Internet-Draft              TAPS Architecture               October 2018
    Email: csp@csperkins.org
 
 
+
+
+
+Pauly, et al.            Expires April 19, 2019                [Page 23]
+
+Internet-Draft              TAPS Architecture               October 2018
+
+
    Philipp S. Tiesel
    TU Berlin
    Marchstrasse 23
@@ -1280,16 +1299,6 @@ Internet-Draft              TAPS Architecture               October 2018
    Email: philipp@inet.tu-berlin.de
 
 
-
-
-
-
-
-Pauly, et al.            Expires April 19, 2019                [Page 23]
-
-Internet-Draft              TAPS Architecture               October 2018
-
-
    Chris Wood
    Apple Inc.
    One Apple Park Way
@@ -1297,15 +1306,6 @@ Internet-Draft              TAPS Architecture               October 2018
    United States of America
 
    Email: cawood@apple.com
-
-
-
-
-
-
-
-
-
 
 
 
