@@ -371,6 +371,7 @@ ul.toc li {
 <link href="#rfc.appendix.A.1.7" rel="Chapter" title="A.1.7 Send or Receive Bit-rate">
 <link href="#rfc.appendix.A.1.8" rel="Chapter" title="A.1.8 Cost Preferences">
 <link href="#rfc.appendix.B" rel="Chapter" title="B Sample API definition in Go">
+<link href="#rfc.appendix.C" rel="Chapter" title="C Relationship to the Minimal Set of Transport Services for End Systems">
 <link href="#rfc.authors" rel="Chapter">
 
 
@@ -379,7 +380,7 @@ ul.toc li {
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-10-16" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-10-17" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -403,7 +404,7 @@ ul.toc li {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: April 19, 2019</td>
+<td class="left">Expires: April 20, 2019</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -456,7 +457,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">October 16, 2018</td>
+<td class="right">October 17, 2018</td>
 </tr>
 
     	
@@ -472,7 +473,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on April 19, 2019.</p>
+<p>This Internet-Draft will expire on April 20, 2019.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -661,6 +662,8 @@ ul.toc li {
 <li>A.1.8.   <a href="#rfc.appendix.A.1.8">Cost Preferences</a>
 </li>
 </ul></ul><li>Appendix B.   <a href="#rfc.appendix.B">Sample API definition in Go</a>
+</li>
+<li>Appendix C.   <a href="#rfc.appendix.C">Relationship to the Minimal Set of Transport Services for End Systems</a>
 </li>
 <li><a href="#rfc.authors">Authors' Addresses</a>
 </li>
@@ -1846,6 +1849,47 @@ Connection -&gt; ConnectionError&lt;&gt;
 <a href="#rfc.appendix.B">Appendix B.</a> <a href="#appendix-api-sketch" id="appendix-api-sketch">Sample API definition in Go</a>
 </h1>
 <p id="rfc.section.B.p.1">This document defines an abstract interface. To illustrate how this would map concretely into a programming language, an API interface definition in Go is available online at https://github.com/mami-project/postsocket.  Documentation for this API &#8211; an illustration of the documentation an application developer would see for an instance of this interface - is available online at https://godoc.org/github.com/mami-project/postsocket. This API definition will be kept largely in sync with the development of this abstract interface definition.</p>
+<h1 id="rfc.appendix.C">
+<a href="#rfc.appendix.C">Appendix C.</a> <a href="#relationship-to-the-minimal-set-of-transport-services-for-end-systems" id="relationship-to-the-minimal-set-of-transport-services-for-end-systems">Relationship to the Minimal Set of Transport Services for End Systems</a>
+</h1>
+<p><a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a> identifies a minimal set of transport services that end systems should offer. These services make all transport features offered by TCP, MPTCP, UDP, UDP-Lite, SCTP and LEDBAT available that 1) require interaction with the application, and 2) do not get in the way of a possible implementation over TCP or, with limitations, UDP. The following text explains how this minimal set is reflected in the present API. For brevity, this uses the list in Section 4.1 of <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>, updated according to the discussion in Section 5 of <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>.</p>
+<p id="rfc.section.C.p.2">[EDITOR&#8217;S NOTE: This is early text. In the future, this section will contain backward references, which we currently avoid because things are still being moved around and names / categories etc. are changing. Also, clearly, the intention is for the full minset to be reflected by the API at some point.]</p>
+<p></p>
+
+<ul>
+<li>Connect:<br> &#8220;Initiate&#8221; Action.</li>
+<li>Listen:<br> &#8220;Listen&#8221; Action.</li>
+<li>Specify number of attempts and/or timeout for the first establishment message:<br> TODO.</li>
+<li>Disable MPTCP:<br> TODO.</li>
+<li>Hand over a message to reliably transfer (possibly multiple times) before connection establishment:<br> &#8220;InitiateWithIdempotentSend&#8221; Action.</li>
+<li>Hand over a message to reliably transfer during connection establishment:<br> TODO.</li>
+<li>Change timeout for aborting connection (using retransmit limit or time value):<br> &#8220;Timeout for aborting Connection&#8221; property, using a time value in seconds.</li>
+<li>Timeout event when data could not be delivered for too long:<br> TODO: this should probably be covered by the &#8220;ConnectionError&#8221; Event, but the text above it currently reads: &#8220;&#8230;can inform the application that the other side has aborted the Connection&#8221;. In this case, it is the local side.</li>
+<li>Suggest timeout to the peer:<br> &#8220;Suggest a timeout to the Remote Endpoint&#8221; and &#8220;Abort timeout to suggest to the Remote Endpoint&#8221; Selection property.  [EDITOR&#8217;S NOTE: For discussion of this option, see https://github.com/taps-api/drafts/issues/109].</li>
+<li>Notification of Excessive Retransmissions (early warning below abortion threshold):<br> &#8220;Notification of excessive retransmissions&#8221; property.</li>
+<li>Notification of ICMP error message arrival:<br> &#8220;Notification of ICMP soft error message arrival&#8221; property.</li>
+<li>Choose a scheduler to operate between streams of an association:<br> &#8220;Connection group transmission scheduler&#8221; property.</li>
+<li>Configure priority or weight for a scheduler:<br> &#8220;Niceness (Connection)&#8221; property.</li>
+<li>&#8220;Specify checksum coverage used by the sender&#8221; and &#8220;Disable checksum when sending&#8221;:<br> &#8220;Corruption Protection Length&#8221; property (value 0 to disable).</li>
+<li>&#8220;Specify minimum checksum coverage required by receiver&#8221; and &#8220;Disable checksum requirement when receiving&#8221;:<br> &#8220;Required minimum coverage of the checksum for receiving&#8221; property (value 0 to disable).</li>
+<li>&#8220;Specify DF&#8221; field and &#8220;Request not to bundle messages:&#8221;<br> The &#8220;Singular Transmission&#8221; Message property combines both of these requests, i.e. if a request not to bundle messages is made, this also turns off DF in case of protocols that allow this (only UDP and UDP-Lite, which cannot bundle messages anyway).</li>
+<li>Get max. transport-message size that may be sent using a non-fragmented IP packet from the configured interface:<br> &#8220;Maximum Message size before fragmentation or segmentation&#8221; property.</li>
+<li>Get max. transport-message size that may be received from the configured interface:<br> &#8220;Maximum Message size on receive&#8221; property.</li>
+<li>Obtain ECN field:<br> &#8220;ECN&#8221; is a defined metadata value as part of the Message Receive Context.</li>
+<li>&#8220;Specify DSCP field&#8221;, &#8220;Disable Nagle algorithm&#8221;, &#8220;Enable and configure a &#8216;Low Extra Delay Background Transfer&#8217;&#8221;:<br> As suggested in Section 5.5 of <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>, these transport features are collectively offered via the &#8220;Capacity profile&#8221; property.</li>
+<li>Close after reliably delivering all remaining data, causing an event informing the application on the other side:<br> This is offered by the &#8220;Close&#8221; Action with slightly changed semantics in line with the discussion in Section 5.2 of <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>.</li>
+<li>&#8220;Abort without delivering remaining data, causing an event informing the application on the other side&#8221; and &#8220;Abort without delivering remaining data, not causing an event informing the application on the other side&#8221;:<br> This is offered by the &#8220;Abort&#8221; action without promising that this is signaled to the other side. If it is, a &#8220;ConnectionError&#8221; Event will fire at the peer.</li>
+<li>&#8220;Reliably transfer data, with congestion control&#8221;, &#8220;Reliably transfer a message, with congestion control&#8221; and &#8220;Unreliably transfer a message&#8221;:<br> Reliability is controlled via the &#8220;Reliable Data Transfer (Message)&#8221; Message property. Transmitting data without delimiters is done by not using a Framer. The choice of congestion control is provided via the &#8220;Congestion control&#8221; property.</li>
+<li>Configurable Message Reliability:<br> The &#8220;Lifetime&#8221; Message Property implements a time-based way to configure message reliability.</li>
+<li>&#8220;Ordered message delivery (potentially slower than unordered)&#8221; and &#8220;Unordered message delivery (potentially faster than ordered)&#8221;:<br> The two transport features are controlled via the Message property &#8220;Ordered&#8221;.</li>
+<li>Request not to delay the acknowledgement (SACK) of a message:<br> Should the protocol support it, this is one of the transport features the transport system can use when an application uses the Capacity Profile Property with value &#8220;Low Latency/Interactive&#8221;.</li>
+<li>Receive data (with no message delimiting):<br> &#8220;Received&#8221; Event without using a Deframer.</li>
+<li>Receive a message:<br> &#8220;Received&#8221; Event. Section 5.1 of <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a> discusses how messages can be obtained from a bytestream in case of implementation over TCP. Here, this is dealt with by Framers and Deframers.</li>
+<li>Information about partial message arrival:<br> &#8220;ReceivedPartial&#8221; Event.</li>
+<li>Notification of send failures:<br> &#8220;Expired&#8221; and &#8220;SendError&#8221; Events.</li>
+<li>Notification that the stack has no more user data to send:<br> Applications can obtain this information via the &#8220;Sent&#8221; Event.</li>
+<li>Notification to a receiver that a partial message delivery has been aborted:<br> &#8220;ReceiveError&#8221; Event.</li>
+</ul>
 <h1 id="rfc.authors"><a href="#rfc.authors">Authors' Addresses</a></h1>
 <div class="avoidbreak">
   <address class="vcard">
