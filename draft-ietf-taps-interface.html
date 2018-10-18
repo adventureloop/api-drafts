@@ -286,6 +286,7 @@ ul.toc li {
 <link href="#rfc.section.3" rel="Chapter" title="3 Interface Design Principles">
 <link href="#rfc.section.4" rel="Chapter" title="4 API Summary">
 <link href="#rfc.section.4.1" rel="Chapter" title="4.1 Transport Properties">
+<link href="#rfc.section.4.2" rel="Chapter" title="4.2 Scope of the Interface Definition">
 <link href="#rfc.section.5" rel="Chapter" title="5 Pre-Establishment Phase">
 <link href="#rfc.section.5.1" rel="Chapter" title="5.1 Specifying Endpoints">
 <link href="#rfc.section.5.2" rel="Chapter" title="5.2 Specifying Transport Properties">
@@ -492,6 +493,8 @@ ul.toc li {
 <li>4.   <a href="#rfc.section.4">API Summary</a>
 </li>
 <ul><li>4.1.   <a href="#rfc.section.4.1">Transport Properties</a>
+</li>
+<li>4.2.   <a href="#rfc.section.4.2">Scope of the Interface Definition</a>
 </li>
 </ul><li>5.   <a href="#rfc.section.5">Pre-Establishment Phase</a>
 </li>
@@ -713,7 +716,7 @@ Object -&gt; Event&lt;&gt;
 Action(parameter, parameter, ...) / Event&lt;parameter, parameter, ...&gt;
 </pre>
 <p id="rfc.section.2.p.8">Actions associated with no Object are Actions on the abstract interface itself; they are equivalent to Actions on a per-application global context.</p>
-<p id="rfc.section.2.p.9">How these abstract concepts map into concrete implementations of this API in a given language on a given platform is largely dependent on the features of the language and the platform. Actions could be implemented as functions or method calls, for instance, and Events could be implemented via callback passing or other asynchronous calling conventions. The method for registering callbacks and handlers is left as an implementation detail, with the caveat that the interface for receiving Messages must require the application to invoke the Connection.Receive() Action once per Message to be received (see <a href="#receiving" class="xref">Section 8</a>).</p>
+<p id="rfc.section.2.p.9">How these abstract concepts map into concrete implementations of this API in a given language on a given platform is largely dependent on the features of the language and the platform. Actions could be implemented as functions or method calls, for instance, and Events could be implemented via callbacks, communicating sequential processes, or other asynchronous calling conventions.  The method for dispatching and handling Events is left as an implementation detail, with the caveat that the interface for receiving Messages must require the application to invoke the Connection.Receive() Action once per Message to be received (see <a href="#receiving" class="xref">Section 8</a>).</p>
 <p id="rfc.section.2.p.10">This specification treats Events and errors similarly. Errors, just as any other Events, may occur asynchronously in network applications. However, it is recommended that implementations of this interface also return errors immediately, according to the error handling idioms of the implementation platform, for errors which can be immediately detected, such as inconsistency in Transport Properties.</p>
 <p id="rfc.section.2.p.11">The key words &#8220;MUST&#8221;, &#8220;MUST NOT&#8221;, &#8220;REQUIRED&#8221;, &#8220;SHALL&#8221;, &#8220;SHALL NOT&#8221;, &#8220;SHOULD&#8221;, &#8220;SHOULD NOT&#8221;, &#8220;RECOMMENDED&#8221;, &#8220;NOT RECOMMENDED&#8221;, &#8220;MAY&#8221;, and &#8220;OPTIONAL&#8221; in this document are to be interpreted as described in BCP 14 <a href="#RFC2119" class="xref">[RFC2119]</a> <a href="#RFC8174" class="xref">[RFC8174]</a> when, and only when, they appear in all capitals, as shown here.</p>
 <h1 id="rfc.section.3">
@@ -724,16 +727,17 @@ Action(parameter, parameter, ...) / Event&lt;parameter, parameter, ...&gt;
 
 <ul>
 <li>A single interface to a variety of transport protocols to be used in a variety of application design patterns, independent of the properties of the application and the Protocol Stacks that will be used at runtime, such that  all common specialized features of these protocol stacks are made available to the application as necessary in a transport-independent way, to enable applications written to a single API to make use of transport protocols in terms of the features they provide;</li>
-<li>Explicit support for security properties as first-order transport features, and for long-term caching of cryptographic identities and parameters for associations among endpoints;</li>
-<li>Asynchronous Connection establishment, transmission, and reception, allowing most application interactions with the transport layer to be Event-driven, in line with developments in modern platforms and programming languages;</li>
-<li>Explicit support for multistreaming and multipath transport protocols, and the grouping of related Connections into Connection Groups through cloning of Connections, to allow applications to take full advantage of new transport protocols supporting these features; and</li>
-<li>Atomic transmission of data, using application-assisted framing and deframing where the underlying transport does not provide these.</li>
+<li>Message- as opposed to stream-orientation, using application-assisted framing and deframing where the underlying transport does not provide these;</li>
+<li>Asynchronous Connection establishment, transmission, and reception, allowing concurrent operations during establishment and supporting event-driven application interactions with the transport layer, in line with developments in modern platforms and programming languages;</li>
+<li>Explicit support for security properties as first-order transport features, and for long-term caching of cryptographic identities and parameters for associations among endpoints; and</li>
+<li>Explicit support for multistreaming and multipath transport protocols, and the grouping of related Connections into Connection Groups through cloning of Connections, to allow applications to take full advantage of new transport protocols supporting these features.</li>
 </ul>
 <h1 id="rfc.section.4">
 <a href="#rfc.section.4">4.</a> <a href="#api-summary" id="api-summary">API Summary</a>
 </h1>
-<p id="rfc.section.4.p.1">The Transport Services Interface is the basic common abstract application programming interface to the Transport Services Architecture defined in <a href="#I-D.ietf-taps-arch" class="xref">[I-D.ietf-taps-arch]</a>. An application primarily interacts with this interface through two Objects, Preconnections and Connections. A Preconnection represents a set of properties and constraints on the selection and configuration of paths and protocols to establish a Connection with a remote endpoint. A Connection represents a transport Protocol Stack on which data can be sent to and/or received from a remote endpoint (i.e., depending on the kind of transport, connections can be bi-directional or unidirectional). Connections can be created from Preconnections in three ways: by initiating the Preconnection (i.e., actively opening, as in a client), through listening on the Preconnection (i.e., passively opening, as in a server), or rendezvousing on the Preconnection (i.e. peer to peer establishment).</p>
-<p id="rfc.section.4.p.2">Once a Connection is established, data can be sent on it in the form of Messages. The interface supports the preservation of message boundaries both via explicit Protocol Stack support, and via application support through a deframing callback which finds message boundaries in a stream. Messages are received asynchronously through a callback registered by the application.  Errors and other notifications also happen asynchronously on the Connection.</p>
+<p id="rfc.section.4.p.1">The Transport Services Interface is the basic common abstract application programming interface to the Transport Services Architecture defined in <a href="#I-D.ietf-taps-arch" class="xref">[I-D.ietf-taps-arch]</a>.</p>
+<p id="rfc.section.4.p.2">An application primarily interacts with this interface through two Objects, Preconnections and Connections. A Preconnection represents a set of properties and constraints on the selection and configuration of paths and protocols to establish a Connection with a remote endpoint. A Connection represents a transport Protocol Stack on which data can be sent to and/or received from a remote endpoint (i.e., depending on the kind of transport, connections can be bi-directional or unidirectional). Connections can be created from Preconnections in three ways: by initiating the Preconnection (i.e., actively opening, as in a client), through listening on the Preconnection (i.e., passively opening, as in a server), or rendezvousing on the Preconnection (i.e.  peer to peer establishment).</p>
+<p id="rfc.section.4.p.3">Once a Connection is established, data can be sent on it in the form of Messages. The interface supports the preservation of message boundaries both via explicit Protocol Stack support, and via application support through a deframing callback which finds message boundaries in a stream. Messages are received asynchronously through a callback registered by the application.  Errors and other notifications also happen asynchronously on the Connection.</p>
 <p><a href="#pre-establishment" class="xref">Section 5</a>, <a href="#establishment" class="xref">Section 6</a>, <a href="#sending" class="xref">Section 7</a>, <a href="#receiving" class="xref">Section 8</a>, and <a href="#termination" class="xref">Section 10</a> describe the details of application interaction with Objects through Actions and Events in each phase of a Connection, following the phases described in <a href="#I-D.ietf-taps-arch" class="xref">[I-D.ietf-taps-arch]</a>.</p>
 <h1 id="rfc.section.4.1">
 <a href="#rfc.section.4.1">4.1.</a> <a href="#transport-properties" id="transport-properties">Transport Properties</a>
@@ -748,6 +752,16 @@ Action(parameter, parameter, ...) / Event&lt;parameter, parameter, ...&gt;
 <li>Integer: can take positive or negative numeric values; range and representation is implementation-dependent.</li>
 <li>Enumeration: can take one value of a finite set of values, dependent on the property itself. The representation is implementation dependent; however, implementations MUST provide a method for the application to determine the entire set of possible values for each property.</li>
 <li>Preference: can take one of five values (Prohibit, Avoid, Ignore, Prefer, Require) for the level of preference of a given property during protocol selection; see <a href="#selection-props" class="xref">Section 5.2</a>.</li>
+</ul>
+<h1 id="rfc.section.4.2">
+<a href="#rfc.section.4.2">4.2.</a> <a href="#scope-of-the-interface-definition" id="scope-of-the-interface-definition">Scope of the Interface Definition</a>
+</h1>
+<p id="rfc.section.4.2.p.1">This document defines a language- and platform-independent interface to a Transport Services system. Given the wide variety of languages and language conventions used to write applications that use the transport layer to connect to other applications over the Internet, this independence makes this interface necessarily abstract. While there is no interoperability benefit to tightly defining how the interface be presented to application programmers in diverse platforms, maintaining the &#8220;shape&#8221; of the abstract interface across these platforms reduces the effort for programmers who learn the transport services interface to apply their knowledge in multiple platforms. We therefore make the following recommendations:</p>
+<p></p>
+
+<ul>
+<li>Actions, Events, and Errors in implementations of this interface SHOULD carry the names given for them in the document, subject to capitalization and punctuation conventions in the language of the implementation, unless the implementation itself uses different names for substantially equivalent objects for networking by convention.</li>
+<li>Implementations of this interface SHOULD implement each Selection Property, Connection Property, and Message Context Property specified in this document, exclusive of appendices, even if said implementation is a non-operation, e.g.  because transport protocols implementing a given Property are not available on the platform.</li>
 </ul>
 <h1 id="rfc.section.5">
 <a href="#rfc.section.5">5.</a> <a href="#pre-establishment" id="pre-establishment">Pre-Establishment Phase</a>
