@@ -25,12 +25,15 @@ Expires: June 3, 2019                                         ETH Zurich
 Abstract
 
    This document provides an overview of the architecture of Transport
-   Services, a system for exposing the features of transport protocols
-   to applications.  This architecture serves as a basis for Application
-   Programming Interfaces (APIs) and implementations that provide
-   flexible transport networking services.  It defines the common set of
-   terminology and concepts to be used in more detailed discussion of
-   Transport Services.
+   Services, a model for exposing transport protocol features to
+   applications for network communication.  In contrast to what is
+   provided by most existing Application Programming Interfaces (APIs),
+   it is based on an asynchronous, event-driven interaction pattern; it
+   uses messages for representing data transfer to applications; and it
+   assumes an implementation that can use multiple IP addresses,
+   multiple protocols, multiple paths, and provide multiple application
+   streams.  This document further defines the common set of terminology
+   and concepts to be used in definitions of APIs and implementations.
 
 Status of This Memo
 
@@ -47,9 +50,6 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on June 3, 2019.
-
-
 
 
 
@@ -57,6 +57,8 @@ Pauly, et al.             Expires June 3, 2019                  [Page 1]
 
 Internet-Draft              TAPS Architecture              November 2018
 
+
+   This Internet-Draft will expire on June 3, 2019.
 
 Copyright Notice
 
@@ -104,8 +106,6 @@ Table of Contents
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .  20
    7.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  21
    8.  Informative References  . . . . . . . . . . . . . . . . . . .  21
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  23
-
 
 
 
@@ -113,6 +113,8 @@ Pauly, et al.             Expires June 3, 2019                  [Page 2]
 
 Internet-Draft              TAPS Architecture              November 2018
 
+
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  23
 
 1.  Introduction
 
@@ -137,11 +139,20 @@ Internet-Draft              TAPS Architecture              November 2018
    applications adopt this interface, they will benefit from a wide set
    of transport features that can evolve over time, and ensure that the
    system providing the interface can optimize its behavior based on the
-   application requirements and network conditions.
+   application requirements and network conditions, without requiring a
+   change to the application.  Further, this flexibility does not only
+   enable faster deployment of new feature and protocols, it can also
+   support applications with racing and fallback mechanisms which today
+   usually need to be implemented in each application separately.
 
    This document is developed in parallel with the specification of the
    Transport Services API [I-D.ietf-taps-interface] and Implementation
-   [I-D.ietf-taps-impl] documents.
+   [I-D.ietf-taps-impl] documents.  Although following the Transport
+   Services Architecture does of course not mean that all APIs and
+   implementations have to be identical, agreeing on a common minimal
+   set of features and representing them in a similar fashion improves
+   the ability to easily port applications from one system to the
+   another.
 
 1.1.  Overview
 
@@ -150,17 +161,6 @@ Internet-Draft              TAPS Architecture              November 2018
    socket API, which provides the interface to the implementations of
    UDP and TCP (typically implemented in the system's kernel), which in
    turn send data over the available network layer interfaces.
-
-
-
-
-
-
-
-
-
-
-
 
 
 
