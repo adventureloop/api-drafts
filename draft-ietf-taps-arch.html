@@ -304,7 +304,6 @@ ul.toc li {
 <link href="#rfc.section.4.2.1" rel="Chapter" title="4.2.1 Candidate Gathering">
 <link href="#rfc.section.4.2.2" rel="Chapter" title="4.2.2 Candidate Racing">
 <link href="#rfc.section.4.2.3" rel="Chapter" title="4.2.3 Protocol Stack Equivalence">
-<link href="#rfc.section.4.3" rel="Chapter" title="4.3 Message Framing, Parsing, and Serialization">
 <link href="#rfc.section.5" rel="Chapter" title="5 IANA Considerations">
 <link href="#rfc.section.6" rel="Chapter" title="6 Security Considerations">
 <link href="#rfc.section.7" rel="Chapter" title="7 Acknowledgements">
@@ -458,9 +457,7 @@ ul.toc li {
 </li>
 <li>4.2.3.   <a href="#rfc.section.4.2.3">Protocol Stack Equivalence</a>
 </li>
-</ul><li>4.3.   <a href="#rfc.section.4.3">Message Framing, Parsing, and Serialization</a>
-</li>
-</ul><li>5.   <a href="#rfc.section.5">IANA Considerations</a>
+</ul></ul><li>5.   <a href="#rfc.section.5">IANA Considerations</a>
 </li>
 <li>6.   <a href="#rfc.section.6">Security Considerations</a>
 </li>
@@ -536,7 +533,16 @@ ul.toc li {
 <a href="#rfc.section.1.3">1.3.</a> <a href="#data-transfer-using-messages" id="data-transfer-using-messages">Data Transfer Using Messages</a>
 </h1>
 <p id="rfc.section.1.3.p.1">Sockets provide a message interface for datagram protocols like UDP, but provide an unstructured stream abstraction for TCP. While TCP does indeed provide the ability to send and receive data as streams, most applications need to interpret structure within these streams. HTTP/1.1 uses character delimiters to segment messages over a stream; TLS record headers carry a version, content type, and length; and HTTP/2 uses frames to segment its headers and bodies.</p>
-<p id="rfc.section.1.3.p.2">The Transport Services API respresents data as messages, so that it more closely matches the way applications use the network. Messages seamlessly work with transport protocols that support datagrams or records, but can also be used over a stream by defining the application-layer framing being used <a href="#framing" class="xref">Section 4.3</a>.</p>
+<p id="rfc.section.1.3.p.2">The Transport Services API respresents data as messages, so that it more closely matches the way applications use the network. Messages seamlessly work with transport protocols that support datagrams or records, but can also be used over a stream by defining an application-layer framer to use <a href="#datatransfer" class="xref">Section 4.1.4</a>. When framing protocols are placed on top of unstructured streams, the messages used in the API represent the framed messages within the stream. In the absence of a framer, protocols that deal only in byte streams, such as TCP, represent their data in each direction as a single, long message.</p>
+<p id="rfc.section.1.3.p.3">Providing a message-based abstraction provides many benefits, such as:</p>
+<p></p>
+
+<ul>
+<li>the ability to associate deadlines with messages, for applications that care about timing;</li>
+<li>the ability to provide control of reliability, choosing which messages to retransmit in the event of packet loss, and how best to make use of the data that arrived;</li>
+<li>the ability to manage dependencies between messages, when the transport system could decide to not deliver a message, either following packet loss or because it has missed a deadline. In particular, this can avoid (re-)sending data that relies on a previous transmission that was never received.</li>
+</ul>
+<p id="rfc.section.1.3.p.5">Allowing applications to interact with messages is backwards-compatible with existings protocols and APIs, as it does not change the wire format of any protocol. Instead, it gives the protocol stack additional information to allow it to make better use of modern transport services, while simplifying the application&#8217;s role in parsing data.</p>
 <h1 id="rfc.section.1.4">
 <a href="#rfc.section.1.4">1.4.</a> <a href="#flexibile-implementation" id="flexibile-implementation">Flexibile Implementation</a>
 </h1>
@@ -713,6 +719,7 @@ ul.toc li {
 <li>Message: A Message object is a unit of data that can be represented as bytes that can be transferred between two systems over a transport connection. The bytes within a Message are assumed to be ordered within the Message. If an application does not care about the order in which a peer receives two distinct spans of bytes, those spans of bytes are considered independent Messages. If a received Message is incomplete or corrupted, it might or might not be usable by certain applications. Boundaries of a Message might or might not be understood or transmitted by transport protocols. Specifically, what one application considers to be two Messages sent on a stream-based transport can be treated as a single Message by the application on the other side.</li>
 <li>Send: The action to transmit a Message or partial Message over a Connection to the remote system. The interface to Send MAY include options specific to how the Message&#8217;s content is to be sent. Status of the Send operation can be delivered back to the application in an event (<a href="#events" class="xref">Section 4.1.5</a>).</li>
 <li>Receive: An action that indicates that the application is ready to asynchronously accept a Message over a Connection from a remote system, while the Message content itself will be delivered in an event (<a href="#events" class="xref">Section 4.1.5</a>). The interface to Receive MAY include options specific to the Message that is to be delivered to the application.</li>
+<li>Framer: A Framer is a data translation layer that can be added to a Connection to define how application-level Messages are transmitted over a transport protocol. This is particularly relevant for protocols that otherwise present unstructured streams, such as TCP.</li>
 </ul>
 <h1 id="rfc.section.4.1.5">
 <a href="#rfc.section.4.1.5">4.1.5.</a> <a href="#events" id="events">Event Handling</a>
@@ -784,20 +791,6 @@ ul.toc li {
 <li>Both stacks MUST offer the same transport services, as required by the application. For example, if an application specifies that it requires reliable transmission of data, then a Protocol Stack using UDP without any reliability layer on top would not be allowed to replace a Protocol Stack using TCP. However, if the application does not require reliability, then a Protocol Stack that adds unnecessary reliability might be allowed as an equivalent Protocol Stack as long as it does not conflict with any other application-requested properties.</li>
 <li>Both stacks MUST offer the same security properties. The inclusion of transport security protocols <a href="#I-D.ietf-taps-transport-security" class="xref">[I-D.ietf-taps-transport-security]</a> in a Protocol Stack adds additional restrictions to Protocol Stack equivalence. Security features and properties, such as cryptographic algorithms, peer authentication, and identity privacy vary across security protocols, and across versions of security protocols. Protocol equivalence ought not to be assumed for different protocols or protocol versions, even if they offer similar application configuration options. To ensure that security protocols are not incorrectly swapped, Transport Services systems SHOULD only automatically generate equivalent Protocol Stacks when the transport security protocols within the stacks are identical. Specifically, a transport system would consider protocols identical only if they are of the same type and version. For example, the same version of TLS running over two different transport protocol stacks are considered equivalent, whereas TLS 1.2 and TLS 1.3 <a href="#I-D.ietf-tls-tls13" class="xref">[I-D.ietf-tls-tls13]</a> are not considered equivalent.</li>
 </ol>
-<h1 id="rfc.section.4.3">
-<a href="#rfc.section.4.3">4.3.</a> <a href="#framing" id="framing">Message Framing, Parsing, and Serialization</a>
-</h1>
-<p id="rfc.section.4.3.p.1">While some transports expose a byte stream abstraction, most higher level protocols impose some structure onto that byte stream. That is, the higher level protocol operates in terms of messages, protocol data units (PDUs), rather than using unstructured sequences of bytes, with each message being processed in turn.  Protocols are specified in terms of state machines acting on semantic messages, with parsing the byte stream into messages being a necessary annoyance, rather than a semantic concern.  Accordingly, the Transport Services architecture exposes messages as the primary abstraction.  Protocols that deal only in byte streams, such as TCP, represent their data in each direction as a single, long message.  When framing protocols are placed on top of byte streams, the messages used in the API represent the framed messages within the stream.</p>
-<p id="rfc.section.4.3.p.2">Providing a message-based abstraction also provides:</p>
-<p></p>
-
-<ul>
-<li>the ability to associate deadlines with messages, for transports that care about timing;</li>
-<li>the ability to provide control of reliability, choosing what messages to retransmit in the event of packet loss, and how best to make use of the data that arrived;</li>
-<li>the ability to manage dependencies between messages, when the transport system could decide to not deliver a message, either following packet loss or because it has missed a deadline. In particular, this can avoid (re-)sending data that relies on a previous transmission that was never received.</li>
-</ul>
-<p id="rfc.section.4.3.p.4">This requires explicit message boundaries and application-level framing of messages. Once a message is passed to the transport, it cannot be cancelled or paused, but prioritization as well as lifetime and retransmission management will provide the protocol stack with all needed information to send the messages as quickly as possible without blocking transmission unnecessarily. The transport services architecture facilitates this by handling messages, with known identity (sequence numbers, in the simple case), lifetimes, niceness, and antecedents.</p>
-<p id="rfc.section.4.3.p.5">Transport protocols such as UDP and SCTP provide a message-oriented API that has similar features to those described.  Other transports, such as TCP, do not.  To support a message-oriented API, while still being compatible with stream-based transport protocols, implementations of the transport services architecture should provide APIs for framing and de-framing messages.  That is, we push message framing down into the transport services API, allowing applications to send and receive complete messages.  This is backwards compatible with existing protocols and APIs, since the wire format of messages does not change, but gives the protocol stack additional information to allow it to make better use of modern transport services.</p>
 <h1 id="rfc.section.5">
 <a href="#rfc.section.5">5.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a>
 </h1>
