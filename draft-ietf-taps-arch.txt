@@ -940,11 +940,11 @@ Internet-Draft              TAPS Architecture              December 2018
 
    o  Path Racing: Path Racing is the act of attempting to establish, or
       scheduling attempts to establish, multiple Protocol Stacks that
-      differ based on a selection from the available Paths.
-
-   o  Endpoint Racing: Endpoint Racing is the act of attempting to
-      establish, or scheduling attempts to establish, multiple Protocol
-      Stacks that differ based on the specific representation of the
+      differ based on a selection from the available Paths.  Since
+      different Paths will have distinct configurations for local
+      addresses and DNS servers, attempts across different Paths will
+      perform separate DNS resolution stepss, which can lead to further
+      racing of the resolved Remote Endpoints.
 
 
 
@@ -954,7 +954,10 @@ Pauly, et al.             Expires June 5, 2019                 [Page 17]
 Internet-Draft              TAPS Architecture              December 2018
 
 
-      Remote Endpoint and the Local Endpoint, such as IP addresses
+   o  Remote Endpoint Racing: Remote Endpoint Racing is the act of
+      attempting to establish, or scheduling attempts to establish,
+      multiple Protocol Stacks that differ based on the specific
+      representation of the Remote Endpoint, such as IP addresses
       resolved from a DNS hostname.
 
 4.2.3.  Protocol Stack Equivalence
@@ -998,10 +1001,7 @@ Internet-Draft              TAPS Architecture              December 2018
        equivalent Protocol Stack as long as it does not conflict with
        any other application-requested properties.
 
-   3.  Both stacks MUST offer the same security properties.  The
-       inclusion of transport security protocols
-       [I-D.ietf-taps-transport-security] in a Protocol Stack adds
-       additional restrictions to Protocol Stack equivalence.  Security
+
 
 
 
@@ -1010,6 +1010,10 @@ Pauly, et al.             Expires June 5, 2019                 [Page 18]
 Internet-Draft              TAPS Architecture              December 2018
 
 
+   3.  Both stacks MUST offer the same security properties.  The
+       inclusion of transport security protocols
+       [I-D.ietf-taps-transport-security] in a Protocol Stack adds
+       additional restrictions to Protocol Stack equivalence.  Security
        features and properties, such as cryptographic algorithms, peer
        authentication, and identity privacy vary across security
        protocols, and across versions of security protocols.  Protocol
@@ -1054,10 +1058,6 @@ Internet-Draft              TAPS Architecture              December 2018
    o  the ability to manage dependencies between messages, when the
       transport system could decide to not deliver a message, either
       following packet loss or because it has missed a deadline.  In
-      particular, this can avoid (re-)sending data that relies on a
-      previous transmission that was never received.
-
-
 
 
 
@@ -1065,6 +1065,9 @@ Pauly, et al.             Expires June 5, 2019                 [Page 19]
 
 Internet-Draft              TAPS Architecture              December 2018
 
+
+      particular, this can avoid (re-)sending data that relies on a
+      previous transmission that was never received.
 
    This requires explicit message boundaries and application-level
    framing of messages.  Once a message is passed to the transport, it
@@ -1111,9 +1114,6 @@ Internet-Draft              TAPS Architecture              December 2018
    (PSKs), key use needs to be validated.  For example, clients ought
    not to use PSK material created for the Encapsulating Security
    Protocol (ESP, part of IPsec) [RFC4303] with QUIC, and clients ought
-   not to use private keys intended for server authentication as a keys
-   for client authentication.
-
 
 
 
@@ -1121,6 +1121,9 @@ Pauly, et al.             Expires June 5, 2019                 [Page 20]
 
 Internet-Draft              TAPS Architecture              December 2018
 
+
+   not to use private keys intended for server authentication as a keys
+   for client authentication.
 
    Moreover, unlike certain transport features such as TCP Fast Open
    (TFO) [RFC7413] or Explicit Congestion Notification (ECN) [RFC3168]
@@ -1164,10 +1167,7 @@ Internet-Draft              TAPS Architecture              December 2018
               Services", draft-ietf-taps-interface-02 (work in
               progress), October 2018.
 
-   [I-D.ietf-taps-minset]
-              Welzl, M. and S. Gjessing, "A Minimal Set of Transport
-              Services for End Systems", draft-ietf-taps-minset-11 (work
-              in progress), September 2018.
+
 
 
 
@@ -1177,6 +1177,11 @@ Pauly, et al.             Expires June 5, 2019                 [Page 21]
 
 Internet-Draft              TAPS Architecture              December 2018
 
+
+   [I-D.ietf-taps-minset]
+              Welzl, M. and S. Gjessing, "A Minimal Set of Transport
+              Services for End Systems", draft-ietf-taps-minset-11 (work
+              in progress), September 2018.
 
    [I-D.ietf-taps-transport-security]
               Pauly, T., Perkins, C., Rose, K., and C. Wood, "A Survey
@@ -1221,11 +1226,6 @@ Internet-Draft              TAPS Architecture              December 2018
               DOI 10.17487/RFC8095, March 2017,
               <https://www.rfc-editor.org/info/rfc8095>.
 
-   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
-              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
-              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
-
-
 
 
 
@@ -1233,6 +1233,10 @@ Pauly, et al.             Expires June 5, 2019                 [Page 22]
 
 Internet-Draft              TAPS Architecture              December 2018
 
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
 
 Authors' Addresses
 
@@ -1273,13 +1277,9 @@ Authors' Addresses
    URI:   http://www.erg.abdn.ac.uk/
 
 
-   Colin Perkins
-   University of Glasgow
-   School of Computing Science
-   Glasgow  G12 8QQ
-   United Kingdom
 
-   Email: csp@csperkins.org
+
+
 
 
 
@@ -1288,6 +1288,15 @@ Authors' Addresses
 Pauly, et al.             Expires June 5, 2019                 [Page 23]
 
 Internet-Draft              TAPS Architecture              December 2018
+
+
+   Colin Perkins
+   University of Glasgow
+   School of Computing Science
+   Glasgow  G12 8QQ
+   United Kingdom
+
+   Email: csp@csperkins.org
 
 
    Philipp S. Tiesel
@@ -1306,15 +1315,6 @@ Internet-Draft              TAPS Architecture              December 2018
    United States of America
 
    Email: cawood@apple.com
-
-
-
-
-
-
-
-
-
 
 
 
