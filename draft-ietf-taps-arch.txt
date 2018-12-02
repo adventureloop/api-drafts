@@ -1102,18 +1102,18 @@ Internet-Draft              TAPS Architecture              December 2018
    The Transport Services architecture does not recommend use of
    specific security protocols or algorithms.  Its goal is to offer ease
    of use for existing protocols by providing a generic security-related
-   interface.  Each provided interface mimics an existing protocol-
-   specific interface provided by supported security protocols.  For
-   example, trust verification callbacks are common parts of TLS APIs.
-   Transport Services APIs will expose similar functionality
+   interface.  Each provided interface translates to an existing
+   protocol-specific interface provided by supported security protocols.
+   For example, trust verification callbacks are common parts of TLS
+   APIs.  Transport Services APIs will expose similar functionality
    [I-D.ietf-taps-transport-security].
+
+   As described above in Section 4.2.3, if a Transport Services system
+   races between two different Protocol Stacks, both MUST use the same
+   security protocols and options.
 
    Clients need to ensure that security APIs are used appropriately.  In
    cases where clients use an interface to provide sensitive keying
-   material, e.g., access to private keys or copies of pre-shared keys
-   (PSKs), key use needs to be validated.  For example, clients ought
-   not to use PSK material created for the Encapsulating Security
-   Protocol (ESP, part of IPsec) [RFC4303] with QUIC, and clients ought
 
 
 
@@ -1122,6 +1122,10 @@ Pauly, et al.             Expires June 5, 2019                 [Page 20]
 Internet-Draft              TAPS Architecture              December 2018
 
 
+   material, e.g., access to private keys or copies of pre-shared keys
+   (PSKs), key use needs to be validated.  For example, clients ought
+   not to use PSK material created for the Encapsulating Security
+   Protocol (ESP, part of IPsec) [RFC4303] with QUIC, and clients ought
    not to use private keys intended for server authentication as a keys
    for client authentication.
 
@@ -1130,10 +1134,9 @@ Internet-Draft              TAPS Architecture              December 2018
    which can fall back to standard configurations, Transport Services
    systems MUST prohibit fallback for security protocols.  For example,
    if a client requests TLS, yet TLS or the desired version are not
-   available, its connection will fail.
-
-   Clients are responsible for implementing protocol or version fallback
-   using a Transport Services API if so desired.
+   available, its connection will fail.  Clients are thus responsible
+   for implementing security protocol fallback or version fallback by
+   creating multiple Transport Services Connections, if so desired.
 
 7.  Acknowledgements
 
@@ -1166,9 +1169,6 @@ Internet-Draft              TAPS Architecture              December 2018
               Abstract Application Layer Interface to Transport
               Services", draft-ietf-taps-interface-02 (work in
               progress), October 2018.
-
-
-
 
 
 

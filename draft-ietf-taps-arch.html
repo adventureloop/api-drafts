@@ -312,7 +312,7 @@ ul.toc li {
 <link href="#rfc.authors" rel="Chapter">
 
 
-  <meta name="generator" content="xml2rfc version 2.15.1 - https://tools.ietf.org/tools/xml2rfc" />
+  <meta name="generator" content="xml2rfc version 2.15.2 - https://tools.ietf.org/tools/xml2rfc" />
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
   <meta name="dct.creator" content="Pauly, T., Ed., Trammell, B., Ed., Brunstrom, A., Fairhurst, G., Perkins, C., Tiesel, P., and C. Wood" />
@@ -773,7 +773,7 @@ ul.toc li {
 <li>Remote Endpoint Racing: Remote Endpoint Racing is the act of attempting to establish, or scheduling attempts to establish, multiple Protocol Stacks that differ based on the specific representation of the Remote Endpoint, such as IP addresses resolved from a DNS hostname.</li>
 </ul>
 <h1 id="rfc.section.4.2.3">
-<a href="#rfc.section.4.2.3">4.2.3.</a> <a href="#protocol-stack-equivalence" id="protocol-stack-equivalence">Protocol Stack Equivalence</a>
+<a href="#rfc.section.4.2.3">4.2.3.</a> <a href="#equivalence" id="equivalence">Protocol Stack Equivalence</a>
 </h1>
 <p id="rfc.section.4.2.3.p.1">The Transport Services architecture defines a mechanism that allows applications to easily use different network paths and Protocol Stacks. Transitioning between different Protocol Stacks is in some cases controlled by properties that only change when application code is updated. For example, an application can enable the use of a multipath or multistreaming transport protocol by modifying the properties in its Pre-Connection configuration. In some cases, however, the Transport Services system will be able to automatically change Protocol Stacks without an update to the application, either by selecting a new stack entirely, or by racing multiple candidate Protocol Stacks during connection establishment. This functionality can be a powerful driver of new protocol adoption, but needs to be constrained carefully to avoid unexpected behavior that can lead to functional or security problems.</p>
 <p id="rfc.section.4.2.3.p.2">If two different Protocol Stacks can be safely swapped, or raced in parallel (see <a href="#racing" class="xref">Section 4.2.2</a>), then they are considered to be &#8220;equivalent&#8221;. Equivalent Protocol Stacks need to meet the following criteria:</p>
@@ -806,10 +806,10 @@ ul.toc li {
 <h1 id="rfc.section.6">
 <a href="#rfc.section.6">6.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a>
 </h1>
-<p id="rfc.section.6.p.1">The Transport Services architecture does not recommend use of specific security protocols or algorithms. Its goal is to offer ease of use for existing protocols by providing a generic security-related interface. Each provided interface mimics an existing protocol-specific interface provided by supported security protocols. For example, trust verification callbacks are common parts of TLS APIs. Transport Services APIs will expose similar functionality <a href="#I-D.ietf-taps-transport-security" class="xref">[I-D.ietf-taps-transport-security]</a>.</p>
-<p id="rfc.section.6.p.2">Clients need to ensure that security APIs are used appropriately. In cases where clients use an interface to provide sensitive keying material, e.g., access to private keys or copies of pre-shared keys (PSKs), key use needs to be validated. For example, clients ought not to use PSK material created for the Encapsulating Security Protocol (ESP, part of IPsec) <a href="#RFC4303" class="xref">[RFC4303]</a> with QUIC, and clients ought not to use private keys intended for server authentication as a keys for client authentication.</p>
-<p id="rfc.section.6.p.3">Moreover, unlike certain transport features such as TCP Fast Open (TFO) <a href="#RFC7413" class="xref">[RFC7413]</a> or Explicit Congestion Notification (ECN) <a href="#RFC3168" class="xref">[RFC3168]</a> which can fall back to standard configurations, Transport Services systems MUST prohibit fallback for security protocols. For example, if a client requests TLS, yet TLS or the desired version are not available, its connection will fail.</p>
-<p id="rfc.section.6.p.4">Clients are responsible for implementing protocol or version fallback using a Transport Services API if so desired.</p>
+<p id="rfc.section.6.p.1">The Transport Services architecture does not recommend use of specific security protocols or algorithms. Its goal is to offer ease of use for existing protocols by providing a generic security-related interface. Each provided interface translates to an existing protocol-specific interface provided by supported security protocols. For example, trust verification callbacks are common parts of TLS APIs. Transport Services APIs will expose similar functionality <a href="#I-D.ietf-taps-transport-security" class="xref">[I-D.ietf-taps-transport-security]</a>.</p>
+<p id="rfc.section.6.p.2">As described above in <a href="#equivalence" class="xref">Section 4.2.3</a>, if a Transport Services system races between two different Protocol Stacks, both MUST use the same security protocols and options.</p>
+<p id="rfc.section.6.p.3">Clients need to ensure that security APIs are used appropriately. In cases where clients use an interface to provide sensitive keying material, e.g., access to private keys or copies of pre-shared keys (PSKs), key use needs to be validated. For example, clients ought not to use PSK material created for the Encapsulating Security Protocol (ESP, part of IPsec) <a href="#RFC4303" class="xref">[RFC4303]</a> with QUIC, and clients ought not to use private keys intended for server authentication as a keys for client authentication.</p>
+<p id="rfc.section.6.p.4">Moreover, unlike certain transport features such as TCP Fast Open (TFO) <a href="#RFC7413" class="xref">[RFC7413]</a> or Explicit Congestion Notification (ECN) <a href="#RFC3168" class="xref">[RFC3168]</a> which can fall back to standard configurations, Transport Services systems MUST prohibit fallback for security protocols. For example, if a client requests TLS, yet TLS or the desired version are not available, its connection will fail. Clients are thus responsible for implementing security protocol fallback or version fallback by creating multiple Transport Services Connections, if so desired.</p>
 <h1 id="rfc.section.7">
 <a href="#rfc.section.7">7.</a> <a href="#acknowledgements" id="acknowledgements">Acknowledgements</a>
 </h1>
