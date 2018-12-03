@@ -300,8 +300,6 @@ ul.toc li {
 <link href="#rfc.section.5.2.8" rel="Chapter" title="5.2.8 Interface Instance or Type">
 <link href="#rfc.section.5.2.9" rel="Chapter" title="5.2.9 Provisioning Domain Instance or Type">
 <link href="#rfc.section.5.2.10" rel="Chapter" title="5.2.10 Direction of communication">
-<link href="#rfc.section.5.2.11" rel="Chapter" title="5.2.11 Bounds on Send or Receive Rate">
-<link href="#rfc.section.5.2.12" rel="Chapter" title="5.2.12 TCP-specific Property: User Timeout">
 <link href="#rfc.section.5.3" rel="Chapter" title="5.3 Specifying Security Parameters and Callbacks">
 <link href="#rfc.section.5.3.1" rel="Chapter" title="5.3.1 Pre-Connection Parameters">
 <link href="#rfc.section.5.3.2" rel="Chapter" title="5.3.2 Connection Establishment Callbacks">
@@ -355,6 +353,8 @@ ul.toc li {
 <link href="#rfc.section.9.1.10" rel="Chapter" title="9.1.10 Maximum Message size on send">
 <link href="#rfc.section.9.1.11" rel="Chapter" title="9.1.11 Maximum Message size on receive">
 <link href="#rfc.section.9.1.12" rel="Chapter" title="9.1.12 Capacity Profile">
+<link href="#rfc.section.9.1.13" rel="Chapter" title="9.1.13 Bounds on Send or Receive Rate">
+<link href="#rfc.section.9.1.14" rel="Chapter" title="9.1.14 TCP-specific Property: User Timeout">
 <link href="#rfc.section.9.2" rel="Chapter" title="9.2 Soft Errors">
 <link href="#rfc.section.10" rel="Chapter" title="10 Connection Termination">
 <link href="#rfc.section.11" rel="Chapter" title="11 Connection State and Ordering of Operations and Events">
@@ -518,10 +518,6 @@ ul.toc li {
 </li>
 <li>5.2.10.   <a href="#rfc.section.5.2.10">Direction of communication</a>
 </li>
-<li>5.2.11.   <a href="#rfc.section.5.2.11">Bounds on Send or Receive Rate</a>
-</li>
-<li>5.2.12.   <a href="#rfc.section.5.2.12">TCP-specific Property: User Timeout</a>
-</li>
 </ul><li>5.3.   <a href="#rfc.section.5.3">Specifying Security Parameters and Callbacks</a>
 </li>
 <ul><li>5.3.1.   <a href="#rfc.section.5.3.1">Pre-Connection Parameters</a>
@@ -627,6 +623,10 @@ ul.toc li {
 <li>9.1.11.   <a href="#rfc.section.9.1.11">Maximum Message size on receive</a>
 </li>
 <li>9.1.12.   <a href="#rfc.section.9.1.12">Capacity Profile</a>
+</li>
+<li>9.1.13.   <a href="#rfc.section.9.1.13">Bounds on Send or Receive Rate</a>
+</li>
+<li>9.1.14.   <a href="#rfc.section.9.1.14">TCP-specific Property: User Timeout</a>
 </li>
 </ul><li>9.2.   <a href="#rfc.section.9.2">Soft Errors</a>
 </li>
@@ -913,27 +913,6 @@ TransportProperties := Connection.GetTransportProperties()
 <dd style="margin-left: 8">The connection must support receiving data</dd>
 </dl>
 <p id="rfc.section.5.2.10.p.3">In case a unidirectional connection is requested, but unidirectional connections are not supported by the transport protocol, the system should fall back to bidirectional transport.</p>
-<h1 id="rfc.section.5.2.11">
-<a href="#rfc.section.5.2.11">5.2.11.</a> <a href="#bounds-on-send-or-receive-rate" id="bounds-on-send-or-receive-rate">Bounds on Send or Receive Rate</a>
-</h1>
-<p id="rfc.section.5.2.11.p.1">This property specifies an upper-bound rate that a transfer is not expected to exceed (even if flow- and congestion control allow higher rates), and/or a lower-bound rate below which the application does not deem a data transfer useful. It is given in bits per second.</p>
-<h1 id="rfc.section.5.2.12">
-<a href="#rfc.section.5.2.12">5.2.12.</a> <a href="#tcp-specific-property-user-timeout" id="tcp-specific-property-user-timeout">TCP-specific Property: User Timeout</a>
-</h1>
-<p id="rfc.section.5.2.12.p.1">This property specifies, for the case TCP becomes the chosen transport protocol:</p>
-<p></p>
-
-<dl>
-<dt>User Timeout:</dt>
-<dd style="margin-left: 8">the time after which the connection will be aborted if data could not be delivered</dd>
-<dt>Advertised User Timeout:</dt>
-<dd style="margin-left: 8">a time value to be advertised via the User Timeout Option (UTO) for the TCP at the remote endpoint to adapt its own user User Timeout value accordingly</dd>
-<dt>User Timeout Enabled:</dt>
-<dd style="margin-left: 8">a boolean (default false) to control whether the UTO option is enabled for a connection. This applies to both sending and receiving.</dd>
-<dt>Changeable:</dt>
-<dd style="margin-left: 8">a boolean (default true) which controls whether the User Timeout may be changed based on a UTO option received from the remote peer. This boolean becomes false when the &#8216;User Timeout&#8217; is used.</dd>
-</dl>
-<p id="rfc.section.5.2.12.p.3">All of the above parameters are optional.</p>
 <h1 id="rfc.section.5.3">
 <a href="#rfc.section.5.3">5.3.</a> <a href="#security-parameters" id="security-parameters">Specifying Security Parameters and Callbacks</a>
 </h1>
@@ -1536,6 +1515,25 @@ Preconnection.DeframeWith(Deframer)
 <dd style="margin-left: 8">The application expects to send/receive data at the maximum rate allowed by its congestion controller over a relatively long period of time. Transport system implementations that map the requested capacity profile onto per-connection DSCP signaling without multiplexing SHOULD assign a DSCP Assured Forwarding (AF11,AF12,AF13,AF14) <a href="#RFC2597" class="xref">[RFC2597]</a> PHB per section 4.8 of <a href="#RFC4594" class="xref">[RFC4594]</a>. When the Connection is multiplexed, the guidelines in section 6 of <a href="#RFC7657" class="xref">[RFC7657]</a> apply.</dd>
 </dl>
 <p id="rfc.section.9.1.12.p.3">The Capacity Profile for a selected protocol stack may be modified on a per-Message basis using the Transmission Profile Message Property; see <a href="#send-profile" class="xref">Section 7.3.8</a>.</p>
+<h1 id="rfc.section.9.1.13">
+<a href="#rfc.section.9.1.13">9.1.13.</a> <a href="#bounds-on-send-or-receive-rate" id="bounds-on-send-or-receive-rate">Bounds on Send or Receive Rate</a>
+</h1>
+<p id="rfc.section.9.1.13.p.1">This property specifies an upper-bound rate that a transfer is not expected to exceed (even if flow- and congestion control allow higher rates), and/or a lower-bound rate below which the application does not deem a data transfer useful. It is given in bits per second.</p>
+<h1 id="rfc.section.9.1.14">
+<a href="#rfc.section.9.1.14">9.1.14.</a> <a href="#tcp-specific-property-user-timeout" id="tcp-specific-property-user-timeout">TCP-specific Property: User Timeout</a>
+</h1>
+<p id="rfc.section.9.1.14.p.1">This property specifies, for the case TCP becomes the chosen transport protocol:</p>
+<p></p>
+
+<dl>
+<dt>Advertised User Timeout:</dt>
+<dd style="margin-left: 8">a time value to be advertised via the User Timeout Option (UTO) for the TCP at the remote endpoint to adapt its own &#8220;Timeout for aborting Connection&#8221; (see {#conn-timeout}) value accordingly</dd>
+<dt>User Timeout Enabled:</dt>
+<dd style="margin-left: 8">a boolean (default false) to control whether the UTO option is enabled for a connection. This applies to both sending and receiving.</dd>
+<dt>Changeable:</dt>
+<dd style="margin-left: 8">a boolean (default true) which controls whether the &#8220;Timeout for aborting Connection&#8221; (see {#conn-timeout}) may be changed based on a UTO option received from the remote peer. This boolean becomes false when &#8220;Timeout for aborting Connection&#8221; (see {#conn-timeout}) is used.</dd>
+</dl>
+<p id="rfc.section.9.1.14.p.3">All of the above parameters are optional (e.g., it is possible to specify &#8220;User Timeout Enabled&#8221; as true, but not specify an Advertised User Timeout value; in this case, the TCP default will be used).</p>
 <h1 id="rfc.section.9.2">
 <a href="#rfc.section.9.2">9.2.</a> <a href="#soft-errors" id="soft-errors">Soft Errors</a>
 </h1>
