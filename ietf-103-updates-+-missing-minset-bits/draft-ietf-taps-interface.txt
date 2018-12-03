@@ -98,7 +98,7 @@ Table of Contents
        5.2.9.  Provisioning Domain Instance or Type  . . . . . . . .  15
        5.2.10. Direction of communication  . . . . . . . . . . . . .  15
        5.2.11. Bounds on Send or Receive Rate  . . . . . . . . . . .  16
-       5.2.12. TCP-specific option: User Timeout . . . . . . . . . .  16
+       5.2.12. TCP-specific Property: User Timeout . . . . . . . . .  16
      5.3.  Specifying Security Parameters and Callbacks  . . . . . .  16
        5.3.1.  Pre-Connection Parameters . . . . . . . . . . . . . .  17
        5.3.2.  Connection Establishment Callbacks  . . . . . . . . .  18
@@ -183,9 +183,8 @@ Internet-Draft               TAPS Interface                December 2018
      15.2.  Informative References . . . . . . . . . . . . . . . . .  44
    Appendix A.  Additional Properties  . . . . . . . . . . . . . . .  45
      A.1.  Experimental Transport Properties . . . . . . . . . . . .  46
-       A.1.1.  Abort timeout to suggest to the Remote Endpoint . . .  46
-       A.1.2.  Cost Preferences  . . . . . . . . . . . . . . . . . .  46
-   Appendix B.  Sample API definition in Go  . . . . . . . . . . . .  47
+       A.1.1.  Cost Preferences  . . . . . . . . . . . . . . . . . .  46
+   Appendix B.  Sample API definition in Go  . . . . . . . . . . . .  46
    Appendix C.  Relationship to the Minimal Set of Transport
                 Services for End Systems . . . . . . . . . . . . . .  47
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  50
@@ -217,6 +216,7 @@ Internet-Draft               TAPS Interface                December 2018
    properties and supported transport features from the analysis
    provided in [RFC8095], [I-D.ietf-taps-minset], and
    [I-D.ietf-taps-transport-security].
+
 
 
 
@@ -855,7 +855,7 @@ Internet-Draft               TAPS Interface                December 2018
    rates), and/or a lower-bound rate below which the application does
    not deem a data transfer useful.  It is given in bits per second.
 
-5.2.12.  TCP-specific option: User Timeout
+5.2.12.  TCP-specific Property: User Timeout
 
    This property specifies, for the case TCP becomes the chosen
    transport protocol:
@@ -2536,31 +2536,12 @@ A.1.  Experimental Transport Properties
    addition to those specified in Section 5.2, Section 9.1, and
    Section 7.3.
 
-A.1.1.  Abort timeout to suggest to the Remote Endpoint
-
-   Classification:  Protocol Property
-
-   Type:  Integer
-
-   Applicability:  Preconnection, Connection
-
-   This numeric property specifies the timeout to propose to the Remote
-   Endpoint.  It is given in seconds.
-
-   [EDITOR'S NOTE: For discussion of this property, see
-   https://github.com/taps-api/drafts/issues/109]
-
-A.1.2.  Cost Preferences
+A.1.1.  Cost Preferences
 
    [EDITOR'S NOTE: At IETF 103, opinions were that this property should
    stay, but it was also said that this is maybe not "on the right
-   level".]
-
-   Classification:  Intent
-
-   Type:  Enumeration
-
-   Applicability:  Preconnection, Message
+   level".  If / when moving it to the main text, note that this is
+   meant to be applicable to a Preconnection or a Message.]
 
    This property describes what an application prefers regarding
    monetary costs, e.g., whether it considers it acceptable to utilize
@@ -2570,13 +2551,6 @@ A.1.2.  Cost Preferences
    Possible values are:
 
    No Expense:  Avoid transports associated with monetary cost
-
-
-
-Trammell, et al.          Expires June 6, 2019                 [Page 46]
-
-Internet-Draft               TAPS Interface                December 2018
-
 
    Optimize Cost:  Prefer inexpensive transports and accept service
       degradation
@@ -2596,6 +2570,14 @@ Appendix B.  Sample API definition in Go
    project/postsocket.  Documentation for this API - an illustration of
    the documentation an application developer would see for an instance
    of this interface - is available online at
+
+
+
+Trammell, et al.          Expires June 6, 2019                 [Page 46]
+
+Internet-Draft               TAPS Interface                December 2018
+
+
    https://godoc.org/github.com/mami-project/postsocket.  This API
    definition will be kept largely in sync with the development of this
    abstract interface definition.
@@ -2625,18 +2607,11 @@ Appendix C.  Relationship to the Minimal Set of Transport Services for
    o  Listen:
       "Listen" Action.
 
-
-
-
-
-Trammell, et al.          Expires June 6, 2019                 [Page 47]
-
-Internet-Draft               TAPS Interface                December 2018
-
-
    o  Specify number of attempts and/or timeout for the first
       establishment message:
-      TODO.
+      TODO.  The description of "Timeout for aborting Connection"
+      contains: "how long to wait before aborting a Connection during
+      establishment".
 
    o  Disable MPTCP:
       TODO.
@@ -2651,6 +2626,14 @@ Internet-Draft               TAPS Interface                December 2018
 
    o  Change timeout for aborting connection (using retransmit limit or
       time value):
+
+
+
+Trammell, et al.          Expires June 6, 2019                 [Page 47]
+
+Internet-Draft               TAPS Interface                December 2018
+
+
       "Timeout for aborting Connection" property, using a time value in
       seconds.
 
@@ -2661,10 +2644,7 @@ Internet-Draft               TAPS Interface                December 2018
       this case, it is the local side.
 
    o  Suggest timeout to the peer:
-      "Suggest a timeout to the Remote Endpoint" and "Abort timeout to
-      suggest to the Remote Endpoint" Selection property.  [EDITOR'S
-      NOTE: For discussion of this option, see https://github.com/taps-
-      api/drafts/issues/109].
+      TCP-specific Property: User Timeout.
 
    o  Notification of Excessive Retransmissions (early warning below
       abortion threshold):
@@ -2682,13 +2662,6 @@ Internet-Draft               TAPS Interface                December 2018
    o  "Specify checksum coverage used by the sender" and "Disable
       checksum when sending":
       "Corruption Protection Length" property (value 0 to disable).
-
-
-
-Trammell, et al.          Expires June 6, 2019                 [Page 48]
-
-Internet-Draft               TAPS Interface                December 2018
-
 
    o  "Specify minimum checksum coverage required by receiver" and
       "Disable checksum requirement when receiving":
@@ -2709,6 +2682,13 @@ Internet-Draft               TAPS Interface                December 2018
    o  Get max. transport-message size that may be received from the
       configured interface:
       "Maximum Message size on receive" property.
+
+
+
+Trammell, et al.          Expires June 6, 2019                 [Page 48]
+
+Internet-Draft               TAPS Interface                December 2018
+
 
    o  Obtain ECN field:
       "ECN" is a defined metadata value as part of the Message Receive
@@ -2737,15 +2717,6 @@ Internet-Draft               TAPS Interface                December 2018
    o  "Reliably transfer data, with congestion control", "Reliably
       transfer a message, with congestion control" and "Unreliably
       transfer a message":
-
-
-
-
-Trammell, et al.          Expires June 6, 2019                 [Page 49]
-
-Internet-Draft               TAPS Interface                December 2018
-
-
       Reliability is controlled via the "Reliable Data Transfer
       (Message)" Message property.  Transmitting data without delimiters
       is done by not using a Framer.  The choice of congestion control
@@ -2768,6 +2739,13 @@ Internet-Draft               TAPS Interface                December 2018
    o  Receive data (with no message delimiting):
       "Received" Event without using a Deframer.
 
+
+
+Trammell, et al.          Expires June 6, 2019                 [Page 49]
+
+Internet-Draft               TAPS Interface                December 2018
+
+
    o  Receive a message:
       "Received" Event.  Section 5.1 of [I-D.ietf-taps-minset] discusses
       how messages can be obtained from a bytestream in case of
@@ -2788,19 +2766,6 @@ Internet-Draft               TAPS Interface                December 2018
       "ReceiveError" Event.
 
 Authors' Addresses
-
-
-
-
-
-
-
-
-
-Trammell, et al.          Expires June 6, 2019                 [Page 50]
-
-Internet-Draft               TAPS Interface                December 2018
-
 
    Brian Trammell (editor)
    ETH Zurich
@@ -2829,6 +2794,14 @@ Internet-Draft               TAPS Interface                December 2018
    Email: theresa@inet.tu-berlin.de
 
 
+
+
+
+Trammell, et al.          Expires June 6, 2019                 [Page 50]
+
+Internet-Draft               TAPS Interface                December 2018
+
+
    Godred Fairhurst
    University of Aberdeen
    Fraser Noble Building
@@ -2846,16 +2819,6 @@ Internet-Draft               TAPS Interface                December 2018
    Switzerland
 
    Email: mirja.kuehlewind@tik.ee.ethz.ch
-
-
-
-
-
-
-
-Trammell, et al.          Expires June 6, 2019                 [Page 51]
-
-Internet-Draft               TAPS Interface                December 2018
 
 
    Colin Perkins
@@ -2890,23 +2853,4 @@ Internet-Draft               TAPS Interface                December 2018
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Trammell, et al.          Expires June 6, 2019                 [Page 52]
+Trammell, et al.          Expires June 6, 2019                 [Page 51]
