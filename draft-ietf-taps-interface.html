@@ -299,6 +299,7 @@ ul.toc li {
 <link href="#rfc.section.5.2.7" rel="Chapter" title="5.2.7 Congestion control">
 <link href="#rfc.section.5.2.8" rel="Chapter" title="5.2.8 Interface Instance or Type">
 <link href="#rfc.section.5.2.9" rel="Chapter" title="5.2.9 Provisioning Domain Instance or Type">
+<link href="#rfc.section.5.2.10" rel="Chapter" title="5.2.10 Direction of communication">
 <link href="#rfc.section.5.3" rel="Chapter" title="5.3 Specifying Security Parameters and Callbacks">
 <link href="#rfc.section.5.3.1" rel="Chapter" title="5.3.1 Pre-Connection Parameters">
 <link href="#rfc.section.5.3.2" rel="Chapter" title="5.3.2 Connection Establishment Callbacks">
@@ -352,6 +353,8 @@ ul.toc li {
 <link href="#rfc.section.9.1.10" rel="Chapter" title="9.1.10 Maximum Message size on send">
 <link href="#rfc.section.9.1.11" rel="Chapter" title="9.1.11 Maximum Message size on receive">
 <link href="#rfc.section.9.1.12" rel="Chapter" title="9.1.12 Capacity Profile">
+<link href="#rfc.section.9.1.13" rel="Chapter" title="9.1.13 Bounds on Send or Receive Rate">
+<link href="#rfc.section.9.1.14" rel="Chapter" title="9.1.14 TCP-specific Property: User Timeout">
 <link href="#rfc.section.9.2" rel="Chapter" title="9.2 Soft Errors">
 <link href="#rfc.section.10" rel="Chapter" title="10 Connection Termination">
 <link href="#rfc.section.11" rel="Chapter" title="11 Connection State and Ordering of Operations and Events">
@@ -363,14 +366,7 @@ ul.toc li {
 <link href="#rfc.references.2" rel="Chapter" title="15.2 Informative References">
 <link href="#rfc.appendix.A" rel="Chapter" title="A Additional Properties">
 <link href="#rfc.appendix.A.1" rel="Chapter" title="A.1 Experimental Transport Properties">
-<link href="#rfc.appendix.A.1.1" rel="Chapter" title="A.1.1 Direction of communication">
-<link href="#rfc.appendix.A.1.2" rel="Chapter" title="A.1.2 Suggest a timeout to the Remote Endpoint">
-<link href="#rfc.appendix.A.1.3" rel="Chapter" title="A.1.3 Abort timeout to suggest to the Remote Endpoint">
-<link href="#rfc.appendix.A.1.4" rel="Chapter" title="A.1.4 Traffic Category">
-<link href="#rfc.appendix.A.1.5" rel="Chapter" title="A.1.5 Size to be Sent or Received">
-<link href="#rfc.appendix.A.1.6" rel="Chapter" title="A.1.6 Duration">
-<link href="#rfc.appendix.A.1.7" rel="Chapter" title="A.1.7 Send or Receive Bit-rate">
-<link href="#rfc.appendix.A.1.8" rel="Chapter" title="A.1.8 Cost Preferences">
+<link href="#rfc.appendix.A.1.1" rel="Chapter" title="A.1.1 Cost Preferences">
 <link href="#rfc.appendix.B" rel="Chapter" title="B Sample API definition in Go">
 <link href="#rfc.appendix.C" rel="Chapter" title="C Relationship to the Minimal Set of Transport Services for End Systems">
 <link href="#rfc.authors" rel="Chapter">
@@ -381,7 +377,7 @@ ul.toc li {
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-12-03" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-12-04" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -405,7 +401,7 @@ ul.toc li {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: June 6, 2019</td>
+<td class="left">Expires: June 7, 2019</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -458,7 +454,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">December 03, 2018</td>
+<td class="right">December 04, 2018</td>
 </tr>
 
     	
@@ -474,7 +470,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on June 6, 2019.</p>
+<p>This Internet-Draft will expire on June 7, 2019.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -519,6 +515,8 @@ ul.toc li {
 <li>5.2.8.   <a href="#rfc.section.5.2.8">Interface Instance or Type</a>
 </li>
 <li>5.2.9.   <a href="#rfc.section.5.2.9">Provisioning Domain Instance or Type</a>
+</li>
+<li>5.2.10.   <a href="#rfc.section.5.2.10">Direction of communication</a>
 </li>
 </ul><li>5.3.   <a href="#rfc.section.5.3">Specifying Security Parameters and Callbacks</a>
 </li>
@@ -626,6 +624,10 @@ ul.toc li {
 </li>
 <li>9.1.12.   <a href="#rfc.section.9.1.12">Capacity Profile</a>
 </li>
+<li>9.1.13.   <a href="#rfc.section.9.1.13">Bounds on Send or Receive Rate</a>
+</li>
+<li>9.1.14.   <a href="#rfc.section.9.1.14">TCP-specific Property: User Timeout</a>
+</li>
 </ul><li>9.2.   <a href="#rfc.section.9.2">Soft Errors</a>
 </li>
 </ul><li>10.   <a href="#rfc.section.10">Connection Termination</a>
@@ -648,21 +650,7 @@ ul.toc li {
 </li>
 <ul><li>A.1.   <a href="#rfc.appendix.A.1">Experimental Transport Properties</a>
 </li>
-<ul><li>A.1.1.   <a href="#rfc.appendix.A.1.1">Direction of communication</a>
-</li>
-<li>A.1.2.   <a href="#rfc.appendix.A.1.2">Suggest a timeout to the Remote Endpoint</a>
-</li>
-<li>A.1.3.   <a href="#rfc.appendix.A.1.3">Abort timeout to suggest to the Remote Endpoint</a>
-</li>
-<li>A.1.4.   <a href="#rfc.appendix.A.1.4">Traffic Category</a>
-</li>
-<li>A.1.5.   <a href="#rfc.appendix.A.1.5">Size to be Sent or Received</a>
-</li>
-<li>A.1.6.   <a href="#rfc.appendix.A.1.6">Duration</a>
-</li>
-<li>A.1.7.   <a href="#rfc.appendix.A.1.7">Send or Receive Bit-rate</a>
-</li>
-<li>A.1.8.   <a href="#rfc.appendix.A.1.8">Cost Preferences</a>
+<ul><li>A.1.1.   <a href="#rfc.appendix.A.1.1">Cost Preferences</a>
 </li>
 </ul></ul><li>Appendix B.   <a href="#rfc.appendix.B">Sample API definition in Go</a>
 </li>
@@ -910,6 +898,21 @@ TransportProperties := Connection.GetTransportProperties()
 <p id="rfc.section.5.2.9.p.2">As with interface instances and types, this property is tuple of an (Enumerated) PvD identifier and a preference, and can either be implemented directly as such, or for making one preference available for each interface and interface type available on the system.</p>
 <p id="rfc.section.5.2.9.p.3">The identification of a specific Provisioning Domain (PvD) is defined to be implementation- and system-specific, since there is not a portable standard format for a PvD identitfier. For example, this identifier may be a string name or an integer. As with requiring specific interfaces, requiring a specific PvD strictly limits path selection.</p>
 <p id="rfc.section.5.2.9.p.4">Categories or types of PvDs are also defined to be implementation- and system-specific. These may be useful to identify a service that is provided by a PvD. For example, if an application wants to use a PvD that provides a Voice-Over-IP service on a Cellular network, it can use the relevant PvD type to require some PvD that provides this service, without needing to look up a particular instance. While this does restrict path selection, it is broader than requiring specific PvD instances or interface instances, and should be preferred over these options.</p>
+<h1 id="rfc.section.5.2.10">
+<a href="#rfc.section.5.2.10">5.2.10.</a> <a href="#direction-of-communication" id="direction-of-communication">Direction of communication</a>
+</h1>
+<p id="rfc.section.5.2.10.p.1">This property specifies whether an application wants to use the connection for sending and/or receiving data.  Possible values are:</p>
+<p></p>
+
+<dl>
+<dt>Bidirectional (default):</dt>
+<dd style="margin-left: 8">The connection must support sending and receiving data</dd>
+<dt>Unidirectional send:</dt>
+<dd style="margin-left: 8">The connection must support sending data</dd>
+<dt>Unidirectional receive:</dt>
+<dd style="margin-left: 8">The connection must support receiving data</dd>
+</dl>
+<p id="rfc.section.5.2.10.p.3">In case a unidirectional connection is requested, but unidirectional connections are not supported by the transport protocol, the system should fall back to bidirectional transport.</p>
 <h1 id="rfc.section.5.3">
 <a href="#rfc.section.5.3">5.3.</a> <a href="#security-parameters" id="security-parameters">Specifying Security Parameters and Callbacks</a>
 </h1>
@@ -1512,6 +1515,25 @@ Preconnection.DeframeWith(Deframer)
 <dd style="margin-left: 8">The application expects to send/receive data at the maximum rate allowed by its congestion controller over a relatively long period of time. Transport system implementations that map the requested capacity profile onto per-connection DSCP signaling without multiplexing SHOULD assign a DSCP Assured Forwarding (AF11,AF12,AF13,AF14) <a href="#RFC2597" class="xref">[RFC2597]</a> PHB per section 4.8 of <a href="#RFC4594" class="xref">[RFC4594]</a>. When the Connection is multiplexed, the guidelines in section 6 of <a href="#RFC7657" class="xref">[RFC7657]</a> apply.</dd>
 </dl>
 <p id="rfc.section.9.1.12.p.3">The Capacity Profile for a selected protocol stack may be modified on a per-Message basis using the Transmission Profile Message Property; see <a href="#send-profile" class="xref">Section 7.3.8</a>.</p>
+<h1 id="rfc.section.9.1.13">
+<a href="#rfc.section.9.1.13">9.1.13.</a> <a href="#bounds-on-send-or-receive-rate" id="bounds-on-send-or-receive-rate">Bounds on Send or Receive Rate</a>
+</h1>
+<p id="rfc.section.9.1.13.p.1">This property specifies an upper-bound rate that a transfer is not expected to exceed (even if flow control and congestion control allow higher rates), and/or a lower-bound rate below which the application does not deem a data transfer useful. It is given in bits per second.</p>
+<h1 id="rfc.section.9.1.14">
+<a href="#rfc.section.9.1.14">9.1.14.</a> <a href="#tcp-specific-property-user-timeout" id="tcp-specific-property-user-timeout">TCP-specific Property: User Timeout</a>
+</h1>
+<p id="rfc.section.9.1.14.p.1">This property specifies, for the case TCP becomes the chosen transport protocol:</p>
+<p></p>
+
+<dl>
+<dt>Advertised User Timeout:</dt>
+<dd style="margin-left: 8">a time value to be advertised via the User Timeout Option (UTO) for the TCP at the remote endpoint to adapt its own &#8220;Timeout for aborting Connection&#8221; (see {#conn-timeout}) value accordingly</dd>
+<dt>User Timeout Enabled:</dt>
+<dd style="margin-left: 8">a boolean (default false) to control whether the UTO option is enabled for a connection. This applies to both sending and receiving.</dd>
+<dt>Changeable:</dt>
+<dd style="margin-left: 8">a boolean (default true) which controls whether the &#8220;Timeout for aborting Connection&#8221; (see {#conn-timeout}) may be changed based on a UTO option received from the remote peer. This boolean becomes false when &#8220;Timeout for aborting Connection&#8221; (see {#conn-timeout}) is used.</dd>
+</dl>
+<p id="rfc.section.9.1.14.p.3">All of the above parameters are optional (e.g., it is possible to specify &#8220;User Timeout Enabled&#8221; as true, but not specify an Advertised User Timeout value; in this case, the TCP default will be used).</p>
 <h1 id="rfc.section.9.2">
 <a href="#rfc.section.9.2">9.2.</a> <a href="#soft-errors" id="soft-errors">Soft Errors</a>
 </h1>
@@ -1707,145 +1729,11 @@ Connection -&gt; ConnectionError&lt;&gt;
 </h1>
 <p id="rfc.section.A.1.p.1">The following Transport Properties might be made available in addition to those specified in <a href="#selection-props" class="xref">Section 5.2</a>, <a href="#connection-props" class="xref">Section 9.1</a>, and <a href="#message-props" class="xref">Section 7.3</a>.</p>
 <h1 id="rfc.appendix.A.1.1">
-<a href="#rfc.appendix.A.1.1">A.1.1.</a> <a href="#direction-of-communication" id="direction-of-communication">Direction of communication</a>
+<a href="#rfc.appendix.A.1.1">A.1.1.</a> <a href="#cost-preferences" id="cost-preferences">Cost Preferences</a>
 </h1>
-<p></p>
-
-<dl>
-<dt>Classification:</dt>
-<dd style="margin-left: 8">Selection Property, Control Property [TODO: Discuss]</dd>
-<dt>Type:</dt>
-<dd style="margin-left: 8">Enumeration</dd>
-<dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection, Connection (read only)</dd>
-</dl>
-<p id="rfc.section.A.1.1.p.2">This property specifies whether an application wants to use the connection for sending and/or receiving data.  Possible values are:</p>
-<p></p>
-
-<dl>
-<dt>Bidirectional (default):</dt>
-<dd style="margin-left: 8">The connection must support sending and receiving data</dd>
-<dt>unidirectional send:</dt>
-<dd style="margin-left: 8">The connection must support sending data.</dd>
-<dt>unidirectional receive:</dt>
-<dd style="margin-left: 8">The connection must support receiving data</dd>
-</dl>
-<p id="rfc.section.A.1.1.p.4">In case a unidirectional connection is requested, but unidirectional connections are not supported by the transport protocol, the system should fall back to bidirectional transport.</p>
-<h1 id="rfc.appendix.A.1.2">
-<a href="#rfc.appendix.A.1.2">A.1.2.</a> <a href="#suggest-a-timeout-to-the-remote-endpoint" id="suggest-a-timeout-to-the-remote-endpoint">Suggest a timeout to the Remote Endpoint</a>
-</h1>
-<p></p>
-
-<dl>
-<dt>Classification:</dt>
-<dd style="margin-left: 8">Selection Property</dd>
-<dt>Type:</dt>
-<dd style="margin-left: 8">Preference</dd>
-<dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection</dd>
-</dl>
-<p id="rfc.section.A.1.2.p.2">This property specifies whether an application considers it useful to propose a timeout until the Connection is assumed to be lost. The default is to have this option.</p>
-<p id="rfc.section.A.1.2.p.3">[EDITOR&#8217;S NOTE: For discussion of this option, see https://github.com/taps-api/drafts/issues/109]</p>
-<h1 id="rfc.appendix.A.1.3">
-<a href="#rfc.appendix.A.1.3">A.1.3.</a> <a href="#abort-timeout-to-suggest-to-the-remote-endpoint" id="abort-timeout-to-suggest-to-the-remote-endpoint">Abort timeout to suggest to the Remote Endpoint</a>
-</h1>
-<p></p>
-
-<dl>
-<dt>Classification:</dt>
-<dd style="margin-left: 8">Protocol Property</dd>
-<dt>Type:</dt>
-<dd style="margin-left: 8">Integer</dd>
-<dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection, Connection</dd>
-</dl>
-<p id="rfc.section.A.1.3.p.2">This numeric property specifies the timeout to propose to the Remote Endpoint.  It is given in seconds.</p>
-<p id="rfc.section.A.1.3.p.3">[EDITOR&#8217;S NOTE: For discussion of this property, see https://github.com/taps-api/drafts/issues/109]</p>
-<h1 id="rfc.appendix.A.1.4">
-<a href="#rfc.appendix.A.1.4">A.1.4.</a> <a href="#traffic-category" id="traffic-category">Traffic Category</a>
-</h1>
-<p></p>
-
-<dl>
-<dt>Classification:</dt>
-<dd style="margin-left: 8">Intent</dd>
-<dt>Type:</dt>
-<dd style="margin-left: 8">Enumeration</dd>
-<dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection</dd>
-</dl>
-<p id="rfc.section.A.1.4.p.2">This property specifies what the application expects the dominating traffic pattern to be. Possible values are:</p>
-<p></p>
-
-<dl>
-<dt>Query:</dt>
-<dd style="margin-left: 8">Single request / response style workload, latency bound</dd>
-<dt>Control:</dt>
-<dd style="margin-left: 8">Long lasting low bandwidth control channel, not bandwidth bound</dd>
-<dt>Stream:</dt>
-<dd style="margin-left: 8">Stream of data with steady data rate</dd>
-<dt>Bulk:</dt>
-<dd style="margin-left: 8">Bulk transfer of large Messages, presumably bandwidth bound</dd>
-</dl>
-<p id="rfc.section.A.1.4.p.4">The default is to not assume any particular traffic pattern. Most categories suggest the use of other intents to further describe the traffic pattern anticipated, e.g., the bulk category suggesting the use of the Message Size intents or the stream category suggesting the Stream Bitrate and Duration intents.</p>
-<h1 id="rfc.appendix.A.1.5">
-<a href="#rfc.appendix.A.1.5">A.1.5.</a> <a href="#size-to-be-sent-or-received" id="size-to-be-sent-or-received">Size to be Sent or Received</a>
-</h1>
-<p></p>
-
-<dl>
-<dt>Classification:</dt>
-<dd style="margin-left: 8">Intent</dd>
-<dt>Type:</dt>
-<dd style="margin-left: 8">Integer</dd>
-<dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection, Message</dd>
-</dl>
-<p id="rfc.section.A.1.5.p.2">This property specifies how many bytes the application expects to send (Size to be Sent) or how many bytes the application expects to receive in response (Size to be Received).</p>
-<h1 id="rfc.appendix.A.1.6">
-<a href="#rfc.appendix.A.1.6">A.1.6.</a> <a href="#duration" id="duration">Duration</a>
-</h1>
-<p></p>
-
-<dl>
-<dt>Classification:</dt>
-<dd style="margin-left: 8">Intent</dd>
-<dt>Type:</dt>
-<dd style="margin-left: 8">Integer</dd>
-<dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection</dd>
-</dl>
-<p id="rfc.section.A.1.6.p.2">This Intent specifies what the application expects the lifetime of a Connection to be. It is given in milliseconds.</p>
-<h1 id="rfc.appendix.A.1.7">
-<a href="#rfc.appendix.A.1.7">A.1.7.</a> <a href="#send-or-receive-bit-rate" id="send-or-receive-bit-rate">Send or Receive Bit-rate</a>
-</h1>
-<p></p>
-
-<dl>
-<dt>Classification:</dt>
-<dd style="margin-left: 8">Intent</dd>
-<dt>Type:</dt>
-<dd style="margin-left: 8">Integer</dd>
-<dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection, Message</dd>
-</dl>
-<p id="rfc.section.A.1.7.p.2">This Intent specifies what the application expects the bit-rate of a transfer to be. It is given in Bytes per second.</p>
-<p id="rfc.section.A.1.7.p.3">On a Message, this property specifies at what bitrate the application wishes the Message to be sent. A transport system supporting this feature will not exceed the requested Send Bitrate even if flow-control and congestion control allow higher bitrates. This helps to avoid a bursty traffic pattern on busy streaming video servers.</p>
-<h1 id="rfc.appendix.A.1.8">
-<a href="#rfc.appendix.A.1.8">A.1.8.</a> <a href="#cost-preferences" id="cost-preferences">Cost Preferences</a>
-</h1>
-<p></p>
-
-<dl>
-<dt>Classification:</dt>
-<dd style="margin-left: 8">Intent</dd>
-<dt>Type:</dt>
-<dd style="margin-left: 8">Enumeration</dd>
-<dt>Applicability:</dt>
-<dd style="margin-left: 8">Preconnection, Message</dd>
-</dl>
-<p id="rfc.section.A.1.8.p.2">This property describes what an application prefers regarding monetary costs, e.g., whether it considers it acceptable to utilize limited data volume. It provides hints to the transport system on how to handle trade-offs between cost and performance or reliability.</p>
-<p id="rfc.section.A.1.8.p.3">Possible values are:</p>
+<p id="rfc.section.A.1.1.p.1">[EDITOR&#8217;S NOTE: At IETF 103, opinions were that this property should stay, but it was also said that this is maybe not &#8220;on the right level&#8221;.  If / when moving it to the main text, note that this is meant to be applicable to a Preconnection or a Message.]</p>
+<p id="rfc.section.A.1.1.p.2">This property describes what an application prefers regarding monetary costs, e.g., whether it considers it acceptable to utilize limited data volume. It provides hints to the transport system on how to handle trade-offs between cost and performance or reliability.</p>
+<p id="rfc.section.A.1.1.p.3">Possible values are:</p>
 <p></p>
 
 <dl>
@@ -1858,7 +1746,7 @@ Connection -&gt; ConnectionError&lt;&gt;
 <dt>Ignore Cost:</dt>
 <dd style="margin-left: 8">Ignore cost, choose transport solely based on other criteria</dd>
 </dl>
-<p id="rfc.section.A.1.8.p.5">The default is &#8220;Balance Cost&#8221;.</p>
+<p id="rfc.section.A.1.1.p.5">The default is &#8220;Balance Cost&#8221;.</p>
 <h1 id="rfc.appendix.B">
 <a href="#rfc.appendix.B">Appendix B.</a> <a href="#appendix-api-sketch" id="appendix-api-sketch">Sample API definition in Go</a>
 </h1>
@@ -1873,13 +1761,13 @@ Connection -&gt; ConnectionError&lt;&gt;
 <ul>
 <li>Connect:<br> &#8220;Initiate&#8221; Action.</li>
 <li>Listen:<br> &#8220;Listen&#8221; Action.</li>
-<li>Specify number of attempts and/or timeout for the first establishment message:<br> TODO.</li>
+<li>Specify number of attempts and/or timeout for the first establishment message:<br> TODO.  The description of &#8220;Timeout for aborting Connection&#8221; contains: &#8220;how long to wait before aborting a Connection during establishment&#8221;.</li>
 <li>Disable MPTCP:<br> TODO.</li>
 <li>Hand over a message to reliably transfer (possibly multiple times) before connection establishment:<br> &#8220;InitiateWithIdempotentSend&#8221; Action.</li>
 <li>Hand over a message to reliably transfer during connection establishment:<br> TODO.</li>
 <li>Change timeout for aborting connection (using retransmit limit or time value):<br> &#8220;Timeout for aborting Connection&#8221; property, using a time value in seconds.</li>
 <li>Timeout event when data could not be delivered for too long:<br> TODO: this should probably be covered by the &#8220;ConnectionError&#8221; Event, but the text above it currently reads: &#8220;&#8230;can inform the application that the other side has aborted the Connection&#8221;. In this case, it is the local side.</li>
-<li>Suggest timeout to the peer:<br> &#8220;Suggest a timeout to the Remote Endpoint&#8221; and &#8220;Abort timeout to suggest to the Remote Endpoint&#8221; Selection property.  [EDITOR&#8217;S NOTE: For discussion of this option, see https://github.com/taps-api/drafts/issues/109].</li>
+<li>Suggest timeout to the peer:<br> TCP-specific Property: User Timeout.</li>
 <li>Notification of Excessive Retransmissions (early warning below abortion threshold):<br> &#8220;Notification of excessive retransmissions&#8221; property.</li>
 <li>Notification of ICMP error message arrival:<br> &#8220;Notification of ICMP soft error message arrival&#8221; property.</li>
 <li>Choose a scheduler to operate between streams of an association:<br> &#8220;Connection group transmission scheduler&#8221; property.</li>
