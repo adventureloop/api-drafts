@@ -171,14 +171,14 @@ Internet-Draft               TAPS Interface                December 2018
 
 
        9.1.12. Capacity Profile  . . . . . . . . . . . . . . . . . .  38
-       9.1.13. Bounds on Send or Receive Rate  . . . . . . . . . . .  40
+       9.1.13. Bounds on Send or Receive Rate  . . . . . . . . . . .  39
        9.1.14. Parallel Use of Multiple Paths  . . . . . . . . . . .  40
        9.1.15. TCP-specific Property: User Timeout . . . . . . . . .  40
-     9.2.  Soft Errors . . . . . . . . . . . . . . . . . . . . . . .  41
+     9.2.  Soft Errors . . . . . . . . . . . . . . . . . . . . . . .  40
    10. Connection Termination  . . . . . . . . . . . . . . . . . . .  41
    11. Connection State and Ordering of Operations and Events  . . .  41
    12. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  42
-   13. Security Considerations . . . . . . . . . . . . . . . . . . .  43
+   13. Security Considerations . . . . . . . . . . . . . . . . . . .  42
    14. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  43
    15. References  . . . . . . . . . . . . . . . . . . . . . . . . .  43
      15.1.  Normative References . . . . . . . . . . . . . . . . . .  43
@@ -850,10 +850,8 @@ Internet-Draft               TAPS Interface                December 2018
 
 5.2.11.  Timeout for aborting Connection Establishment
 
-   Type:  Integer
-
    This property specifies how long to wait before aborting a Connection
-   during establishment.  It is given in seconds.
+   during establishment.
 
 5.3.  Specifying Security Parameters and Callbacks
 
@@ -890,6 +888,8 @@ Internet-Draft               TAPS Interface                December 2018
 
    o  Supported algorithms: Used to restrict what parameters are used by
       underlying transport security protocols.  When not specified,
+      these algorithms should default to known and safe defaults for the
+
 
 
 
@@ -898,7 +898,6 @@ Trammell, et al.          Expires June 9, 2019                 [Page 16]
 Internet-Draft               TAPS Interface                December 2018
 
 
-      these algorithms should default to known and safe defaults for the
       system.  Parameters include: ciphersuites, supported groups, and
       signature algorithms.
 
@@ -945,6 +944,7 @@ SecurityParameters.AddSignatureAlgorithm(ed25519)
      // Handle challenge
    })
    SecurityParameters.SetIdentityChallengeCallback(challengeCallback)
+
 
 
 
@@ -2039,10 +2039,8 @@ Internet-Draft               TAPS Interface                December 2018
 
 9.1.6.  Timeout for aborting Connection
 
-   Type:  Integer
-
    This property specifies how long to wait before deciding that a
-   Connection has failed after establishment.  It is given in seconds.
+   Connection has failed after establishment.
 
 9.1.7.  Connection group transmission scheduler
 
@@ -2064,7 +2062,9 @@ Internet-Draft               TAPS Interface                December 2018
 
    Type:  Integer (read only)
 
-
+   This property, if applicable, represents the maximum Message size
+   that can be sent without incurring network-layer fragmentation or
+   transport layer segmentation at the sender.
 
 
 
@@ -2073,10 +2073,6 @@ Trammell, et al.          Expires June 9, 2019                 [Page 37]
 
 Internet-Draft               TAPS Interface                December 2018
 
-
-   This property, if applicable, represents the maximum Message size
-   that can be sent without incurring network-layer fragmentation or
-   transport layer segmentation at the sender.
 
 9.1.10.  Maximum Message size on send
 
@@ -2121,7 +2117,11 @@ Internet-Draft               TAPS Interface                December 2018
       the Connection is multiplexed, the guidelines in section 6 of
       [RFC7657] apply.
 
-
+   Low Latency/Interactive:  The application is interactive, and prefers
+      loss to latency.  Response time should be optimized at the expense
+      of bandwidth efficiency and delay variation when sending on this
+      connection.  This can be used by the system to disable the
+      coalescing of multiple small Messages into larger packets (Nagle's
 
 
 
@@ -2130,11 +2130,6 @@ Trammell, et al.          Expires June 9, 2019                 [Page 38]
 Internet-Draft               TAPS Interface                December 2018
 
 
-   Low Latency/Interactive:  The application is interactive, and prefers
-      loss to latency.  Response time should be optimized at the expense
-      of bandwidth efficiency and delay variation when sending on this
-      connection.  This can be used by the system to disable the
-      coalescing of multiple small Messages into larger packets (Nagle's
       algorithm); to prefer immediate acknowledgment from the peer
       endpoint when supported by the underlying transport; and so on.
       Transport system implementations that map the requested capacity
@@ -2178,6 +2173,11 @@ Internet-Draft               TAPS Interface                December 2018
    a per-Message basis using the Transmission Profile Message Property;
    see Section 7.3.8.
 
+9.1.13.  Bounds on Send or Receive Rate
+
+   This property specifies an upper-bound rate that a transfer is not
+   expected to exceed (even if flow control and congestion control allow
+   higher rates), and/or a lower-bound rate below which the application
 
 
 
@@ -2186,11 +2186,6 @@ Trammell, et al.          Expires June 9, 2019                 [Page 39]
 Internet-Draft               TAPS Interface                December 2018
 
 
-9.1.13.  Bounds on Send or Receive Rate
-
-   This property specifies an upper-bound rate that a transfer is not
-   expected to exceed (even if flow control and congestion control allow
-   higher rates), and/or a lower-bound rate below which the application
    does not deem a data transfer useful.  It is given in bits per
    second.
 
@@ -2230,18 +2225,6 @@ Internet-Draft               TAPS Interface                December 2018
    specify "User Timeout Enabled" as true, but not specify an Advertised
    User Timeout value; in this case, the TCP default will be used).
 
-
-
-
-
-
-
-
-Trammell, et al.          Expires June 9, 2019                 [Page 40]
-
-Internet-Draft               TAPS Interface                December 2018
-
-
 9.2.  Soft Errors
 
    Asynchronous introspection is also possible, via the SoftError Event.
@@ -2250,6 +2233,14 @@ Internet-Draft               TAPS Interface                December 2018
    the underlying protocol stack supports access to soft errors;
    however, even if the underlying stack supports it, there is no
    guarantee that a soft error will be signaled.
+
+
+
+
+Trammell, et al.          Expires June 9, 2019                 [Page 40]
+
+Internet-Draft               TAPS Interface                December 2018
+
 
    Connection -> SoftError<>
 
@@ -2289,15 +2280,6 @@ Internet-Draft               TAPS Interface                December 2018
    actions are handled, and on which threads/callbacks events are
    dispatched, are implementation dependent.
 
-
-
-
-
-Trammell, et al.          Expires June 9, 2019                 [Page 41]
-
-Internet-Draft               TAPS Interface                December 2018
-
-
    Each transition of connection state is associated with one of more
    events:
 
@@ -2306,6 +2288,15 @@ Internet-Draft               TAPS Interface                December 2018
 
    o  ConnectionReceived<> occurs when a Connection created with
       Listen() transitions to Established state.
+
+
+
+
+
+Trammell, et al.          Expires June 9, 2019                 [Page 41]
+
+Internet-Draft               TAPS Interface                December 2018
+
 
    o  RendezvousDone<> occurs when a Connection created with
       Rendezvous() transitions to Established state.
@@ -2347,13 +2338,6 @@ Internet-Draft               TAPS Interface                December 2018
 
    This document has no Actions for IANA.
 
-
-
-Trammell, et al.          Expires June 9, 2019                 [Page 42]
-
-Internet-Draft               TAPS Interface                December 2018
-
-
 13.  Security Considerations
 
    This document describes a generic API for interacting with a
@@ -2362,6 +2346,13 @@ Internet-Draft               TAPS Interface                December 2018
    in Section 5.3.  It does not recommend use (or disuse) of specific
    algorithms or protocols.  Any API-compatible transport security
    protocol should work in a TAPS system.
+
+
+
+Trammell, et al.          Expires June 9, 2019                 [Page 42]
+
+Internet-Draft               TAPS Interface                December 2018
+
 
 14.  Acknowledgements
 
@@ -2402,6 +2393,15 @@ Internet-Draft               TAPS Interface                December 2018
               Packet Markings for WebRTC QoS", draft-ietf-tsvwg-rtcweb-
               qos-18 (work in progress), August 2016.
 
+   [I-D.ietf-tsvwg-sctp-ndata]
+              Stewart, R., Tuexen, M., Loreto, S., and R. Seggelmann,
+              "Stream Schedulers and User Message Interleaving for the
+              Stream Control Transmission Protocol", draft-ietf-tsvwg-
+              sctp-ndata-13 (work in progress), September 2017.
+
+
+
+
 
 
 
@@ -2409,12 +2409,6 @@ Trammell, et al.          Expires June 9, 2019                 [Page 43]
 
 Internet-Draft               TAPS Interface                December 2018
 
-
-   [I-D.ietf-tsvwg-sctp-ndata]
-              Stewart, R., Tuexen, M., Loreto, S., and R. Seggelmann,
-              "Stream Schedulers and User Message Interleaving for the
-              Stream Control Transmission Protocol", draft-ietf-tsvwg-
-              sctp-ndata-13 (work in progress), September 2017.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -2456,6 +2450,12 @@ Internet-Draft               TAPS Interface                December 2018
               DOI 10.17487/RFC2597, June 1999,
               <https://www.rfc-editor.org/info/rfc2597>.
 
+   [RFC2914]  Floyd, S., "Congestion Control Principles", BCP 41,
+              RFC 2914, DOI 10.17487/RFC2914, September 2000,
+              <https://www.rfc-editor.org/info/rfc2914>.
+
+
+
 
 
 
@@ -2465,10 +2465,6 @@ Trammell, et al.          Expires June 9, 2019                 [Page 44]
 
 Internet-Draft               TAPS Interface                December 2018
 
-
-   [RFC2914]  Floyd, S., "Congestion Control Principles", BCP 41,
-              RFC 2914, DOI 10.17487/RFC2914, September 2000,
-              <https://www.rfc-editor.org/info/rfc2914>.
 
    [RFC3246]  Davie, B., Charny, A., Bennet, J., Benson, K., Le Boudec,
               J., Courtney, W., Davari, S., Firoiu, V., and D.
@@ -2511,7 +2507,11 @@ Internet-Draft               TAPS Interface                December 2018
               BCP 208, RFC 8084, DOI 10.17487/RFC8084, March 2017,
               <https://www.rfc-editor.org/info/rfc8084>.
 
-
+   [RFC8095]  Fairhurst, G., Ed., Trammell, B., Ed., and M. Kuehlewind,
+              Ed., "Services Provided by IETF Transport Protocols and
+              Congestion Control Mechanisms", RFC 8095,
+              DOI 10.17487/RFC8095, March 2017,
+              <https://www.rfc-editor.org/info/rfc8095>.
 
 
 
@@ -2521,12 +2521,6 @@ Trammell, et al.          Expires June 9, 2019                 [Page 45]
 
 Internet-Draft               TAPS Interface                December 2018
 
-
-   [RFC8095]  Fairhurst, G., Ed., Trammell, B., Ed., and M. Kuehlewind,
-              Ed., "Services Provided by IETF Transport Protocols and
-              Congestion Control Mechanisms", RFC 8095,
-              DOI 10.17487/RFC8095, March 2017,
-              <https://www.rfc-editor.org/info/rfc8095>.
 
 Appendix A.  Additional Properties
 
@@ -2570,6 +2564,12 @@ A.1.1.  Cost Preferences
 
    Possible values are:
 
+   No Expense:  Avoid transports associated with monetary cost
+
+   Optimize Cost:  Prefer inexpensive transports and accept service
+      degradation
+
+   Balance Cost:  Use system policy to balance cost and other criteria
 
 
 
@@ -2577,13 +2577,6 @@ Trammell, et al.          Expires June 9, 2019                 [Page 46]
 
 Internet-Draft               TAPS Interface                December 2018
 
-
-   No Expense:  Avoid transports associated with monetary cost
-
-   Optimize Cost:  Prefer inexpensive transports and accept service
-      degradation
-
-   Balance Cost:  Use system policy to balance cost and other criteria
 
    Ignore Cost:  Ignore cost, choose transport solely based on other
       criteria
@@ -2626,6 +2619,13 @@ Appendix C.  Relationship to the Minimal Set of Transport Services for
    o  Listen:
       "Listen" Action.
 
+   o  Specify number of attempts and/or timeout for the first
+      establishment message:
+      "Timeout for aborting Connection Establishment" Property, using a
+      time value.
+
+   o  Disable MPTCP:
+      "Parallel Use of Multiple Paths" Property.
 
 
 
@@ -2633,14 +2633,6 @@ Trammell, et al.          Expires June 9, 2019                 [Page 47]
 
 Internet-Draft               TAPS Interface                December 2018
 
-
-   o  Specify number of attempts and/or timeout for the first
-      establishment message:
-      "Timeout for aborting Connection Establishment" Property, using a
-      time value in seconds.
-
-   o  Disable MPTCP:
-      "Parallel Use of Multiple Paths" Property.
 
    o  Hand over a message to reliably transfer (possibly multiple times)
       before connection establishment:
@@ -2652,8 +2644,7 @@ Internet-Draft               TAPS Interface                December 2018
 
    o  Change timeout for aborting connection (using retransmit limit or
       time value):
-      "Timeout for aborting Connection" property, using a time value in
-      seconds.
+      "Timeout for aborting Connection" property, using a time value.
 
    o  Timeout event when data could not be delivered for too long:
       "ConnectionError" Event.
@@ -2683,13 +2674,6 @@ Internet-Draft               TAPS Interface                December 2018
       "Required minimum coverage of the checksum for receiving" property
       (value 0 to disable).
 
-
-
-Trammell, et al.          Expires June 9, 2019                 [Page 48]
-
-Internet-Draft               TAPS Interface                December 2018
-
-
    o  "Specify DF" field and "Request not to bundle messages:"
       The "Singular Transmission" Message property combines both of
       these requests, i.e. if a request not to bundle messages is made,
@@ -2698,6 +2682,14 @@ Internet-Draft               TAPS Interface                December 2018
 
    o  Get max. transport-message size that may be sent using a non-
       fragmented IP packet from the configured interface:
+
+
+
+Trammell, et al.          Expires June 9, 2019                 [Page 48]
+
+Internet-Draft               TAPS Interface                December 2018
+
+
       "Maximum Message size before fragmentation or segmentation"
       property.
 
@@ -2738,14 +2730,6 @@ Internet-Draft               TAPS Interface                December 2018
       is provided via the "Congestion control" property.
 
    o  Configurable Message Reliability:
-
-
-
-Trammell, et al.          Expires June 9, 2019                 [Page 49]
-
-Internet-Draft               TAPS Interface                December 2018
-
-
       The "Lifetime" Message Property implements a time-based way to
       configure message reliability.
 
@@ -2753,6 +2737,14 @@ Internet-Draft               TAPS Interface                December 2018
       "Unordered message delivery (potentially faster than ordered)":
       The two transport features are controlled via the Message property
       "Ordered".
+
+
+
+
+Trammell, et al.          Expires June 9, 2019                 [Page 49]
+
+Internet-Draft               TAPS Interface                December 2018
+
 
    o  Request not to delay the acknowledgement (SACK) of a message:
       Should the protocol support it, this is one of the transport
@@ -2792,6 +2784,14 @@ Authors' Addresses
    Email: ietf@trammell.ch
 
 
+   Michael Welzl (editor)
+   University of Oslo
+   PO Box 1080 Blindern
+   0316  Oslo
+   Norway
+
+   Email: michawe@ifi.uio.no
+
 
 
 
@@ -2800,15 +2800,6 @@ Authors' Addresses
 Trammell, et al.          Expires June 9, 2019                 [Page 50]
 
 Internet-Draft               TAPS Interface                December 2018
-
-
-   Michael Welzl (editor)
-   University of Oslo
-   PO Box 1080 Blindern
-   0316  Oslo
-   Norway
-
-   Email: michawe@ifi.uio.no
 
 
    Theresa Enghardt
@@ -2848,6 +2839,15 @@ Internet-Draft               TAPS Interface                December 2018
    Email: csp@csperkins.org
 
 
+   Philipp S. Tiesel
+   TU Berlin
+   Marchstrasse 23
+   10587 Berlin
+   Germany
+
+   Email: philipp@inet.tu-berlin.de
+
+
 
 
 
@@ -2858,15 +2858,6 @@ Trammell, et al.          Expires June 9, 2019                 [Page 51]
 Internet-Draft               TAPS Interface                December 2018
 
 
-   Philipp S. Tiesel
-   TU Berlin
-   Marchstrasse 23
-   10587 Berlin
-   Germany
-
-   Email: philipp@inet.tu-berlin.de
-
-
    Chris Wood
    Apple Inc.
    1 Infinite Loop
@@ -2874,6 +2865,15 @@ Internet-Draft               TAPS Interface                December 2018
    United States of America
 
    Email: cawood@apple.com
+
+
+
+
+
+
+
+
+
 
 
 
