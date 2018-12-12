@@ -299,7 +299,9 @@ ul.toc li {
 <link href="#rfc.section.5.2.7" rel="Chapter" title="5.2.7 Congestion control">
 <link href="#rfc.section.5.2.8" rel="Chapter" title="5.2.8 Interface Instance or Type">
 <link href="#rfc.section.5.2.9" rel="Chapter" title="5.2.9 Provisioning Domain Instance or Type">
-<link href="#rfc.section.5.2.10" rel="Chapter" title="5.2.10 Direction of communication">
+<link href="#rfc.section.5.2.10" rel="Chapter" title="5.2.10 Parallel Use of Multiple Paths">
+<link href="#rfc.section.5.2.11" rel="Chapter" title="5.2.11 Direction of communication">
+<link href="#rfc.section.5.2.12" rel="Chapter" title="5.2.12 Timeout for aborting Connection Establishment">
 <link href="#rfc.section.5.3" rel="Chapter" title="5.3 Specifying Security Parameters and Callbacks">
 <link href="#rfc.section.5.3.1" rel="Chapter" title="5.3.1 Pre-Connection Parameters">
 <link href="#rfc.section.5.3.2" rel="Chapter" title="5.3.2 Connection Establishment Callbacks">
@@ -326,7 +328,7 @@ ul.toc li {
 <link href="#rfc.section.7.3.9" rel="Chapter" title="7.3.9 Singular Transmission">
 <link href="#rfc.section.7.4" rel="Chapter" title="7.4 Partial Sends">
 <link href="#rfc.section.7.5" rel="Chapter" title="7.5 Batching Sends">
-<link href="#rfc.section.7.6" rel="Chapter" title="7.6 Send on Active Open: InitiateWithIdempotentSend">
+<link href="#rfc.section.7.6" rel="Chapter" title="7.6 Send on Active Open: InitiateWithSend">
 <link href="#rfc.section.7.7" rel="Chapter" title="7.7 Sender-side Framing">
 <link href="#rfc.section.8" rel="Chapter" title="8 Receiving Data">
 <link href="#rfc.section.8.1" rel="Chapter" title="8.1 Enqueuing Receives">
@@ -372,12 +374,12 @@ ul.toc li {
 <link href="#rfc.authors" rel="Chapter">
 
 
-  <meta name="generator" content="xml2rfc version 2.15.2 - https://tools.ietf.org/tools/xml2rfc" />
+  <meta name="generator" content="xml2rfc version 2.15.3 - https://tools.ietf.org/tools/xml2rfc" />
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-12-04" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-12-12" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -401,7 +403,7 @@ ul.toc li {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: June 7, 2019</td>
+<td class="left">Expires: June 15, 2019</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -454,7 +456,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">December 04, 2018</td>
+<td class="right">December 12, 2018</td>
 </tr>
 
     	
@@ -470,7 +472,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on June 7, 2019.</p>
+<p>This Internet-Draft will expire on June 15, 2019.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -516,7 +518,11 @@ ul.toc li {
 </li>
 <li>5.2.9.   <a href="#rfc.section.5.2.9">Provisioning Domain Instance or Type</a>
 </li>
-<li>5.2.10.   <a href="#rfc.section.5.2.10">Direction of communication</a>
+<li>5.2.10.   <a href="#rfc.section.5.2.10">Parallel Use of Multiple Paths</a>
+</li>
+<li>5.2.11.   <a href="#rfc.section.5.2.11">Direction of communication</a>
+</li>
+<li>5.2.12.   <a href="#rfc.section.5.2.12">Timeout for aborting Connection Establishment</a>
 </li>
 </ul><li>5.3.   <a href="#rfc.section.5.3">Specifying Security Parameters and Callbacks</a>
 </li>
@@ -570,7 +576,7 @@ ul.toc li {
 </li>
 <li>7.5.   <a href="#rfc.section.7.5">Batching Sends</a>
 </li>
-<li>7.6.   <a href="#rfc.section.7.6">Send on Active Open: InitiateWithIdempotentSend</a>
+<li>7.6.   <a href="#rfc.section.7.6">Send on Active Open: InitiateWithSend</a>
 </li>
 <li>7.7.   <a href="#rfc.section.7.7">Sender-side Framing</a>
 </li>
@@ -899,9 +905,14 @@ TransportProperties := Connection.GetTransportProperties()
 <p id="rfc.section.5.2.9.p.3">The identification of a specific Provisioning Domain (PvD) is defined to be implementation- and system-specific, since there is not a portable standard format for a PvD identitfier. For example, this identifier may be a string name or an integer. As with requiring specific interfaces, requiring a specific PvD strictly limits path selection.</p>
 <p id="rfc.section.5.2.9.p.4">Categories or types of PvDs are also defined to be implementation- and system-specific. These may be useful to identify a service that is provided by a PvD. For example, if an application wants to use a PvD that provides a Voice-Over-IP service on a Cellular network, it can use the relevant PvD type to require some PvD that provides this service, without needing to look up a particular instance. While this does restrict path selection, it is broader than requiring specific PvD instances or interface instances, and should be preferred over these options.</p>
 <h1 id="rfc.section.5.2.10">
-<a href="#rfc.section.5.2.10">5.2.10.</a> <a href="#direction-of-communication" id="direction-of-communication">Direction of communication</a>
+<a href="#rfc.section.5.2.10">5.2.10.</a> <a href="#parallel-use-of-multiple-paths" id="parallel-use-of-multiple-paths">Parallel Use of Multiple Paths</a>
 </h1>
-<p id="rfc.section.5.2.10.p.1">This property specifies whether an application wants to use the connection for sending and/or receiving data.  Possible values are:</p>
+<p id="rfc.section.5.2.10.p.1">This property specifies whether an application considers it useful to transfer data across multiple paths between the same end hosts. Generally, in most cases, this will improve performance (e.g., achieve greater throughput).  One possible side-effect is increased jitter, which may be problematic for delay-sensitive applications.</p>
+<p id="rfc.section.5.2.10.p.2">The recommended default is to have this option.</p>
+<h1 id="rfc.section.5.2.11">
+<a href="#rfc.section.5.2.11">5.2.11.</a> <a href="#direction-of-communication" id="direction-of-communication">Direction of communication</a>
+</h1>
+<p id="rfc.section.5.2.11.p.1">This property specifies whether an application wants to use the connection for sending and/or receiving data.  Possible values are:</p>
 <p></p>
 
 <dl>
@@ -912,7 +923,11 @@ TransportProperties := Connection.GetTransportProperties()
 <dt>Unidirectional receive:</dt>
 <dd style="margin-left: 8">The connection must support receiving data</dd>
 </dl>
-<p id="rfc.section.5.2.10.p.3">In case a unidirectional connection is requested, but unidirectional connections are not supported by the transport protocol, the system should fall back to bidirectional transport.</p>
+<p id="rfc.section.5.2.11.p.3">In case a unidirectional connection is requested, but unidirectional connections are not supported by the transport protocol, the system should fall back to bidirectional transport.</p>
+<h1 id="rfc.section.5.2.12">
+<a href="#rfc.section.5.2.12">5.2.12.</a> <a href="#conn-establish-timeout" id="conn-establish-timeout">Timeout for aborting Connection Establishment</a>
+</h1>
+<p id="rfc.section.5.2.12.p.1">This property specifies how long to wait before aborting a Connection during establishment.</p>
 <h1 id="rfc.section.5.3">
 <a href="#rfc.section.5.3">5.3.</a> <a href="#security-parameters" id="security-parameters">Specifying Security Parameters and Callbacks</a>
 </h1>
@@ -1252,20 +1267,20 @@ Connection.Batch(
 )
 </pre>
 <h1 id="rfc.section.7.6">
-<a href="#rfc.section.7.6">7.6.</a> <a href="#initiate-and-send" id="initiate-and-send">Send on Active Open: InitiateWithIdempotentSend</a>
+<a href="#rfc.section.7.6">7.6.</a> <a href="#initiate-and-send" id="initiate-and-send">Send on Active Open: InitiateWithSend</a>
 </h1>
-<p id="rfc.section.7.6.p.1">For application-layer protocols where the Connection initiator also sends the first message, the InitiateWithIdempotentSend() action combines Connection initiation with a first Message sent, provided that message is idempotent.</p>
+<p id="rfc.section.7.6.p.1">For application-layer protocols where the Connection initiator also sends the first message, the InitiateWithSend() action combines Connection initiation with a first Message sent.</p>
 <p id="rfc.section.7.6.p.2">Without a message context (as in <a href="#send-basic" class="xref">Section 7.1</a>):</p>
 <pre>
-Connection := Preconnection.InitiateWithIdempotentSend(messageData)
+Connection := Preconnection.InitiateWithSend(messageData)
 </pre>
 <p id="rfc.section.7.6.p.3">With a message context (as in <a href="#message-props" class="xref">Section 7.3</a>):</p>
 <pre>
-Connection := Preconnection.InitiateWithIdempotentSend(messageData, messageContext)
+Connection := Preconnection.InitiateWithSend(messageData, messageContext)
 </pre>
-<p id="rfc.section.7.6.p.4">The message passed to InitiateWithIdempotentSend() is, as suggested by the name, considered to be idempotent (see <a href="#msg-idempotent" class="xref">Section 7.3.4</a>) regardless of declared message properties or defaults. If protocol stacks supporting 0-RTT establishment with idempotent data are available on the Preconnection, then 0-RTT establishment may be used with the given message when establishing candidate connections. For a non-idemponent initial message, or when the selected stack(s) do not support 0-RTT establishment, InitiateWithIdempotentSend is identical to Initiate() followed by Send().</p>
-<p id="rfc.section.7.6.p.5">Neither partial sends nor send batching are supported by InitiateWithIdempotentSend().</p>
-<p id="rfc.section.7.6.p.6">The Events that may be sent after InitiateWithIdempotentSend() are equivalent to those that would be sent by an invocation of Initate() followed immediately by an invocation of Send(), with the caveat that a send failure that occurs because the Connection could not be established will not result in a SendError separate from the InitiateError signaling the failure of Connection establishment.</p>
+<p id="rfc.section.7.6.p.4">Whenever possible, a messageContext should be provided to declare the message passed to InitiateWithSend as idempotent. This allows the transport system to make use of 0-RTT establishment in case this is supported by the available protocol stacks. When the selected stack(s) do not support transmitting data upon connection establishment, InitiateWithSend is identical to Initiate() followed by Send().</p>
+<p id="rfc.section.7.6.p.5">Neither partial sends nor send batching are supported by InitiateWithSend().</p>
+<p id="rfc.section.7.6.p.6">The Events that may be sent after InitiateWithSend() are equivalent to those that would be sent by an invocation of Initate() followed immediately by an invocation of Send(), with the caveat that a send failure that occurs because the Connection could not be established will not result in a SendError separate from the InitiateError signaling the failure of Connection establishment.</p>
 <h1 id="rfc.section.7.7">
 <a href="#rfc.section.7.7">7.7.</a> <a href="#send-framing" id="send-framing">Sender-side Framing</a>
 </h1>
@@ -1437,13 +1452,7 @@ Preconnection.DeframeWith(Deframer)
 <h1 id="rfc.section.9.1.6">
 <a href="#rfc.section.9.1.6">9.1.6.</a> <a href="#conn-timeout" id="conn-timeout">Timeout for aborting Connection</a>
 </h1>
-<p></p>
-
-<dl>
-<dt>Type:</dt>
-<dd style="margin-left: 8">Integer</dd>
-</dl>
-<p id="rfc.section.9.1.6.p.2">This property specifies how long to wait before aborting a Connection during establishment, or before deciding that a Connection has failed after establishment. It is given in seconds.</p>
+<p id="rfc.section.9.1.6.p.1">This property specifies how long to wait before deciding that a Connection has failed after establishment.</p>
 <h1 id="rfc.section.9.1.7">
 <a href="#rfc.section.9.1.7">9.1.7.</a> <a href="#conn-scheduler" id="conn-scheduler">Connection group transmission scheduler</a>
 </h1>
@@ -1556,7 +1565,7 @@ Connection -&gt; Closed&lt;&gt;
 <pre>
 Connection.Abort()
 </pre>
-<p id="rfc.section.10.p.4">A ConnectionError can inform the application that the other side has aborted the Connection; however, there is no guarantee that an Abort will indeed be signaled.</p>
+<p id="rfc.section.10.p.4">A ConnectionError informs the application that data to could not be delivered after a timeout, or the other side has aborted the Connection; however, there is no guarantee that an Abort will indeed be signaled.</p>
 <pre>
 Connection -&gt; ConnectionError&lt;&gt;
 </pre>
@@ -1568,7 +1577,7 @@ Connection -&gt; ConnectionError&lt;&gt;
 <p></p>
 
 <ul>
-<li>Ready&lt;&gt; occurs when a Connection created with Initiate() or InitiateWithIdempotentData() transitions to Established state.</li>
+<li>Ready&lt;&gt; occurs when a Connection created with Initiate() or InitiateWithSend() transitions to Established state.</li>
 <li>ConnectionReceived&lt;&gt; occurs when a Connection created with Listen() transitions to Established state.</li>
 <li>RendezvousDone&lt;&gt; occurs when a Connection created with Rendezvous() transitions to Established state.</li>
 <li>Closed&lt;&gt; occurs when a Connection transitions to Closed state without error.</li>
@@ -1755,18 +1764,18 @@ Connection -&gt; ConnectionError&lt;&gt;
 <a href="#rfc.appendix.C">Appendix C.</a> <a href="#relationship-to-the-minimal-set-of-transport-services-for-end-systems" id="relationship-to-the-minimal-set-of-transport-services-for-end-systems">Relationship to the Minimal Set of Transport Services for End Systems</a>
 </h1>
 <p><a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a> identifies a minimal set of transport services that end systems should offer. These services make all transport features offered by TCP, MPTCP, UDP, UDP-Lite, SCTP and LEDBAT available that 1) require interaction with the application, and 2) do not get in the way of a possible implementation over TCP or, with limitations, UDP. The following text explains how this minimal set is reflected in the present API. For brevity, this uses the list in Section 4.1 of <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>, updated according to the discussion in Section 5 of <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>.</p>
-<p id="rfc.section.C.p.2">[EDITOR&#8217;S NOTE: This is early text. In the future, this section will contain backward references, which we currently avoid because things are still being moved around and names / categories etc. are changing. Also, clearly, the intention is for the full minset to be reflected by the API at some point.]</p>
+<p id="rfc.section.C.p.2">[EDITOR&#8217;S NOTE: This is early text. In the future, this section will contain backward references, which we currently avoid because things are still being moved around and names / categories etc. are changing.]</p>
 <p></p>
 
 <ul>
 <li>Connect:<br> &#8220;Initiate&#8221; Action.</li>
 <li>Listen:<br> &#8220;Listen&#8221; Action.</li>
-<li>Specify number of attempts and/or timeout for the first establishment message:<br> TODO.  The description of &#8220;Timeout for aborting Connection&#8221; contains: &#8220;how long to wait before aborting a Connection during establishment&#8221;.</li>
-<li>Disable MPTCP:<br> TODO.</li>
-<li>Hand over a message to reliably transfer (possibly multiple times) before connection establishment:<br> &#8220;InitiateWithIdempotentSend&#8221; Action.</li>
-<li>Hand over a message to reliably transfer during connection establishment:<br> TODO.</li>
-<li>Change timeout for aborting connection (using retransmit limit or time value):<br> &#8220;Timeout for aborting Connection&#8221; property, using a time value in seconds.</li>
-<li>Timeout event when data could not be delivered for too long:<br> TODO: this should probably be covered by the &#8220;ConnectionError&#8221; Event, but the text above it currently reads: &#8220;&#8230;can inform the application that the other side has aborted the Connection&#8221;. In this case, it is the local side.</li>
+<li>Specify number of attempts and/or timeout for the first establishment message:<br> &#8220;Timeout for aborting Connection Establishment&#8221; Property, using a time value.</li>
+<li>Disable MPTCP:<br> &#8220;Parallel Use of Multiple Paths&#8221; Property.</li>
+<li>Hand over a message to reliably transfer (possibly multiple times) before connection establishment:<br> &#8220;InitiateWithSend&#8221; Action.</li>
+<li>Hand over a message to reliably transfer during connection establishment:<br> &#8220;InitiateWithSend&#8221; Action.</li>
+<li>Change timeout for aborting connection (using retransmit limit or time value):<br> &#8220;Timeout for aborting Connection&#8221; property, using a time value.</li>
+<li>Timeout event when data could not be delivered for too long:<br> &#8220;ConnectionError&#8221; Event.</li>
 <li>Suggest timeout to the peer:<br> TCP-specific Property: User Timeout.</li>
 <li>Notification of Excessive Retransmissions (early warning below abortion threshold):<br> &#8220;Notification of excessive retransmissions&#8221; property.</li>
 <li>Notification of ICMP error message arrival:<br> &#8220;Notification of ICMP soft error message arrival&#8221; property.</li>
