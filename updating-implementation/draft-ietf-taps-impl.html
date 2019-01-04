@@ -310,7 +310,7 @@ ul.toc li {
 <link href="#rfc.section.5.1.2" rel="Chapter" title="5.1.2 Receiving Messages">
 <link href="#rfc.section.5.2" rel="Chapter" title="5.2 Handling of data for fast-open protocols">
 <link href="#rfc.section.6" rel="Chapter" title="6 Implementing Maintenance">
-<link href="#rfc.section.6.1" rel="Chapter" title="6.1 Changing Protocol Properties">
+<link href="#rfc.section.6.1" rel="Chapter" title="6.1 Managing Connections">
 <link href="#rfc.section.6.2" rel="Chapter" title="6.2 Handling Path Changes">
 <link href="#rfc.section.7" rel="Chapter" title="7 Implementing Termination">
 <link href="#rfc.section.8" rel="Chapter" title="8 Cached State">
@@ -502,7 +502,7 @@ ul.toc li {
 </li>
 </ul><li>6.   <a href="#rfc.section.6">Implementing Maintenance</a>
 </li>
-<ul><li>6.1.   <a href="#rfc.section.6.1">Changing Protocol Properties</a>
+<ul><li>6.1.   <a href="#rfc.section.6.1">Managing Connections</a>
 </li>
 <li>6.2.   <a href="#rfc.section.6.2">Handling Path Changes</a>
 </li>
@@ -886,18 +886,26 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 </h1>
 <p id="rfc.section.6.p.1">Maintenance encompasses changes that the application can request to a Connection, or that a Connection can react to based on system and network changes.</p>
 <h1 id="rfc.section.6.1">
-<a href="#rfc.section.6.1">6.1.</a> <a href="#changing-protocol-properties" id="changing-protocol-properties">Changing Protocol Properties</a>
+<a href="#rfc.section.6.1">6.1.</a> <a href="#managing-connections" id="managing-connections">Managing Connections</a>
 </h1>
-<p id="rfc.section.6.1.p.1">Appendix A.1 of <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a> explains, using primitives that are described in <a href="#RFC8303" class="xref">[RFC8303]</a> and <a href="#RFC8304" class="xref">[RFC8304]</a>, how to implement changing the following protocol properties of an established connection with TCP and UDP. Below, we amend this description for other protocols (if applicable):</p>
+<p id="rfc.section.6.1.p.1">Appendix A.1 of <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a> explains, using primitives from <a href="#RFC8303" class="xref">[RFC8303]</a> and <a href="#RFC8304" class="xref">[RFC8304]</a>, how to implement changing some of the following protocol properties of an established connection with TCP and UDP. Below, we amend this description for other protocols (if applicable) and extend it with Connection Properties that are not contained in <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>.</p>
 <p></p>
 
 <ul>
-<li>Relative niceness: for SCTP, this can be done using the primitive CONFIGURE_STREAM_SCHEDULER.SCTP described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.</li>
-<li>Timeout for aborting Connection: for SCTP, this can be done using the primitive CHANGE_TIMEOUT.SCTP described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.</li>
-<li>Abort timeout to suggest to the Remote Endpoint: for TCP, this can be done using the primitive CHANGE_TIMEOUT.TCP described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.</li>
-<li>Retransmission threshold before excessive retransmission notification: for TCP, this can be done using ERROR.TCP described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.</li>
+<li>Notification of excessive retransmissions: TODO</li>
+<li>Retransmission threshold before excessive retransmission notification: TODO; for TCP, this can be done using ERROR.TCP described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.</li>
+<li>Notification of ICMP soft error message arrival: TODO</li>
 <li>Required minimum coverage of the checksum for receiving: for UDP-Lite, this can be done using the primitive SET_MIN_CHECKSUM_COVERAGE.UDP-Lite described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.</li>
+<li>Niceness (Connection): TODO; for SCTP, this can be done using the primitive CONFIGURE_STREAM_SCHEDULER.SCTP described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.</li>
+<li>Timeout for aborting Connection: for SCTP, this can be done using the primitive CHANGE_TIMEOUT.SCTP described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.</li>
 <li>Connection group transmission scheduler: for SCTP, this can be done using the primitive SET_STREAM_SCHEDULER.SCTP described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.</li>
+<li>Maximum message size concurrent with Connection establishment: TODO</li>
+<li>Maximum Message size before fragmentation or segmentation: TODO</li>
+<li>Maximum Message size on send: TODO</li>
+<li>Maximum Message size on receive: TODO</li>
+<li>Capacity Profile: TODO</li>
+<li>Bounds on Send or Receive Rate: TODO</li>
+<li>TCP-specific Property: User Timeout: for TCP, this can be configured using the primitive CHANGE_TIMEOUT.TCP described in section 4 of <a href="#RFC8303" class="xref">[RFC8303]</a>.</li>
 </ul>
 <p id="rfc.section.6.1.p.3">It may happen that the application attempts to set a Protocol Property which does not apply to the actually chosen protocol. In this case, the implementation should fail gracefully, i.e., it may give a warning to the application, but it should not terminate the Connection.</p>
 <h1 id="rfc.section.6.2">
