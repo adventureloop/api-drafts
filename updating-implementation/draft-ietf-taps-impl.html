@@ -293,8 +293,9 @@ ul.toc li {
 <link href="#rfc.section.4.2" rel="Chapter" title="4.2 Branching Order-of-Operations">
 <link href="#rfc.section.4.3" rel="Chapter" title="4.3 Sorting Branches">
 <link href="#rfc.section.4.4" rel="Chapter" title="4.4 Candidate Racing">
-<link href="#rfc.section.4.4.1" rel="Chapter" title="4.4.1 Delayed Racing">
-<link href="#rfc.section.4.4.2" rel="Chapter" title="4.4.2 Failover">
+<link href="#rfc.section.4.4.1" rel="Chapter" title="4.4.1 Immediate">
+<link href="#rfc.section.4.4.2" rel="Chapter" title="4.4.2 Delayed">
+<link href="#rfc.section.4.4.3" rel="Chapter" title="4.4.3 Failover">
 <link href="#rfc.section.4.5" rel="Chapter" title="4.5 Completing Establishment">
 <link href="#rfc.section.4.5.1" rel="Chapter" title="4.5.1 Determining Successful Establishment">
 <link href="#rfc.section.4.6" rel="Chapter" title="4.6 Establishing multiplexed connections">
@@ -467,9 +468,11 @@ ul.toc li {
 </li>
 <li>4.4.   <a href="#rfc.section.4.4">Candidate Racing</a>
 </li>
-<ul><li>4.4.1.   <a href="#rfc.section.4.4.1">Delayed Racing</a>
+<ul><li>4.4.1.   <a href="#rfc.section.4.4.1">Immediate</a>
 </li>
-<li>4.4.2.   <a href="#rfc.section.4.4.2">Failover</a>
+<li>4.4.2.   <a href="#rfc.section.4.4.2">Delayed</a>
+</li>
+<li>4.4.3.   <a href="#rfc.section.4.4.3">Failover</a>
 </li>
 </ul><li>4.5.   <a href="#rfc.section.4.5">Completing Establishment</a>
 </li>
@@ -582,7 +585,7 @@ ul.toc li {
 <h1 id="rfc.section.3.2">
 <a href="#rfc.section.3.2">3.2.</a> <a href="#role-of-system-policy" id="role-of-system-policy">Role of system policy</a>
 </h1>
-<p id="rfc.section.3.2.p.1">The properties specified during pre-establishment has a close connection to system policy. The implementation is responsible for combining and reconciling several different sources of preferences when establishing Connections. These include, but are not limited to:</p>
+<p id="rfc.section.3.2.p.1">The properties specified during pre-establishment have a close connection to system policy. The implementation is responsible for combining and reconciling several different sources of preferences when establishing Connections. These include, but are not limited to:</p>
 <p></p>
 
 <ol>
@@ -741,7 +744,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 </ul>
 </li>
 </ul>
-<p id="rfc.section.4.3.p.4">Implementations should process properties in the following order: Prohibit, Require, Prefer, Avoid.  [MICHAEL: What about &#8220;Ignore&#8221; (which cancels system default preferences for an option)?] If Selection or Connection Properties contain any prohibited properties, the implementation should first purge branches containing nodes with these properties. For required properties, it should only keep branches that satisfy these requirements. Finally, it should order branches according to preferred properties, and finally use avoided properties as a tiebreaker.</p>
+<p id="rfc.section.4.3.p.4">Implementations should process properties in the following order: Prohibit, Require, Prefer, Avoid.  If Selection or Connection Properties contain any prohibited properties, the implementation should first purge branches containing nodes with these properties. For required properties, it should only keep branches that satisfy these requirements. Finally, it should order branches according to preferred properties, and finally use avoided properties as a tiebreaker.</p>
 <p id="rfc.section.4.3.p.5">For Require and Avoid, path selection takes precedence over protocol selection.  For example, if the application has indicated both a preference for WiFi over LTE and for a feature only available in SCTP, branches will be first sorted accord to path selection, with WiFi at the top. Then, branches with SCTP will be sorted to the top within their subtree according to the properties influencing protocol selection. However, if the implementation has cached the information that SCTP is not available on the path over WiFi, there is no SCTP node in the WiFi subtree. Here, the path over WiFi will be tried first, and, if connection establishment succeeds, TCP will be used. So the Selection Property of preferring WiFi takes precedence over the Property that led to a preference for SCTP.</p>
 <pre>
 1. [www.example.com:80, Any, Any Stream]
@@ -767,18 +770,22 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <p id="rfc.section.4.4.p.5">Each approach is appropriate in different use-cases and branch types. However, to avoid consuming unnecessary network resources, implementations should not use immediate racing as a default approach.</p>
 <p id="rfc.section.4.4.p.6">The timing algorithms for racing should remain independent across branches of the tree. Any timers or racing logic is isolated to a given parent node, and is not ordered precisely with regards to other children of other nodes.</p>
 <h1 id="rfc.section.4.4.1">
-<a href="#rfc.section.4.4.1">4.4.1.</a> <a href="#delayed-racing" id="delayed-racing">Delayed Racing</a>
+<a href="#rfc.section.4.4.1">4.4.1.</a> <a href="#immediate" id="immediate">Immediate</a>
 </h1>
-<p id="rfc.section.4.4.1.p.1">Delayed racing can be used whenever a single node of the tree has multiple child nodes. Based on the order determined when building the tree, the first child node will be initiated immediately, followed by the next child node after some delay. Once that second child node is initiated, the third child node (if present) will begin after another delay, and so on until all child nodes have been initiated, or one of the child nodes successfully completes its negotiation.</p>
-<p id="rfc.section.4.4.1.p.2">Delayed racing attempts occur in parallel. Implementations should not terminate an earlier child connection attempt upon starting a secondary child.</p>
-<p id="rfc.section.4.4.1.p.3">The delay between starting child nodes should be based on the properties of the previously started child node. For example, if the first child represents an IP address with a known route, and the second child represents another IP address, the delay between starting the first and second IP addresses can be based on the expected retransmission cadence for the first child&#8217;s connection (derived from historical round-trip-time). Alternatively, if the first child represents a branch on a Wi-Fi interface, and the second child represents a branch on an LTE interface, the delay should be based on the expected time in which the branch for the first interface would be able to establish a connection, based on link quality and historical round-trip-time.</p>
-<p id="rfc.section.4.4.1.p.4">Any delay should have a defined minimum and maximum value based on the branch type. Generally, branches between paths and protocols should have longer delays than branches between derived endpoints. The maximum delay should be considered with regards to how long a user is expected to wait for the connection to complete.</p>
-<p id="rfc.section.4.4.1.p.5">If a child node fails to connect before the delay timer has fired for the next child, the next child should be started immediately.</p>
+<p id="rfc.section.4.4.1.p.1">[MICHAEL: This seems like an easy thing to do, and its description may be obvious, but I don&#8217;t think we can skip it &#8211; it just looks odd to first introduce the three variants and then only describe two of them.]</p>
 <h1 id="rfc.section.4.4.2">
-<a href="#rfc.section.4.4.2">4.4.2.</a> <a href="#failover" id="failover">Failover</a>
+<a href="#rfc.section.4.4.2">4.4.2.</a> <a href="#delayed" id="delayed">Delayed</a>
 </h1>
-<p id="rfc.section.4.4.2.p.1">If an implementation or application has a strong preference for one branch over another, the branching node may choose to wait until one child has failed before starting the next. Failure of a leaf node is determined by its protocol negotiation failing or timing out; failure of a parent branching node is determined by all of its children failing.</p>
-<p id="rfc.section.4.4.2.p.2">An example in which failover is recommended is a race between a protocol stack that uses a proxy and a protocol stack that bypasses the proxy. Failover is useful in case the proxy is down or misconfigured, but any more aggressive type of racing may end up unnecessarily avoiding a proxy that was preferred by policy.</p>
+<p id="rfc.section.4.4.2.p.1">Delayed racing can be used whenever a single node of the tree has multiple child nodes. Based on the order determined when building the tree, the first child node will be initiated immediately, followed by the next child node after some delay. Once that second child node is initiated, the third child node (if present) will begin after another delay, and so on until all child nodes have been initiated, or one of the child nodes successfully completes its negotiation.</p>
+<p id="rfc.section.4.4.2.p.2">Delayed racing attempts occur in parallel. Implementations should not terminate an earlier child connection attempt upon starting a secondary child.</p>
+<p id="rfc.section.4.4.2.p.3">The delay between starting child nodes should be based on the properties of the previously started child node. For example, if the first child represents an IP address with a known route, and the second child represents another IP address, the delay between starting the first and second IP addresses can be based on the expected retransmission cadence for the first child&#8217;s connection (derived from historical round-trip-time). Alternatively, if the first child represents a branch on a Wi-Fi interface, and the second child represents a branch on an LTE interface, the delay should be based on the expected time in which the branch for the first interface would be able to establish a connection, based on link quality and historical round-trip-time.</p>
+<p id="rfc.section.4.4.2.p.4">Any delay should have a defined minimum and maximum value based on the branch type. Generally, branches between paths and protocols should have longer delays than branches between derived endpoints. The maximum delay should be considered with regards to how long a user is expected to wait for the connection to complete.</p>
+<p id="rfc.section.4.4.2.p.5">If a child node fails to connect before the delay timer has fired for the next child, the next child should be started immediately.</p>
+<h1 id="rfc.section.4.4.3">
+<a href="#rfc.section.4.4.3">4.4.3.</a> <a href="#failover" id="failover">Failover</a>
+</h1>
+<p id="rfc.section.4.4.3.p.1">If an implementation or application has a strong preference for one branch over another, the branching node may choose to wait until one child has failed before starting the next. Failure of a leaf node is determined by its protocol negotiation failing or timing out; failure of a parent branching node is determined by all of its children failing.</p>
+<p id="rfc.section.4.4.3.p.2">An example in which failover is recommended is a race between a protocol stack that uses a proxy and a protocol stack that bypasses the proxy. Failover is useful in case the proxy is down or misconfigured, but any more aggressive type of racing may end up unnecessarily avoiding a proxy that was preferred by policy.</p>
 <h1 id="rfc.section.4.5">
 <a href="#rfc.section.4.5">4.5.</a> <a href="#completing-establishment" id="completing-establishment">Completing Establishment</a>
 </h1>
@@ -811,8 +818,8 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <a href="#rfc.section.4.8">4.8.</a> <a href="#listen" id="listen">Implementing listeners</a>
 </h1>
 <p id="rfc.section.4.8.p.1">When an implementation is asked to Listen, it registers with the system to wait for incoming traffic to the Local Endpoint. If no Local Endpoint is specified, the implementation should either use an ephemeral port or generate an error.</p>
-<p id="rfc.section.4.8.p.2">If the Path Selection Properties do not require a single network interface or path, but allow the use of multiple paths, the Listener object should register for incoming traffic on all of the network interfaces or paths that conform to the Path Selection Properties. The set of available paths can change over time, so the implementation should monitor network path changes and register and de-register the Listener across all usable paths. When using multiple paths, the Listener is generally expected to use the same port for listening on each.</p>
-<p id="rfc.section.4.8.p.3">If the Protocol Selection Properties allow multiple protocols to be used for listening, and the implementation supports it, the Listener object should register across the eligble protocols for each path. This means that inbound Connections delivered by the implementation may have heterogeneous protocol stacks.</p>
+<p id="rfc.section.4.8.p.2">If the Selection or Connection Properties do not require a single network interface or path, but allow the use of multiple paths, the Listener object should register for incoming traffic on all of the network interfaces or paths that conform to the Properties. The set of available paths can change over time, so the implementation should monitor network path changes and register and de-register the Listener across all usable paths. When using multiple paths, the Listener is generally expected to use the same port for listening on each.</p>
+<p id="rfc.section.4.8.p.3">If the Selection or Connection Properties allow multiple protocols to be used for listening, and the implementation supports it, the Listener object should register across the eligble protocols for each path. This means that inbound Connections delivered by the implementation may have heterogeneous protocol stacks.</p>
 <h1 id="rfc.section.4.8.1">
 <a href="#rfc.section.4.8.1">4.8.1.</a> <a href="#implementing-listeners-for-connected-protocols" id="implementing-listeners-for-connected-protocols">Implementing listeners for Connected Protocols</a>
 </h1>
@@ -839,18 +846,19 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 </h1>
 <p id="rfc.section.5.1.1.p.1">The effect of the application sending a Message is determined by the top-level protocol in the established Protocol Stack. That is, if the top-level protocol provides an abstraction of framed messages over a connection, the receiving application will be able to obtain multiple Messages on that connection, even if the framing protocol is built on a byte-stream protocol like TCP.</p>
 <h1 id="rfc.section.5.1.1.1">
-<a href="#rfc.section.5.1.1.1">5.1.1.1.</a> <a href="#send-params" id="send-params">Send Parameters</a>
+<a href="#rfc.section.5.1.1.1">5.1.1.1.</a> <a href="#msg-properties" id="msg-properties">Message Properties</a>
 </h1>
 <p></p>
 
 <ul>
 <li>Lifetime: this should be implemented by removing the Message from its queue of pending Messages after the Lifetime has expired. A queue of pending Messages within the transport system implementation that have yet to be handed to the Protocol Stack can always support this property, but once a Message has been sent into the send buffer of a protocol, only certain protocols may support de-queueing a message. For example, TCP cannot remove bytes from its send buffer, while in case of SCTP, such control over the SCTP send buffer can be exercised using the partial reliability extension <a href="#RFC8303" class="xref">[RFC8303]</a>. When there is no standing queue of Messages within the system, and the Protocol Stack does not support removing a Message from its buffer, this property may be ignored.</li>
-<li>Niceness: this represents the ability to de-prioritize a Message in favor of other Messages. This can be implemented by the system re-ordering Messages that have yet to be handed to the Protocol Stack, or by giving relative priority hints to protocols that support priorities per Message. For example, an implementation of HTTP/2 could choose to send Messages of different niceness on streams of different priority.</li>
+<li>Niceness: this represents the ability to de-prioritize a Message in favor of other Messages. This can be implemented by the system re-ordering Messages that have yet to be handed to the Protocol Stack, or by giving relative priority hints to protocols that support priorities per Message.</li>
 <li>Ordered: when this is false, it disables the requirement of in-order-delivery for protocols that support configurable ordering.</li>
 <li>Idempotent: when this is true, it means that the Message can be used by mechanisms that might transfer it multiple times &#8211; e.g., as a result of racing multiple transports or as part of TCP Fast Open.</li>
+<li>Final: when this is true, it means that a transport connection can be closed immediately after its transmission.</li>
 <li>Corruption Protection Length: when this is set to any value other than -1, it limits the required checksum in protocols that allow limiting the checksum length (e.g. UDP-Lite).</li>
-<li>Immediate Acknowledgement: this informs the implementation that the sender intends to execute tight control over the send buffer, and therefore wants to avoid delayed acknowledgements. In case of SCTP, a request to immediately send acknowledgements can be implemented using the &#8220;sack-immediately flag&#8221; described in Section 4.2 of <a href="#RFC8303" class="xref">[RFC8303]</a> for the SEND.SCTP primitive.</li>
-<li>Instantaneous Capacity Profile: when this is&#160;set to &#8220;Interactive/Low Latency&#8221;, the Message should be sent immediately, even when this comes at the cost of using the network capacity less efficiently. For example, small messages can sometimes be bundled to fit into a single data packet for the sake of reducing header overhead; such bundling should not be used. For example, in case of TCP, the Nagle algorithm should be disabled when Interactive/Low Latency is selected as the capacity profile. Scavenger/Bulk can translate into usage of a congestion control mechanism such as LEDBAT, and/or the capacity profile can lead to a choice of a DSCP value as described in <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>).</li>
+<li>Transmission Profile: TBD &#8211; because it&#8217;s not final in the API yet.  Old text follows: when this is&#160;set to &#8220;Interactive/Low Latency&#8221;, the Message should be sent immediately, even when this comes at the cost of using the network capacity less efficiently. For example, small messages can sometimes be bundled to fit into a single data packet for the sake of reducing header overhead; such bundling should not be used. For example, in case of TCP, the Nagle algorithm should be disabled when Interactive/Low Latency is selected as the capacity profile. Scavenger/Bulk can translate into usage of a congestion control mechanism such as LEDBAT, and/or the capacity profile can lead to a choice of a DSCP value as described in <a href="#I-D.ietf-taps-minset" class="xref">[I-D.ietf-taps-minset]</a>).</li>
+<li>Singular Transmission: when this is true, the application requests to avoid transport-layer segmentation or network-layer fragmentation. Some transports implement network-layer fragmentation avoidance (Path MTU Discovery) without exposing this functionality to the application; in this case, only transport-layer segmentation should be avoided, by fitting the message into a single transport-layer segment or otherwise failing. Otherwise, network-layer fragmentation should be avoided&#8212;e.g. by requesting the IP Don&#8217;t Fragment bit to be set in case of UDP(-Lite) and IPv4 (SET_DF in <a href="#RFC8304" class="xref">[RFC8304]</a>).</li>
 </ul>
 <h1 id="rfc.section.5.1.1.2">
 <a href="#rfc.section.5.1.1.2">5.1.1.2.</a> <a href="#send-completion" id="send-completion">Send Completion</a>
@@ -895,7 +903,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <h1 id="rfc.section.6.2">
 <a href="#rfc.section.6.2">6.2.</a> <a href="#handling-path-changes" id="handling-path-changes">Handling Path Changes</a>
 </h1>
-<p id="rfc.section.6.2.p.1">When a path change occurs, the Transport Services implementation is responsible for notifying Protocol Instances in the Protocol Stack.  If the Protocol Stack includes a transport protocol that supports multipath connectivity, an update to the available paths should inform the Protocol Instance of the new set of paths that are permissible based on the Path Selection Properties passed by the application. A multipath protocol can establish new subflows over new paths, and should tear down subflows over paths that are no longer available. If the Protocol Stack includes a transport protocol that does not support multipath, but support migrating between paths, the update to available paths can be used as the trigger to migrating the connection. For protocols that do not support multipath or migration, the Protocol Instances may be informed of the path change, but should not be forcibly disconnected if the previously used path becomes unavailable. An exception to this case is if the System Policy changes to prohibit traffic from the Connection based on its properties, in which case the Protocol Stack should be disconnected.</p>
+<p id="rfc.section.6.2.p.1">When a path change occurs, the Transport Services implementation is responsible for notifying Protocol Instances in the Protocol Stack.  If the Protocol Stack includes a transport protocol that supports multipath connectivity, an update to the available paths should inform the Protocol Instance of the new set of paths that are permissible based on the Selection or Connection Properties passed by the application. A multipath protocol can establish new subflows over new paths, and should tear down subflows over paths that are no longer available. If the Protocol Stack includes a transport protocol that does not support multipath, but support migrating between paths, the update to available paths can be used as the trigger to migrating the connection. For protocols that do not support multipath or migration, the Protocol Instances may be informed of the path change, but should not be forcibly disconnected if the previously used path becomes unavailable. An exception to this case is if the System Policy changes to prohibit traffic from the Connection based on its properties, in which case the Protocol Stack should be disconnected.</p>
 <h1 id="rfc.section.7">
 <a href="#rfc.section.7">7.</a> <a href="#implementing-termination" id="implementing-termination">Implementing Termination</a>
 </h1>
