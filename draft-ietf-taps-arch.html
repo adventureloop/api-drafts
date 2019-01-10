@@ -311,12 +311,12 @@ ul.toc li {
 <link href="#rfc.authors" rel="Chapter">
 
 
-  <meta name="generator" content="xml2rfc version 2.16.0 - https://tools.ietf.org/tools/xml2rfc" />
+  <meta name="generator" content="xml2rfc version 2.16.2 - https://tools.ietf.org/tools/xml2rfc" />
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
   <meta name="dct.creator" content="Pauly, T., Ed., Trammell, B., Ed., Brunstrom, A., Fairhurst, G., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-taps-arch-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2019-01-04" />
+  <meta name="dct.issued" scheme="ISO8601" content="2019-01-10" />
   <meta name="dct.abstract" content="This document provides an overview of the architecture of Transport Services, a model for exposing transport protocol features to applications for network communication. In contrast to what is provided by most existing Application Programming Interfaces (APIs), it is based on an asynchronous, event-driven interaction pattern; it uses messages for representing data transfer to applications; and it assumes an implementation that can use multiple IP addresses, multiple protocols, multiple paths, and provide multiple application streams. This document further defines the common set of terminology and concepts to be used in definitions of APIs and implementations." />
   <meta name="description" content="This document provides an overview of the architecture of Transport Services, a model for exposing transport protocol features to applications for network communication. In contrast to what is provided by most existing Application Programming Interfaces (APIs), it is based on an asynchronous, event-driven interaction pattern; it uses messages for representing data transfer to applications; and it assumes an implementation that can use multiple IP addresses, multiple protocols, multiple paths, and provide multiple application streams. This document further defines the common set of terminology and concepts to be used in definitions of APIs and implementations." />
 
@@ -340,7 +340,7 @@ ul.toc li {
 <td class="right">B. Trammell, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: July 8, 2019</td>
+<td class="left">Expires: July 14, 2019</td>
 <td class="right">ETH Zurich</td>
 </tr>
 <tr>
@@ -385,7 +385,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">January 04, 2019</td>
+<td class="right">January 10, 2019</td>
 </tr>
 
     	
@@ -401,7 +401,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on July 8, 2019.</p>
+<p>This Internet-Draft will expire on July 14, 2019.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2019 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -639,13 +639,13 @@ ul.toc li {
 <p></p>
 
 <ul>
-<li>Pre-Establishment (<a href="#preestablishment" class="xref">Section 4.1.2</a>) encompasses the properties that an application can pass to describe its intent, requirements, prohibitions, and preferences for its networking operations. For any system that provides generic Transport Services, these properties SHOULD be defined to apply to multiple transport protocols. Some properties are specific to a single transport protocol, and these are be exposed as non-generic interfaces (see Specific Protocol Properties <a href="#preestablishment" class="xref">Section 4.1.2</a>). Properties can have a large impact on the rest of the aspects of the interface: they modify how establishment occurs, they influence the expectations around data transfer, and they determine the set of events that will be supported.</li>
+<li>Pre-Establishment (<a href="#preestablishment" class="xref">Section 4.1.2</a>) encompasses the properties that an application can pass to describe its intent, requirements, prohibitions, and preferences for its networking operations. For any system that provides generic Transport Services, these Selection Properties SHOULD be defined to apply to multiple transport protocols. Selection Properties can have a large impact on the rest of the aspects of the interface: they modify how establishment occurs, they influence the expectations around data transfer, and they determine the set of events that will be supported.</li>
 <li>Establishment (<a href="#establishment" class="xref">Section 4.1.3</a>) focuses on the actions that an application takes on the basic objects to prepare for data transfer.</li>
 <li>Data Transfer (<a href="#datatransfer" class="xref">Section 4.1.4</a>) consists of how an application represents the data to be sent and received, the functions required to send and receive that data, and how the application is notified of the status of its data transfer.</li>
 <li>Event Handling (<a href="#events" class="xref">Section 4.1.5</a>) defines the set of properties about which an application can receive notifications during the lifetime of transport objects. Events MAY also provide opportunities for the application to interact with the underlying transport by querying state or updating maintenance options.</li>
 <li>Termination (<a href="#termination" class="xref">Section 4.1.6</a>) focuses on the methods by which data transmission is stopped, and state is torn down in the transport.</li>
 </ul>
-<p id="rfc.section.4.1.p.4">The diagram below provides a high-level view of the actions taken during the lifetime of a connection.</p>
+<p id="rfc.section.4.1.p.4">The diagram below provides a high-level view of the actions taken during the lifetime of a connection.  Note that some actions are alternatives (e.g., whether to initiate a connection or to listen for incoming connections), others are optional (e.g., setting Connection and Message Properties in Pre-Establishment), or have been omitted for brevity.</p>
 <div id="rfc.figure.2"></div>
 <div id="fig-lifetime"></div>
 <pre>
@@ -655,22 +655,17 @@ ul.toc li {
      +---------------+ Initiate() +------------+ Abort()   :
  +--&gt;| Preconnection |-----------&gt;| Connection |---------------&gt; Closed
  |   +---------------+     :      +------------+ Connection:
- |                         :      ^   ^    |     Finished  :
- +-- Local Endpoint        :      |   |    |               :
- |                         :      |   |    +---------+     :
- +-- Remote Endpoint       :      |   |              |     :
- |                         :      |   |Send()        |     :
- +-- Path Selection        :      | +---------+      v     :
- |   Properties            :      | | Message |  Message   :
- |                         :      | | to send |  Received  :
- +-- Protocol Selection    :      | +---------+            :
- |   Properties            :      |                        :
- |                         :      |                        :
- +-- Specific Protocol     :      |                        :
- |   Properties            :      |                        :
- |                         :      |                        :
- |   +----------+          :      |                        :
- +--&gt;| Listener |-----------------+                        :
+ |                         :       ^  ^  ^  |    Finished  :
+ +-- Local Endpoint        :       |  |  |  |              :
+ |                         :       |  |  |  +---------+    :
+ +-- Remote Endpoint       :  +----+  |  +-----+      |    :
+ |                         :  |       |Send()  |      |    :
+ +-- Selection Properties  :  |  +---------+   |      v    :
+ +-- Connection Properties ---+  | Message |   |  Message  :
+ +-- Message Properties --------&gt;| to send |   |  Received :
+ |                         :     +---------+   |           :
+ |   +----------+          :                   |           :
+ +--&gt;| Listener |------------------------------+           :
      +----------+ Connection Received                      :
            ^               :                               :
            |               :                               :
@@ -683,9 +678,16 @@ ul.toc li {
 <p></p>
 
 <ul>
-<li>Preconnection: A Preconnection object is a representation of a potential connection. It has state that describes parameters of a Connection that might exist in the future: the Local Endpoint from which that Connection will be established, the Remote Endpoint (<a href="#preestablishment" class="xref">Section 4.1.2</a>) to which it will connect, and Path Selection Properties, Protocol Selection Properties, and Specific Protocol Properties that influence the choice of transport that a Connection will use. A Preconnection can be fully specified and represent a single possible Connection, or it can be partially specified such that it represents a family of possible Connections. The Local Endpoint (<a href="#preestablishment" class="xref">Section 4.1.2</a>) MUST be specified if the Preconnection is used to Listen for incoming connections. The Local Endpoint is OPTIONAL if it is used to Initiate connections. The Remote Endpoint MUST be specified in the Preconnection is used to Initiate connections. The Remote Endpoint is OPTIONAL if it is used to Listen for incoming connections. The Local Endpoint and the Remote Endpoint MUST both be specified if a peer-to-peer Rendezvous is to occur based on the Preconnection.</li>
+<li>Preconnection: A Preconnection object is a representation of a potential connection. It has state that describes parameters of a Connection that might exist in the future: the Local Endpoint from which that Connection will be established, the Remote Endpoint (<a href="#preestablishment" class="xref">Section 4.1.2</a>) to which it will connect, and Selection Properties, that influence the choice of transport that a Connection will use. A Preconnection can be fully specified and represent a single possible Connection, or it can be partially specified such that it represents a family of possible Connections. The Local Endpoint (<a href="#preestablishment" class="xref">Section 4.1.2</a>) MUST be specified if the Preconnection is used to Listen for incoming connections. The Local Endpoint is OPTIONAL if it is used to Initiate connections. The Remote Endpoint MUST be specified in the Preconnection is used to Initiate connections. The Remote Endpoint is OPTIONAL if it is used to Listen for incoming connections. The Local Endpoint and the Remote Endpoint MUST both be specified if a peer-to-peer Rendezvous is to occur based on the Preconnection.</li>
 <li>Connection: A Connection object represents an active transport protocol instance that can send and/or receive Messages between local and remote systems. It holds state pertaining to the underlying transport protocol instance and any ongoing data transfer. This represents, for example, an active connection in a connection-oriented protocol such as TCP, or a fully-specified 5-tuple for a connectionless protocol such as UDP.</li>
 <li>Listener: A Listener object accepts incoming transport protocol connections from remote systems  and generates corresponding Connection objects. It is created from a Preconnection object that specifies the type of incoming connections it will accept.</li>
+<li>Transport Properties: Transport Properties allow the application to configure the Transport System and express their requirements, prohibitions, and preferences. There are three kinds of Transport Properties:  <ul>
+<li>Selection Properties are used influence connection establishment.</li>
+<li>Connection Properties are used to configure the protocol instance and control per-connection behavior of the Transport System.</li>
+<li>Message Properties are used to configure per-message control per-connection behavior of the Transport System.</li>
+</ul>
+<p> Connection and Message Properties can also be specified prior establishment. If done so, they are used as a default and MAY be used as an input to path selection and protocol selection.  Some Transport Properties only apply to a single protocol (transport protocol, IP, or security protocol). The presence of such Transport Properties does not require that a specific protocol will be used when a Connection is established, but that if this protocol is employed, a particular set of options is to be used.</p>
+</li>
 </ul>
 <h1 id="rfc.section.4.1.2">
 <a href="#rfc.section.4.1.2">4.1.2.</a> <a href="#preestablishment" id="preestablishment">Pre-Establishment</a>
@@ -696,9 +698,7 @@ ul.toc li {
 <li>Endpoint: An Endpoint represents an identifier for one side of a transport connection.  Endpoints can be Local Endpoints or Remote Endpoints, and respectively represent an identity that the application uses for the source or destination of a connection.  An Endpoint can be specified at various levels, and an Endpoint with wider scope (such as a hostname) can be resolved to more concrete identities (such as IP addresses).</li>
 <li>Remote Endpoint: The Remote Endpoint represents the application&#8217;s identifier for a peer that can participate in a transport connection. For example, the combination of a DNS name for the peer and a service name/port.</li>
 <li>Local Endpoint: The Local Endpoint represents the application&#8217;s identifier for itself that it uses for transport connections. For example, a local IP address and port.</li>
-<li>Path Selection Properties: The Path Selection Properties consist of the options that an application can set to influence the selection of paths between the local and remote systems. These options can take  the form of requirements, prohibitions, or preferences. Examples of options that influence path selection include the interface type (such as a Wi-Fi Ethernet connection, or a Cellular LTE connection), characteristics of the path that are locally known like the Maximum Transmission Unit (MTU) or discovered like the Path MTU (PMTU), or predicted based on cached information like expected throughput or latency.</li>
-<li>Protocol Selection Properties: The Protocol Selection Properties consist of the options that an application can set to influence the selection of transport protocol, or to configure the behavior of generic transport protocol features. These options can take the form of requirements, prohibitions, and preferences. Examples include reliability, service class, multipath support, and fast open support.</li>
-<li>Specific Protocol Properties: The Specific Protocol Properties refer to the subset of Protocol Properties options that apply to a single protocol (transport protocol, IP, or security protocol). The presence of such Properties does not require that a specific protocol will be used when a Connection is established, but that if this protocol is employed, a particular set of options is to be used.</li>
+<li>Selection Properties: The Selection Properties consist of the options that an application can set to influence the selection of paths between the local and remote systems, to influence the selection of transport protocol, or to configure the behavior of generic transport protocol features. These options can take  the form of requirements, prohibitions, or preferences. Examples of options that influence path selection include the interface type (such as a Wi-Fi Ethernet connection, or a Cellular LTE connection), characteristics of the path that are locally known like the Maximum Transmission Unit (MTU) or discovered like the Path MTU (PMTU), or predicted based on cached information like expected throughput or latency. Examples of options that influence protocol selection and configuration of transport protocol features include reliability, service class, multipath support, and fast open support.</li>
 </ul>
 <h1 id="rfc.section.4.1.3">
 <a href="#rfc.section.4.1.3">4.1.3.</a> <a href="#establishment" id="establishment">Establishment Actions</a>
@@ -745,7 +745,7 @@ ul.toc li {
 <li>Abort: The action the application takes on a Connection to indicate a Close and also indicate that the transport system SHOULD NOT attempt to deliver any outstanding data.</li>
 </ul>
 <h1 id="rfc.section.4.2">
-<a href="#rfc.section.4.2">4.2.</a> <a href="#transport-system-implementation-concepts" id="transport-system-implementation-concepts">Transport System Implementation Concepts</a>
+<a href="#rfc.section.4.2">4.2.</a> <a href="#concepts" id="concepts">Transport System Implementation Concepts</a>
 </h1>
 <p id="rfc.section.4.2.p.1">The Transport System Implementation Concepts define the set of objects used internally to a system or library to implement the functionality needed to provide a transport service across a network, as required by the abstract interface.</p>
 <p></p>
@@ -755,7 +755,7 @@ ul.toc li {
 <li>Path: Represents an available set of properties that a local system can use to communicate with a remote system, such as routes, addresses, and physical and virtual network interfaces.</li>
 <li>Protocol Instance: A single instance of one protocol, including any state it has necessary to establish connectivity or send and receive Messages.</li>
 <li>Protocol Stack: A set of Protocol Instances (including relevant application, security, transport, or Internet protocols) that are used together to establish connectivity or send and receive Messages. A single stack can be simple (a single transport protocol instance over IP), or complex (multiple application protocol streams going through a single security and transport protocol, over IP; or, a multi-path transport protocol over multiple transport sub-flows).</li>
-<li>Candidate Path: One path that is available to an application and conforms to the Path Selection Properties and System Policy. Candidate Paths are identified during the gathering phase (<a href="#gathering" class="xref">Section 4.2.1</a>) and can be used during the racing phase (<a href="#racing" class="xref">Section 4.2.2</a>).</li>
+<li>Candidate Path: One path that is available to an application and conforms to the Selection Properties and System Policy. Candidate Paths are identified during the gathering phase (<a href="#gathering" class="xref">Section 4.2.1</a>) and can be used during the racing phase (<a href="#racing" class="xref">Section 4.2.2</a>).</li>
 <li>Candidate Protocol Stack: One protocol stack that can be used by an application for a connection, of which there can be several. Candidate Protocol Stacks are identified during the gathering phase (<a href="#gathering" class="xref">Section 4.2.1</a>) and are started during the racing phase (<a href="#racing" class="xref">Section 4.2.2</a>).</li>
 <li>System Policy: Represents the input from an operating system or other global preferences that can constrain or influence how an implementation will gather candidate paths and protocol stacks (<a href="#gathering" class="xref">Section 4.2.1</a>) and race the candidates during establishment (<a href="#racing" class="xref">Section 4.2.2</a>). Specific aspects of the System Policy either apply to all Connections or only certain ones, depending on the runtime context and properties of the Connection.</li>
 <li>Cached State: The state and history that the implementation keeps for each set of associated Endpoints that have been used previously. This can include DNS results, TLS session state, previous success and quality of transport protocols over certain paths.</li>
@@ -766,8 +766,8 @@ ul.toc li {
 <p></p>
 
 <ul>
-<li>Path Selection: Path Selection represents the act of choosing one or more paths that are available to use based on the Path Selection Properties provided by the application, the policies and heuristics of a Transport Services system.</li>
-<li>Protocol Selection: Protocol Selection represents the act of choosing one or more sets of protocol options that are available to use based on the Protocol Properties provided by the application, and a Transport Services system&#8217;s policies and heuristics.</li>
+<li>Path Selection: Path Selection represents the act of choosing one or more paths that are available to use based on the Selection Properties provided by the application, the policies and heuristics of a Transport Services system.</li>
+<li>Protocol Selection: Protocol Selection represents the act of choosing one or more sets of protocol options that are available to use based on the Transport Properties provided by the application, and a Transport Services system&#8217;s policies and heuristics.</li>
 </ul>
 <h1 id="rfc.section.4.2.2">
 <a href="#rfc.section.4.2.2">4.2.2.</a> <a href="#racing" id="racing">Candidate Racing</a>
