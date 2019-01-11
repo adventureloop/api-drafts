@@ -362,7 +362,8 @@ ul.toc li {
 <link href="#rfc.section.11" rel="Chapter" title="11 Connection State and Ordering of Operations and Events">
 <link href="#rfc.section.12" rel="Chapter" title="12 IANA Considerations">
 <link href="#rfc.section.12.1" rel="Chapter" title="12.1 Transport Property Domains">
-<link href="#rfc.section.12.2" rel="Chapter" title="12.2 Well-Known Generic Transport Properties">
+<link href="#rfc.section.12.2" rel="Chapter" title="12.2 Generic Transport Properties">
+<link href="#rfc.section.12.3" rel="Chapter" title="12.3 TCP Specific Properties">
 <link href="#rfc.section.13" rel="Chapter" title="13 Security Considerations">
 <link href="#rfc.section.14" rel="Chapter" title="14 Acknowledgements">
 <link href="#rfc.references" rel="Chapter" title="15 References">
@@ -381,7 +382,7 @@ ul.toc li {
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2019-01-10" />
+  <meta name="dct.issued" scheme="ISO8601" content="2019-01-11" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -405,7 +406,7 @@ ul.toc li {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: July 14, 2019</td>
+<td class="left">Expires: July 15, 2019</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -458,7 +459,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">January 10, 2019</td>
+<td class="right">January 11, 2019</td>
 </tr>
 
     	
@@ -474,7 +475,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on July 14, 2019.</p>
+<p>This Internet-Draft will expire on July 15, 2019.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2019 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -646,7 +647,9 @@ ul.toc li {
 </li>
 <ul><li>12.1.   <a href="#rfc.section.12.1">Transport Property Domains</a>
 </li>
-<li>12.2.   <a href="#rfc.section.12.2">Well-Known Generic Transport Properties</a>
+<li>12.2.   <a href="#rfc.section.12.2">Generic Transport Properties</a>
+</li>
+<li>12.3.   <a href="#rfc.section.12.3">TCP Specific Properties</a>
 </li>
 </ul><li>13.   <a href="#rfc.section.13">Security Considerations</a>
 </li>
@@ -744,13 +747,14 @@ Action(parameter, parameter, ...) / Event&lt;parameter, parameter, ...&gt;
 </h1>
 <p id="rfc.section.4.1.p.1">Each application using the Transport Services Interface declares its preferences for how the transport service should operate using properties at each stage of the lifetime of a connection. During pre-establishment, Selection Properties (see <a href="#selection-props" class="xref">Section 5.2</a>) are used to specify which paths and protocol stacks can be used and are preferred by the application, and Connection Properties (see <a href="#connection-props" class="xref">Section 9.1</a>) can be used to fine-tune the eventually established connection. These Connection Properties can also be used later, to monitor and fine-tune established connections &#8211; but configuring Connection Properties on Preconnections is preferred because they can then can influence decisions made during establishment. The behavior of the selected protocol stack(s) when sending Messages is controlled by Message Properties (see <a href="#message-props" class="xref">Section 7.3</a>).</p>
 <p id="rfc.section.4.1.p.2">Collectively, Selection, Connection, and Message Properties can be referred to as Transport Properties. All Transport Properties, regardless of the phase in which they are used, are organized within a single namespace. This enables setting them as defaults in earlier stages and querying them in later stages: - Connection Properties can be set on Preconnections - Message Properties can be set on Preconnections and Connections - The effect of Selection Properties can be queried on Connections and Messages</p>
-<p id="rfc.section.4.1.p.3">The Transport Properties Names are hierarchically organized in the form [&lt;domain&gt;.]&lt;PropertyName&gt;. The Domain part is empty for well known, generic properties, i.e., for properties defined by an RFC which use is not limited to a specific protocol. Otherwise, the domain part specifies the domain they apply to &#8212; see <a href="#iana" class="xref">Section 12</a> for the assignment policy and initial values.</p>
+<p id="rfc.section.4.1.p.3">The Transport Properties Names are CamelCased strings.  They are hierarchically organized in the form [&lt;domain&gt;.]&lt;PropertyName&gt;.  The Domain part is empty for well known, generic properties, i.e., properties defined by an RFC which use is not limited to a specific protocol. Otherwise, the domain part specifies the domain they apply to, e.g., a specific protocol, vendor, or implementation.  See <a href="#iana" class="xref">Section 12</a> for the assignment policy and an overview of the initial values.  All Transport Properties specified in this document are well known, generic properties.</p>
 <p id="rfc.section.4.1.p.4">Transport Properties can have one of a set of data types:</p>
 <p></p>
 
 <ul>
 <li>Boolean: can take the values &#8220;true&#8221; and &#8220;false&#8221;; representation is implementation-dependent.</li>
-<li>Integer: can take positive or negative numeric values; range and representation is implementation-dependent.</li>
+<li>Integer: can take positive or negative numeric integer values; range and representation is implementation-dependent.</li>
+<li>Numeric: can take positive or negative numeric values; range and representation is implementation-dependent.</li>
 <li>Enumeration: can take one value of a finite set of values, dependent on the property itself. The representation is implementation dependent; however, implementations MUST provide a method for the application to determine the entire set of possible values for each property.</li>
 <li>Preference: can take one of five values (Prohibit, Avoid, Ignore, Prefer, Require) for the level of preference of a given property during protocol selection; see <a href="#selection-props" class="xref">Section 5.2</a>.</li>
 </ul>
@@ -1148,7 +1152,7 @@ Connection.Send(messageData, messageContext)
 
 <dl>
 <dt>Type:</dt>
-<dd style="margin-left: 8">Integer</dd>
+<dd style="margin-left: 8">Numeric</dd>
 </dl>
 <p id="rfc.section.7.3.1.p.2">Lifetime specifies how long a particular Message can wait to be sent to the remote endpoint before it is irrelevant and no longer needs to be (re-)transmitted. When a Message&#8217;s Lifetime is infinite, it must be transmitted reliably. The type and units of Lifetime are implementation-specific.</p>
 <h1 id="rfc.section.7.3.2">
@@ -1465,7 +1469,13 @@ ConnectionProperties := Connection.GetProperties()
 <h1 id="rfc.section.9.1.6">
 <a href="#rfc.section.9.1.6">9.1.6.</a> <a href="#conn-timeout" id="conn-timeout">Timeout for aborting Connection</a>
 </h1>
-<p id="rfc.section.9.1.6.p.1">This property specifies how long to wait before deciding that a Connection has failed after establishment.</p>
+<p></p>
+
+<dl>
+<dt>Type:</dt>
+<dd style="margin-left: 8">Numeric</dd>
+</dl>
+<p id="rfc.section.9.1.6.p.2">This property specifies how long to wait before deciding that a Connection has failed after establishment.</p>
 <h1 id="rfc.section.9.1.7">
 <a href="#rfc.section.9.1.7">9.1.7.</a> <a href="#conn-scheduler" id="conn-scheduler">Connection group transmission scheduler</a>
 </h1>
@@ -1540,7 +1550,13 @@ ConnectionProperties := Connection.GetProperties()
 <h1 id="rfc.section.9.1.13">
 <a href="#rfc.section.9.1.13">9.1.13.</a> <a href="#bounds-on-send-or-receive-rate" id="bounds-on-send-or-receive-rate">Bounds on Send or Receive Rate</a>
 </h1>
-<p id="rfc.section.9.1.13.p.1">This property specifies an upper-bound rate that a transfer is not expected to exceed (even if flow control and congestion control allow higher rates), and/or a lower-bound rate below which the application does not deem a data transfer useful. It is given in bits per second.</p>
+<p></p>
+
+<dl>
+<dt>Type:</dt>
+<dd style="margin-left: 8">Numeric</dd>
+</dl>
+<p id="rfc.section.9.1.13.p.2">This property specifies an upper-bound rate that a transfer is not expected to exceed (even if flow control and congestion control allow higher rates), and/or a lower-bound rate below which the application does not deem a data transfer useful. It is given in bits per second.</p>
 <h1 id="rfc.section.9.1.14">
 <a href="#rfc.section.9.1.14">9.1.14.</a> <a href="#tcp-specific-property-user-timeout" id="tcp-specific-property-user-timeout">TCP-specific Property: User Timeout</a>
 </h1>
@@ -1608,13 +1624,71 @@ Connection -&gt; ConnectionError&lt;&gt;
 <h1 id="rfc.section.12">
 <a href="#rfc.section.12">12.</a> <a href="#iana" id="iana">IANA Considerations</a>
 </h1>
-<p id="rfc.section.12.p.1">This document creates a new registry group entitled &#8220;TAPS Transport Properties&#8221; with two registries: &#8220;Transport Property Domains&#8221; and &#8220;Well-Known Generic Transport Properties&#8221;. Their use is described in <a href="#transport-properties" class="xref">Section 4.1</a>.</p>
+<p id="rfc.section.12.p.1">This document creates a new registry group entitled &#8220;TAPS Transport Properties&#8221; to hold the definition of Transport Property names as described in <a href="#transport-properties" class="xref">Section 4.1</a>.</p>
 <h1 id="rfc.section.12.1">
 <a href="#rfc.section.12.1">12.1.</a> <a href="#property-domains" id="property-domains">Transport Property Domains</a>
 </h1>
+<p id="rfc.section.12.1.p.1">This registry contains the names used in the the domain part of Transport Property names.  These are used to delegate the definitions of protocol, implementation, or vendor specific Transport Properties to the respective sub-registries or documents. The names are Protocol Acronyms or CamelCased strings, The reference field must point to the document defining the namespace and assignment policy.</p>
+<p id="rfc.section.12.1.p.2">Initial values for the Transport Property Domains registry are given below; future assignments are to be made by an RFC or with IESG approval for IETF protocol names, on a first come first served basis otherwise.</p>
+<table cellpadding="3" cellspacing="0" class="tt full center">
+<thead><tr>
+<th class="left">Name</th>
+<th class="left">Description</th>
+<th class="left">Reference</th>
+</tr></thead>
+<tbody>
+<tr>
+<td class="left">X</td>
+<td class="left">Experimental and Private use</td>
+<td class="left">this RFC, <a href="#transport-properties" class="xref">Section 4.1</a>
+</td>
+</tr>
+<tr>
+<td class="left">TCP</td>
+<td class="left">TCP specific Properties</td>
+<td class="left">this RFC, <a href="#connection-props" class="xref">Section 9.1</a>
+</td>
+</tr>
+</tbody>
+</table>
 <h1 id="rfc.section.12.2">
-<a href="#rfc.section.12.2">12.2.</a> <a href="#generic-properties" id="generic-properties">Well-Known Generic Transport Properties</a>
+<a href="#rfc.section.12.2">12.2.</a> <a href="#generic-properties" id="generic-properties">Generic Transport Properties</a>
 </h1>
+<p id="rfc.section.12.2.p.1">This registry contains the names of well-known Generic Transport Properties as defined in <a href="#transport-properties" class="xref">Section 4.1</a>.  Names are CamelCased strings.  Type is one of &#8220;Boolean&#8221;, &#8220;Integer&#8221;, &#8220;Numeric&#8221;, &#8220;Enumeration&#8221;, or &#8220;Preference&#8221;.  Scope is one of &#8220;Pre-Connection&#8221;, &#8220;Connection&#8221; or &#8220;Message&#8221; The reference field must point to a document where the usage of the respective property is defined.</p>
+<p id="rfc.section.12.2.p.2">Initial values for the Generic Transport Property registry are given below; future assignments are to be made by an RFC or with IESG approval.</p>
+<table cellpadding="3" cellspacing="0" class="tt full center">
+<thead><tr>
+<th class="left">Name</th>
+<th class="left">Type</th>
+<th class="left">Scope</th>
+<th class="left">Reference</th>
+</tr></thead>
+<tbody><tr>
+<td class="left">TODO!</td>
+<td class="left"></td>
+<td class="left"></td>
+<td class="left"></td>
+</tr></tbody>
+</table>
+<h1 id="rfc.section.12.3">
+<a href="#rfc.section.12.3">12.3.</a> <a href="#iana-tcp-properties" id="iana-tcp-properties">TCP Specific Properties</a>
+</h1>
+<p id="rfc.section.12.3.p.1">This registry contains the well-known Transport Properties specific to TCP.  The fields are defined analogous to these in the Well-Known Generic Transport Property registry, see <a href="#generic-properties" class="xref">Section 12.2</a>.</p>
+<p id="rfc.section.12.3.p.2">Initial values for the Well-Known Generic Transport Property registry are given below; future assignments are to be made by an RFC or with IESG approval.</p>
+<table cellpadding="3" cellspacing="0" class="tt full center">
+<thead><tr>
+<th class="left">Name</th>
+<th class="left">Type</th>
+<th class="left">Scope</th>
+<th class="left">Reference</th>
+</tr></thead>
+<tbody><tr>
+<td class="left">TODO!</td>
+<td class="left"></td>
+<td class="left"></td>
+<td class="left"></td>
+</tr></tbody>
+</table>
 <h1 id="rfc.section.13">
 <a href="#rfc.section.13">13.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a>
 </h1>
