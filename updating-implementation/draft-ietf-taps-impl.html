@@ -336,12 +336,12 @@ ul.toc li {
 <link href="#rfc.authors" rel="Chapter">
 
 
-  <meta name="generator" content="xml2rfc version 2.16.2 - https://tools.ietf.org/tools/xml2rfc" />
+  <meta name="generator" content="xml2rfc version 2.15.4 - https://tools.ietf.org/tools/xml2rfc" />
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
   <meta name="dct.creator" content="Brunstrom, A., Ed., Pauly, T., Ed., Enghardt, T., Grinnemo, K-J., Jones, T., Tiesel, P., Perkins, C., and M. Welzl" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-taps-impl-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2019-01-09" />
+  <meta name="dct.issued" scheme="ISO8601" content="2019-01-16" />
   <meta name="dct.abstract" content="The Transport Services architecture  defines a system that allows applications to use transport networking protocols flexibly. This document serves as a guide to implementation on how to build such a system." />
   <meta name="description" content="The Transport Services architecture  defines a system that allows applications to use transport networking protocols flexibly. This document serves as a guide to implementation on how to build such a system." />
 
@@ -365,7 +365,7 @@ ul.toc li {
 <td class="right">T. Pauly, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: July 13, 2019</td>
+<td class="left">Expires: July 20, 2019</td>
 <td class="right">Apple Inc.</td>
 </tr>
 <tr>
@@ -418,7 +418,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">January 09, 2019</td>
+<td class="right">January 16, 2019</td>
 </tr>
 
     	
@@ -434,7 +434,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on July 13, 2019.</p>
+<p>This Internet-Draft will expire on July 20, 2019.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2019 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -569,7 +569,8 @@ ul.toc li {
 <h1 id="rfc.section.3">
 <a href="#rfc.section.3">3.</a> <a href="#implementing-pre-establishment" id="implementing-pre-establishment">Implementing Pre-Establishment</a>
 </h1>
-<p id="rfc.section.3.p.1">During pre-establishment the application specifies the Endpoints to be used for communication as well as its preferences via Selection Properties and, if desired, also Connection Properties. The implementation stores these objects and properties as part of the Preconnection object for use during connection establishment. For Selection Properties that are not provided by the application, the implementation must use the default values specified in the Transport Services API (<a href="#I-D.ietf-taps-interface" class="xref">[I-D.ietf-taps-interface]</a>).</p>
+<p id="rfc.section.3.p.1">During pre-establishment the application specifies the Endpoints to be used for communication as well as its preferences via Selection Properties and, if desired, also Connection Properties. Generally, Connection Properties should be configured as early as possible, as they may serve as input to decisions that are made by the implementation (the Capacity Profile may guide usage of a protocol offering scavenger-type congestion control, for example). In the remainder of this document, we only refer to Selection Properties because they are the more typical case.</p>
+<p id="rfc.section.3.p.2">The implementation stores these objects and properties as part of the Preconnection object for use during connection establishment. For Selection Properties that are not provided by the application, the implementation must use the default values specified in the Transport Services API (<a href="#I-D.ietf-taps-interface" class="xref">[I-D.ietf-taps-interface]</a>).</p>
 <h1 id="rfc.section.3.1">
 <a href="#rfc.section.3.1">3.1.</a> <a href="#configuration-time-errors" id="configuration-time-errors">Configuration-time errors</a>
 </h1>
@@ -589,7 +590,7 @@ ul.toc li {
 <p></p>
 
 <ol>
-<li>Application preferences, i.e., preferences specified during the pre-establishment via Selection and Connection Properties.</li>
+<li>Application preferences, i.e., preferences specified during the pre-establishment via Selection Properties.</li>
 <li>Dynamic system policy, i.e., policy compiled from internally and externally acquired information about available network interfaces, supported transport protocols, and current/previous Connections. Examples of ways to externally retrieve policy-support information are through OS-specific statistics/measurement tools and tools that reside on middleboxes and routers.</li>
 <li>Default implementation policy, i.e., predefined policy by OS or application.</li>
 </ol>
@@ -612,7 +613,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <h1 id="rfc.section.4.1">
 <a href="#rfc.section.4.1">4.1.</a> <a href="#gathering" id="gathering">Candidate Gathering</a>
 </h1>
-<p id="rfc.section.4.1.p.1">The step of gathering candidates involves identifying which paths, protocols, and endpoints may be used for a given Connection. This list is determined by the requirements, prohibitions, and preferences of the application as specified in the Selection and Connection Properties.</p>
+<p id="rfc.section.4.1.p.1">The step of gathering candidates involves identifying which paths, protocols, and endpoints may be used for a given Connection. This list is determined by the requirements, prohibitions, and preferences of the application as specified in the Selection Properties.</p>
 <h1 id="rfc.section.4.1.1">
 <a href="#rfc.section.4.1.1">4.1.1.</a> <a href="#structuring-options-as-a-tree" id="structuring-options-as-a-tree">Structuring Options as a Tree</a>
 </h1>
@@ -740,8 +741,8 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <h1 id="rfc.section.4.3">
 <a href="#rfc.section.4.3">4.3.</a> <a href="#branch-sorting" id="branch-sorting">Sorting Branches</a>
 </h1>
-<p id="rfc.section.4.3.p.1">Implementations should sort the branches of the tree of connection options in order of their preference rank.  Leaf nodes on branches with higher rankings represent connection attempts that will be raced first.  Implementations should order the branches to reflect the preferences expressed by the application for its new connection, including Selection and Connection Properties, which are specified in <a href="#I-D.ietf-taps-interface" class="xref">[I-D.ietf-taps-interface]</a>.</p>
-<p id="rfc.section.4.3.p.2">In addition to the properties provided by the application, an implementation may include additional criteria such as cached performance estimates, see <a href="#performance-caches" class="xref">Section 8.2</a>, or system policy, see <a href="#role-of-system-policy" class="xref">Section 3.2</a>, in the ranking.  Two examples of how the Selection and Connection Properties may be used to sort branches are provided below:</p>
+<p id="rfc.section.4.3.p.1">Implementations should sort the branches of the tree of connection options in order of their preference rank.  Leaf nodes on branches with higher rankings represent connection attempts that will be raced first.  Implementations should order the branches to reflect the preferences expressed by the application for its new connection, including Selection Properties, which are specified in <a href="#I-D.ietf-taps-interface" class="xref">[I-D.ietf-taps-interface]</a>.</p>
+<p id="rfc.section.4.3.p.2">In addition to the properties provided by the application, an implementation may include additional criteria such as cached performance estimates, see <a href="#performance-caches" class="xref">Section 8.2</a>, or system policy, see <a href="#role-of-system-policy" class="xref">Section 3.2</a>, in the ranking.  Two examples of how Selection and Connection Properties may be used to sort branches are provided below:</p>
 <p></p>
 
 <ul>
@@ -753,7 +754,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 </ul>
 </li>
 </ul>
-<p id="rfc.section.4.3.p.4">Implementations should process properties in the following order: Prohibit, Require, Prefer, Avoid.  If Selection or Connection Properties contain any prohibited properties, the implementation should first purge branches containing nodes with these properties. For required properties, it should only keep branches that satisfy these requirements. Finally, it should order branches according to preferred properties, and finally use avoided properties as a tiebreaker.</p>
+<p id="rfc.section.4.3.p.4">Implementations should process properties in the following order: Prohibit, Require, Prefer, Avoid.  If Selection Properties contain any prohibited properties, the implementation should first purge branches containing nodes with these properties. For required properties, it should only keep branches that satisfy these requirements. Finally, it should order branches according to preferred properties, and finally use avoided properties as a tiebreaker.</p>
 <h1 id="rfc.section.4.4">
 <a href="#rfc.section.4.4">4.4.</a> <a href="#candidate-racing" id="candidate-racing">Candidate Racing</a>
 </h1>
@@ -818,8 +819,8 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <a href="#rfc.section.4.8">4.8.</a> <a href="#listen" id="listen">Implementing listeners</a>
 </h1>
 <p id="rfc.section.4.8.p.1">When an implementation is asked to Listen, it registers with the system to wait for incoming traffic to the Local Endpoint. If no Local Endpoint is specified, the implementation should either use an ephemeral port or generate an error.</p>
-<p id="rfc.section.4.8.p.2">If the Selection or Connection Properties do not require a single network interface or path, but allow the use of multiple paths, the Listener object should register for incoming traffic on all of the network interfaces or paths that conform to the Properties. The set of available paths can change over time, so the implementation should monitor network path changes and register and de-register the Listener across all usable paths. When using multiple paths, the Listener is generally expected to use the same port for listening on each.</p>
-<p id="rfc.section.4.8.p.3">If the Selection or Connection Properties allow multiple protocols to be used for listening, and the implementation supports it, the Listener object should register across the eligble protocols for each path. This means that inbound Connections delivered by the implementation may have heterogeneous protocol stacks.</p>
+<p id="rfc.section.4.8.p.2">If the Selection Properties do not require a single network interface or path, but allow the use of multiple paths, the Listener object should register for incoming traffic on all of the network interfaces or paths that conform to the Properties. The set of available paths can change over time, so the implementation should monitor network path changes and register and de-register the Listener across all usable paths. When using multiple paths, the Listener is generally expected to use the same port for listening on each.</p>
+<p id="rfc.section.4.8.p.3">If the Selection Properties allow multiple protocols to be used for listening, and the implementation supports it, the Listener object should register across the eligble protocols for each path. This means that inbound Connections delivered by the implementation may have heterogeneous protocol stacks.</p>
 <h1 id="rfc.section.4.8.1">
 <a href="#rfc.section.4.8.1">4.8.1.</a> <a href="#implementing-listeners-for-connected-protocols" id="implementing-listeners-for-connected-protocols">Implementing listeners for Connected Protocols</a>
 </h1>
@@ -911,7 +912,7 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <h1 id="rfc.section.6.2">
 <a href="#rfc.section.6.2">6.2.</a> <a href="#handling-path-changes" id="handling-path-changes">Handling Path Changes</a>
 </h1>
-<p id="rfc.section.6.2.p.1">When a path change occurs, the Transport Services implementation is responsible for notifying Protocol Instances in the Protocol Stack.  If the Protocol Stack includes a transport protocol that supports multipath connectivity, an update to the available paths should inform the Protocol Instance of the new set of paths that are permissible based on the Selection or Connection Properties passed by the application. A multipath protocol can establish new subflows over new paths, and should tear down subflows over paths that are no longer available. If the Protocol Stack includes a transport protocol that does not support multipath, but support migrating between paths, the update to available paths can be used as the trigger to migrating the connection. For protocols that do not support multipath or migration, the Protocol Instances may be informed of the path change, but should not be forcibly disconnected if the previously used path becomes unavailable. An exception to this case is if the System Policy changes to prohibit traffic from the Connection based on its properties, in which case the Protocol Stack should be disconnected.</p>
+<p id="rfc.section.6.2.p.1">When a path change occurs, the Transport Services implementation is responsible for notifying Protocol Instances in the Protocol Stack.  If the Protocol Stack includes a transport protocol that supports multipath connectivity, an update to the available paths should inform the Protocol Instance of the new set of paths that are permissible based on the Selection Properties passed by the application. A multipath protocol can establish new subflows over new paths, and should tear down subflows over paths that are no longer available. If the Protocol Stack includes a transport protocol that does not support multipath, but support migrating between paths, the update to available paths can be used as the trigger to migrating the connection. For protocols that do not support multipath or migration, the Protocol Instances may be informed of the path change, but should not be forcibly disconnected if the previously used path becomes unavailable. An exception to this case is if the System Policy changes to prohibit traffic from the Connection based on its properties, in which case the Protocol Stack should be disconnected.</p>
 <h1 id="rfc.section.7">
 <a href="#rfc.section.7">7.</a> <a href="#implementing-termination" id="implementing-termination">Implementing Termination</a>
 </h1>
