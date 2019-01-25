@@ -380,7 +380,7 @@ ul.toc li {
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2019-01-22" />
+  <meta name="dct.issued" scheme="ISO8601" content="2019-01-25" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -404,7 +404,7 @@ ul.toc li {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: July 26, 2019</td>
+<td class="left">Expires: July 29, 2019</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -457,7 +457,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">January 22, 2019</td>
+<td class="right">January 25, 2019</td>
 </tr>
 
     	
@@ -473,7 +473,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on July 26, 2019.</p>
+<p>This Internet-Draft will expire on July 29, 2019.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2019 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -1154,7 +1154,8 @@ Connection.Send(messageData, messageContext)
 <dt>Type:</dt>
 <dd style="margin-left: 8">Integer</dd>
 </dl>
-<p id="rfc.section.7.3.1.p.2">Lifetime specifies how long a particular Message can wait to be sent to the remote endpoint before it is irrelevant and no longer needs to be (re-)transmitted. When a Message&#8217;s Lifetime is infinite, it must be transmitted reliably. The type and units of Lifetime are implementation-specific.</p>
+<p id="rfc.section.7.3.1.p.2">Lifetime specifies how long a particular Message can wait to be sent to the remote endpoint before it is irrelevant and no longer needs to be (re-)transmitted. This is a hint to the transport system &#8211; it is not guaranteed that a Message will not be sent when its Lifetime has expired.</p>
+<p id="rfc.section.7.3.1.p.3">Setting a Message&#8217;s Lifetime to infinite indicates that the application does not wish to apply a time constraint on it, but it does not express a need for reliable delivery; reliability is adjustable per Message via the &#8220;Reliable Data Transfer (Message)&#8221; property (see <a href="#msg-reliable-message" class="xref">Section 7.3.7</a>). The type and units of Lifetime are implementation-specific.</p>
 <h1 id="rfc.section.7.3.2">
 <a href="#rfc.section.7.3.2">7.3.2.</a> <a href="#msg-niceness" id="msg-niceness">Niceness</a>
 </h1>
@@ -1217,7 +1218,7 @@ Connection.Send(messageData, messageContext)
 <dt>Type:</dt>
 <dd style="margin-left: 8">Boolean</dd>
 </dl>
-<p id="rfc.section.7.3.7.p.2">This property specifies that a message should be sent in such a way that the transport protocol ensures all data is received on the other side without corruption. Changing the &#180;Reliable Data Transfer&#180; property on Messages is only possible if the Connection supports reliability.  When this is not the case, changing it will generate an error.</p>
+<p id="rfc.section.7.3.7.p.2">When true, this property specifies that a message should be sent in such a way that the transport protocol ensures all data is received on the other side without corruption. Changing the &#180;Reliable Data Transfer&#180; property on Messages is only possible if the Connection supports reliability.  When this is not the case, changing it will generate an error.  Disabling this property indicates that the transport system may disable retransmissions or other reliability mechanisms for this particular Message, but such disabling is not guaranteed.</p>
 <h1 id="rfc.section.7.3.8">
 <a href="#rfc.section.7.3.8">7.3.8.</a> <a href="#send-profile" id="send-profile">Transmission Profile</a>
 </h1>
@@ -1662,7 +1663,7 @@ Connection -&gt; ConnectionError&lt;&gt;
 <tr>
 <td class="reference"><b id="LE-PHB">[LE-PHB]</b></td>
 <td class="top">
-<a>Bless, R.</a>, "<a href="https://tools.ietf.org/html/draft-ietf-tsvwg-le-phb-07">A Lower Effort Per-Hop Behavior (LE PHB)</a>", Internet-Draft draft-ietf-tsvwg-le-phb-07, January 2019.</td>
+<a>Bless, R.</a>, "<a href="https://tools.ietf.org/html/draft-ietf-tsvwg-le-phb-06">A Lower Effort Per-Hop Behavior (LE PHB)</a>", Internet-Draft draft-ietf-tsvwg-le-phb-06, October 2018.</td>
 </tr>
 <tr>
 <td class="reference"><b id="RFC0793">[RFC0793]</b></td>
