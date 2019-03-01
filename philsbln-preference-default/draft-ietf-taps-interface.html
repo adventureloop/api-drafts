@@ -840,36 +840,34 @@ LocalSpecifier.WithStunServer(address, port, credentials)
 <td class="left">Prohibit</td>
 <td class="left">Select only protocols/paths not providing the property, fail otherwise</td>
 </tr>
-<tr>
-<td class="left">Default</td>
-<td class="left">Reverts this property to the default value used by the implementation</td>
-</tr>
 </tbody>
 </table>
-<p id="rfc.section.5.2.p.4">Internally, the transport system will first exclude all protocols and paths that match a Prohibit, then exclude all protocols and paths that do not match a Require, then sort candidates according to Preferred properties, and then use Avoided properties as a tiebreaker. Selection Properties which select paths take preference over those which select protocols. For example, if an application indicates a preference for a specific path by specifying an interface, but also a preference for a protocol not available on this path, the transport system will try the path first, ignoring the preference.</p>
-<p id="rfc.section.5.2.p.5">Both Selection and Connection Properties can be added to a Preconnection to configure the selection process, and to further configure the eventually selected protocol stack(s). They are collected into a TransportProperties object to be passed into a Preconnection object:</p>
+<p id="rfc.section.5.2.p.4">In addition, the pseudo-level <samp>Default</samp> can be used to reset the property to the default level used by the implementation. This level will never show up when queuing the value of a preference - the effective preference must be returned instead.</p>
+<p id="rfc.section.5.2.p.5">Internally, the transport system will first exclude all protocols and paths that match a Prohibit, then exclude all protocols and paths that do not match a Require, then sort candidates according to Preferred properties, and then use Avoided properties as a tiebreaker. Selection Properties which select paths take preference over those which select protocols. For example, if an application indicates a preference for a specific path by specifying an interface, but also a preference for a protocol not available on this path, the transport system will try the path first, ignoring the preference.</p>
+<p id="rfc.section.5.2.p.6">Both Selection and Connection Properties can be added to a Preconnection to configure the selection process, and to further configure the eventually selected protocol stack(s). They are collected into a TransportProperties object to be passed into a Preconnection object:</p>
 <pre>
 TransportProperties := NewTransportProperties()
 </pre>
-<p id="rfc.section.5.2.p.6">Individual properties are then added to the TransportProperties Object:</p>
+<p id="rfc.section.5.2.p.7">Individual properties are then added to the TransportProperties Object:</p>
 <pre>
 TransportProperties.Add(property, value)
 </pre>
-<p id="rfc.section.5.2.p.7">Selection Properties can be added to a TransportProperties object using special actions for each preference level i.e, <samp>TransportProperties.Add(some_property, avoid)</samp> is equivalent to <samp>TransportProperties.Avoid(some_property)</samp>:</p>
+<p id="rfc.section.5.2.p.8">Selection Properties can be added to a TransportProperties object using special actions for each preference level i.e, <samp>TransportProperties.Add(some_property, avoid)</samp> is equivalent to <samp>TransportProperties.Avoid(some_property)</samp>:</p>
 <pre>
 TransportProperties.Require(property)
 TransportProperties.Prefer(property)
 TransportProperties.Ignore(property)
 TransportProperties.Avoid(property)
 TransportProperties.Prohibit(property)
+TransportProperties.Default(property)
 </pre>
-<p id="rfc.section.5.2.p.8">For an existing Connection, the Transport Properties can be queried any time by using the following call on the Connection Object:</p>
+<p id="rfc.section.5.2.p.9">For an existing Connection, the Transport Properties can be queried any time by using the following call on the Connection Object:</p>
 <pre>
 TransportProperties := Connection.GetTransportProperties()
 </pre>
-<p id="rfc.section.5.2.p.9">A Connection gets its Transport Properties either by being explicitly configured via a Preconnection, by configuration after establishment, or by inheriting them from an antecedent via cloning; see <a href="#groups" class="xref">Section 6.4</a> for more.</p>
+<p id="rfc.section.5.2.p.10">A Connection gets its Transport Properties either by being explicitly configured via a Preconnection, by configuration after establishment, or by inheriting them from an antecedent via cloning; see <a href="#groups" class="xref">Section 6.4</a> for more.</p>
 <p><a href="#connection-props" class="xref">Section 9.1</a> provides a list of Connection Properties, while Selection Properties are listed in the subsections below. Note that many properties are only considered during establishment, and can not be changed after a Connection is established; however, they can be queried. Querying a Selection Property after establishment yields the value Required for properties of the selected protocol and path, Avoid for properties avoided during selection, and Ignore for all other properties.</p>
-<p id="rfc.section.5.2.p.11">An implementation of this interface must provide sensible defaults for Selection Properties. The recommended defaults given for each property below represent a configuration that can be implemented over TCP. An alternate set of default Protocol Selection Properties would represent a configuration that can be implemented over UDP.</p>
+<p id="rfc.section.5.2.p.12">An implementation of this interface must provide sensible defaults for Selection Properties. The recommended defaults given for each property below represent a configuration that can be implemented over TCP. An alternate set of default Protocol Selection Properties would represent a configuration that can be implemented over UDP.</p>
 <h1 id="rfc.section.5.2.1">
 <a href="#rfc.section.5.2.1">5.2.1.</a> <a href="#prop-reliable" id="prop-reliable">Reliable Data Transfer (Connection)</a>
 </h1>
