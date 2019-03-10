@@ -285,10 +285,14 @@ ul.toc li {
 <link href="#rfc.section.2" rel="Chapter" title="2 Terminology and Notation">
 <link href="#rfc.section.3" rel="Chapter" title="3 Interface Design Principles">
 <link href="#rfc.section.4" rel="Chapter" title="4 API Summary">
-<link href="#rfc.section.4.1" rel="Chapter" title="4.1 Transport Properties">
-<link href="#rfc.section.4.1.1" rel="Chapter" title="4.1.1 Transport Property Names">
-<link href="#rfc.section.4.1.2" rel="Chapter" title="4.1.2 Transport Property Types">
-<link href="#rfc.section.4.2" rel="Chapter" title="4.2 Scope of the Interface Definition">
+<link href="#rfc.section.4.1" rel="Chapter" title="4.1 Usage Examples">
+<link href="#rfc.section.4.1.1" rel="Chapter" title="4.1.1 Server Example">
+<link href="#rfc.section.4.1.2" rel="Chapter" title="4.1.2 Client Example">
+<link href="#rfc.section.4.1.3" rel="Chapter" title="4.1.3 Peer Example">
+<link href="#rfc.section.4.2" rel="Chapter" title="4.2 Transport Properties">
+<link href="#rfc.section.4.2.1" rel="Chapter" title="4.2.1 Transport Property Names">
+<link href="#rfc.section.4.2.2" rel="Chapter" title="4.2.2 Transport Property Types">
+<link href="#rfc.section.4.3" rel="Chapter" title="4.3 Scope of the Interface Definition">
 <link href="#rfc.section.5" rel="Chapter" title="5 Pre-Establishment Phase">
 <link href="#rfc.section.5.1" rel="Chapter" title="5.1 Specifying Endpoints">
 <link href="#rfc.section.5.2" rel="Chapter" title="5.2 Specifying Transport Properties">
@@ -383,7 +387,7 @@ ul.toc li {
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2019-03-01" />
+  <meta name="dct.issued" scheme="ISO8601" content="2019-03-10" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -407,7 +411,7 @@ ul.toc li {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: September 2, 2019</td>
+<td class="left">Expires: September 11, 2019</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -460,7 +464,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">March 01, 2019</td>
+<td class="right">March 10, 2019</td>
 </tr>
 
     	
@@ -476,7 +480,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on September 2, 2019.</p>
+<p>This Internet-Draft will expire on September 11, 2019.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2019 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -494,13 +498,21 @@ ul.toc li {
 </li>
 <li>4.   <a href="#rfc.section.4">API Summary</a>
 </li>
-<ul><li>4.1.   <a href="#rfc.section.4.1">Transport Properties</a>
+<ul><li>4.1.   <a href="#rfc.section.4.1">Usage Examples</a>
 </li>
-<ul><li>4.1.1.   <a href="#rfc.section.4.1.1">Transport Property Names</a>
+<ul><li>4.1.1.   <a href="#rfc.section.4.1.1">Server Example</a>
 </li>
-<li>4.1.2.   <a href="#rfc.section.4.1.2">Transport Property Types</a>
+<li>4.1.2.   <a href="#rfc.section.4.1.2">Client Example</a>
 </li>
-</ul><li>4.2.   <a href="#rfc.section.4.2">Scope of the Interface Definition</a>
+<li>4.1.3.   <a href="#rfc.section.4.1.3">Peer Example</a>
+</li>
+</ul><li>4.2.   <a href="#rfc.section.4.2">Transport Properties</a>
+</li>
+<ul><li>4.2.1.   <a href="#rfc.section.4.2.1">Transport Property Names</a>
+</li>
+<li>4.2.2.   <a href="#rfc.section.4.2.2">Transport Property Types</a>
+</li>
+</ul><li>4.3.   <a href="#rfc.section.4.3">Scope of the Interface Definition</a>
 </li>
 </ul><li>5.   <a href="#rfc.section.5">Pre-Establishment Phase</a>
 </li>
@@ -746,21 +758,155 @@ Action(param0, param1?, ...) / Event&lt;param0, param1, ...&gt;
 <p id="rfc.section.4.p.3">Once a Connection is established, data can be sent on it in the form of Messages. The interface supports the preservation of message boundaries both via explicit Protocol Stack support, and via application support through a deframing callback which finds message boundaries in a stream. Messages are received asynchronously through a callback registered by the application.  Errors and other notifications also happen asynchronously on the Connection.</p>
 <p><a href="#pre-establishment" class="xref">Section 5</a>, <a href="#establishment" class="xref">Section 6</a>, <a href="#sending" class="xref">Section 7</a>, <a href="#receiving" class="xref">Section 8</a>, and <a href="#termination" class="xref">Section 10</a> describe the details of application interaction with Objects through Actions and Events in each phase of a Connection, following the phases described in <a href="#I-D.ietf-taps-arch" class="xref">[I-D.ietf-taps-arch]</a>.</p>
 <h1 id="rfc.section.4.1">
-<a href="#rfc.section.4.1">4.1.</a> <a href="#transport-properties" id="transport-properties">Transport Properties</a>
+<a href="#rfc.section.4.1">4.1.</a> <a href="#usage-examples" id="usage-examples">Usage Examples</a>
 </h1>
-<p id="rfc.section.4.1.p.1">Each application using the Transport Services Interface declares its preferences for how the transport service should operate using properties at each stage of the lifetime of a connection. During pre-establishment, Selection Properties (see <a href="#selection-props" class="xref">Section 5.2</a>) are used to specify which paths and protocol stacks can be used and are preferred by the application, and Connection Properties (see <a href="#connection-props" class="xref">Section 9.1</a>) can be used to fine-tune the eventually established connection. These Connection Properties can also be used later, to monitor and fine-tune established connections &#8211; but configuring Connection Properties on Preconnections is preferred because they can then can influence decisions made during establishment. The behavior of the selected protocol stack(s) when sending Messages is controlled by Message Properties (see <a href="#message-props" class="xref">Section 7.3</a>).</p>
-<p id="rfc.section.4.1.p.2">Collectively, Selection, Connection, and Message Properties can be referred to as Transport Properties. All Transport Properties, regardless of the phase in which they are used, are organized within a single namespace. This enables setting them as defaults in earlier stages and querying them in later stages: - Connection Properties can be set on Preconnections - Message Properties can be set on Preconnections and Connections - The effect of Selection Properties can be queried on Connections and Messages</p>
+<p id="rfc.section.4.1.p.1">The following usage examples illustrate how an application might use a Transport Services Interface to:</p>
+<p></p>
+
+<ul>
+<li>Act as a server, by listening for incoming connections, receiving requests, and sending responses, see <a href="#server-example" class="xref">Section 4.1.1</a>.</li>
+<li>Act as a client, by connecting to a remote endpoint using Initiate, sending requests, and receiving responses, see <a href="#client-example" class="xref">Section 4.1.2</a>.</li>
+<li>Act as a peer, by connecting to a remote endpoint using Rendezvous while simultaneously waiting for incoming Connections, sending Messages, and receiving Messages, see <a href="#peer-example" class="xref">Section 4.1.3</a>.</li>
+</ul>
+<p id="rfc.section.4.1.p.3">The examples in this section presume that a transport protocol is available between the endpoints which provides Reliable Data Transfer, Preservation of data ordering, and Preservation of Message Boundaries. In this case, the application can choose to receive only complete messages.</p>
+<p id="rfc.section.4.1.p.4">If none of the available transport protocols provides Preservation of Message Boundaries, but there is a transport protocol which provides a reliable ordered octet stream, an application may receive this octet stream as partial Messages and transform it into application-layer Messages.  Alternatively, an application may provide a Deframer, which is a function that transforms an octet stream into a sequence of Messages, see <a href="#receive-framing" class="xref">Section 8.4</a>.</p>
 <h1 id="rfc.section.4.1.1">
-<a href="#rfc.section.4.1.1">4.1.1.</a> <a href="#property-names" id="property-names">Transport Property Names</a>
+<a href="#rfc.section.4.1.1">4.1.1.</a> <a href="#server-example" id="server-example">Server Example</a>
 </h1>
-<p id="rfc.section.4.1.1.p.1">Transport Properties are referred to by property names. These names are lower-case strings whereby words are separated by hyphens.  These names serve two purposes:</p>
+<p id="rfc.section.4.1.1.p.1">This is an example of how an application might listen for incoming Connections using the Transport Services Interface, receive a request, and send a response.</p>
+<pre>
+LocalSpecifier := NewLocalEndpoint()
+LocalSpecifier.WithInterface("any")
+LocalSpecifier.WithService("https")
+
+TransportProperties := NewTransportProperties()
+TransportProperties.Require(preserve-msg-boundaries)
+// Reliable Data Transfer and Preserve Order are Required by default
+
+SecurityParameters := NewSecurityParameters()
+SecurityParameters.AddIdentity(identity)
+SecurityParameters.AddPrivateKey(privateKey, publicKey)
+
+// Specifying a remote endpoint is optional when using Listen()
+Preconnection := NewPreconnection(LocalSpecifier,
+                                  None,
+                                  TransportProperties,
+                                  SecurityParameters)
+
+Preconnection.Listen()
+
+Preconnection -&gt; ConnectionReceived&lt;Connection&gt;
+
+// Only receive complete messages
+Connection.Receive()
+
+Connection -&gt; Received(messageDataRequest, messageContext)
+
+Connection.Send(messageDataResponse)
+
+Connection.Close()
+
+// Stop listening for incoming Connections
+Preconnection.Stop()
+</pre>
+<h1 id="rfc.section.4.1.2">
+<a href="#rfc.section.4.1.2">4.1.2.</a> <a href="#client-example" id="client-example">Client Example</a>
+</h1>
+<p id="rfc.section.4.1.2.p.1">This is an example of how an application might connect to a remote application using the Transport Services Interface, send a request, and receive a response.</p>
+<pre>
+RemoteSpecifier := NewRemoteEndpoint()
+RemoteSpecifier.WithHostname("example.com")
+RemoteSpecifier.WithService("https")
+
+TransportProperties := NewTransportProperties()
+TransportProperties.Require(preserve-msg-boundaries)
+// Reliable Data Transfer and Preserve Order are Required by default
+
+SecurityParameters := NewSecurityParameters()
+TrustCallback := New Callback({
+  // Verify identity of the remote endpoint, return the result
+})
+SecurityParameters.SetTrustVerificationCallback(TrustCallback)
+
+// Specifying a local endpoint is optional when using Initiate()
+Preconnection := NewPreconnection(None,
+                                  RemoteSpecifier,
+                                  TransportPreperties,
+                                  SecurityParameters)
+
+Connection := Preconnection.Initiate()
+
+Connection -&gt; Ready&lt;&gt;
+
+Connection.Send(messageDataRequest)
+
+// Only receive complete messages
+Connection.Receive()
+
+Connection -&gt; Received(messageDataResponse, messageContext)
+
+Connection.Close()
+</pre>
+<h1 id="rfc.section.4.1.3">
+<a href="#rfc.section.4.1.3">4.1.3.</a> <a href="#peer-example" id="peer-example">Peer Example</a>
+</h1>
+<p id="rfc.section.4.1.3.p.1">This is an example of how an application might establish a connection with a peer using Rendezvous(), send a Message, and receive a Message.</p>
+<pre>
+LocalSpecifier := NewLocalEndpoint()
+LocalSpecifier.WithPort(9876)
+
+RemoteSpecifier := NewRemoteEndpoint()
+RemoteSpecifier.WithHostname("example.com")
+RemoteSpecifier.WithPort(9877)
+
+TransportProperties := NewTransportProperties()
+TransportProperties.Require(preserve-msg-boundaries)
+// Reliable Data Transfer and Preserve Order are Required by default
+
+SecurityParameters := NewSecurityParameters()
+SecurityParameters.AddIdentity(identity)
+SecurityParameters.AddPrivateKey(privateKey, publicKey)
+
+TrustCallback := New Callback({
+  // Verify identity of the remote endpoint, return the result
+})
+SecurityParameters.SetTrustVerificationCallback(trustCallback)
+
+// Both local and remote endpoint must be specified
+Preconnection := NewPreconnection(LocalSpecifier,
+                                  RemoteSpecifier,
+                                  TransportPreperties,
+                                  SecurityParameters)
+
+Preconnection.Rendezvous()
+
+Preconnection -&gt; RendezvousDone&lt;Connection&gt;
+
+Connection.Send(messageDataRequest)
+
+// Only receive complete messages
+Connection.Receive()
+
+Connection -&gt; Received(messageDataResponse, messageContext)
+
+Connection.Close()
+</pre>
+<h1 id="rfc.section.4.2">
+<a href="#rfc.section.4.2">4.2.</a> <a href="#transport-properties" id="transport-properties">Transport Properties</a>
+</h1>
+<p id="rfc.section.4.2.p.1">Each application using the Transport Services Interface declares its preferences for how the transport service should operate using properties at each stage of the lifetime of a connection. During pre-establishment, Selection Properties (see <a href="#selection-props" class="xref">Section 5.2</a>) are used to specify which paths and protocol stacks can be used and are preferred by the application, and Connection Properties (see <a href="#connection-props" class="xref">Section 9.1</a>) can be used to fine-tune the eventually established connection. These Connection Properties can also be used later, to monitor and fine-tune established connections &#8211; but configuring Connection Properties on Preconnections is preferred because they can then can influence decisions made during establishment. The behavior of the selected protocol stack(s) when sending Messages is controlled by Message Properties (see <a href="#message-props" class="xref">Section 7.3</a>).</p>
+<p id="rfc.section.4.2.p.2">Collectively, Selection, Connection, and Message Properties can be referred to as Transport Properties. All Transport Properties, regardless of the phase in which they are used, are organized within a single namespace. This enables setting them as defaults in earlier stages and querying them in later stages: - Connection Properties can be set on Preconnections - Message Properties can be set on Preconnections and Connections - The effect of Selection Properties can be queried on Connections and Messages</p>
+<h1 id="rfc.section.4.2.1">
+<a href="#rfc.section.4.2.1">4.2.1.</a> <a href="#property-names" id="property-names">Transport Property Names</a>
+</h1>
+<p id="rfc.section.4.2.1.p.1">Transport Properties are referred to by property names. These names are lower-case strings whereby words are separated by hyphens.  These names serve two purposes:</p>
 <p></p>
 
 <ul>
 <li>Allow different components of a TAPS implementation to pass Transport Properties, e.g., between a language frontend and a policy manager.</li>
 <li>Make code of different TAPS implementations look similar.</li>
 </ul>
-<p id="rfc.section.4.1.1.p.3">Transport Property Names are hierarchically organized in the form [&lt;Namespace&gt;.]&lt;PropertyName&gt;.</p>
+<p id="rfc.section.4.2.1.p.3">Transport Property Names are hierarchically organized in the form [&lt;Namespace&gt;.]&lt;PropertyName&gt;.</p>
 <p></p>
 
 <ul>
@@ -768,10 +914,10 @@ Action(param0, param1?, ...) / Event&lt;param0, param1, ...&gt;
 <li>Protocol Specific Properties must use the protocol acronym as Namespace, e.g., &#8220;tcp&#8221; for TCP specific Transport Properties.  For IETF protocols, property names under these namespaces should be defined in an RFC.</li>
 <li>Vendor or implementation specific properties must use the vendor&#8217;s or implementation&#8217;s name or acronym as Namespace.</li>
 </ul>
-<h1 id="rfc.section.4.1.2">
-<a href="#rfc.section.4.1.2">4.1.2.</a> <a href="#property-types" id="property-types">Transport Property Types</a>
+<h1 id="rfc.section.4.2.2">
+<a href="#rfc.section.4.2.2">4.2.2.</a> <a href="#property-types" id="property-types">Transport Property Types</a>
 </h1>
-<p id="rfc.section.4.1.2.p.1">Transport Properties can have one of a set of data types:</p>
+<p id="rfc.section.4.2.2.p.1">Transport Properties can have one of a set of data types:</p>
 <p></p>
 
 <ul>
@@ -781,10 +927,10 @@ Action(param0, param1?, ...) / Event&lt;param0, param1, ...&gt;
 <li>Enumeration: can take one value of a finite set of values, dependent on the property itself. The representation is implementation dependent; however, implementations MUST provide a method for the application to determine the entire set of possible values for each property.</li>
 <li>Preference: can take one of five values (Prohibit, Avoid, Ignore, Prefer, Require) for the level of preference of a given property during protocol selection; see <a href="#selection-props" class="xref">Section 5.2</a>.</li>
 </ul>
-<h1 id="rfc.section.4.2">
-<a href="#rfc.section.4.2">4.2.</a> <a href="#scope-of-the-interface-definition" id="scope-of-the-interface-definition">Scope of the Interface Definition</a>
+<h1 id="rfc.section.4.3">
+<a href="#rfc.section.4.3">4.3.</a> <a href="#scope-of-the-interface-definition" id="scope-of-the-interface-definition">Scope of the Interface Definition</a>
 </h1>
-<p id="rfc.section.4.2.p.1">This document defines a language- and platform-independent interface to a Transport Services system. Given the wide variety of languages and language conventions used to write applications that use the transport layer to connect to other applications over the Internet, this independence makes this interface necessarily abstract. While there is no interoperability benefit to tightly defining how the interface be presented to application programmers in diverse platforms, maintaining the &#8220;shape&#8221; of the abstract interface across these platforms reduces the effort for programmers who learn the transport services interface to apply their knowledge in multiple platforms. We therefore make the following recommendations:</p>
+<p id="rfc.section.4.3.p.1">This document defines a language- and platform-independent interface to a Transport Services system. Given the wide variety of languages and language conventions used to write applications that use the transport layer to connect to other applications over the Internet, this independence makes this interface necessarily abstract. While there is no interoperability benefit to tightly defining how the interface be presented to application programmers in diverse platforms, maintaining the &#8220;shape&#8221; of the abstract interface across these platforms reduces the effort for programmers who learn the transport services interface to apply their knowledge in multiple platforms. We therefore make the following recommendations:</p>
 <p></p>
 
 <ul>
@@ -871,30 +1017,32 @@ LocalSpecifier.WithStunServer(address, port, credentials)
 </tr>
 </tbody>
 </table>
-<p id="rfc.section.5.2.p.4">Internally, the transport system will first exclude all protocols and paths that match a Prohibit, then exclude all protocols and paths that do not match a Require, then sort candidates according to Preferred properties, and then use Avoided properties as a tiebreaker. Selection Properties which select paths take preference over those which select protocols. For example, if an application indicates a preference for a specific path by specifying an interface, but also a preference for a protocol not available on this path, the transport system will try the path first, ignoring the preference.</p>
-<p id="rfc.section.5.2.p.5">Both Selection and Connection Properties can be added to a Preconnection to configure the selection process, and to further configure the eventually selected protocol stack(s). They are collected into a TransportProperties object to be passed into a Preconnection object:</p>
+<p id="rfc.section.5.2.p.4">In addition, the pseudo-level <samp>Default</samp> can be used to reset the property to the default level used by the implementation. This level will never show up when queuing the value of a preference - the effective preference must be returned instead.</p>
+<p id="rfc.section.5.2.p.5">Internally, the transport system will first exclude all protocols and paths that match a Prohibit, then exclude all protocols and paths that do not match a Require, then sort candidates according to Preferred properties, and then use Avoided properties as a tiebreaker. Selection Properties which select paths take preference over those which select protocols. For example, if an application indicates a preference for a specific path by specifying an interface, but also a preference for a protocol not available on this path, the transport system will try the path first, ignoring the preference.</p>
+<p id="rfc.section.5.2.p.6">Both Selection and Connection Properties can be added to a Preconnection to configure the selection process, and to further configure the eventually selected protocol stack(s). They are collected into a TransportProperties object to be passed into a Preconnection object:</p>
 <pre>
 TransportProperties := NewTransportProperties()
 </pre>
-<p id="rfc.section.5.2.p.6">Individual properties are then added to the TransportProperties Object:</p>
+<p id="rfc.section.5.2.p.7">Individual properties are then added to the TransportProperties Object:</p>
 <pre>
 TransportProperties.Add(property, value)
 </pre>
-<p id="rfc.section.5.2.p.7">Selection Properties can be added to a TransportProperties object using special actions for each preference level i.e, <samp>TransportProperties.Add(some_property, avoid)</samp> is equivalent to <samp>TransportProperties.Avoid(some_property)</samp>:</p>
+<p id="rfc.section.5.2.p.8">Selection Properties can be added to a TransportProperties object using special actions for each preference level i.e, <samp>TransportProperties.Add(some_property, avoid)</samp> is equivalent to <samp>TransportProperties.Avoid(some_property)</samp>:</p>
 <pre>
 TransportProperties.Require(property)
 TransportProperties.Prefer(property)
 TransportProperties.Ignore(property)
 TransportProperties.Avoid(property)
 TransportProperties.Prohibit(property)
+TransportProperties.Default(property)
 </pre>
-<p id="rfc.section.5.2.p.8">For an existing Connection, the Transport Properties can be queried any time by using the following call on the Connection Object:</p>
+<p id="rfc.section.5.2.p.9">For an existing Connection, the Transport Properties can be queried any time by using the following call on the Connection Object:</p>
 <pre>
 TransportProperties := Connection.GetTransportProperties()
 </pre>
-<p id="rfc.section.5.2.p.9">A Connection gets its Transport Properties either by being explicitly configured via a Preconnection, by configuration after establishment, or by inheriting them from an antecedent via cloning; see <a href="#groups" class="xref">Section 6.4</a> for more.</p>
+<p id="rfc.section.5.2.p.10">A Connection gets its Transport Properties either by being explicitly configured via a Preconnection, by configuration after establishment, or by inheriting them from an antecedent via cloning; see <a href="#groups" class="xref">Section 6.4</a> for more.</p>
 <p><a href="#connection-props" class="xref">Section 9.1</a> provides a list of Connection Properties, while Selection Properties are listed in the subsections below. Note that many properties are only considered during establishment, and can not be changed after a Connection is established; however, they can be queried. Querying a Selection Property after establishment yields the value Required for properties of the selected protocol and path, Avoid for properties avoided during selection, and Ignore for all other properties.</p>
-<p id="rfc.section.5.2.p.11">An implementation of this interface must provide sensible defaults for Selection Properties. The recommended defaults given for each property below represent a configuration that can be implemented over TCP. An alternate set of default Protocol Selection Properties would represent a configuration that can be implemented over UDP.</p>
+<p id="rfc.section.5.2.p.12">An implementation of this interface must provide sensible defaults for Selection Properties. The recommended defaults given for each property below represent a configuration that can be implemented over TCP. An alternate set of default Protocol Selection Properties would represent a configuration that can be implemented over UDP.</p>
 <h1 id="rfc.section.5.2.1">
 <a href="#rfc.section.5.2.1">5.2.1.</a> <a href="#prop-reliable" id="prop-reliable">Reliable Data Transfer (Connection)</a>
 </h1>
@@ -1776,7 +1924,7 @@ Connection -&gt; ConnectionError&lt;&gt;
 <a href="#rfc.section.12">12.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a>
 </h1>
 <p id="rfc.section.12.p.1">RFC-EDITOR: Please remove this section before publication.</p>
-<p id="rfc.section.12.p.2">This document has no Actions for IANA.  Later versions of this document may create IANA registries for generic transport property names and transport property namespaces (see <a href="#property-names" class="xref">Section 4.1.1</a>).</p>
+<p id="rfc.section.12.p.2">This document has no Actions for IANA.  Later versions of this document may create IANA registries for generic transport property names and transport property namespaces (see <a href="#property-names" class="xref">Section 4.2.1</a>).</p>
 <h1 id="rfc.section.13">
 <a href="#rfc.section.13">13.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a>
 </h1>
