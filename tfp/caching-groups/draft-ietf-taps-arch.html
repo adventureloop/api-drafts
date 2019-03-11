@@ -756,7 +756,7 @@ ul.toc li {
 <p></p>
 
 <ul>
-<li>Connection Group: A set of Connections that share properties. For multiplexing transport protocols, the Connection Group defines the set of Connections that can be multiplexed together. Groups can be defined implicitly by the Implementation, based on which properties are compatible. However, applications SHOULD be able to explicitly define Connection Groups, as discussed in <a href="#groups" class="xref">Section 4.2.4</a>.</li>
+<li>Connection Group: A set of Connections that share properties and caches. For multiplexing transport protocols, only Connections within the same Connection Group are allowed be multiplexed together. Applications can use their explicitly defined Connection Groups to control caching boundaries, as discussed in <a href="#groups" class="xref">Section 4.2.4</a>.</li>
 <li>Path: Represents an available set of properties that a local system can use to communicate with a remote system, such as routes, addresses, and physical and virtual network interfaces.</li>
 <li>Protocol Instance: A single instance of one protocol, including any state it has necessary to establish connectivity or send and receive Messages.</li>
 <li>Protocol Stack: A set of Protocol Instances (including relevant application, security, transport, or Internet protocols) that are used together to establish connectivity or send and receive Messages. A single stack can be simple (a single transport protocol instance over IP), or complex (multiple application protocol streams going through a single security and transport protocol, over IP; or, a multi-path transport protocol over multiple transport sub-flows).</li>
@@ -808,8 +808,8 @@ ul.toc li {
 <li>Privacy concerns about allowing Connections to multiplex together, which can tell a Remote Endpoint that all of the Connections are coming from the same application (for example, when Connections are multiplexed HTTP/2 or QUIC streams).</li>
 <li>Performance concerns about Connections introducing head-of-line blocking due to multiplexing or needing to share state on a single thread.</li>
 </ul>
-<p id="rfc.section.4.2.4.p.4">The Transport Services API SHOULD allow applications to explicitly define Connection Groups to force separation of Cached State and Protocol Stacks. For example, a web browser application might use separate Connection Groups for different tabs in the browser to decrease linkability.</p>
-<p id="rfc.section.4.2.4.p.5">The interface to specify these Groups can optionally expose fine-grained tuning for which properties and cached state is allowed to be shared with other Connections. For example, an application might want to allow sharing TCP Fast Open cookies across groups, but not TLS session state.</p>
+<p id="rfc.section.4.2.4.p.4">The Transport Services API SHOULD allow applications to explicitly define Connection Groups that force separation of Cached State and Protocol Stacks. For example, a web browser application might use Connection Groups with separate caches for different tabs in the browser to decrease linkability.</p>
+<p id="rfc.section.4.2.4.p.5">The interface to specify these Groups MAY expose fine-grained tuning for which properties and cached state is allowed to be shared with other Connections. For example, an application might want to allow sharing TCP Fast Open cookies across groups, but not TLS session state.</p>
 <h1 id="rfc.section.5">
 <a href="#rfc.section.5">5.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a>
 </h1>

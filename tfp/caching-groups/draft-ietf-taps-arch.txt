@@ -943,9 +943,9 @@ Internet-Draft              TAPS Architecture                 March 2019
    functionality needed to provide a transport service across a network,
    as required by the abstract interface.
 
-   o  Connection Group: A set of Connections that share properties.  For
-      multiplexing transport protocols, the Connection Group defines the
-      set of Connections that can be multiplexed together.  Groups can
+   o  Connection Group: A set of Connections that share properties and
+      caches.  For multiplexing transport protocols, only Connections
+      within the same Connection Group are allowed be multiplexed
 
 
 
@@ -954,9 +954,8 @@ Pauly, et al.          Expires September 12, 2019              [Page 17]
 Internet-Draft              TAPS Architecture                 March 2019
 
 
-      be defined implicitly by the Implementation, based on which
-      properties are compatible.  However, applications SHOULD be able
-      to explicitly define Connection Groups, as discussed in
+      together.  Applications can use their explicitly defined
+      Connection Groups to control caching boundaries, as discussed in
       Section 4.2.4.
 
    o  Path: Represents an available set of properties that a local
@@ -1000,6 +999,7 @@ Internet-Draft              TAPS Architecture                 March 2019
       previously.  This can include DNS results, TLS session state,
       previous success and quality of transport protocols over certain
       paths.
+
 
 
 
@@ -1148,16 +1148,16 @@ Internet-Draft              TAPS Architecture                 March 2019
       thread.
 
    The Transport Services API SHOULD allow applications to explicitly
-   define Connection Groups to force separation of Cached State and
+   define Connection Groups that force separation of Cached State and
    Protocol Stacks.  For example, a web browser application might use
-   separate Connection Groups for different tabs in the browser to
-   decrease linkability.
+   Connection Groups with separate caches for different tabs in the
+   browser to decrease linkability.
 
-   The interface to specify these Groups can optionally expose fine-
-   grained tuning for which properties and cached state is allowed to be
-   shared with other Connections.  For example, an application might
-   want to allow sharing TCP Fast Open cookies across groups, but not
-   TLS session state.
+   The interface to specify these Groups MAY expose fine-grained tuning
+   for which properties and cached state is allowed to be shared with
+   other Connections.  For example, an application might want to allow
+   sharing TCP Fast Open cookies across groups, but not TLS session
+   state.
 
 5.  IANA Considerations
 
