@@ -1073,11 +1073,13 @@ Internet-Draft             TAPS Implementation                March 2019
       support removing a Message from its buffer, this property may be
       ignored.
 
-   o  Priority: this represents the ability to de-prioritize a Message
-      in favor of other Messages.  This can be implemented by the system
-      re-ordering Messages that have yet to be handed to the Protocol
-      Stack, or by giving relative priority hints to protocols that
-      support priorities per Message.
+   o  Priority: this represents the ability to prioritize a Message over
+      other Messages.  This can be implemented by the system re-ordering
+      Messages that have yet to be handed to the Protocol Stack, or by
+      giving relative priority hints to protocols that support
+      priorities per Message.  For example, an implementation of HTTP/2
+      could choose to send Messages of different Priority on streams of
+      different priority.
 
    o  Ordered: when this is false, it disables the requirement of in-
       order-delivery for protocols that support configurable ordering.
@@ -1112,8 +1114,6 @@ Internet-Draft             TAPS Implementation                March 2019
       fragmentation.  Some transports implement network-layer
       fragmentation avoidance (Path MTU Discovery) without exposing this
       functionality to the application; in this case, only transport-
-      layer segmentation should be avoided, by fitting the message into
-      a single transport-layer segment or otherwise failing.  Otherwise,
 
 
 
@@ -1122,6 +1122,8 @@ Brunstrom, et al.      Expires September 12, 2019              [Page 20]
 Internet-Draft             TAPS Implementation                March 2019
 
 
+      layer segmentation should be avoided, by fitting the message into
+      a single transport-layer segment or otherwise failing.  Otherwise,
       network-layer fragmentation should be avoided--e.g. by requesting
       the IP Don't Fragment bit to be set in case of UDP(-Lite) and IPv4
       (SET_DF in [RFC8304]).
@@ -1168,8 +1170,6 @@ Internet-Draft             TAPS Implementation                March 2019
    content it wants to receive (which may be just a single byte) to
    control the flow of received data.
 
-   If a Connection becomes finished before a requested Receive action
-   can be satisfied, the implementation should deliver any partial
 
 
 
@@ -1178,6 +1178,8 @@ Brunstrom, et al.      Expires September 12, 2019              [Page 21]
 Internet-Draft             TAPS Implementation                March 2019
 
 
+   If a Connection becomes finished before a requested Receive action
+   can be satisfied, the implementation should deliver any partial
    Message content outstanding, or if none is available, an indication
    that there will be no more received Messages.
 
@@ -1221,8 +1223,6 @@ Internet-Draft             TAPS Implementation                March 2019
    attempt must use a different ticket.  In effect, each leaf node will
    send the same early application data, yet encoded (encrypted)
    differently on the wire.
-
-
 
 
 
