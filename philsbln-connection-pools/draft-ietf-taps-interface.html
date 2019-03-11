@@ -313,8 +313,8 @@ ul.toc li {
 <link href="#rfc.section.6.2" rel="Chapter" title="6.2 Passive Open: Listen">
 <link href="#rfc.section.6.3" rel="Chapter" title="6.3 Peer-to-Peer Establishment: Rendezvous">
 <link href="#rfc.section.6.4" rel="Chapter" title="6.4 Connection Pools">
-<link href="#rfc.section.6.4.1" rel="Chapter" title="6.4.1 Initiating Pools">
-<link href="#rfc.section.6.4.2" rel="Chapter" title="6.4.2 Listening Pools">
+<link href="#rfc.section.6.4.1" rel="Chapter" title="6.4.1 Requestor Pools">
+<link href="#rfc.section.6.4.2" rel="Chapter" title="6.4.2 Responder Pools">
 <link href="#rfc.section.6.5" rel="Chapter" title="6.5 Connection Groups">
 <link href="#rfc.section.7" rel="Chapter" title="7 Sending Data">
 <link href="#rfc.section.7.1" rel="Chapter" title="7.1 Basic Sending">
@@ -385,7 +385,7 @@ ul.toc li {
 
   <meta name="dct.creator" content="Trammell, B., Ed., Welzl, M., Ed., Enghardt, T., Fairhurst, G., Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-taps-interface-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2019-03-09" />
+  <meta name="dct.issued" scheme="ISO8601" content="2019-03-11" />
   <meta name="dct.abstract" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
   <meta name="description" content="This document describes an abstract programming interface to the transport layer, following the Transport Services Architecture. It supports the asynchronous, atomic transmission of messages over transport protocols and network paths dynamically selected at runtime. It is intended to replace the traditional BSD sockets API as the lowest common denominator interface to the transport layer, in an environment where endpoints have multiple interfaces and potential transport protocols to select from." />
 
@@ -409,7 +409,7 @@ ul.toc li {
 <td class="right">M. Welzl, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: September 10, 2019</td>
+<td class="left">Expires: September 12, 2019</td>
 <td class="right">University of Oslo</td>
 </tr>
 <tr>
@@ -462,7 +462,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">March 09, 2019</td>
+<td class="right">March 11, 2019</td>
 </tr>
 
     	
@@ -478,7 +478,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on September 10, 2019.</p>
+<p>This Internet-Draft will expire on September 12, 2019.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2019 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -552,9 +552,9 @@ ul.toc li {
 </li>
 <li>6.4.   <a href="#rfc.section.6.4">Connection Pools</a>
 </li>
-<ul><li>6.4.1.   <a href="#rfc.section.6.4.1">Initiating Pools</a>
+<ul><li>6.4.1.   <a href="#rfc.section.6.4.1">Requestor Pools</a>
 </li>
-<li>6.4.2.   <a href="#rfc.section.6.4.2">Listening Pools</a>
+<li>6.4.2.   <a href="#rfc.section.6.4.2">Responder Pools</a>
 </li>
 </ul><li>6.5.   <a href="#rfc.section.6.5">Connection Groups</a>
 </li>
@@ -1095,39 +1095,43 @@ Preconnection -&gt; RendezvousError&lt;msgRef, error&gt;
 </pre>
 <p id="rfc.section.6.3.p.8">The Resolve() call returns a list of Preconnection Objects, that represent the concrete addresses, local and server reflexive, on which a Rendezvous() for the Preconnection will listen for incoming Connections. These resolved Preconnections will share all other Properties with the Preconnection from which they are derived, though some Properties may be made more-specific by the resolution process. This list can be passed to a peer via a signalling protocol, such as SIP <a href="#RFC3261" class="xref">[RFC3261]</a> or WebRTC <a href="#RFC7478" class="xref">[RFC7478]</a>, to configure the remote.</p>
 <h1 id="rfc.section.6.4">
-<a href="#rfc.section.6.4">6.4.</a> <a href="#pools" id="pools">Connection Pools</a>
+<a href="#rfc.section.6.4">6.4.</a> <a href="#connection-pools" id="connection-pools">Connection Pools</a>
 </h1>
-<p id="rfc.section.6.4.p.1">When using Request/Response style protocols, such as HTTP, applications can let the Transport System manage their connections by using Connection Pools.  In this case, the Transport System can automatically distribute requests across multiple connections towards equivalent endpoints or be multiplexed on multi-streaming connections.  A connection pool is created by the ConnectionPool Action:</p>
-<pre>
-ConnectionPool := Preconnection.ConnectionPool()
-</pre>
-<p id="rfc.section.6.4.p.2">The caller should specify all properties necessary for candidate selection that are shared by all requests send or received using this connection pool.  By specifying selection properties on a send call later, the application can influence which Connection within the Connection Pool should be used.</p>
-<p id="rfc.section.6.4.p.3">The Connection Pool can be used for sending and receiving requests and responses like a connection, see <a href="#sending" class="xref">Section 7</a> and <a href="#receiving" class="xref">Section 8</a>.</p>
-<pre>
-ConnectionPool.Stop()
-</pre>
-<p id="rfc.section.6.4.p.4">After Stop() is called, the Connection Pool can be disposed of, all listening will be stopped, and all backing connections will be terminated.</p>
+<p id="rfc.section.6.4.p.1">When using Request/Response style protocols, such as HTTP, applications can let the Transport System manage their connections by using Connection Pools.  In this case, the Transport System can automatically distribute requests across multiple connections towards equivalent endpoints or be multiplexed on multi-streaming connections.</p>
+<p id="rfc.section.6.4.p.2">Connection Pools are used like regular connections with one exception: They use the msgRef/reqRef parameters of the send and receive calls to send responses on the same backing connection as the request was received.  If the Message received is a request from the remote side, the reqRef provided, see <a href="#receiving" class="xref">Section 8</a>, must be used later when sending a response.  If the Message received is a response to a request sent earlier, the reqRef matches the msgRef of the original request.  When sending a new request, see <a href="#sending" class="xref">Section 7</a>, the reqRef parameter must be empty.</p>
 <h1 id="rfc.section.6.4.1">
-<a href="#rfc.section.6.4.1">6.4.1.</a> <a href="#initiating-pools" id="initiating-pools">Initiating Pools</a>
+<a href="#rfc.section.6.4.1">6.4.1.</a> <a href="#requestor-pools" id="requestor-pools">Requestor Pools</a>
 </h1>
-<p id="rfc.section.6.4.1.p.1">When using a connection pool to send requests, the caller must have populated a Preconnection Object with sufficient Endpoint specifiers to initiate a Connection as described in <a href="#initiate" class="xref">Section 6.1</a>.</p>
+<p id="rfc.section.6.4.1.p.1">When using a Requestor Pool to send requests, the caller must have populated a Preconnection Object with sufficient Endpoint specifiers to initiate a Connection as described in <a href="#initiate" class="xref">Section 6.1</a>.  The caller should specify all properties necessary for candidate selection that are shared by all requests send or received using this connection pool.  By specifying selection properties on a send call later, the application can influence which Connection within the Connection Pool should be used.  A Requestor Pool is then created by the RequestorPool Action:</p>
+<pre>
+RequestorPool := Preconnection.RequestorPool()
+</pre>
 <p id="rfc.section.6.4.1.p.2">There is no need to call initiate for a pool, as connections get initiated automatically when sending requests.  Also, the connection pool will consume ConnectionReady events from the backing Connections.</p>
 <pre>
 ConnectionPool -&gt; InitiateError&lt;&gt;
 </pre>
 <p id="rfc.section.6.4.1.p.3">When initiating of all backing Connection fail, the Connection Pool may forward initiation errors to the application.</p>
-<h1 id="rfc.section.6.4.2">
-<a href="#rfc.section.6.4.2">6.4.2.</a> <a href="#listening-pools" id="listening-pools">Listening Pools</a>
-</h1>
-<p id="rfc.section.6.4.2.p.1">When using a connection pool to send requests, the caller must have populated a Preconnection Object with sufficient Endpoint specifiers to Listen for Connections as described in <a href="#listen" class="xref">Section 6.2</a>.</p>
 <pre>
-ConnectionPool.Listen()
+ConnectionPool.Stop()
 </pre>
-<p id="rfc.section.6.4.2.p.2">Instead of calling Listen() on the Preconnection, an application using listening pools calls Listen() directly on the connection pool.</p>
+<p id="rfc.section.6.4.1.p.4">After Stop() is called, the Connection Pool can be disposed of, all backing connections will be terminated.</p>
+<h1 id="rfc.section.6.4.2">
+<a href="#rfc.section.6.4.2">6.4.2.</a> <a href="#responder-pools" id="responder-pools">Responder Pools</a>
+</h1>
+<p id="rfc.section.6.4.2.p.1">When using a Responder Pool to send requests, the caller must have populated a Preconnection Object with sufficient Endpoint specifiers to Listen for Connections as described in <a href="#listen" class="xref">Section 6.2</a>.</p>
+<p id="rfc.section.6.4.2.p.2">A Responder Pool is created by the ConnectionPool Action:</p>
+<pre>
+ResponderPool := Preconnection.ResponderPool()
+</pre>
+<p id="rfc.section.6.4.2.p.3">There is no need to call Listen() on the Preconnection, all necessary actions are performed with the Responder Pool.</p>
 <pre>
 ConnectionPool -&gt; ListenError&lt;&gt;
 </pre>
-<p id="rfc.section.6.4.2.p.3">If listening fails, the Connection Pool may forward listen errors to the application.</p>
+<p id="rfc.section.6.4.2.p.4">If listening fails, the Connection Pool may forward listen errors to the application.</p>
+<pre>
+ConnectionPool.Stop()
+</pre>
+<p id="rfc.section.6.4.2.p.5">After Stop() is called, the Connection Pool can be disposed of, all listening will be stopped, and all backing connections will be terminated.</p>
 <h1 id="rfc.section.6.5">
 <a href="#rfc.section.6.5">6.5.</a> <a href="#groups" id="groups">Connection Groups</a>
 </h1>
@@ -1149,11 +1153,9 @@ Connection -&gt; CloneError&lt;&gt;
 <p id="rfc.section.7.p.1">Once a Connection has been established, it can be used for sending data. Data is sent in terms of Messages, which allow the application to communicate the boundaries of the data being transferred. By default, Send enqueues a complete Message, and takes optional per-Message properties (see <a href="#send-basic" class="xref">Section 7.1</a>). All Send actions are asynchronous, and deliver events (see <a href="#send-events" class="xref">Section 7.2</a>). Sending partial Messages for streaming large data is also supported (see <a href="#send-partial" class="xref">Section 7.5</a>).</p>
 <p id="rfc.section.7.p.2">Messages are sent on a Connection or a Connection Pool using the Send action:</p>
 <pre>
-msgRef := Connection.Send(messageData, messageContext?, endOfMessage?)
-msgRef := ConnectionPool.Send(reqRef?, messageData, messageContext?, endOfMessage?)
+msgRef := Connection.Send(messageData, messageContext?, reqRef?, endOfMessage?)
 </pre>
-<p id="rfc.section.7.p.3">where messageData is the data object to send. The optional messageContext parameter supports per-message properties and is described in <a href="#message-props" class="xref">Section 7.3</a>.  The optional endOfMessage parameter supports partial sending and is described in <a href="#send-partial" class="xref">Section 7.5</a>.</p>
-<p id="rfc.section.7.p.4">The optional reqRef can be used to match requests and responses for requests/response style protocols. When sending a request, this parameter must be empty. When sending a response, the reqRef received with the Receive Event must be provided.</p>
+<p id="rfc.section.7.p.3">where messageData is the data object to send. The optional messageContext parameter supports per-message properties and is described in <a href="#message-props" class="xref">Section 7.3</a>.  The optional reqRef can be used to match requests and responses for requests/response style protocols and is described in {connection-pools}.  The optional endOfMessage parameter supports partial sending and is described in <a href="#send-partial" class="xref">Section 7.5</a>.</p>
 <h1 id="rfc.section.7.1">
 <a href="#rfc.section.7.1">7.1.</a> <a href="#send-basic" id="send-basic">Basic Sending</a>
 </h1>
@@ -1375,7 +1377,6 @@ OctetArray := Framer.Frame(messageData)
 <p id="rfc.section.8.1.p.1">Receive takes two parameters to specify the length of data that an application is willing to receive, both of which are optional and have default values if not specified.</p>
 <pre>
 Connection.Receive(minIncompleteLength?, maxLength?)
-ConnectionPool.Receive(minIncompleteLength?, maxLength?)
 </pre>
 <p id="rfc.section.8.1.p.2">By default, Receive will try to deliver complete Messages in a single event (<a href="#receive-complete" class="xref">Section 8.2.1</a>).</p>
 <p id="rfc.section.8.1.p.3">The application can set a minIncompleteLength value to indicates the smallest partial Message data size in bytes that should be delivered in response to this Receive. By default, this value is infinite, which means that only complete Messages should be delivered (see <a href="#receive-partial" class="xref">Section 8.2.2</a> and <a href="#receive-framing" class="xref">Section 8.4</a> for more information on how this is accomplished).  If this value is set to some smaller value, the associated receive event will be triggered only when at least that many bytes are available, or the Message is complete with fewer bytes, or the system needs to free up memory. Applications should always check the length of the data delivered to the receive event and not assume it will be as long as minIncompleteLength in the case of shorter complete Messages or memory issues.</p>
@@ -1389,12 +1390,11 @@ ConnectionPool.Receive(minIncompleteLength?, maxLength?)
 <a href="#rfc.section.8.2.1">8.2.1.</a> <a href="#receive-complete" id="receive-complete">Received</a>
 </h1>
 <pre>
-Connection -&gt; Received&lt;messageData, messageContext&gt;
-ConnectionPool -&gt; Received&lt;messageData, messageContext, reqRef&gt;
+Connection -&gt; Received&lt;messageData, messageContext, reqRef?&gt;
 </pre>
 <p id="rfc.section.8.2.1.p.1">A Received event indicates the delivery of a complete Message. It contains two objects, the received bytes as messageData, and the metadata and properties of the received Message as messageContext. See <a href="#receive-context" class="xref">Section 8.3</a> for details about the received context.</p>
 <p id="rfc.section.8.2.1.p.2">The messageData object provides access to the bytes that were received for this Message, along with the length of the byte array.</p>
-<p id="rfc.section.8.2.1.p.3">In case a Message is received from a Connection Pool, a (local) reqRef is provided to match requests and responses. If the Message received is a response to a request sent earlier, the reqRef matches the msgRef of the original request. If the Message received is a request from the remote side, the reqRef is provided to be used later to send a response.</p>
+<p id="rfc.section.8.2.1.p.3">In case a Message is received from a Connection Pool, a (local) reqRef is provided to match requests and responses, see <a href="#connection-pools" class="xref">Section 6.4</a>.</p>
 <p id="rfc.section.8.2.1.p.4">See <a href="#receive-framing" class="xref">Section 8.4</a> for handling Message framing in situations where the Protocol Stack provides octet-stream transport only.</p>
 <h1 id="rfc.section.8.2.2">
 <a href="#rfc.section.8.2.2">8.2.2.</a> <a href="#receive-partial" id="receive-partial">ReceivedPartial</a>
