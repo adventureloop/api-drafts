@@ -293,9 +293,8 @@ ul.toc li {
 <link href="#rfc.section.4.2" rel="Chapter" title="4.2 Branching Order-of-Operations">
 <link href="#rfc.section.4.3" rel="Chapter" title="4.3 Sorting Branches">
 <link href="#rfc.section.4.4" rel="Chapter" title="4.4 Candidate Racing">
-<link href="#rfc.section.4.4.1" rel="Chapter" title="4.4.1 Immediate">
-<link href="#rfc.section.4.4.2" rel="Chapter" title="4.4.2 Delayed">
-<link href="#rfc.section.4.4.3" rel="Chapter" title="4.4.3 Failover">
+<link href="#rfc.section.4.4.1" rel="Chapter" title="4.4.1 Delayed">
+<link href="#rfc.section.4.4.2" rel="Chapter" title="4.4.2 Failover">
 <link href="#rfc.section.4.5" rel="Chapter" title="4.5 Completing Establishment">
 <link href="#rfc.section.4.5.1" rel="Chapter" title="4.5.1 Determining Successful Establishment">
 <link href="#rfc.section.4.6" rel="Chapter" title="4.6 Establishing multiplexed connections">
@@ -468,11 +467,9 @@ ul.toc li {
 </li>
 <li>4.4.   <a href="#rfc.section.4.4">Candidate Racing</a>
 </li>
-<ul><li>4.4.1.   <a href="#rfc.section.4.4.1">Immediate</a>
+<ul><li>4.4.1.   <a href="#rfc.section.4.4.1">Delayed</a>
 </li>
-<li>4.4.2.   <a href="#rfc.section.4.4.2">Delayed</a>
-</li>
-<li>4.4.3.   <a href="#rfc.section.4.4.3">Failover</a>
+<li>4.4.2.   <a href="#rfc.section.4.4.2">Failover</a>
 </li>
 </ul><li>4.5.   <a href="#rfc.section.4.5">Completing Establishment</a>
 </li>
@@ -771,22 +768,18 @@ Aggregate [Endpoint: www.example.com:80] [Interface: Any]   [Protocol: TCP]
 <p id="rfc.section.4.4.p.5">Each approach is appropriate in different use-cases and branch types. However, to avoid consuming unnecessary network resources, implementations should not use immediate racing as a default approach.</p>
 <p id="rfc.section.4.4.p.6">The timing algorithms for racing should remain independent across branches of the tree. Any timers or racing logic is isolated to a given parent node, and is not ordered precisely with regards to other children of other nodes.</p>
 <h1 id="rfc.section.4.4.1">
-<a href="#rfc.section.4.4.1">4.4.1.</a> <a href="#immediate" id="immediate">Immediate</a>
+<a href="#rfc.section.4.4.1">4.4.1.</a> <a href="#delayed" id="delayed">Delayed</a>
 </h1>
-<p id="rfc.section.4.4.1.p.1">[MICHAEL: This seems like an easy thing to do, and its description may be obvious, but I don&#8217;t think we can skip it &#8211; it just looks odd to first introduce the three variants and then only describe two of them.]</p>
+<p id="rfc.section.4.4.1.p.1">Delayed racing can be used whenever a single node of the tree has multiple child nodes. Based on the order determined when building the tree, the first child node will be initiated immediately, followed by the next child node after some delay. Once that second child node is initiated, the third child node (if present) will begin after another delay, and so on until all child nodes have been initiated, or one of the child nodes successfully completes its negotiation.</p>
+<p id="rfc.section.4.4.1.p.2">Delayed racing attempts occur in parallel. Implementations should not terminate an earlier child connection attempt upon starting a secondary child.</p>
+<p id="rfc.section.4.4.1.p.3">The delay between starting child nodes should be based on the properties of the previously started child node. For example, if the first child represents an IP address with a known route, and the second child represents another IP address, the delay between starting the first and second IP addresses can be based on the expected retransmission cadence for the first child&#8217;s connection (derived from historical round-trip-time). Alternatively, if the first child represents a branch on a Wi-Fi interface, and the second child represents a branch on an LTE interface, the delay should be based on the expected time in which the branch for the first interface would be able to establish a connection, based on link quality and historical round-trip-time.</p>
+<p id="rfc.section.4.4.1.p.4">Any delay should have a defined minimum and maximum value based on the branch type. Generally, branches between paths and protocols should have longer delays than branches between derived endpoints. The maximum delay should be considered with regards to how long a user is expected to wait for the connection to complete.</p>
+<p id="rfc.section.4.4.1.p.5">If a child node fails to connect before the delay timer has fired for the next child, the next child should be started immediately.</p>
 <h1 id="rfc.section.4.4.2">
-<a href="#rfc.section.4.4.2">4.4.2.</a> <a href="#delayed" id="delayed">Delayed</a>
+<a href="#rfc.section.4.4.2">4.4.2.</a> <a href="#failover" id="failover">Failover</a>
 </h1>
-<p id="rfc.section.4.4.2.p.1">Delayed racing can be used whenever a single node of the tree has multiple child nodes. Based on the order determined when building the tree, the first child node will be initiated immediately, followed by the next child node after some delay. Once that second child node is initiated, the third child node (if present) will begin after another delay, and so on until all child nodes have been initiated, or one of the child nodes successfully completes its negotiation.</p>
-<p id="rfc.section.4.4.2.p.2">Delayed racing attempts occur in parallel. Implementations should not terminate an earlier child connection attempt upon starting a secondary child.</p>
-<p id="rfc.section.4.4.2.p.3">The delay between starting child nodes should be based on the properties of the previously started child node. For example, if the first child represents an IP address with a known route, and the second child represents another IP address, the delay between starting the first and second IP addresses can be based on the expected retransmission cadence for the first child&#8217;s connection (derived from historical round-trip-time). Alternatively, if the first child represents a branch on a Wi-Fi interface, and the second child represents a branch on an LTE interface, the delay should be based on the expected time in which the branch for the first interface would be able to establish a connection, based on link quality and historical round-trip-time.</p>
-<p id="rfc.section.4.4.2.p.4">Any delay should have a defined minimum and maximum value based on the branch type. Generally, branches between paths and protocols should have longer delays than branches between derived endpoints. The maximum delay should be considered with regards to how long a user is expected to wait for the connection to complete.</p>
-<p id="rfc.section.4.4.2.p.5">If a child node fails to connect before the delay timer has fired for the next child, the next child should be started immediately.</p>
-<h1 id="rfc.section.4.4.3">
-<a href="#rfc.section.4.4.3">4.4.3.</a> <a href="#failover" id="failover">Failover</a>
-</h1>
-<p id="rfc.section.4.4.3.p.1">If an implementation or application has a strong preference for one branch over another, the branching node may choose to wait until one child has failed before starting the next. Failure of a leaf node is determined by its protocol negotiation failing or timing out; failure of a parent branching node is determined by all of its children failing.</p>
-<p id="rfc.section.4.4.3.p.2">An example in which failover is recommended is a race between a protocol stack that uses a proxy and a protocol stack that bypasses the proxy. Failover is useful in case the proxy is down or misconfigured, but any more aggressive type of racing may end up unnecessarily avoiding a proxy that was preferred by policy.</p>
+<p id="rfc.section.4.4.2.p.1">If an implementation or application has a strong preference for one branch over another, the branching node may choose to wait until one child has failed before starting the next. Failure of a leaf node is determined by its protocol negotiation failing or timing out; failure of a parent branching node is determined by all of its children failing.</p>
+<p id="rfc.section.4.4.2.p.2">An example in which failover is recommended is a race between a protocol stack that uses a proxy and a protocol stack that bypasses the proxy. Failover is useful in case the proxy is down or misconfigured, but any more aggressive type of racing may end up unnecessarily avoiding a proxy that was preferred by policy.</p>
 <h1 id="rfc.section.4.5">
 <a href="#rfc.section.4.5">4.5.</a> <a href="#completing-establishment" id="completing-establishment">Completing Establishment</a>
 </h1>
