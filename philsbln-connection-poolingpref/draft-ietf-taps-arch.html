@@ -304,7 +304,8 @@ ul.toc li {
 <link href="#rfc.section.4.2.1" rel="Chapter" title="4.2.1 Candidate Gathering">
 <link href="#rfc.section.4.2.2" rel="Chapter" title="4.2.2 Candidate Racing">
 <link href="#rfc.section.4.2.3" rel="Chapter" title="4.2.3 Protocol Stack Equivalence">
-<link href="#rfc.section.4.2.4" rel="Chapter" title="4.2.4 Separating Connection Groups">
+<link href="#rfc.section.4.2.4" rel="Chapter" title="4.2.4 Pooled Connections">
+<link href="#rfc.section.4.2.5" rel="Chapter" title="4.2.5 Separating Connection Groups">
 <link href="#rfc.section.5" rel="Chapter" title="5 IANA Considerations">
 <link href="#rfc.section.6" rel="Chapter" title="6 Security Considerations">
 <link href="#rfc.section.7" rel="Chapter" title="7 Acknowledgements">
@@ -317,7 +318,7 @@ ul.toc li {
 
   <meta name="dct.creator" content="Pauly, T., Ed., Trammell, B., Ed., Brunstrom, A., Fairhurst, G., Perkins, C., Tiesel, P., and C. Wood" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-taps-arch-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2019-03-20" />
+  <meta name="dct.issued" scheme="ISO8601" content="2019-03-22" />
   <meta name="dct.abstract" content="This document provides an overview of the architecture of Transport Services, a model for exposing transport protocol features to applications for network communication. In contrast to what is provided by most existing Application Programming Interfaces (APIs), Transport Services is based on an asynchronous, event-driven interaction pattern; it uses messages for representing data transfer to applications; and it assumes an implementation that can use multiple IP addresses, multiple protocols, and multiple paths, and provide multiple application streams. This document further defines the common set of terminology and concepts to be used in definitions of Transport Services APIs and implementations." />
   <meta name="description" content="This document provides an overview of the architecture of Transport Services, a model for exposing transport protocol features to applications for network communication. In contrast to what is provided by most existing Application Programming Interfaces (APIs), Transport Services is based on an asynchronous, event-driven interaction pattern; it uses messages for representing data transfer to applications; and it assumes an implementation that can use multiple IP addresses, multiple protocols, and multiple paths, and provide multiple application streams. This document further defines the common set of terminology and concepts to be used in definitions of Transport Services APIs and implementations." />
 
@@ -341,7 +342,7 @@ ul.toc li {
 <td class="right">B. Trammell, Ed.</td>
 </tr>
 <tr>
-<td class="left">Expires: September 21, 2019</td>
+<td class="left">Expires: September 23, 2019</td>
 <td class="right">Google</td>
 </tr>
 <tr>
@@ -386,7 +387,7 @@ ul.toc li {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">March 20, 2019</td>
+<td class="right">March 22, 2019</td>
 </tr>
 
     	
@@ -402,7 +403,7 @@ ul.toc li {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on September 21, 2019.</p>
+<p>This Internet-Draft will expire on September 23, 2019.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2019 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -458,7 +459,9 @@ ul.toc li {
 </li>
 <li>4.2.3.   <a href="#rfc.section.4.2.3">Protocol Stack Equivalence</a>
 </li>
-<li>4.2.4.   <a href="#rfc.section.4.2.4">Separating Connection Groups</a>
+<li>4.2.4.   <a href="#rfc.section.4.2.4">Pooled Connections</a>
+</li>
+<li>4.2.5.   <a href="#rfc.section.4.2.5">Separating Connection Groups</a>
 </li>
 </ul></ul><li>5.   <a href="#rfc.section.5">IANA Considerations</a>
 </li>
@@ -550,9 +553,9 @@ ul.toc li {
 <li>the ability to associate deadlines with messages, for applications that care about timing;</li>
 <li>the ability to provide control of reliability, choosing which messages to retransmit in the event of packet loss, and how best to make use of the data that arrived;</li>
 <li>the ability to manage dependencies between messages, when the transport system could decide to not deliver a message, either following packet loss or because it has missed a deadline. In particular, this can avoid (re-)sending data that relies on a previous transmission that was never received.</li>
+<li>the ability to automatically distribute messages of reordering resistant request/response protocols, like HTTP, across several underlaying transport connections.</li>
 </ul>
-<p id="rfc.section.1.3.p.5">Allowing applications to interact with messages is backwards-compatible with existings protocols and APIs, as it does not change the wire format of any protocol. Instead, it gives the protocol stack additional information to allow it to make better use of modern transport services, while simplifying the application&#8217;s role in parsing data.</p>
-<p id="rfc.section.1.3.p.6">For request/response protocols like HTTP, that can be operated using several transport connections between equivalent endpoints or via multi-streaming connections the Transport Services API supports Connection Pools.  These connection pools hide the connection management and provide a messages-only API that enables per-message endpoint and path selection.</p>
+<p id="rfc.section.1.3.p.5">Allowing applications to interact with messages is backwards-compatible with existing protocols and APIs, as it does not change the wire format of any protocol. Instead, it gives the protocol stack additional information to allow it to make better use of modern transport services, while simplifying the application&#8217;s role in parsing data.</p>
 <h1 id="rfc.section.1.4">
 <a href="#rfc.section.1.4">1.4.</a> <a href="#flexibile-implementation" id="flexibile-implementation">Flexibile Implementation</a>
 </h1>
@@ -690,7 +693,7 @@ ul.toc li {
 <ul>
 <li>Preconnection: A Preconnection object is a representation of a potential connection. It has state that describes parameters of a Connection that might exist in the future: the Local Endpoint from which that Connection will be established, the Remote Endpoint (<a href="#preestablishment" class="xref">Section 4.1.2</a>) to which it will connect, and Selection Properties (<a href="#preestablishment" class="xref">Section 4.1.2</a>) that influence the paths and protocols a Connection will use. A Preconnection can be fully specified and represent a single possible Connection, or it can be partially specified such that it represents a family of possible Connections. The Local Endpoint (<a href="#preestablishment" class="xref">Section 4.1.2</a>) MUST be specified if the Preconnection is used to Listen for incoming connections. The Local Endpoint is OPTIONAL if it is used to Initiate connections. The Remote Endpoint MUST be specified in the Preconnection is used to Initiate connections. The Remote Endpoint is OPTIONAL if it is used to Listen for incoming connections. The Local Endpoint and the Remote Endpoint MUST both be specified if a peer-to-peer Rendezvous is to occur based on the Preconnection.  <ul><li>Transport Properties: Transport Properties can be specified as part of a Preconnection to allow the application to configure the Transport System and express their requirements, prohibitions, and preferences. There are three kinds of Transport Properties: Selection Properties (<a href="#preestablishment" class="xref">Section 4.1.2</a>), Connection Properties (<a href="#preestablishment" class="xref">Section 4.1.2</a>), and Message Properties (<a href="#datatransfer" class="xref">Section 4.1.4</a>). Message Properties can also be specified during data transfer to affect specific Messages.</li></ul>
 </li>
-<li>Connection: A Connection object represents one or more active transport protocol instance that can send and/or receive Messages between local and remote systems. It holds state pertaining to the underlying transport protocol instance(s) and any ongoing data transfer(s).  This represents, for example, an active connection in a connection-oriented protocol such as TCP, or a fully-specified 5-tuple for a connectionless protocol such as UDP.  However, a connection can also represent a pool of transport protocol instance, for example, a bunch of TCP and QUIC connections to equivalent endpoints provided by a CDN, or a set of incoming connections that are saved the same way.</li>
+<li>Connection: A Connection object represents one or more active transport protocol instance that can send and/or receive Messages between local and remote systems. It holds state pertaining to the underlying transport protocol instance(s) and any ongoing data transfer(s).  This represents, for example, an active connection in a connection-oriented protocol such as TCP, or a fully-specified 5-tuple for a connectionless protocol such as UDP.  However, a connection can also represent a pool of transport protocol instance, for example, a bunch of TCP and QUIC connections to equivalent endpoints provided by a CDN, or a set of incoming connections that are served the same way.</li>
 <li>Listener: A Listener object accepts incoming transport protocol connections from remote systems and generates corresponding Connection objects. It is created from a Preconnection object that specifies the type of incoming connections it will accept.</li>
 </ul>
 <h1 id="rfc.section.4.1.2">
@@ -757,7 +760,7 @@ ul.toc li {
 <p></p>
 
 <ul>
-<li>Connection Group: A set of Connections that share properties and caches. For multiplexing transport protocols, only Connections within the same Connection Group are allowed be multiplexed together. Applications can use their explicitly defined Connection Groups to control caching boundaries, as discussed in <a href="#groups" class="xref">Section 4.2.4</a>.</li>
+<li>Connection Group: A set of Connections that share properties and caches. For multiplexing transport protocols, only Connections within the same Connection Group are allowed be multiplexed together. Applications can use their explicitly defined Connection Groups to control caching boundaries, as discussed in <a href="#groups" class="xref">Section 4.2.5</a>.</li>
 <li>Path: Represents an available set of properties that a local system can use to communicate with a remote system, such as routes, addresses, and physical and virtual network interfaces.</li>
 <li>Protocol Instance: A single instance of one protocol, including any state it has necessary to establish connectivity or send and receive Messages.</li>
 <li>Protocol Stack: A set of Protocol Instances (including relevant application, security, transport, or Internet protocols) that are used together to establish connectivity or send and receive Messages. A single stack can be simple (a single transport protocol instance over IP), or complex (multiple application protocol streams going through a single security and transport protocol, over IP; or, a multi-path transport protocol over multiple transport sub-flows).</li>
@@ -798,10 +801,20 @@ ul.toc li {
 <li>Both stacks MUST offer the same security properties. The inclusion of transport security protocols <a href="#I-D.ietf-taps-transport-security" class="xref">[I-D.ietf-taps-transport-security]</a> in a Protocol Stack adds additional restrictions to Protocol Stack equivalence. Security features and properties, such as cryptographic algorithms, peer authentication, and identity privacy vary across security protocols, and across versions of security protocols. Protocol equivalence ought not to be assumed for different protocols or protocol versions, even if they offer similar application configuration options. To ensure that security protocols are not incorrectly swapped, Transport Services systems SHOULD only automatically generate equivalent Protocol Stacks when the transport security protocols within the stacks are identical. Specifically, a transport system would consider protocols identical only if they are of the same type and version. For example, the same version of TLS running over two different transport protocol stacks are considered equivalent, whereas TLS 1.2 and TLS 1.3 <a href="#RFC8446" class="xref">[RFC8446]</a> are not considered equivalent.</li>
 </ol>
 <h1 id="rfc.section.4.2.4">
-<a href="#rfc.section.4.2.4">4.2.4.</a> <a href="#groups" id="groups">Separating Connection Groups</a>
+<a href="#rfc.section.4.2.4">4.2.4.</a> <a href="#pooled-conn" id="pooled-conn">Pooled Connections</a>
 </h1>
-<p id="rfc.section.4.2.4.p.1">By default, all stored properties of the Implementation are shared within a process, such as cached protocol state, cached path state, and heuristics. This provides efficiency and convenience for the application, since the Transport System Implementation can automatically optimize behavior.</p>
-<p id="rfc.section.4.2.4.p.2">There are several reasons, however, that an application might want to isolate some Connections within a single process. These reasons include:</p>
+<p id="rfc.section.4.2.4.p.1">For message reordering resistant request/response protocols like HTTP, interactions can be automatically distributed across several underlaying transport connections.  This is realized by Pooled Connections that hide the connection management and provide a messages-only API that enables per-message endpoint and path selection.  Pooled Connections use multiple connections between equivalent endpoints using equivalent protocol stacks, see <a href="#equivalence" class="xref">Section 4.2.3</a>, in parallel, including multiple streams of multi-streaming connections.</p>
+<p></p>
+
+<dl>
+<dt>TODO:</dt>
+<dd style="margin-left: 8">Either define &#8220;equivalent endpoints&#8221; here (Endpoints derived from the representation given to the API) or update <a href="#equivalence" class="xref">Section 4.2.3</a> to do it. We need this for racing anyway.</dd>
+</dl>
+<h1 id="rfc.section.4.2.5">
+<a href="#rfc.section.4.2.5">4.2.5.</a> <a href="#groups" id="groups">Separating Connection Groups</a>
+</h1>
+<p id="rfc.section.4.2.5.p.1">By default, all stored properties of the Implementation are shared within a process, such as cached protocol state, cached path state, and heuristics. This provides efficiency and convenience for the application, since the Transport System Implementation can automatically optimize behavior.</p>
+<p id="rfc.section.4.2.5.p.2">There are several reasons, however, that an application might want to isolate some Connections within a single process. These reasons include:</p>
 <p></p>
 
 <ul>
@@ -809,8 +822,8 @@ ul.toc li {
 <li>Privacy concerns about allowing Connections to multiplex together, which can tell a Remote Endpoint that all of the Connections are coming from the same application (for example, when Connections are multiplexed HTTP/2 or QUIC streams).</li>
 <li>Performance concerns about Connections introducing head-of-line blocking due to multiplexing or needing to share state on a single thread.</li>
 </ul>
-<p id="rfc.section.4.2.4.p.4">The Transport Services API SHOULD allow applications to explicitly define Connection Groups that force separation of Cached State and Protocol Stacks. For example, a web browser application might use Connection Groups with separate caches for different tabs in the browser to decrease linkability.</p>
-<p id="rfc.section.4.2.4.p.5">The interface to specify these Groups MAY expose fine-grained tuning for which properties and cached state is allowed to be shared with other Connections. For example, an application might want to allow sharing TCP Fast Open cookies across groups, but not TLS session state.</p>
+<p id="rfc.section.4.2.5.p.4">The Transport Services API SHOULD allow applications to explicitly define Connection Groups that force separation of Cached State and Protocol Stacks. For example, a web browser application might use Connection Groups with separate caches for different tabs in the browser to decrease linkability.</p>
+<p id="rfc.section.4.2.5.p.5">The interface to specify these Groups MAY expose fine-grained tuning for which properties and cached state is allowed to be shared with other Connections. For example, an application might want to allow sharing TCP Fast Open cookies across groups, but not TLS session state.</p>
 <h1 id="rfc.section.5">
 <a href="#rfc.section.5">5.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a>
 </h1>
@@ -836,12 +849,12 @@ ul.toc li {
 <tr>
 <td class="reference"><b id="I-D.ietf-taps-impl">[I-D.ietf-taps-impl]</b></td>
 <td class="top">
-<a>Brunstrom, A.</a>, <a>Pauly, T.</a>, <a>Enghardt, T.</a>, <a>Grinnemo, K.</a>, <a>Jones, T.</a>, <a>Tiesel, P.</a>, <a>Perkins, C.</a> and <a>M. Welzl</a>, "<a href="https://tools.ietf.org/html/draft-ietf-taps-impl-02">Implementing Interfaces to Transport Services</a>", Internet-Draft draft-ietf-taps-impl-02, October 2018.</td>
+<a>Brunstrom, A.</a>, <a>Pauly, T.</a>, <a>Enghardt, T.</a>, <a>Grinnemo, K.</a>, <a>Jones, T.</a>, <a>Tiesel, P.</a>, <a>Perkins, C.</a> and <a>M. Welzl</a>, "<a href="https://tools.ietf.org/html/draft-ietf-taps-impl-03">Implementing Interfaces to Transport Services</a>", Internet-Draft draft-ietf-taps-impl-03, March 2019.</td>
 </tr>
 <tr>
 <td class="reference"><b id="I-D.ietf-taps-interface">[I-D.ietf-taps-interface]</b></td>
 <td class="top">
-<a>Trammell, B.</a>, <a>Welzl, M.</a>, <a>Enghardt, T.</a>, <a>Fairhurst, G.</a>, <a>Kuehlewind, M.</a>, <a>Perkins, C.</a>, <a>Tiesel, P.</a> and <a>C. Wood</a>, "<a href="https://tools.ietf.org/html/draft-ietf-taps-interface-02">An Abstract Application Layer Interface to Transport Services</a>", Internet-Draft draft-ietf-taps-interface-02, October 2018.</td>
+<a>Trammell, B.</a>, <a>Welzl, M.</a>, <a>Enghardt, T.</a>, <a>Fairhurst, G.</a>, <a>Kuehlewind, M.</a>, <a>Perkins, C.</a>, <a>Tiesel, P.</a> and <a>C. Wood</a>, "<a href="https://tools.ietf.org/html/draft-ietf-taps-interface-03">An Abstract Application Layer Interface to Transport Services</a>", Internet-Draft draft-ietf-taps-interface-03, March 2019.</td>
 </tr>
 <tr>
 <td class="reference"><b id="I-D.ietf-taps-minset">[I-D.ietf-taps-minset]</b></td>
@@ -851,7 +864,7 @@ ul.toc li {
 <tr>
 <td class="reference"><b id="I-D.ietf-taps-transport-security">[I-D.ietf-taps-transport-security]</b></td>
 <td class="top">
-<a>Pauly, T.</a>, <a>Perkins, C.</a>, <a>Rose, K.</a> and <a>C. Wood</a>, "<a href="https://tools.ietf.org/html/draft-ietf-taps-transport-security-04">A Survey of Transport Security Protocols</a>", Internet-Draft draft-ietf-taps-transport-security-04, November 2018.</td>
+<a>Wood, C.</a>, <a>Enghardt, T.</a>, <a>Pauly, T.</a>, <a>Perkins, C.</a> and <a>K. Rose</a>, "<a href="https://tools.ietf.org/html/draft-ietf-taps-transport-security-06">A Survey of Transport Security Protocols</a>", Internet-Draft draft-ietf-taps-transport-security-06, March 2019.</td>
 </tr>
 <tr>
 <td class="reference"><b id="POSIX">[POSIX]</b></td>

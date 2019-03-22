@@ -5,7 +5,7 @@
 TAPS Working Group                                      B. Trammell, Ed.
 Internet-Draft                                                    Google
 Intended status: Standards Track                           M. Welzl, Ed.
-Expires: September 21, 2019                           University of Oslo
+Expires: September 23, 2019                           University of Oslo
                                                              T. Enghardt
                                                                TU Berlin
                                                             G. Fairhurst
@@ -18,7 +18,7 @@ Expires: September 21, 2019                           University of Oslo
                                                                TU Berlin
                                                                  C. Wood
                                                               Apple Inc.
-                                                          March 20, 2019
+                                                          March 22, 2019
 
 
      An Abstract Application Layer Interface to Transport Services
@@ -53,12 +53,12 @@ Status of This Memo
 
 
 
-Trammell, et al.       Expires September 21, 2019               [Page 1]
+Trammell, et al.       Expires September 23, 2019               [Page 1]
 
 Internet-Draft               TAPS Interface                   March 2019
 
 
-   This Internet-Draft will expire on September 21, 2019.
+   This Internet-Draft will expire on September 23, 2019.
 
 Copyright Notice
 
@@ -94,7 +94,7 @@ Table of Contents
      5.2.  Specifying Transport Properties . . . . . . . . . . . . .  16
        5.2.1.  Reliable Data Transfer (Connection) . . . . . . . . .  18
        5.2.2.  Preservation of Message Boundaries  . . . . . . . . .  18
-       5.2.3.  Connection Pooling  . . . . . . . . . . . . . . . . .  18
+       5.2.3.  Pooled Connections  . . . . . . . . . . . . . . . . .  18
        5.2.4.  Configure per-Message reliability . . . . . . . . . .  19
        5.2.5.  Preservation of data ordering . . . . . . . . . . . .  19
        5.2.6.  Use 0-RTT session establishment with an idempotent
@@ -103,13 +103,13 @@ Table of Contents
        5.2.8.  Control checksum coverage on sending  . . . . . . . .  20
        5.2.9.  Control checksum coverage on receiving  . . . . . . .  20
        5.2.10. Congestion control  . . . . . . . . . . . . . . . . .  20
-       5.2.11. Interface Instance or Type  . . . . . . . . . . . . .  20
+       5.2.11. Interface Instance or Type  . . . . . . . . . . . . .  21
        5.2.12. Provisioning Domain Instance or Type  . . . . . . . .  21
        5.2.13. Parallel Use of Multiple Paths  . . . . . . . . . . .  22
 
 
 
-Trammell, et al.       Expires September 21, 2019               [Page 2]
+Trammell, et al.       Expires September 23, 2019               [Page 2]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -118,11 +118,11 @@ Internet-Draft               TAPS Interface                   March 2019
        5.2.15. Notification of excessive retransmissions . . . . . .  23
        5.2.16. Notification of ICMP soft error message arrival . . .  23
      5.3.  Specifying Security Parameters and Callbacks  . . . . . .  23
-       5.3.1.  Pre-Connection Parameters . . . . . . . . . . . . . .  23
-       5.3.2.  Connection Establishment Callbacks  . . . . . . . . .  24
+       5.3.1.  Pre-Connection Parameters . . . . . . . . . . . . . .  24
+       5.3.2.  Connection Establishment Callbacks  . . . . . . . . .  25
    6.  Establishing Connections  . . . . . . . . . . . . . . . . . .  25
      6.1.  Active Open: Initiate . . . . . . . . . . . . . . . . . .  25
-     6.2.  Passive Open: Listen  . . . . . . . . . . . . . . . . . .  26
+     6.2.  Passive Open: Listen  . . . . . . . . . . . . . . . . . .  27
      6.3.  Peer-to-Peer Establishment: Rendezvous  . . . . . . . . .  28
      6.4.  Connection Groups . . . . . . . . . . . . . . . . . . . .  29
    7.  Sending Data  . . . . . . . . . . . . . . . . . . . . . . . .  30
@@ -165,7 +165,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019               [Page 3]
+Trammell, et al.       Expires September 23, 2019               [Page 3]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -221,7 +221,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019               [Page 4]
+Trammell, et al.       Expires September 23, 2019               [Page 4]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -277,7 +277,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019               [Page 5]
+Trammell, et al.       Expires September 23, 2019               [Page 5]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -333,7 +333,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019               [Page 6]
+Trammell, et al.       Expires September 23, 2019               [Page 6]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -389,7 +389,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019               [Page 7]
+Trammell, et al.       Expires September 23, 2019               [Page 7]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -445,7 +445,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019               [Page 8]
+Trammell, et al.       Expires September 23, 2019               [Page 8]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -501,7 +501,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019               [Page 9]
+Trammell, et al.       Expires September 23, 2019               [Page 9]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -557,7 +557,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 10]
+Trammell, et al.       Expires September 23, 2019              [Page 10]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -613,7 +613,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 11]
+Trammell, et al.       Expires September 23, 2019              [Page 11]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -669,7 +669,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 12]
+Trammell, et al.       Expires September 23, 2019              [Page 12]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -725,7 +725,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 13]
+Trammell, et al.       Expires September 23, 2019              [Page 13]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -781,7 +781,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 14]
+Trammell, et al.       Expires September 23, 2019              [Page 14]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -837,7 +837,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 15]
+Trammell, et al.       Expires September 23, 2019              [Page 15]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -893,7 +893,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 16]
+Trammell, et al.       Expires September 23, 2019              [Page 16]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -949,7 +949,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 17]
+Trammell, et al.       Expires September 23, 2019              [Page 17]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -981,49 +981,54 @@ Internet-Draft               TAPS Interface                   March 2019
    use a transport protocol that preserves message boundaries.  The
    recommended default is to Prefer Preservation of Message Boundaries.
 
-5.2.3.  Connection Pooling
+5.2.3.  Pooled Connections
 
    Name: :pool-connections
 
-   When using Request/Response style protocols, such as HTTP,
-   applications can let the Transport System manage their connections by
-   using Connection Pooling.  In this case, the Transport System can
-   automatically distribute requests across multiple connections towards
-   equivalent endpoints or be multiplexed on multi-streaming
-   connections.
+   When using Request/Response style protocols that don't require
+   message ordering, such as HTTP, applications can let the Transport
+   System manage their connections by using Connection Pooling.  In this
+   case, the Transport System can automatically distribute requests
+   across multiple stack-equivalent connections towards equivalent
+   endpoints or manage streams on a multi-streaming connections for
+   them.
 
    Pooled Connections behave regular connections with a few exceptions:
 
-   o  Pooling Connection need to operate on Messages, not streams.
+   o  Pooled Connection need to operate on Messages, not streams.
       Therefore, they need to have appropriate framers if used on top of
       a stream transport.
+
+   o  Pooled Connection can only be used when Preservation of data
+      ordering, see Section 5.2.5 is not required.
+
+
+
+
+Trammell, et al.       Expires September 23, 2019              [Page 18]
+
+Internet-Draft               TAPS Interface                   March 2019
+
+
+   o  Pooled Connection usually use the msgRef/reqRef parameters of the
+      send and receive calls to mat responses to the same underlying
+      transport connection as the request was received.
+
+   o  If the Message received is a request from the remote side, the
+      reqRef provided, see Section 8, must be used later when sending a
+      response.
+
+   o  If the Message received is a response to a request sent earlier,
+      the reqRef provided by the transport system must match the msgRef
+      of the original request.
+
+   o  When sending a new request, see Section 7, the reqRef parameter
+      must be undefined.
 
    o  The application can influence which of the underlying transport
       connections within the Pooled Connection Pool should be used.
       Therefore Selection Properties may be specified on a send call for
       Pooled Connections.
-
-
-
-Trammell, et al.       Expires September 21, 2019              [Page 18]
-
-Internet-Draft               TAPS Interface                   March 2019
-
-
-   o  They use the msgRef/reqRef parameters of the send and receive
-      calls to send responses on the same backing connection as the
-      request was received.
-
-      *  If the Message received is a request from the remote side, the
-         reqRef provided, see Section 8, must be used later when sending
-         a response.
-
-      *  If the Message received is a response to a request sent
-         earlier, the reqRef provided by the transport system must match
-         the msgRef of the original request.
-
-      *  When sending a new request, see Section 7, the reqRef parameter
-         must be undefined.
 
    As pooled connection behave quite differently from rnegular
    connections, the recommended default is to Prohibit connection
@@ -1053,18 +1058,18 @@ Internet-Draft               TAPS Interface                   March 2019
 
    This property specifies whether an application would like to supply a
    Message to the transport protocol before Connection establishment,
+
+
+
+Trammell, et al.       Expires September 23, 2019              [Page 19]
+
+Internet-Draft               TAPS Interface                   March 2019
+
+
    which will then be reliably transferred to the other side before or
    during Connection establishment, potentially multiple times.  See
    also Section 7.3.4.  The recommended default is to Prefer this
    option.
-
-
-
-
-Trammell, et al.       Expires September 21, 2019              [Page 19]
-
-Internet-Draft               TAPS Interface                   March 2019
-
 
 5.2.7.  Multistream Connections in Group
 
@@ -1105,6 +1110,18 @@ Internet-Draft               TAPS Interface                   March 2019
    The recommended default is to Require that the Connection is
    congestion controlled.
 
+
+
+
+
+
+
+
+Trammell, et al.       Expires September 23, 2019              [Page 20]
+
+Internet-Draft               TAPS Interface                   March 2019
+
+
 5.2.11.  Interface Instance or Type
 
    Name:  interface
@@ -1114,13 +1131,6 @@ Internet-Draft               TAPS Interface                   March 2019
    This property allows the application to select which specific network
    interfaces or categories of interfaces it wants to "Require",
    "Prohibit", "Prefer", or "Avoid".
-
-
-
-Trammell, et al.       Expires September 21, 2019              [Page 20]
-
-Internet-Draft               TAPS Interface                   March 2019
-
 
    In contrast to other Selection Properties, this property is a tuple
    of an (Enumerated) interface identifier and a preference, and can
@@ -1161,6 +1171,13 @@ Internet-Draft               TAPS Interface                   March 2019
 
    Type:  Set (Preference, Enumeration)
 
+
+
+Trammell, et al.       Expires September 23, 2019              [Page 21]
+
+Internet-Draft               TAPS Interface                   March 2019
+
+
    Similar to interface instances and types (see Section 5.2.11), this
    property allows the application to control path selection by
    selecting which specific Provisioning Domains or categories of
@@ -1168,15 +1185,6 @@ Internet-Draft               TAPS Interface                   March 2019
    "Avoid".  Provisioning Domains define consistent sets of network
    properties that may be more specific than network interfaces
    [RFC7556].
-
-
-
-
-
-Trammell, et al.       Expires September 21, 2019              [Page 21]
-
-Internet-Draft               TAPS Interface                   March 2019
-
 
    As with interface instances and types, this property is a tuple of an
    (Enumerated) PvD identifier and a preference, and can either be
@@ -1217,6 +1225,15 @@ Internet-Draft               TAPS Interface                   March 2019
 
    Type:  Enumeration
 
+
+
+
+
+Trammell, et al.       Expires September 23, 2019              [Page 22]
+
+Internet-Draft               TAPS Interface                   March 2019
+
+
    This property specifies whether an application wants to use the
    connection for sending and/or receiving data.  Possible values are:
 
@@ -1226,13 +1243,6 @@ Internet-Draft               TAPS Interface                   March 2019
    Unidirectional send:  The connection must support sending data
 
    Unidirectional receive:  The connection must support receiving data
-
-
-
-Trammell, et al.       Expires September 21, 2019              [Page 22]
-
-Internet-Draft               TAPS Interface                   March 2019
-
 
    In case a unidirectional connection is requested, but unidirectional
    connections are not supported by the transport protocol, the system
@@ -1268,6 +1278,18 @@ Internet-Draft               TAPS Interface                   March 2019
    Properties, both parameters and callbacks are inherited during
    cloning (see Section 6.4).
 
+
+
+
+
+
+
+
+Trammell, et al.       Expires September 23, 2019              [Page 23]
+
+Internet-Draft               TAPS Interface                   March 2019
+
+
 5.3.1.  Pre-Connection Parameters
 
    Common parameters such as TLS ciphersuites are known to
@@ -1281,14 +1303,6 @@ Internet-Draft               TAPS Interface                   March 2019
    SecurityParameters := NewSecurityParameters()
 
    Security configuration parameters and sample usage follow:
-
-
-
-
-Trammell, et al.       Expires September 21, 2019              [Page 23]
-
-Internet-Draft               TAPS Interface                   March 2019
-
 
    o  Local identity and private keys: Used to perform private key
       operations and prove one's identity to the Remote Endpoint.
@@ -1324,6 +1338,14 @@ SecurityParameters.AddSignatureAlgorithm(ed25519)
 
    SecurityParameters.AddPreSharedKey(key, identity)
 
+
+
+
+Trammell, et al.       Expires September 23, 2019              [Page 24]
+
+Internet-Draft               TAPS Interface                   March 2019
+
+
 5.3.2.  Connection Establishment Callbacks
 
    Security decisions, especially pertaining to trust, are not static.
@@ -1334,17 +1356,6 @@ SecurityParameters.AddSignatureAlgorithm(ed25519)
 
    o  Trust verification callback: Invoked when a Remote Endpoint's
       trust must be validated before the handshake protocol can proceed.
-
-
-
-
-
-
-
-Trammell, et al.       Expires September 21, 2019              [Page 24]
-
-Internet-Draft               TAPS Interface                   March 2019
-
 
    TrustCallback := NewCallback({
      // Handle trust, return the result
@@ -1383,6 +1394,14 @@ Internet-Draft               TAPS Interface                   March 2019
 
    The timeout parameter specifies how long to wait before aborting
    Active open.  Before calling Initiate, the caller must have populated
+
+
+
+Trammell, et al.       Expires September 23, 2019              [Page 25]
+
+Internet-Draft               TAPS Interface                   March 2019
+
+
    a Preconnection Object with a Remote Endpoint specifier, optionally a
    Local Endpoint specifier (if not specified, the system will attempt
    to determine a suitable Local Endpoint), as well as all properties
@@ -1392,15 +1411,6 @@ Internet-Draft               TAPS Interface                   March 2019
    has been called, no further properties may be added to the
    Preconnection, and no subsequent establishment call may be made on
    the Preconnection.
-
-
-
-
-
-Trammell, et al.       Expires September 21, 2019              [Page 25]
-
-Internet-Draft               TAPS Interface                   March 2019
-
 
    Once Initiate is called, the candidate Protocol Stack(s) may cause
    one or more candidate transport-layer connections to be created to
@@ -1439,6 +1449,15 @@ Internet-Draft               TAPS Interface                   March 2019
    See also Section 7.7 to combine Connection establishment and
    transmission of the first message in a single action.
 
+
+
+
+
+Trammell, et al.       Expires September 23, 2019              [Page 26]
+
+Internet-Draft               TAPS Interface                   March 2019
+
+
 6.2.  Passive Open: Listen
 
    Passive open is the Action of waiting for Connections from remote
@@ -1450,14 +1469,6 @@ Internet-Draft               TAPS Interface                   March 2019
 
    Before calling Listen, the caller must have initialized the
    Preconnection during the pre-establishment phase with a Local
-
-
-
-Trammell, et al.       Expires September 21, 2019              [Page 26]
-
-Internet-Draft               TAPS Interface                   March 2019
-
-
    Endpoint specifier, as well as all properties necessary for Protocol
    Stack selection.  A Remote Endpoint may optionally be specified, to
    constrain what Connections are accepted.  The Listen() Action
@@ -1473,12 +1484,13 @@ Internet-Draft               TAPS Interface                   March 2019
    send replies to them.
 
    In both cases, Listening continues until the global context shuts
-   down, or until the Stop action is performed on the same
-   Preconnection:
+   down, until the Stop action is performed on the same Preconnection,
+   or after the Close action is performed on a Pooled Connection:
 
    Preconnection.Stop()
+   PooledConnection.Close()
 
-   After Stop() is called, the preconnection can be disposed of.
+   After this, the preconnection can be disposed of.
 
    Preconnection -> ConnectionReceived<Connection>
 
@@ -1493,6 +1505,15 @@ Internet-Draft               TAPS Interface                   March 2019
 
    Preconnection -> ListenError<>
 
+
+
+
+
+Trammell, et al.       Expires September 23, 2019              [Page 27]
+
+Internet-Draft               TAPS Interface                   March 2019
+
+
    A ListenError occurs either when the Preconnection cannot be
    fulfilled for listening, when the Local Endpoint (or Remote Endpoint,
    if specified) cannot be resolved, or when the application is
@@ -1501,18 +1522,6 @@ Internet-Draft               TAPS Interface                   March 2019
    Preconnection -> Stopped<>
 
    A Stopped event occurs after the Preconnection has stopped listening.
-
-
-
-
-
-
-
-
-Trammell, et al.       Expires September 21, 2019              [Page 27]
-
-Internet-Draft               TAPS Interface                   March 2019
-
 
 6.3.  Peer-to-Peer Establishment: Rendezvous
 
@@ -1554,6 +1563,13 @@ Internet-Draft               TAPS Interface                   March 2019
    established to the Remote Endpoint, or when the application is
    prohibited from rendezvous by policy.
 
+
+
+Trammell, et al.       Expires September 23, 2019              [Page 28]
+
+Internet-Draft               TAPS Interface                   March 2019
+
+
    When using some NAT traversal protocols, e.g., Interactive
    Connectivity Establishment (ICE) [RFC5245], it is expected that the
    Local Endpoint will be configured with some method of discovering NAT
@@ -1561,14 +1577,6 @@ Internet-Draft               TAPS Interface                   March 2019
    In this case, the Local Endpoint may resolve to a mixture of local
    and server reflexive addresses.  The Resolve() action on the
    Preconnection can be used to discover these bindings:
-
-
-
-
-Trammell, et al.       Expires September 21, 2019              [Page 28]
-
-Internet-Draft               TAPS Interface                   March 2019
-
 
    []Preconnection := Preconnection.Resolve()
 
@@ -1610,6 +1618,14 @@ Internet-Draft               TAPS Interface                   March 2019
    not only inside endpoints but also across the end-to-end Internet
    path.
 
+
+
+
+Trammell, et al.       Expires September 23, 2019              [Page 29]
+
+Internet-Draft               TAPS Interface                   March 2019
+
+
    If the underlying Protocol Stack does not support cloning, or cannot
    create a new stream on the given Connection, then attempts to clone a
    connection will result in a CloneError:
@@ -1618,14 +1634,6 @@ Internet-Draft               TAPS Interface                   March 2019
 
    The Protocol Property "Priority" operates on entangled Connections as
    in Section 7.3.2: when allocating available network capacity among
-
-
-
-Trammell, et al.       Expires September 21, 2019              [Page 29]
-
-Internet-Draft               TAPS Interface                   March 2019
-
-
    Connections in a Connection Group, sends on Connections with higher
    Priority values will be prioritized over sends on Connections with
    lower Priority values.  An ideal transport system implementation
@@ -1667,21 +1675,19 @@ msgRef := Connection.Send(messageData, messageContext?, reqRef?, endOfMessage?)
    resulting object contains both the byte array and the length of the
    array.
 
+
+
+Trammell, et al.       Expires September 23, 2019              [Page 30]
+
+Internet-Draft               TAPS Interface                   March 2019
+
+
    messageData := "hello".octets()
    Connection.Send(messageData)
 
    The interpretation of a Message to be sent is dependent on the
    implementation, and on the constraints on the Protocol Stacks implied
    by the Connection's transport properties.  For example, a Message may
-
-
-
-
-Trammell, et al.       Expires September 21, 2019              [Page 30]
-
-Internet-Draft               TAPS Interface                   March 2019
-
-
    be a single datagram for UDP Connections; or an HTTP Request for HTTP
    Connections.
 
@@ -1724,19 +1730,16 @@ Internet-Draft               TAPS Interface                   March 2019
    amount of buffering it creates.  That is, if an application calls the
    Send Action multiple times without waiting for a Sent Event, it has
    created more buffer inside the transport system than an application
-   that always waits for the Sent Event before calling the next Send
-   Action.
 
 
 
-
-
-
-
-Trammell, et al.       Expires September 21, 2019              [Page 31]
+Trammell, et al.       Expires September 23, 2019              [Page 31]
 
 Internet-Draft               TAPS Interface                   March 2019
 
+
+   that always waits for the Sent Event before calling the next Send
+   Action.
 
 7.2.2.  Expired
 
@@ -1783,16 +1786,16 @@ Internet-Draft               TAPS Interface                   March 2019
    If an application wants to override Message Properties for a specific
    message, it can acquire an empty MessageContext Object and add all
    desired Message Properties to that Object.  It can then reuse the
-   same messageContext Object for sending multiple Messages with the
-   same properties.
 
 
 
-
-Trammell, et al.       Expires September 21, 2019              [Page 32]
+Trammell, et al.       Expires September 23, 2019              [Page 32]
 
 Internet-Draft               TAPS Interface                   March 2019
 
+
+   same messageContext Object for sending multiple Messages with the
+   same properties.
 
    Properties may be added to a MessageContext object only before the
    context is used for sending.  Once a messageContext has been used
@@ -1839,16 +1842,16 @@ Internet-Draft               TAPS Interface                   March 2019
    A Message with Priority 0 will yield to a Message with Priority 1,
    which will yield to a Message with Priority 2, and so on.  Priorities
    may be used as a sender-side scheduling construct only, or be used to
-   specify priorities on the wire for Protocol Stacks supporting
-   prioritization.
 
 
 
-
-Trammell, et al.       Expires September 21, 2019              [Page 33]
+Trammell, et al.       Expires September 23, 2019              [Page 33]
 
 Internet-Draft               TAPS Interface                   March 2019
 
+
+   specify priorities on the wire for Protocol Stacks supporting
+   prioritization.
 
    Note that this property is not a per-message override of the
    connection Priority - see Section 9.1.3.  Both Priority properties
@@ -1894,17 +1897,17 @@ Internet-Draft               TAPS Interface                   March 2019
    the sending direction.  For example, TCP-based Connections can send a
    FIN once a Message marked as Final has been completely sent,
    indicated by marking endOfMessage.  Protocols that do not support
-   signalling the end of a Connection in a given direction will ignore
-   this property.
 
 
 
 
-
-Trammell, et al.       Expires September 21, 2019              [Page 34]
+Trammell, et al.       Expires September 23, 2019              [Page 34]
 
 Internet-Draft               TAPS Interface                   March 2019
 
+
+   signalling the end of a Connection in a given direction will ignore
+   this property.
 
    Note that a Final Message must always be sorted to the end of a list
    of Messages.  The Final property overrides Priority and any other
@@ -1951,17 +1954,16 @@ Internet-Draft               TAPS Interface                   March 2019
 
    Type:  Enumeration
 
-   This enumerated property specifies the application's preferred
-   tradeoffs for sending this Message; it is a per-Message override of
 
 
 
-
-Trammell, et al.       Expires September 21, 2019              [Page 35]
+Trammell, et al.       Expires September 23, 2019              [Page 35]
 
 Internet-Draft               TAPS Interface                   March 2019
 
 
+   This enumerated property specifies the application's preferred
+   tradeoffs for sending this Message; it is a per-Message override of
    the Capacity Profile protocol and path selection property (see
    Section 9.1.10).
 
@@ -2011,9 +2013,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-
-
-Trammell, et al.       Expires September 21, 2019              [Page 36]
+Trammell, et al.       Expires September 23, 2019              [Page 36]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -2069,7 +2069,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 37]
+Trammell, et al.       Expires September 23, 2019              [Page 37]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -2125,7 +2125,7 @@ Connection := Preconnection.InitiateWithSend(messageData, messageContext?, timeo
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 38]
+Trammell, et al.       Expires September 23, 2019              [Page 38]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -2181,7 +2181,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 39]
+Trammell, et al.       Expires September 23, 2019              [Page 39]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -2237,7 +2237,7 @@ Connection -> ReceivedPartial<messageData, messageContext, endOfMessage>
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 40]
+Trammell, et al.       Expires September 23, 2019              [Page 40]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -2293,7 +2293,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 41]
+Trammell, et al.       Expires September 23, 2019              [Page 41]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -2349,7 +2349,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 42]
+Trammell, et al.       Expires September 23, 2019              [Page 42]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -2405,7 +2405,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 43]
+Trammell, et al.       Expires September 23, 2019              [Page 43]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -2461,7 +2461,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 44]
+Trammell, et al.       Expires September 23, 2019              [Page 44]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -2517,7 +2517,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 45]
+Trammell, et al.       Expires September 23, 2019              [Page 45]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -2573,7 +2573,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 46]
+Trammell, et al.       Expires September 23, 2019              [Page 46]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -2629,7 +2629,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 47]
+Trammell, et al.       Expires September 23, 2019              [Page 47]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -2685,7 +2685,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 48]
+Trammell, et al.       Expires September 23, 2019              [Page 48]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -2741,7 +2741,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 49]
+Trammell, et al.       Expires September 23, 2019              [Page 49]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -2797,7 +2797,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 50]
+Trammell, et al.       Expires September 23, 2019              [Page 50]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -2853,7 +2853,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 51]
+Trammell, et al.       Expires September 23, 2019              [Page 51]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -2884,8 +2884,8 @@ Internet-Draft               TAPS Interface                   March 2019
    [I-D.ietf-taps-arch]
               Pauly, T., Trammell, B., Brunstrom, A., Fairhurst, G.,
               Perkins, C., Tiesel, P., and C. Wood, "An Architecture for
-              Transport Services", draft-ietf-taps-arch-02 (work in
-              progress), October 2018.
+              Transport Services", draft-ietf-taps-arch-03 (work in
+              progress), March 2019.
 
    [I-D.ietf-tsvwg-rtcweb-qos]
               Jones, P., Dhesikan, S., Jennings, C., and D. Druta, "DSCP
@@ -2909,7 +2909,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 52]
+Trammell, et al.       Expires September 23, 2019              [Page 52]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -2926,13 +2926,14 @@ Internet-Draft               TAPS Interface                   March 2019
               in progress), September 2018.
 
    [I-D.ietf-taps-transport-security]
-              Pauly, T., Perkins, C., Rose, K., and C. Wood, "A Survey
-              of Transport Security Protocols", draft-ietf-taps-
-              transport-security-04 (work in progress), November 2018.
-
-   [LE-PHB]   Bless, R., "A Lower Effort Per-Hop Behavior (LE PHB)",
-              draft-ietf-tsvwg-le-phb-09 (work in progress), February
+              Wood, C., Enghardt, T., Pauly, T., Perkins, C., and K.
+              Rose, "A Survey of Transport Security Protocols", draft-
+              ietf-taps-transport-security-06 (work in progress), March
               2019.
+
+   [LE-PHB]   Bless, R., "A Lower Effort Per-Hop Behavior (LE PHB) for
+              Differentiated Services", draft-ietf-tsvwg-le-phb-10 (work
+              in progress), March 2019.
 
    [RFC0793]  Postel, J., "Transmission Control Protocol", STD 7,
               RFC 793, DOI 10.17487/RFC0793, September 1981,
@@ -2964,8 +2965,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-
-Trammell, et al.       Expires September 21, 2019              [Page 53]
+Trammell, et al.       Expires September 23, 2019              [Page 53]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -3021,7 +3021,7 @@ Appendix A.  Additional Properties
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 54]
+Trammell, et al.       Expires September 23, 2019              [Page 54]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -3077,7 +3077,7 @@ A.1.1.  Cost Preferences
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 55]
+Trammell, et al.       Expires September 23, 2019              [Page 55]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -3133,7 +3133,7 @@ Appendix C.  Relationship to the Minimal Set of Transport Services for
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 56]
+Trammell, et al.       Expires September 23, 2019              [Page 56]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -3189,7 +3189,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 57]
+Trammell, et al.       Expires September 23, 2019              [Page 57]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -3245,7 +3245,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 58]
+Trammell, et al.       Expires September 23, 2019              [Page 58]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -3301,7 +3301,7 @@ Authors' Addresses
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 59]
+Trammell, et al.       Expires September 23, 2019              [Page 59]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -3357,7 +3357,7 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 60]
+Trammell, et al.       Expires September 23, 2019              [Page 60]
 
 Internet-Draft               TAPS Interface                   March 2019
 
@@ -3413,4 +3413,4 @@ Internet-Draft               TAPS Interface                   March 2019
 
 
 
-Trammell, et al.       Expires September 21, 2019              [Page 61]
+Trammell, et al.       Expires September 23, 2019              [Page 61]

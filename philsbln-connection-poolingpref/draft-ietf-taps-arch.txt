@@ -5,7 +5,7 @@
 TAPS Working Group                                         T. Pauly, Ed.
 Internet-Draft                                                Apple Inc.
 Intended status: Standards Track                        B. Trammell, Ed.
-Expires: September 21, 2019                                       Google
+Expires: September 23, 2019                                       Google
                                                             A. Brunstrom
                                                      Karlstad University
                                                             G. Fairhurst
@@ -16,7 +16,7 @@ Expires: September 21, 2019                                       Google
                                                                TU Berlin
                                                                  C. Wood
                                                               Apple Inc.
-                                                          March 20, 2019
+                                                          March 22, 2019
 
 
                  An Architecture for Transport Services
@@ -53,12 +53,12 @@ Status of This Memo
 
 
 
-Pauly, et al.          Expires September 21, 2019               [Page 1]
+Pauly, et al.          Expires September 23, 2019               [Page 1]
 
 Internet-Draft              TAPS Architecture                 March 2019
 
 
-   This Internet-Draft will expire on September 21, 2019.
+   This Internet-Draft will expire on September 23, 2019.
 
 Copyright Notice
 
@@ -83,7 +83,7 @@ Table of Contents
      1.3.  Data Transfer Using Messages  . . . . . . . . . . . . . .   5
      1.4.  Flexibile Implementation  . . . . . . . . . . . . . . . .   6
    2.  Background  . . . . . . . . . . . . . . . . . . . . . . . . .   7
-     2.1.  Specification of Requirements . . . . . . . . . . . . . .   8
+     2.1.  Specification of Requirements . . . . . . . . . . . . . .   7
    3.  Design Principles . . . . . . . . . . . . . . . . . . . . . .   8
      3.1.  Common APIs for Common Features . . . . . . . . . . . . .   8
      3.2.  Access to Specialized Features  . . . . . . . . . . . . .   8
@@ -100,19 +100,21 @@ Table of Contents
        4.2.1.  Candidate Gathering . . . . . . . . . . . . . . . . .  19
        4.2.2.  Candidate Racing  . . . . . . . . . . . . . . . . . .  19
        4.2.3.  Protocol Stack Equivalence  . . . . . . . . . . . . .  19
-       4.2.4.  Separating Connection Groups  . . . . . . . . . . . .  21
-   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  21
-   6.  Security Considerations . . . . . . . . . . . . . . . . . . .  21
-   7.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  22
+       4.2.4.  Pooled Connections  . . . . . . . . . . . . . . . . .  21
+       4.2.5.  Separating Connection Groups  . . . . . . . . . . . .  21
+   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  22
+   6.  Security Considerations . . . . . . . . . . . . . . . . . . .  22
+   7.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  23
    8.  Informative References  . . . . . . . . . . . . . . . . . . .  23
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  24
 
 
 
-Pauly, et al.          Expires September 21, 2019               [Page 2]
+Pauly, et al.          Expires September 23, 2019               [Page 2]
 
 Internet-Draft              TAPS Architecture                 March 2019
 
+
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  24
 
 1.  Introduction
 
@@ -163,9 +165,7 @@ Internet-Draft              TAPS Architecture                 March 2019
 
 
 
-
-
-Pauly, et al.          Expires September 21, 2019               [Page 3]
+Pauly, et al.          Expires September 23, 2019               [Page 3]
 
 Internet-Draft              TAPS Architecture                 March 2019
 
@@ -221,7 +221,7 @@ Internet-Draft              TAPS Architecture                 March 2019
 
 
 
-Pauly, et al.          Expires September 21, 2019               [Page 4]
+Pauly, et al.          Expires September 23, 2019               [Page 4]
 
 Internet-Draft              TAPS Architecture                 March 2019
 
@@ -277,7 +277,7 @@ Internet-Draft              TAPS Architecture                 March 2019
 
 
 
-Pauly, et al.          Expires September 21, 2019               [Page 5]
+Pauly, et al.          Expires September 23, 2019               [Page 5]
 
 Internet-Draft              TAPS Architecture                 March 2019
 
@@ -306,19 +306,16 @@ Internet-Draft              TAPS Architecture                 March 2019
       particular, this can avoid (re-)sending data that relies on a
       previous transmission that was never received.
 
+   o  the ability to automatically distribute messages of reordering
+      resistant request/response protocols, like HTTP, across several
+      underlaying transport connections.
+
    Allowing applications to interact with messages is backwards-
-   compatible with existings protocols and APIs, as it does not change
+   compatible with existing protocols and APIs, as it does not change
    the wire format of any protocol.  Instead, it gives the protocol
    stack additional information to allow it to make better use of modern
    transport services, while simplifying the application's role in
    parsing data.
-
-   For request/response protocols like HTTP, that can be operated using
-   several transport connections between equivalent endpoints or via
-   multi-streaming connections the Transport Services API supports
-   Connection Pools.  These connection pools hide the connection
-   management and provide a messages-only API that enables per-message
-   endpoint and path selection.
 
 1.4.  Flexibile Implementation
 
@@ -330,17 +327,17 @@ Internet-Draft              TAPS Architecture                 March 2019
    multiple candidate endpoints, protocols, and paths; and support
    multipath and multistreaming protocols.
 
+   Transport Services implementations are meant to be flexible at
+   connection establishment time, considering many different options and
+   trying to select the most optimal combinations (Section 4.2.1 and
 
 
 
-Pauly, et al.          Expires September 21, 2019               [Page 6]
+Pauly, et al.          Expires September 23, 2019               [Page 6]
 
 Internet-Draft              TAPS Architecture                 March 2019
 
 
-   Transport Services implementations are meant to be flexible at
-   connection establishment time, considering many different options and
-   trying to select the most optimal combinations (Section 4.2.1 and
    Section 4.2.2).  This requires applications to provide higher-level
    endpoints than IP addresses, such as hostnames and URLs, which are
    used by a Transport Services implementation for resolution, path
@@ -382,18 +379,6 @@ Internet-Draft              TAPS Architecture                 March 2019
    functionality needs to be explicitly allowed by the application,
    since reordering messages would be undesirable in many cases.
 
-
-
-
-
-
-
-
-Pauly, et al.          Expires September 21, 2019               [Page 7]
-
-Internet-Draft              TAPS Architecture                 March 2019
-
-
 2.1.  Specification of Requirements
 
    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
@@ -401,6 +386,13 @@ Internet-Draft              TAPS Architecture                 March 2019
    "OPTIONAL" in this document are to be interpreted as described in BCP
    14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
+
+
+
+Pauly, et al.          Expires September 23, 2019               [Page 7]
+
+Internet-Draft              TAPS Architecture                 March 2019
+
 
 3.  Design Principles
 
@@ -442,14 +434,6 @@ Internet-Draft              TAPS Architecture                 March 2019
    There are applications that will need to control fine-grained details
    of transport protocols to optimize their behavior and ensure
    compatibility with remote systems.  A Transport Services system
-
-
-
-Pauly, et al.          Expires September 21, 2019               [Page 8]
-
-Internet-Draft              TAPS Architecture                 March 2019
-
-
    therefore SHOULD also permit more specialized protocol features to be
    used.  The interface for these specialized options should be exposed
    differently from the common options to ensure flexibility.
@@ -458,6 +442,14 @@ Internet-Draft              TAPS Architecture                 March 2019
    using a specific protocol, and not when using others.  For example,
    if an application is using UDP, it could require control over the
    checksum or fragmentation behavior for UDP; if it used a protocol to
+
+
+
+Pauly, et al.          Expires September 23, 2019               [Page 8]
+
+Internet-Draft              TAPS Architecture                 March 2019
+
+
    frame its data over a byte stream like TCP, it would not need these
    options.  In such cases, the API ought to expose the features in such
    a way that they take effect when a particular protocol is selected,
@@ -498,14 +490,6 @@ Internet-Draft              TAPS Architecture                 March 2019
    constrained devices might not have, for example, a full TCP
    implementation beneath the API.
 
-
-
-
-Pauly, et al.          Expires September 21, 2019               [Page 9]
-
-Internet-Draft              TAPS Architecture                 March 2019
-
-
    To preserve flexibility and compatibility with future protocols, top-
    level features in the Transport Services API SHOULD avoid referencing
    particular transport protocols.  The mappings of these API features
@@ -514,6 +498,13 @@ Internet-Draft              TAPS Architecture                 March 2019
    existing protocols.  It is expected that this document will be
    updated and supplemented as new protocols and protocol features are
    developed.
+
+
+
+Pauly, et al.          Expires September 23, 2019               [Page 9]
+
+Internet-Draft              TAPS Architecture                 March 2019
+
 
    It is important to note that neither the Transport Services API
    [I-D.ietf-taps-interface] nor the Implementation document
@@ -557,7 +548,16 @@ Internet-Draft              TAPS Architecture                 March 2019
 
 
 
-Pauly, et al.          Expires September 21, 2019              [Page 10]
+
+
+
+
+
+
+
+
+
+Pauly, et al.          Expires September 23, 2019              [Page 10]
 
 Internet-Draft              TAPS Architecture                 March 2019
 
@@ -613,7 +613,7 @@ Internet-Draft              TAPS Architecture                 March 2019
 
 
 
-Pauly, et al.          Expires September 21, 2019              [Page 11]
+Pauly, et al.          Expires September 23, 2019              [Page 11]
 
 Internet-Draft              TAPS Architecture                 March 2019
 
@@ -669,7 +669,7 @@ Internet-Draft              TAPS Architecture                 March 2019
 
 
 
-Pauly, et al.          Expires September 21, 2019              [Page 12]
+Pauly, et al.          Expires September 23, 2019              [Page 12]
 
 Internet-Draft              TAPS Architecture                 March 2019
 
@@ -725,7 +725,7 @@ Internet-Draft              TAPS Architecture                 March 2019
 
 
 
-Pauly, et al.          Expires September 21, 2019              [Page 13]
+Pauly, et al.          Expires September 23, 2019              [Page 13]
 
 Internet-Draft              TAPS Architecture                 March 2019
 
@@ -746,7 +746,7 @@ Internet-Draft              TAPS Architecture                 March 2019
       However, a connection can also represent a pool of transport
       protocol instance, for example, a bunch of TCP and QUIC
       connections to equivalent endpoints provided by a CDN, or a set of
-      incoming connections that are saved the same way.
+      incoming connections that are served the same way.
 
    o  Listener: A Listener object accepts incoming transport protocol
       connections from remote systems and generates corresponding
@@ -781,7 +781,7 @@ Internet-Draft              TAPS Architecture                 March 2019
 
 
 
-Pauly, et al.          Expires September 21, 2019              [Page 14]
+Pauly, et al.          Expires September 23, 2019              [Page 14]
 
 Internet-Draft              TAPS Architecture                 March 2019
 
@@ -837,7 +837,7 @@ Internet-Draft              TAPS Architecture                 March 2019
 
 
 
-Pauly, et al.          Expires September 21, 2019              [Page 15]
+Pauly, et al.          Expires September 23, 2019              [Page 15]
 
 Internet-Draft              TAPS Architecture                 March 2019
 
@@ -893,7 +893,7 @@ Internet-Draft              TAPS Architecture                 March 2019
 
 
 
-Pauly, et al.          Expires September 21, 2019              [Page 16]
+Pauly, et al.          Expires September 23, 2019              [Page 16]
 
 Internet-Draft              TAPS Architecture                 March 2019
 
@@ -949,14 +949,14 @@ Internet-Draft              TAPS Architecture                 March 2019
 
 
 
-Pauly, et al.          Expires September 21, 2019              [Page 17]
+Pauly, et al.          Expires September 23, 2019              [Page 17]
 
 Internet-Draft              TAPS Architecture                 March 2019
 
 
       together.  Applications can use their explicitly defined
       Connection Groups to control caching boundaries, as discussed in
-      Section 4.2.4.
+      Section 4.2.5.
 
    o  Path: Represents an available set of properties that a local
       system can use to communicate with a remote system, such as
@@ -1005,7 +1005,7 @@ Internet-Draft              TAPS Architecture                 March 2019
 
 
 
-Pauly, et al.          Expires September 21, 2019              [Page 18]
+Pauly, et al.          Expires September 23, 2019              [Page 18]
 
 Internet-Draft              TAPS Architecture                 March 2019
 
@@ -1061,7 +1061,7 @@ Internet-Draft              TAPS Architecture                 March 2019
 
 
 
-Pauly, et al.          Expires September 21, 2019              [Page 19]
+Pauly, et al.          Expires September 23, 2019              [Page 19]
 
 Internet-Draft              TAPS Architecture                 March 2019
 
@@ -1117,12 +1117,28 @@ Internet-Draft              TAPS Architecture                 March 2019
 
 
 
-Pauly, et al.          Expires September 21, 2019              [Page 20]
+Pauly, et al.          Expires September 23, 2019              [Page 20]
 
 Internet-Draft              TAPS Architecture                 March 2019
 
 
-4.2.4.  Separating Connection Groups
+4.2.4.  Pooled Connections
+
+   For message reordering resistant request/response protocols like
+   HTTP, interactions can be automatically distributed across several
+   underlaying transport connections.  This is realized by Pooled
+   Connections that hide the connection management and provide a
+   messages-only API that enables per-message endpoint and path
+   selection.  Pooled Connections use multiple connections between
+   equivalent endpoints using equivalent protocol stacks, see
+   Section 4.2.3, in parallel, including multiple streams of multi-
+   streaming connections.
+
+   TODO:  Either define "equivalent endpoints" here (Endpoints derived
+      from the representation given to the API) or update Section 4.2.3
+      to do it.  We need this for racing anyway.
+
+4.2.5.  Separating Connection Groups
 
    By default, all stored properties of the Implementation are shared
    within a process, such as cached protocol state, cached path state,
@@ -1153,6 +1169,15 @@ Internet-Draft              TAPS Architecture                 March 2019
    Connection Groups with separate caches for different tabs in the
    browser to decrease linkability.
 
+
+
+
+
+Pauly, et al.          Expires September 23, 2019              [Page 21]
+
+Internet-Draft              TAPS Architecture                 March 2019
+
+
    The interface to specify these Groups MAY expose fine-grained tuning
    for which properties and cached state is allowed to be shared with
    other Connections.  For example, an application might want to allow
@@ -1170,14 +1195,6 @@ Internet-Draft              TAPS Architecture                 March 2019
    The Transport Services architecture does not recommend use of
    specific security protocols or algorithms.  Its goal is to offer ease
    of use for existing protocols by providing a generic security-related
-
-
-
-Pauly, et al.          Expires September 21, 2019              [Page 21]
-
-Internet-Draft              TAPS Architecture                 March 2019
-
-
    interface.  Each provided interface translates to an existing
    protocol-specific interface provided by supported security protocols.
    For example, trust verification callbacks are common parts of TLS
@@ -1206,6 +1223,17 @@ Internet-Draft              TAPS Architecture                 March 2019
    for implementing security protocol fallback or version fallback by
    creating multiple Transport Services Connections, if so desired.
 
+
+
+
+
+
+
+Pauly, et al.          Expires September 23, 2019              [Page 22]
+
+Internet-Draft              TAPS Architecture                 March 2019
+
+
 7.  Acknowledgements
 
    This work has received funding from the European Union's Horizon 2020
@@ -1223,31 +1251,20 @@ Internet-Draft              TAPS Architecture                 March 2019
    Kinnear for their implementation and design efforts, including Happy
    Eyeballs, that heavily influenced this work.
 
-
-
-
-
-
-
-Pauly, et al.          Expires September 21, 2019              [Page 22]
-
-Internet-Draft              TAPS Architecture                 March 2019
-
-
 8.  Informative References
 
    [I-D.ietf-taps-impl]
               Brunstrom, A., Pauly, T., Enghardt, T., Grinnemo, K.,
               Jones, T., Tiesel, P., Perkins, C., and M. Welzl,
               "Implementing Interfaces to Transport Services", draft-
-              ietf-taps-impl-02 (work in progress), October 2018.
+              ietf-taps-impl-03 (work in progress), March 2019.
 
    [I-D.ietf-taps-interface]
               Trammell, B., Welzl, M., Enghardt, T., Fairhurst, G.,
               Kuehlewind, M., Perkins, C., Tiesel, P., and C. Wood, "An
               Abstract Application Layer Interface to Transport
-              Services", draft-ietf-taps-interface-02 (work in
-              progress), October 2018.
+              Services", draft-ietf-taps-interface-03 (work in
+              progress), March 2019.
 
    [I-D.ietf-taps-minset]
               Welzl, M. and S. Gjessing, "A Minimal Set of Transport
@@ -1255,14 +1272,23 @@ Internet-Draft              TAPS Architecture                 March 2019
               in progress), September 2018.
 
    [I-D.ietf-taps-transport-security]
-              Pauly, T., Perkins, C., Rose, K., and C. Wood, "A Survey
-              of Transport Security Protocols", draft-ietf-taps-
-              transport-security-04 (work in progress), November 2018.
+              Wood, C., Enghardt, T., Pauly, T., Perkins, C., and K.
+              Rose, "A Survey of Transport Security Protocols", draft-
+              ietf-taps-transport-security-06 (work in progress), March
+              2019.
 
    [POSIX]    "IEEE Std. 1003.1-2008 Standard for Information Technology
               -- Portable Operating System Interface (POSIX).  Open
               group Technical Standard: Base Specifications, Issue 7",
               n.d..
+
+
+
+
+Pauly, et al.          Expires September 23, 2019              [Page 23]
+
+Internet-Draft              TAPS Architecture                 March 2019
+
 
    [RFC0793]  Postel, J., "Transmission Control Protocol", STD 7,
               RFC 793, DOI 10.17487/RFC0793, September 1981,
@@ -1281,14 +1307,6 @@ Internet-Draft              TAPS Architecture                 March 2019
    [RFC4303]  Kent, S., "IP Encapsulating Security Payload (ESP)",
               RFC 4303, DOI 10.17487/RFC4303, December 2005,
               <https://www.rfc-editor.org/info/rfc4303>.
-
-
-
-
-Pauly, et al.          Expires September 21, 2019              [Page 23]
-
-Internet-Draft              TAPS Architecture                 March 2019
-
 
    [RFC6265]  Barth, A., "HTTP State Management Mechanism", RFC 6265,
               DOI 10.17487/RFC6265, April 2011,
@@ -1314,6 +1332,20 @@ Internet-Draft              TAPS Architecture                 March 2019
 
 Authors' Addresses
 
+
+
+
+
+
+
+
+
+
+Pauly, et al.          Expires September 23, 2019              [Page 24]
+
+Internet-Draft              TAPS Architecture                 March 2019
+
+
    Tommy Pauly (editor)
    Apple Inc.
    One Apple Park Way
@@ -1330,20 +1362,6 @@ Authors' Addresses
    Switzerland
 
    Email: ietf@trammell.ch
-
-
-
-
-
-
-
-
-
-
-
-Pauly, et al.          Expires September 21, 2019              [Page 24]
-
-Internet-Draft              TAPS Architecture                 March 2019
 
 
    Anna Brunstrom
@@ -1374,6 +1392,16 @@ Internet-Draft              TAPS Architecture                 March 2019
    Email: csp@csperkins.org
 
 
+
+
+
+
+
+Pauly, et al.          Expires September 23, 2019              [Page 25]
+
+Internet-Draft              TAPS Architecture                 March 2019
+
+
    Philipp S. Tiesel
    TU Berlin
    Marchstrasse 23
@@ -1397,4 +1425,32 @@ Internet-Draft              TAPS Architecture                 March 2019
 
 
 
-Pauly, et al.          Expires September 21, 2019              [Page 25]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Pauly, et al.          Expires September 23, 2019              [Page 26]
